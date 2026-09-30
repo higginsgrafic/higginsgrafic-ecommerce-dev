@@ -31,9 +31,11 @@ const AJUST_PDP_VERTICAL_PX = 40;
 const BAIXADA_BLOC_PDP_VERTICAL_PX = 150;
 
 const PDP_TITLE_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
+  // LA MATEIXA MIDA QUE EL TITOL `ESPECIFICACIONS` DE LA MATEIXA PANTALLA
+  // (30/09/2026): alla son 20pt.
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 20, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.003, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
-  color: '#475059', textTransform: 'uppercase',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'uppercase',
 };
 const PDP_COLLECTION_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 16, fontWeight: 400, selectedFontWeight: 700,
@@ -43,27 +45,28 @@ const PDP_COLLECTION_SETTINGS = {
 const PDP_DESCRIPTION_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Roboto', fontSize: 16, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.03, lineHeight: 1.65, textAlign: 'left', verticalAlign: 'top',
-  color: '#111827', textTransform: 'none',
+  color: 'hsl(var(--grey-ink-strong))', textTransform: 'none',
 };
 const PDP_PRICE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 200, selectedFontWeight: 700,
   letterSpacing: 0, lineHeight: 1, textAlign: 'left', verticalAlign: 'center',
-  color: '#475059', textTransform: 'none',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'none',
 };
 const PDP_CTA_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 12, fontWeight: 300, selectedFontWeight: 400,
   letterSpacing: 0.04, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
-  color: '#475059', textTransform: 'uppercase',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'uppercase',
 };
 const PDP_SIZE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 12, fontWeight: 300, selectedFontWeight: 400,
   letterSpacing: 0, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
-  color: '#475059', textTransform: 'none',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'none',
 };
 
 const OFFICIAL_COLORS = [
-  'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
-  'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
+  'white', 'light-blue', 'royal', 'navy', 'irish-green', 'military-green',
+  'daisy', 'gold', 'red', 'dark-chocolate', 'ice-grey', 'rs-sport-grey',
+  'charcoal', 'black',
 ];
 const THUMB_COUNT = OFFICIAL_COLORS.length;
 
@@ -625,7 +628,7 @@ function PdpDesktop({ product }) {
                 lineHeight: 1,
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
-                color: '#475059',
+                color: 'hsl(var(--grey-ink-2))',
                 textAlign: 'right',
               }}
             >
@@ -667,7 +670,7 @@ function PdpDesktop({ product }) {
                       fontWeight: 700,
                       letterSpacing: '0.2em',
                       textTransform: 'uppercase',
-                      color: '#111827',
+                      color: 'hsl(var(--grey-ink-strong))',
                       lineHeight: 1.2,
                     }}
                   >
@@ -697,7 +700,7 @@ function PdpDesktop({ product }) {
                 flex: '1 1 auto',
                 minWidth: 0,
                 minHeight: 0,
-                background: '#fbfcfd',
+                background: 'hsl(var(--grey-paper))',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -782,7 +785,7 @@ function PdpDesktop({ product }) {
                               top: '4px',
                               bottom: '4px',
                               width: '3px',
-                              background: '#0b0d10',
+                              background: 'hsl(var(--grey-ink-strong))',
                             }}
                           />
                         )}
@@ -870,10 +873,10 @@ function PdpDesktop({ product }) {
             <div
               style={{
                 display: 'flex',
-                backgroundColor: '#f3f4f6',
+                backgroundColor: 'hsl(var(--grey-paper-soft))',
                 padding: '2px',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-                border: '1px solid #e5e7eb',
+                border: '1px solid hsl(var(--grey-line))',
                 width: portraitControlWidth,
                 height: '44px',
                 boxSizing: 'border-box',
@@ -897,8 +900,8 @@ function PdpDesktop({ product }) {
                       letterSpacing: `${sizeButtonTextSettings.letterSpacing}em`,
                       lineHeight: sizeButtonTextSettings.lineHeight,
                       textTransform: sizeButtonTextSettings.textTransform,
-                      color: isSelected ? '#111827' : '#9ca3af',
-                      backgroundColor: isSelected ? '#ffffff' : 'transparent',
+                      color: isSelected ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-muted-2))',
+                      backgroundColor: isSelected ? 'hsl(var(--grey-paper))' : 'transparent',
                       border: 'none',
                       borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
                       cursor: 'pointer',
@@ -936,10 +939,10 @@ function PdpDesktop({ product }) {
             <div
               style={{
                 display: 'flex',
-                backgroundColor: '#f3f4f6',
+                backgroundColor: 'hsl(var(--grey-paper-soft))',
                 padding: '2px',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-                border: '1px solid #e5e7eb',
+                border: '1px solid hsl(var(--grey-line))',
                 width: portraitControlWidth,
                 height: '44px',
                 boxSizing: 'border-box',
@@ -965,8 +968,8 @@ function PdpDesktop({ product }) {
                       letterSpacing: `${finishButtonTextSettings.letterSpacing}em`,
                       lineHeight: finishButtonTextSettings.lineHeight,
                       textTransform: finishButtonTextSettings.textTransform,
-                      color: !isAvailable ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
-                      backgroundColor: isActive ? '#ffffff' : 'transparent',
+                      color: !isAvailable ? 'hsl(var(--grey-muted))' : (isActive ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-muted-2))'),
+                      backgroundColor: isActive ? 'hsl(var(--grey-paper))' : 'transparent',
                       border: 'none',
                       borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
                       cursor: isAvailable ? 'pointer' : 'not-allowed',
@@ -1013,14 +1016,14 @@ function PdpDesktop({ product }) {
                   // ignore
                 }
               }}
-              className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
+              className="bg-muted text-[hsl(var(--grey-ink-2))] transition-all duration-200 hover:bg-paper hover:text-[hsl(var(--grey-ink-strong))] hover:shadow-sm active:scale-95"
               style={{
                 width: portraitControlWidth,
                 height: '44px',
                 position: 'absolute',
                 bottom: '0',
                 left: '0',
-                border: '1px solid #e5e7eb',
+                border: '1px solid hsl(var(--grey-line))',
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
                 padding: '0 16px',
                 cursor: 'pointer',

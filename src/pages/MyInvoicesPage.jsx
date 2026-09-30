@@ -58,45 +58,45 @@ export default function MyInvoicesPage() {
   }, [factures]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-paper">
       <div className="max-w-3xl mx-auto px-5 py-10">
         <h1 className="font-oswald text-2xl tracking-[0.04em] uppercase mb-1">Les meves factures</h1>
-        <p className="text-sm text-gray-500 mb-7">
+        <p className="text-sm text-ink-soft mb-7">
           Aquí tens totes les factures de les teves comandes. Es poden obrir i desar en PDF quan vulguis.
         </p>
 
-        {estat === 'carregant' && <div className="text-gray-400 text-sm">Carregant…</div>}
+        {estat === 'carregant' && <div className="text-muted-2 text-sm">Carregant…</div>}
 
         {estat === 'error' && (
-          <div className="text-sm text-gray-600 border border-gray-200 bg-gray-50 px-4 py-3">
+          <div className="text-sm text-ink-2 border border-line bg-paper-soft px-4 py-3">
             No s&apos;han pogut carregar les factures. Torna-ho a provar d&apos;aquí una estona.
           </div>
         )}
 
         {estat === 'ok' && factures.length === 0 && (
-          <div className="text-sm text-gray-600 border border-gray-200 bg-gray-50 px-4 py-3">
+          <div className="text-sm text-ink-2 border border-line bg-paper-soft px-4 py-3">
             Encara no tens cap factura. Quan facis una comanda, apareixerà aquí.
           </div>
         )}
 
         {estat === 'ok' && perAny.map(([any, llista]) => (
           <section key={any} className="mb-8">
-            <div className="font-oswald text-[11px] tracking-[0.18em] uppercase text-gray-400 mb-2 pb-1 border-b border-gray-200">
+            <div className="font-oswald text-[11px] tracking-[0.18em] uppercase text-muted-2 mb-2 pb-1 border-b border-line">
               {any}
             </div>
             <ul>
               {llista.map((f) => (
-                <li key={f.number} className="flex items-center gap-4 py-3 border-b border-gray-100 text-sm">
+                <li key={f.number} className="flex items-center gap-4 py-3 border-b border-line text-sm">
                   <span className="font-oswald tracking-wide w-28 shrink-0">{f.number}</span>
-                  <span className="text-gray-500 w-24 shrink-0 tabular-nums">{fmtDate(f.issued_at)}</span>
-                  <span className="text-gray-400 text-[11px] tracking-[0.12em] uppercase flex-1">
+                  <span className="text-ink-soft w-24 shrink-0 tabular-nums">{fmtDate(f.issued_at)}</span>
+                  <span className="text-muted-2 text-[11px] tracking-[0.12em] uppercase flex-1">
                     {f.invoice_type === 'full' ? 'Factura' : 'Simplificada'}
                   </span>
                   <span className="tabular-nums w-20 text-right">{eur(f.total)}</span>
                   {f.access_token ? (
                     <Link
                       to={`/factura/${f.access_token}`}
-                      className="w-16 text-right text-[11px] tracking-[0.12em] uppercase underline decoration-gray-300 hover:decoration-black"
+                      className="w-16 text-right text-[11px] tracking-[0.12em] uppercase underline decoration-line-strong hover:decoration-ink-pure"
                     >
                       Veure
                     </Link>

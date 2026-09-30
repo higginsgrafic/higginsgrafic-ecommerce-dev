@@ -340,8 +340,8 @@ const AdminUploadPage = () => {
 
   const mapColorToHex = (value) => {
     const v = normalizeToCanonicalColor(value);
-    if (v === 'Blanc') return '#FFFFFF';
-    if (v === 'Negre') return '#000000';
+    if (v === 'Blanc') return 'hsl(var(--grey-paper))';
+    if (v === 'Negre') return 'hsl(var(--grey-ink-pure))';
     if (v === 'Vermell') return '#D00000';
     if (v === 'Militar') return '#4B5320';
     if (v === 'Forest') return '#0B3D2E';
@@ -811,7 +811,7 @@ const AdminUploadPage = () => {
       case 'image':
         return <File className="w-5 h-5 text-green-500" />;
       default:
-        return <File className="w-5 h-5 text-gray-500" />;
+        return <File className="w-5 h-5 text-ink-soft" />;
     }
   };
 
@@ -958,25 +958,25 @@ const AdminUploadPage = () => {
   return (
     <>
       <SEO title="Upload de Fitxers - Admin" />
-      <div className="h-screen overflow-y-auto bg-gray-50 p-6 pb-24">
+      <div className="h-screen overflow-y-auto bg-paper-soft p-6 pb-24">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload de Fitxers</h1>
-            <p className="text-gray-600">Pugeu fitxers, arxius .zip i carpetes al sistema</p>
+            <h1 className="text-3xl font-bold text-ink-strong mb-2">Upload de Fitxers</h1>
+            <p className="text-ink-2">Pugeu fitxers, arxius .zip i carpetes al sistema</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="bg-paper rounded-lg shadow-sm border border-line p-6 mb-6">
             <div className="flex items-start justify-between gap-6 flex-wrap">
               <div className="min-w-[260px]">
-                <h2 className="text-lg font-semibold text-gray-900">Neteja col·leccions (First Contact + Miscel·lània)</h2>
-                <p className="text-sm text-gray-600 mt-1">Esborra productes, variants, imatges i fitxers del bucket <span className="font-mono">media</span>. Primer fes dry-run.</p>
+                <h2 className="text-lg font-semibold text-ink-strong">Neteja col·leccions (First Contact + Miscel·lània)</h2>
+                <p className="text-sm text-ink-2 mt-1">Esborra productes, variants, imatges i fitxers del bucket <span className="font-mono">media</span>. Primer fes dry-run.</p>
               </div>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={runCleanupDryRun}
                   disabled={cleanupLoading}
-                  className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-60"
+                  className="px-4 py-2 bg-paper-tint text-ink-strong rounded-lg hover:bg-muted-foreground transition-colors disabled:opacity-60"
                 >
                   {cleanupLoading ? 'Carregant...' : 'Dry-run'}
                 </button>
@@ -984,7 +984,7 @@ const AdminUploadPage = () => {
                   type="button"
                   onClick={runCleanupExecute}
                   disabled={cleanupLoading}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-60"
+                  className="px-4 py-2 bg-red-600 text-paper rounded-lg hover:bg-red-700 transition-colors disabled:opacity-60"
                 >
                   {cleanupLoading ? 'Esborrant...' : 'Delete for real'}
                 </button>
@@ -992,11 +992,11 @@ const AdminUploadPage = () => {
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirmació (obligatòria per esborrar)</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Confirmació (obligatòria per esborrar)</label>
               <input
                 value={cleanupConfirmText}
                 onChange={(e) => setCleanupConfirmText(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 font-mono"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg bg-paper text-ink-strong font-mono"
                 placeholder="DELETE FIRST-CONTACT MISCELLANIA"
               />
             </div>
@@ -1023,16 +1023,16 @@ const AdminUploadPage = () => {
                   <button
                     type="button"
                     onClick={() => runCopy('cleanup-report', JSON.stringify(cleanupReport, null, 2))}
-                    className="px-3 py-1 text-xs bg-gray-200 text-gray-900 rounded hover:bg-gray-300 transition-colors"
+                    className="px-3 py-1 text-xs bg-paper-tint text-ink-strong rounded hover:bg-muted-foreground transition-colors"
                   >
                     Copiar report (JSON)
                   </button>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="text-sm text-gray-700">
-                    <div className="font-semibold text-gray-900 mb-2">Resum</div>
+                <div className="border border-line rounded-lg p-4">
+                  <div className="text-sm text-ink-2">
+                    <div className="font-semibold text-ink-strong mb-2">Resum</div>
                     <div>Products: <span className="font-mono">{cleanupReport.products.length}</span></div>
                     <div>Variants: <span className="font-mono">{cleanupReport.productVariants.length}</span></div>
                     <div>Product images: <span className="font-mono">{cleanupReport.productImages.length}</span></div>
@@ -1040,9 +1040,9 @@ const AdminUploadPage = () => {
                   </div>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="font-semibold text-gray-900 mb-2">Mostra (primeres 10 rutes)</div>
-                  <pre className="text-xs text-gray-700 font-mono whitespace-pre-wrap break-all max-h-40 overflow-auto">
+                <div className="border border-line rounded-lg p-4">
+                  <div className="font-semibold text-ink-strong mb-2">Mostra (primeres 10 rutes)</div>
+                  <pre className="text-xs text-ink-2 font-mono whitespace-pre-wrap break-all max-h-40 overflow-auto">
                     {(cleanupReport.storagePaths || []).slice(0, 10).join('\n') || '(cap fitxer detectat via product_images.url)'}
                   </pre>
                 </div>
@@ -1091,11 +1091,11 @@ const AdminUploadPage = () => {
           )}
 
           {/* Dropzone */}
-          <div className="bg-white rounded-lg shadow-sm border-2 border-dashed border-gray-300 p-8 mb-6">
+          <div className="bg-paper rounded-lg shadow-sm border-2 border-dashed border-line-strong p-8 mb-6">
             <div
               {...getRootProps()}
               className={`text-center cursor-pointer transition-colors ${
-                isDragActive ? 'border-blue-500 bg-blue-50' : 'hover:border-gray-400'
+                isDragActive ? 'border-blue-500 bg-blue-50' : 'hover:border-muted-2'
               }`}
             >
               <input {...getInputProps()} />
@@ -1108,29 +1108,29 @@ const AdminUploadPage = () => {
                 style={{ display: 'none' }}
                 onChange={onFolderSelected}
               />
-              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <Upload className="w-12 h-12 text-muted-2 mx-auto mb-4" />
               {isDragActive ? (
                 <p className="text-blue-600 font-medium">Deixa anar els fitxers aquí...</p>
               ) : (
                 <div>
-                  <p className="text-gray-600 font-medium mb-2">
+                  <p className="text-ink-2 font-medium mb-2">
                     Arrossega fitxers aquí
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-ink-soft">
                     Suporta fitxers individuals, .zip i carpetes
                   </p>
                   <div className="mt-4 flex items-center justify-center gap-3">
                     <button
                       type="button"
                       onClick={open}
-                      className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                      className="px-4 py-2 text-ink-2 bg-paper-tint rounded-lg hover:bg-muted-foreground transition-colors"
                     >
                       Seleccioneu fitxers
                     </button>
                     <button
                       type="button"
                       onClick={() => folderInputRef.current?.click()}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="px-4 py-2 bg-blue-600 text-paper rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       Seleccioneu carpeta
                     </button>
@@ -1142,28 +1142,28 @@ const AdminUploadPage = () => {
 
           {/* Files List */}
           {files.length > 0 && (
-            <div className="bg-white rounded-lg shadow-sm mb-6">
-              <div className="p-4 border-b border-gray-200">
-                <h2 className="font-semibold text-gray-900">Fitxers seleccionats ({files.length})</h2>
+            <div className="bg-paper rounded-lg shadow-sm mb-6">
+              <div className="p-4 border-b border-line">
+                <h2 className="font-semibold text-ink-strong">Fitxers seleccionats ({files.length})</h2>
               </div>
-              <div className="divide-y divide-gray-200 max-h-[60vh] overflow-y-auto">
+              <div className="divide-y divide-line max-h-[60vh] overflow-y-auto">
                 {files.map(fileData => (
                   <div key={fileData.id} className="p-4 flex items-center justify-between">
                     <div className="flex items-center space-x-3 flex-1">
                       {getFileIcon(fileData.type)}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-ink-strong truncate">
                           {fileData.name}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-ink-soft">
                           {formatFileSize(fileData.size)}
                         </p>
-                        <p className="text-xs text-gray-400 font-mono break-all">
+                        <p className="text-xs text-muted-2 font-mono break-all">
                           {needsManualPath(fileData.path) ? (
                             <input
                               value={fileData.path}
                               onChange={(e) => updateFilePath(fileData.id, e.target.value)}
-                              className="w-full px-2 py-1 border border-red-300 rounded bg-white text-gray-800"
+                              className="w-full px-2 py-1 border border-red-300 rounded bg-paper text-ink"
                               placeholder="Collection/DesignName/Color/file"
                             />
                           ) : (
@@ -1177,13 +1177,13 @@ const AdminUploadPage = () => {
                       {uploading && (
                         <div className="w-32">
                           <div className="flex items-center space-x-2">
-                            <div className="flex-1 bg-gray-200 rounded-full h-2">
+                            <div className="flex-1 bg-paper-tint rounded-full h-2">
                               <div
                                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${uploadProgress[fileData.id] || 0}%` }}
                               />
                             </div>
-                            <span className="text-xs text-gray-600 w-10">
+                            <span className="text-xs text-ink-2 w-10">
                               {Math.round(uploadProgress[fileData.id] || 0)}%
                             </span>
                           </div>
@@ -1215,14 +1215,14 @@ const AdminUploadPage = () => {
               <button
                 onClick={() => setFiles([])}
                 disabled={uploading}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 text-ink-2 bg-paper-tint rounded-lg hover:bg-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Netejar
               </button>
               <button
                 onClick={handleUpload}
                 disabled={uploading || hasInvalidPaths}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                className="px-6 py-2 bg-blue-600 text-paper rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
               >
                 {uploading && <Loader2 className="w-4 h-4 animate-spin" />}
                 <span>{uploading ? 'Pujant...' : 'Pugeu fitxers'}</span>
@@ -1231,38 +1231,38 @@ const AdminUploadPage = () => {
           )}
 
           {uploadRuns.length > 0 && (
-            <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between gap-3">
-                <h2 className="font-semibold text-gray-900">Registre d'Uploads ({uploadRuns.length})</h2>
+            <div className="mt-6 bg-paper rounded-lg shadow-sm border border-line">
+              <div className="p-4 border-b border-line flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-ink-strong">Registre d'Uploads ({uploadRuns.length})</h2>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={copyUploadLogToClipboard}
-                    className="px-3 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                    className="px-3 py-2 text-ink-2 bg-paper-tint rounded-lg hover:bg-muted-foreground transition-colors"
                   >
                     Copiar JSON
                   </button>
                   <button
                     type="button"
                     onClick={() => setUploadRuns([])}
-                    className="px-3 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                    className="px-3 py-2 text-ink-2 bg-paper-tint rounded-lg hover:bg-muted-foreground transition-colors"
                   >
                     Esborrar
                   </button>
                 </div>
               </div>
 
-              <div className="max-h-[45vh] overflow-y-auto divide-y divide-gray-100">
+              <div className="max-h-[45vh] overflow-y-auto divide-y divide-line">
                 {uploadRuns.map(run => (
                   <div key={run.id} className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-ink-strong">
                           {run.status === 'success' ? '✅' : run.status === 'error' ? '❌' : '⏳'} {run.startedAt}
                         </div>
-                        <div className="text-xs text-gray-500 font-mono break-all">{run.id}</div>
+                        <div className="text-xs text-ink-soft font-mono break-all">{run.id}</div>
                       </div>
-                      <div className="text-sm text-gray-700">
+                      <div className="text-sm text-ink-2">
                         {run.items?.length || 0} fitxer(s)
                       </div>
                     </div>
@@ -1270,10 +1270,10 @@ const AdminUploadPage = () => {
                     {Array.isArray(run.items) && run.items.length > 0 && (
                       <div className="mt-3 space-y-2">
                         {run.items.map((item, idx) => (
-                          <div key={`${run.id}-${item.fileId}-${idx}`} className="rounded border border-gray-200 p-2">
+                          <div key={`${run.id}-${item.fileId}-${idx}`} className="rounded border border-line p-2">
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
-                                <div className="text-xs font-mono text-gray-900 break-all">
+                                <div className="text-xs font-mono text-ink-strong break-all">
                                   {item.targetPath}
                                 </div>
                                 {item.url && (
@@ -1290,7 +1290,7 @@ const AdminUploadPage = () => {
                                   <div className="text-xs text-red-700 font-mono break-all">{item.error}</div>
                                 )}
                               </div>
-                              <div className="text-xs text-gray-700 whitespace-nowrap">
+                              <div className="text-xs text-ink-2 whitespace-nowrap">
                                 {item.status}
                               </div>
                             </div>

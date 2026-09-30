@@ -43,7 +43,7 @@ export default function MegaslidePagina3({
   const pageHeight = isPortraitTablet && !acordioExpanded ? '269px' : '100%';
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: pageHeight, position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
+    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: pageHeight, position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 hsl(var(--grey-paper)), inset -8px 0 0 hsl(var(--grey-paper))' : undefined }}>
       <div data-mega-page-viewport="3" style={{
         width: '100%',
         height: pageHeight,

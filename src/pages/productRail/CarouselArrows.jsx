@@ -5,7 +5,7 @@ function ArrowButton({ ariaLabel, onClick, rowHeight = 44, children }) {
     width: `${rowHeight}px`,
     height: `${rowHeight}px`,
     borderRadius: '0',
-    backgroundColor: '#e5e7eb',
+    backgroundColor: 'hsl(var(--grey-paper-tint))',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -81,9 +81,9 @@ export default function CarouselArrows({
           style={{ transform: vertical ? 'translateY(-1px)' : 'translateX(-1px)' }}
         >
           {vertical ? (
-            <path d="M6 15L12 9L18 15" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6 15L12 9L18 15" stroke="hsl(var(--grey-ink-2))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           ) : (
-            <path d="M15 18L9 12L15 6" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M15 18L9 12L15 6" stroke="hsl(var(--grey-ink-2))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           )}
         </svg>
       </ArrowButton>
@@ -97,9 +97,9 @@ export default function CarouselArrows({
           style={{ transform: vertical ? 'translateY(1px)' : 'translateX(1px)' }}
         >
           {vertical ? (
-            <path d="M6 9L12 15L18 9" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6 9L12 15L18 9" stroke="hsl(var(--grey-ink-2))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           ) : (
-            <path d="M9 6L15 12L9 18" stroke="#475059" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M9 6L15 12L9 18" stroke="hsl(var(--grey-ink-2))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           )}
         </svg>
       </ArrowButton>

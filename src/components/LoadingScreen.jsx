@@ -157,7 +157,7 @@ const LoadingScreen = ({ spinnerId: propSpinnerId, variant = 'screen' }) => {
         ...(enLinia ? {
           width: '100%',
           minHeight: '100vh',
-          background: '#ffffff',
+          background: 'hsl(var(--grey-paper))',
         } : {
           position: 'fixed',
           top: 0,
@@ -167,9 +167,9 @@ const LoadingScreen = ({ spinnerId: propSpinnerId, variant = 'screen' }) => {
           width: '100vw',
           height: '100vh',
           zIndex: 99999,
-          background: '#ffffff',
+          background: 'hsl(var(--grey-paper))',
         }),
-        color: '#141414',
+        color: 'hsl(var(--grey-ink-strong))',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -179,7 +179,7 @@ const LoadingScreen = ({ spinnerId: propSpinnerId, variant = 'screen' }) => {
     >
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <Spinner />
-        <p style={{ marginTop: '24px', fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: '14px', fontWeight: 500, color: '#141414', letterSpacing: '0.3px', lineHeight: 'normal' }}>
+        <p style={{ marginTop: '24px', fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: '14px', fontWeight: 500, color: 'hsl(var(--grey-ink-strong))', letterSpacing: '0.3px', lineHeight: 'normal' }}>
           Carregant...
         </p>
       </div>

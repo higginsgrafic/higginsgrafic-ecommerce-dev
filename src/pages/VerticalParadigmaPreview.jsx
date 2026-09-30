@@ -25,13 +25,13 @@ const COLORS = [
 
 export default function VerticalParadigmaPreview() {
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', paddingTop: '120px', paddingBottom: '60px' }}>
+    <div style={{ minHeight: '100vh', background: 'hsl(var(--grey-paper))', paddingTop: '120px', paddingBottom: '60px' }}>
       <div
         style={{
           width: 'min(var(--hg-band-w, 100%), 100vw)',
           margin: '0 auto',
           fontFamily: 'Roboto Condensed, sans-serif',
-          color: '#4A5057',
+          color: 'hsl(var(--grey-ink-2))',
         }}
       >
         {/* FILA A — la graella de dibuixos, amplada de carril.
@@ -53,14 +53,14 @@ export default function VerticalParadigmaPreview() {
           {/* Col 2: botons d'accio + paleta */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {['BLANC', 'COLOR', 'NEGRE'].map((f) => (
-              <div key={f} style={{ padding: '4px 10px', fontSize: '10pt', textAlign: 'center', border: '1px solid #E6E8EC', borderRadius: '2px' }}>{f}</div>
+              <div key={f} style={{ padding: '4px 10px', fontSize: '10pt', textAlign: 'center', border: '1px solid hsl(var(--grey-line))', borderRadius: '2px' }}>{f}</div>
             ))}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginTop: '6px' }}>
               {COLORS.map((c) => (
-                <div key={c} style={{ width: '100%', aspectRatio: '1 / 1', borderRadius: '9999px', background: c, border: '1px solid #E6E8EC' }} />
+                <div key={c} style={{ width: '100%', aspectRatio: '1 / 1', borderRadius: '9999px', background: c, border: '1px solid hsl(var(--grey-line))' }} />
               ))}
             </div>
-            <div style={{ alignSelf: 'center', marginTop: '4px', padding: '2px 12px', fontSize: '9pt', border: '1px solid #E6E8EC', borderRadius: '9999px' }}>COLOR</div>
+            <div style={{ alignSelf: 'center', marginTop: '4px', padding: '2px 12px', fontSize: '9pt', border: '1px solid hsl(var(--grey-line))', borderRadius: '9999px' }}>COLOR</div>
           </div>
 
           {/* Col 3: la franja, 2 files de 7 */}
@@ -68,7 +68,7 @@ export default function VerticalParadigmaPreview() {
             {[0, 1].map((fila) => (
               <div key={fila} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
                 {Array.from({ length: 7 }).map((_, c) => (
-                  <div key={c} style={{ aspectRatio: '1 / 1', background: '#F4F6F8', border: '1px solid #E6E8EC', borderRadius: '2px' }} />
+                  <div key={c} style={{ aspectRatio: '1 / 1', background: 'hsl(var(--grey-paper-soft))', border: '1px solid hsl(var(--grey-line))', borderRadius: '2px' }} />
                 ))}
               </div>
             ))}

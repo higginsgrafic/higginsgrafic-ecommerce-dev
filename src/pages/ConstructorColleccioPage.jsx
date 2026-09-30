@@ -8,21 +8,22 @@ import CollectionTdpCard from '@/components/tdp/CollectionTdpCard';
 import TramFinal from '@/components/home/TramFinal';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 import { LLENCOS } from '@/config/llencos';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const COLLECTION_BG_SRC = '/tmp/PAGINES/PAGINES TIPUS/00 COLLECCIO.webp';
 
 const TDP_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
 const tdpImage = (color) =>
-  `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.webp`;
+  tshirtSrc(color);
 
-// 14 colors canònics (ordre extret de FullWideSlideHeader.jsx).
+// 14 colors canònics (mockupPaths.SHIRT_COLORS).
 // Repetits cíclicament fins a omplir les 16 cel·les del 4x4.
 const TDP_GRID_COLORS = [
-  ['white',        'light-blue',     'royal',         'purple'],
-  ['navy',         'daisy',          'gold',          'light-pink'],
-  ['red',          'kiwi',           'irish-green',   'military-green'],
-  ['forest-green', 'black',          'white',         'light-blue'],
+  ['white',          'light-blue',     'royal',         'navy'],
+  ['irish-green',    'military-green', 'daisy',         'gold'],
+  ['red',            'dark-chocolate', 'ice-grey',      'rs-sport-grey'],
+  ['charcoal',       'black',          'white',         'light-blue'],
 ];
 
 function colorToProductName(color) {
@@ -31,16 +32,16 @@ function colorToProductName(color) {
     'light-blue': 'Light Blue',
     'royal': 'Royal',
     'navy': 'Navy',
-    'purple': 'Purple',
-    'light-pink': 'Light Pink',
     'daisy': 'Daisy',
     'gold': 'Gold',
     'red': 'Red',
-    'kiwi': 'Kiwi',
     'irish-green': 'Irish Green',
     'military-green': 'Military Green',
-    'forest-green': 'Forest Green',
     'black': 'Black',
+    'rs-sport-grey': 'RS Sport Grey',
+    'ice-grey': 'Ice Grey',
+    'charcoal': 'Charcoal',
+    'dark-chocolate': 'Dark Chocolate',
   };
   return map[color] || color;
 }
@@ -48,7 +49,7 @@ function colorToProductName(color) {
 const HERO_SLIDES = [
   {
     id: 'first-contact',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.webp',
+    imageSrc: tshirtSrc('royal'),
     imageAlt: 'Samarreta de la col·lecció First Contact',
     kicker: 'First Contact',
     headline: 'Ciència-ficció per mirar cap a les estrelles.',
@@ -57,7 +58,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'the-human-inside',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp',
+    imageSrc: tshirtSrc('black'),
     imageAlt: 'Samarreta de la col·lecció The Human Inside',
     kicker: 'The Human Inside',
     headline: 'Robots, identitat i preguntes incòmodes.',
@@ -66,7 +67,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'miscellania',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.webp',
+    imageSrc: tshirtSrc('dark-chocolate'),
     imageAlt: 'Samarreta de la col·lecció Miscel·lània',
     kicker: 'Miscel·lània',
     headline: 'Per a qui tria el seu propi camí.',
@@ -182,7 +183,7 @@ function ConstructorColleccioPage() {
               fontSize: 'clamp(64px, 12vw, 200px)',
               letterSpacing: '-0.01em',
               lineHeight: 0.85,
-              color: '#0b0d10',
+              color: 'hsl(var(--grey-ink-strong))',
               textTransform: 'uppercase',
               transform: 'translateY(calc(1% + 10px))',
             }}

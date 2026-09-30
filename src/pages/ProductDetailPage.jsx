@@ -103,6 +103,11 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     if (vv.includes('forest')) return 'Forest Green';
     if (vv.includes('royal')) return 'Royal';
     if (vv.includes('navy') || vv.includes('marina')) return 'Navy';
+    // Els 4 colors nous del 64000 (29/09/2026). El catàleg ja en té peces.
+    if (vv.includes('sport grey') || vv.includes('sport-grey') || vv.includes('rs sport')) return 'RS Sport Grey';
+    if (vv.includes('ice grey') || vv.includes('ice-grey')) return 'Ice Grey';
+    if (vv.includes('charcoal')) return 'Charcoal';
+    if (vv.includes('chocolate')) return 'Dark Chocolate';
 
     return null;
   };
@@ -485,7 +490,11 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       ['Military Green', '#556B2F'],
       ['Forest Green', '#0B3D2E'],
       ['Royal', '#0052CC'],
-      ['Navy', '#001F3F']
+      ['Navy', '#001F3F'],
+      ['RS Sport Grey', '#8C8E90'],
+      ['Ice Grey', '#CBC5BE'],
+      ['Charcoal', '#4D5252'],
+      ['Dark Chocolate', '#332A28']
     ]);
 
     const resolveHexForColor = (color) => {

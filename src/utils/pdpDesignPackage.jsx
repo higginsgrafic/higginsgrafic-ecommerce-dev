@@ -1,6 +1,6 @@
 export function ToggleRow({ label, checked, onChange }) {
   return (
-    <label className="mb-2 flex items-center justify-between gap-3 text-[12px] text-neutral-800">
+    <label className="mb-2 flex items-center justify-between gap-3 text-[12px] text-ink">
       <span>{label}</span>
       <input
         type="checkbox"
@@ -15,9 +15,9 @@ export function ToggleRow({ label, checked, onChange }) {
 export function OpacitySlider({ label, value, onChange, disabled = false }) {
   return (
     <label className={`mb-2 block ${disabled ? 'opacity-50' : ''}`}>
-      <div className="flex items-center justify-between text-[11px] text-neutral-700">
+      <div className="flex items-center justify-between text-[11px] text-ink-2">
         <span>{label}</span>
-        <span className="tabular-nums text-neutral-900">{value.toFixed(2)}</span>
+        <span className="tabular-nums text-ink-strong">{value.toFixed(2)}</span>
       </div>
       <input
         type="range"

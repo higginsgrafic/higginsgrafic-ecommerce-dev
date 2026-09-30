@@ -31,8 +31,8 @@ export default function OverlayUnderHeader({ open, onClose, children }) {
       className="fixed left-0 right-0 bottom-0 z-[20000]"
       style={{ top: 'var(--appHeaderOffset, 0px)' }}
     >
-      <div className="absolute inset-0 bg-black/30" onClick={() => onClose?.()} />
-      <div className="relative h-full overflow-y-auto bg-white">
+      <div className="absolute inset-0 bg-ink-pure/30" onClick={() => onClose?.()} />
+      <div className="relative h-full overflow-y-auto bg-paper">
         {children}
       </div>
     </div>,

@@ -18,12 +18,13 @@
  *   - austen-looking-for-my-darcy: només color, amb subcarpetes solid/frame.
  */
 
-import { COLLECTIONS, INK_BLACK, INK_WHITE, INK_MULTI } from '@/lib/mockupPaths';
+import { COLLECTIONS, INK_BLACK, INK_WHITE, INK_MULTI, invertLineInk } from '@/lib/mockupPaths';
 
 const STRIPE_BASE = '/custom_logos/drawings/images_stripe';
 
 const DARK_COLORS = new Set([
-  'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
+  'royal', 'navy', 'red', 'irish-green', 'military-green', 'black',
+  'charcoal', 'dark-chocolate',
 ]);
 
 const FINISH_TO_INK = { BLANC: INK_WHITE, COLOR: INK_MULTI, NEGRE: INK_BLACK };
@@ -61,10 +62,10 @@ const STRIPE_DESIGN_MAP = {
   },
   'austen-quotes': {
     'quotes-half-agony-half-hope': 'half-agony-half-hope',
-    'quotes-i-admire-and-love-you': 'i-prefer-to-be',
+    'quotes-i-admire-and-love-you': 'i-admire-and-love-you',
     'quotes-it-is-a-truth': 'it-is-a-truth',
-    'quotes-unsociable-and-taciturn': 'body-and-soul',
-    'quotes-you-have-bewitched-me': 'you-must-allow-me',
+    'quotes-unsociable-and-taciturn': 'unsociable-and-taciturn',
+    'quotes-you-have-bewitched-me': 'you-have-bewitched-me',
   },
 };
 
@@ -92,8 +93,7 @@ function resolveInk(collectionSlug, shirtColor, finish) {
   const effFinish = finish && ['BLANC', 'COLOR', 'NEGRE'].includes(finish) ? finish : null;
   let ink = effFinish ? FINISH_TO_INK[effFinish] : (DARK_COLORS.has(shirtColor) ? INK_WHITE : INK_BLACK);
 
-  if (ink === INK_WHITE && shirtColor === 'white') ink = INK_BLACK;
-  else if (ink === INK_BLACK && shirtColor === 'black') ink = INK_WHITE;
+  ink = invertLineInk(ink, shirtColor);
 
   if (!inks.includes(ink)) ink = inks[0];
   return ink;

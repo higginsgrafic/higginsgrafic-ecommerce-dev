@@ -370,7 +370,7 @@ export const mapGelatoProduct = (gelatoProduct, index = 0) => {
         gelato_variant_id: productId,
         size: dim.value || 'M',
         color: dim.valueFormatted || 'Default',
-        color_hex: '#FFFFFF',
+        color_hex: 'hsl(var(--grey-paper))',
         price: calculateSellingPrice(),
         stock: 999,
         is_available: true
@@ -510,13 +510,13 @@ const mapGelatoSize = (gelatoSize) => {
  */
 const mapGelatoColor = (gelatoColor) => {
   const colorMap = {
-    'white': { id: 'white', label: 'White', hex: '#FFFFFF' },
-    'black': { id: 'black', label: 'Black', hex: '#181818' },
+    'white': { id: 'white', label: 'White', hex: 'hsl(var(--grey-paper))' },
+    'black': { id: 'black', label: 'Black', hex: 'hsl(var(--grey-ink-strong))' },
     'navy': { id: 'blue', label: 'Blue', hex: '#2563EB' },
     'green': { id: 'green', label: 'Green', hex: '#10B981' },
     'red': { id: 'red', label: 'Red', hex: '#DC2626' }
   };
-  return colorMap[gelatoColor.toLowerCase()] || { id: 'white', label: 'White', hex: '#FFFFFF' };
+  return colorMap[gelatoColor.toLowerCase()] || { id: 'white', label: 'White', hex: 'hsl(var(--grey-paper))' };
 };
 
 // ==================== SINCRONITZACIÓ ====================

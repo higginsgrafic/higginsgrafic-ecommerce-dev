@@ -867,7 +867,7 @@ function MegaStripePanel({
                     padding: '6px 8px',
                     borderRadius: 8,
                     background: 'rgba(255, 80, 80, 0.92)',
-                    color: '#fff',
+                    color: 'hsl(var(--grey-paper))',
                     maxWidth: 420,
                     wordBreak: 'break-all',
                   }}
@@ -1123,12 +1123,12 @@ function MegaStripePanel({
                             width={VECTOR_FRANJA_VIEWBOX_OBERT.width}
                             height={VECTOR_FRANJA_CONTINGUT}
                           >
-                            <rect x={0} y={0} width={VECTOR_FRANJA_VIEWBOX_OBERT.width} height={VECTOR_FRANJA_CONTINGUT} fill="#FFFFFF" />
+                            <rect x={0} y={0} width={VECTOR_FRANJA_VIEWBOX_OBERT.width} height={VECTOR_FRANJA_CONTINGUT} fill="hsl(var(--grey-paper))" />
                             {/* Casa per casa, en ordre, com a la imatge del vel: la
                                 silueta blanca on la casa demana vel i negra on es
                                 activa, perque l'ultima pintada es la que es veu. */}
                             {Array.from({ length: 14 }, (_, k) => k).map((k) => (
-                              <path key={`hg-vel-casa-${k}`} d={VECTOR_FRANJA_SAMARRETES[k]} fill={inactivesVel.has(k) ? '#FFFFFF' : '#000000'} />
+                              <path key={`hg-vel-casa-${k}`} d={VECTOR_FRANJA_SAMARRETES[k]} fill={inactivesVel.has(k) ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-pure))'} />
                             ))}
                           </mask>
                         ) : null}
@@ -1193,7 +1193,7 @@ function MegaStripePanel({
                           // cops al solapament i hi quedava el ROMBE. Amb
                           // `opacity` al grup, el grup es composa una vegada.
                           <g
-                            fill="#FFFFFF"
+                            fill="hsl(var(--grey-paper))"
                             opacity={shirtColor === '#FFFFFF' ? VEL_SAMARRETA_BUIDA_ALFA_BLANCA : 'var(--hgStripeEmptyVeilAlpha, 0.85)'}
                           >
                             {indicesSamarretesBuides.map((idx) => {
@@ -1243,7 +1243,7 @@ function MegaStripePanel({
                         // mateix ROMBE que a la vista apaisada, aqui amb les
                         // arees de clic de cada casella (que tambe es
                         // trepitgen). Vegeu `generaVelDataUrl`.
-                        <g fill="#FFFFFF" opacity={alfaVelSamarretaInactiva} mask={`url(#${idMascaraVelActives})`}>
+                        <g fill="hsl(var(--grey-paper))" opacity={alfaVelSamarretaInactiva} mask={`url(#${idMascaraVelActives})`}>
                           {(indicesSamarretesInactives || []).map((idx) => {
                             if (!Number.isInteger(idx) || idx < 0 || idx >= 14) return null;
                             const extrem = idx === 0 || idx === 13;

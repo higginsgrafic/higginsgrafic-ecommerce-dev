@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { drawingStripePath } from '@/lib/drawingPaths';
 import { esTauletaApaisada , readRootCssNumber } from '@/utils/layoutMetrics';
+import { tshirtSrc } from '@/utils/placeholders';
 
 function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmpleNatural }) {
   const navigate = useNavigate();
@@ -144,11 +145,6 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
   }, [onAmpleNatural, ROW_W]);
 
 
-  const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
-  const TSHIRT_SUFFIX = '_gpr-4-0_front.webp';
-  const tshirtSrc = (color) => `${TSHIRT_BASE}${color}${TSHIRT_SUFFIX}`;
-
-
   const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   const CART_ITEMS = cartItems;
 
@@ -245,8 +241,8 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
     });
   };
 
-  const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
-  const VAL  = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 500, color: '#475059' };
+  const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'hsl(var(--grey-ink-2))' };
+  const VAL  = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 500, color: 'hsl(var(--grey-ink-2))' };
 
   useShippingCosts('es_peninsula');
 
@@ -310,7 +306,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
             fontFamily: 'Oswald, sans-serif',
             fontWeight: 200,
             fontSize: '18pt',
-            color: '#C3C8CD',
+            color: 'hsl(var(--grey-muted))',
             letterSpacing: '1px',
             textTransform: 'uppercase',
             textAlign: 'center',
@@ -321,7 +317,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
             fontFamily: 'Roboto Condensed, sans-serif',
             fontWeight: 300,
             fontSize: '10pt',
-            color: '#E0E3E8',
+            color: 'hsl(var(--grey-paper))',
             marginTop: '12px',
             letterSpacing: '0.5px',
             textAlign: 'center',
@@ -455,8 +451,8 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
               style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 2 }}
               aria-hidden="true"
             >
-              <line x1="12" y1="3" x2="12" y2="21" stroke="#7D8895" strokeWidth="1" strokeLinecap="butt" />
-              <line x1="3" y1="12" x2="21" y2="12" stroke="#7D8895" strokeWidth="1" strokeLinecap="butt" />
+              <line x1="12" y1="3" x2="12" y2="21" stroke="hsl(var(--grey-muted-2))" strokeWidth="1" strokeLinecap="butt" />
+              <line x1="3" y1="12" x2="21" y2="12" stroke="hsl(var(--grey-muted-2))" strokeWidth="1" strokeLinecap="butt" />
             </svg>
           </div>
 
@@ -471,17 +467,17 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
           <div style={{ ...colBg, display: 'grid', gridTemplateColumns: `${SLOT_W}px ${SLOT_W}px`, gridTemplateRows: `${ROW_H - V_GUTTER}px ${ROW_H - V_GUTTER}px`, columnGap: `${SLIDE_GAP}px`, rowGap: `${V_GUTTER}px`, alignItems: 'center', justifyItems: 'center',  }}>
             <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transform: `translateY(${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: MIDES.gapQty, ...VAL, fontSize: '11.6424pt' }}>
-                <button onClick={() => changeQty(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>−</button>
+                <button onClick={() => changeQty(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-ink-2))'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-muted))'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: 'hsl(var(--grey-muted))', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>−</button>
                 <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: 600 }}>{item.qty}</span>
-                <button onClick={() => changeQty(i, +1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: '#C3C8CD', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>+</button>
+                <button onClick={() => changeQty(i, +1)} onMouseEnter={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-ink-2))'; e.currentTarget.style.fontSize = '12pt'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-muted))'; e.currentTarget.style.fontSize = '8.7318pt'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${(ROW_H - V_GUTTER) * 1.25}px`, height: `${(ROW_H - V_GUTTER) * 1.25}px`, border: '1px solid #C9D0D9', borderRadius: '50%', backgroundColor: 'transparent', color: 'hsl(var(--grey-muted))', cursor: 'pointer', fontSize: '8.7318pt', lineHeight: 1, padding: 0, transition: 'color 0.15s ease, transform 0.15s ease, font-size 0.15s ease' }}>+</button>
               </div>
             </div>
             <div style={{ gridRow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', // A la vertical, la talla tambe s'allunya de la quantitat.
               transform: `translate(${MIDES.dxTalla}px, ${-0.5 * ROW_H}px)` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: MIDES.gapTalla, ...VAL, fontSize: '11.6424pt' }}>
-                <button onClick={() => changeSize(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#7D8895'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#C3C8CD', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronDown size={19.64655} strokeWidth={2.5} /></button>
+                <button onClick={() => changeSize(i, -1)} onMouseEnter={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-muted-2))'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-muted))'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: 'hsl(var(--grey-muted))', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronDown size={19.64655} strokeWidth={2.5} /></button>
                 <span style={{ minWidth: '32px', textAlign: 'center', fontWeight: 600 }}>{item.size}</span>
-                <button onClick={() => changeSize(i, +1)} onMouseEnter={(e) => { e.currentTarget.style.color = '#7D8895'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#C3C8CD'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: '#C3C8CD', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronUp size={19.64655} strokeWidth={2.5} /></button>
+                <button onClick={() => changeSize(i, +1)} onMouseEnter={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-muted-2))'; e.currentTarget.style.transform = 'scale(1.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-muted))'; e.currentTarget.style.transform = 'scale(1)'; }} style={{ width: `${ROW_H - V_GUTTER}px`, height: `${ROW_H - V_GUTTER}px`, border: 'none', background: 'transparent', color: 'hsl(var(--grey-muted))', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease, transform 0.15s ease' }}><ChevronUp size={19.64655} strokeWidth={2.5} /></button>
               </div>
             </div>
           </div>
@@ -494,9 +490,9 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
                   oculta no hi pot ocupar lloc i les caselles van justes, si no
                   el preu se'n va mes enlla de la filera i queda tallat. */}
               <div style={{ display: 'grid', gridTemplateColumns: MIDES.gridPreu, alignItems: 'center', columnGap: MIDES.gapCellesPreu }}>
-                <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: '#7D8895', marginRight: isPortraitTablet ? 0 : (isNarrowCart ? '8px' : '24px'), visibility: 'hidden', transform: `translateY(${ROW_H}px)` }}>TOT PLEGAT FA</span>
+                <span style={{ ...HEAD, fontSize: '10.1871pt', fontWeight: 400, color: 'hsl(var(--grey-muted-2))', marginRight: isPortraitTablet ? 0 : (isNarrowCart ? '8px' : '24px'), visibility: 'hidden', transform: `translateY(${ROW_H}px)` }}>TOT PLEGAT FA</span>
                 <span />
-                <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = '#475059'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = '#000'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: '#000', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', // A la vertical, el cubell tambe s'allunya una mica mes del preu.
+                <button onClick={() => removeItem(i)} onMouseEnter={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-ink-2))'; e.currentTarget.querySelector('svg').setAttribute('width', '25.5'); e.currentTarget.querySelector('svg').setAttribute('height', '25.5'); }} onMouseLeave={(e) => { e.currentTarget.style.color = 'hsl(var(--grey-ink-pure))'; e.currentTarget.querySelector('svg').setAttribute('width', '19.64655'); e.currentTarget.querySelector('svg').setAttribute('height', '19.64655'); }} style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', color: 'hsl(var(--grey-ink-pure))', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', justifySelf: 'center', // A la vertical, el cubell tambe s'allunya una mica mes del preu.
                   transform: `translate(${MIDES.dxCubell}px, 0.5px)`, transition: 'color 0.15s ease' }}>
                   <Trash2 size={19.64655} strokeWidth={2.5} />
                 </button>
@@ -504,7 +500,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
                   const unit = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'));
                   const total = Number.isNaN(unit) ? null : (unit * (item.qty || 1)).toFixed(2);
                   const [intPart, decPart] = total ? total.split('.') : ['', ''];
-                  const priceStyle = { ...HEAD, fontSize: '14.553pt', fontWeight: 350, color: '#474F59', letterSpacing: '0.6px' };
+                  const priceStyle = { ...HEAD, fontSize: '14.553pt', fontWeight: 350, color: 'hsl(var(--grey-ink-2))', letterSpacing: '0.6px' };
                   // A la vertical, el preu no s'ha d'acostar a la paperera: la
                   // seva casella ja va a la dreta del tot. El -12px hi feia que
                   // el cubell d'esborrar toques el preu.
@@ -531,7 +527,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
         left: 0,
         right: 0,
         height: '1px',
-        background: '#E6E8EC',
+        background: 'hsl(var(--grey-paper-tint))',
         pointerEvents: 'none',
         zIndex: 3,
       }} />
@@ -606,7 +602,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
                 top: 0,
                 width: `${colWidths[idx]}px`,
                 height: '100%',
-                border: '1px dashed #DEDFE1',
+                border: '1px dashed hsl(var(--grey-line-strong))',
                 boxSizing: 'border-box',
                 backgroundColor: 'rgba(222, 223, 225, 0.25)',
               }} />
@@ -668,7 +664,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
                   fontFamily: 'Oswald, sans-serif',
                   fontWeight: 300,
                   fontSize: '11pt',
-                  color: '#475059',
+                  color: 'hsl(var(--grey-ink-2))',
                   letterSpacing: '0.04em',
                   textTransform: 'uppercase',
                   whiteSpace: 'nowrap',
@@ -679,7 +675,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
                   fontFamily: 'Oswald, sans-serif',
                   fontWeight: 500,
                   fontSize: '13pt',
-                  color: '#111827',
+                  color: 'hsl(var(--grey-ink-strong))',
                   whiteSpace: 'nowrap',
                 }}>
                   {fmt(itemTotal)}
@@ -701,7 +697,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
                       textTransform: 'uppercase',
                       letterSpacing: '0.4px',
                       color: '#F4F6F8',
-                      backgroundColor: '#474F59',
+                      backgroundColor: 'hsl(var(--grey-ink-2))',
                       border: 'none',
                       borderRadius: '3px',
                       cursor: 'pointer',

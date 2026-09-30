@@ -55,11 +55,28 @@ export const STRIPE_DRAWING_CALIBRATIONS = {
   '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/light/blue-light-gradient-grid-light-gradient-stripe.webp': { dx: 0.0, dy: 0.0, scale: 1.0 },
   '/custom_logos/drawings/images_stripe/austen/looking_for_my_darcy/solid/blue-solid-grid-solid-stripe.webp': { dx: 0.0, dy: 0.0, scale: 1.0 },
   '/custom_logos/drawings/images_stripe/austen/quotes/black/it-is-a-truth-b-stripe.webp': { dx: 3.75, dy: 23.5, scale: 0.23 },
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-must-allow-me-b-stripe.webp': { dx: 3.25, dy: 25.25, scale: 0.2 },
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/i-admire-and-love-you-b-stripe.webp': { dx: 3.25, dy: 25.25, scale: 0.2 },
+  // LES TRES CITES QUE HI CAIEN (01/10/2026).
+  //
+  // Aquestes tres no tenien entrada i agafaven el default de la casa
+  // (`STRIPE_DRAWING_OVERLAY_DEFAULTS`: dy 28.75), o sigui que queien mes
+  // avall que les altres dues, que si que hi son. Ho va veure l'amo: «Només
+  // falta pujar els dibuixos I ADMIRE AND LOVE YOU, HALF AGONY HALF HOPE,
+  // UNSOCIABLE AND TACITURN, a la mateixa alçada que les altres dues». El dy
+  // ha baixat 15 px (28,75 -> 13,75): mesurat al navegador, la part de dalt
+  // del dibuix passa de 41,3 a 26,3 px sota la vora de la franja, que es on
+  // la tenen `it-is-a-truth` (26) i `i-admire-and-love-you` (27). La resta de
+  // la calibracio (dx 0,5 i escala 0,31) es la que ja s'aplicava.
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp': { dx: 0.5, dy: 17.25, scale: 0.31 },
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/half-agony-half-hope-b-stripe.webp': { dx: 0.5, dy: 17.25, scale: 0.31 },
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/unsociable-and-taciturn-b-stripe.webp': { dx: 0.5, dy: 17.25, scale: 0.31 },
   '/custom_logos/drawings/images_stripe/austen/quotes/color/it-is-a-truth-multi-light-stripe.webp': { dx: 3.75, dy: 23.5, scale: 0.23 },
-  '/custom_logos/drawings/images_stripe/austen/quotes/color/you-must-allow-me-multi-light-stripe.webp': { dx: 3.25, dy: 25.25, scale: 0.2 },
+  '/custom_logos/drawings/images_stripe/austen/quotes/color/i-admire-and-love-you-multi-light-stripe.webp': { dx: 3.25, dy: 25.25, scale: 0.2 },
   '/custom_logos/drawings/images_stripe/austen/quotes/white/it-is-a-truth-w-stripe.webp': { dx: 3.75, dy: 23.5, scale: 0.23 },
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-must-allow-me-w-stripe.webp': { dx: 3.25, dy: 25.25, scale: 0.2 },
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/i-admire-and-love-you-w-stripe.webp': { dx: 3.25, dy: 25.25, scale: 0.2 },
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-have-bewitched-me-w-stripe.webp': { dx: 0.5, dy: 17.25, scale: 0.31 },
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/half-agony-half-hope-w-stripe.webp': { dx: 0.5, dy: 17.25, scale: 0.31 },
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/unsociable-and-taciturn-w-stripe.webp': { dx: 0.5, dy: 17.25, scale: 0.31 },
   '/custom_logos/drawings/images_stripe/cube/cylon-cube-03-stripe.webp': { dx: 0.75, dy: 29.5, scale: 0.251 },
   '/custom_logos/drawings/images_stripe/cube/darth-cube-stripe.webp': { dx: 0.75, dy: 30.0, scale: 0.235 },
   '/custom_logos/drawings/images_stripe/cube/iron-cube-08-iron-kong-stripe.webp': { dx: 0.75, dy: 30.0, scale: 0.235 },

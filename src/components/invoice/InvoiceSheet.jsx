@@ -122,8 +122,8 @@ export function liniesDelDocument(doc) {
 function Bloc({ etiqueta, children }) {
   return (
     <div>
-      <div className="font-oswald text-[10px] tracking-[0.18em] uppercase text-gray-400 mb-1">{etiqueta}</div>
-      <div className="text-[13px] leading-relaxed text-gray-900">{children}</div>
+      <div className="font-oswald text-[10px] tracking-[0.18em] uppercase text-muted-2 mb-1">{etiqueta}</div>
+      <div className="text-[13px] leading-relaxed text-ink-strong">{children}</div>
     </div>
   );
 }
@@ -154,7 +154,7 @@ export default function InvoiceSheet({
   const files = Array.isArray(linies) ? linies : [];
 
   return (
-    <div className="mx-auto bg-white shadow-sm print:shadow-none" style={{ width: '210mm', minHeight: '297mm', padding: '14mm' }}>
+    <div className="mx-auto bg-paper shadow-sm print:shadow-none" style={{ width: '210mm', minHeight: '297mm', padding: '14mm' }}>
 
       {/* Avís de prova: ha de ser impossible confondre un full de prova amb un de debò */}
       {isTest && (
@@ -164,7 +164,7 @@ export default function InvoiceSheet({
       )}
 
       {/* Capçalera */}
-      <div className="flex items-start justify-between gap-6 pb-4 border-b-2 border-gray-900">
+      <div className="flex items-start justify-between gap-6 pb-4 border-b-2 border-ink-strong">
         <img src="/custom_logos/brand/grup-higgins-logo.svg" alt={ISSUER.tradeName} className="h-10" />
         <div className="text-right">
           {/* A la factura simplificada el títol va més petit: és més llarg i
@@ -187,18 +187,18 @@ export default function InvoiceSheet({
           ['Comanda', doc?.order_number || '—'],
           ['Forma de pagament', 'Targeta'],
         ].map(([k, v]) => (
-          <div key={k} className="border border-gray-200 bg-gray-50 px-3 py-2">
-            <div className="font-oswald text-[9px] tracking-[0.16em] uppercase text-gray-400 mb-1">{k}</div>
-            <div className="text-gray-900">{v}</div>
+          <div key={k} className="border border-line bg-paper-soft px-3 py-2">
+            <div className="font-oswald text-[9px] tracking-[0.16em] uppercase text-muted-2 mb-1">{k}</div>
+            <div className="text-ink-strong">{v}</div>
           </div>
         ))}
       </div>
 
       {esRectificativa && (
-        <div className="mb-6 border border-gray-900 px-4 py-3 text-[12px]">
-          <div className="font-oswald text-[9px] uppercase tracking-[0.16em] text-gray-400">Document rectificat</div>
+        <div className="mb-6 border border-ink-strong px-4 py-3 text-[12px]">
+          <div className="font-oswald text-[9px] uppercase tracking-[0.16em] text-muted-2">Document rectificat</div>
           <div className="mt-1 font-oswald text-[14px]">{doc?.rectified_invoice_number || 'Factura original'}</div>
-          <div className="mt-1 text-gray-600">{doc?.correction_reason}</div>
+          <div className="mt-1 text-ink-2">{doc?.correction_reason}</div>
         </div>
       )}
 
@@ -245,32 +245,32 @@ export default function InvoiceSheet({
       {/* Línies: base + transport + IVA, com al model */}
       <table className="w-full text-[12px] border-collapse">
         <thead>
-          <tr className="border-b border-gray-900">
-            <th className="text-left font-oswald font-normal text-[9px] tracking-[0.16em] uppercase text-gray-400 py-2">Producte</th>
-            <th className="text-center font-oswald font-normal text-[9px] tracking-[0.16em] uppercase text-gray-400 py-2 w-16">Quantitat</th>
-            <th className="text-right font-oswald font-normal text-[9px] tracking-[0.16em] uppercase text-gray-400 py-2 w-40">Base + Transport + IVA</th>
-            <th className="text-right font-oswald font-normal text-[9px] tracking-[0.16em] uppercase text-gray-400 py-2 w-24">Preu</th>
+          <tr className="border-b border-ink-strong">
+            <th className="text-left font-oswald font-normal text-[9px] tracking-[0.16em] uppercase text-muted-2 py-2">Producte</th>
+            <th className="text-center font-oswald font-normal text-[9px] tracking-[0.16em] uppercase text-muted-2 py-2 w-16">Quantitat</th>
+            <th className="text-right font-oswald font-normal text-[9px] tracking-[0.16em] uppercase text-muted-2 py-2 w-40">Base + Transport + IVA</th>
+            <th className="text-right font-oswald font-normal text-[9px] tracking-[0.16em] uppercase text-muted-2 py-2 w-24">Preu</th>
           </tr>
         </thead>
         <tbody>
           {files.map((l) => (
-            <tr key={l.key} className="border-b border-gray-100 align-top">
+            <tr key={l.key} className="border-b border-line align-top">
               <td className="py-3 pr-2">
-                <div className="text-gray-900">{l.nom}</div>
-                {l.detalls && <div className="text-[11px] text-gray-400 mt-0.5">{l.detalls}</div>}
+                <div className="text-ink-strong">{l.nom}</div>
+                {l.detalls && <div className="text-[11px] text-muted-2 mt-0.5">{l.detalls}</div>}
               </td>
-              <td className="py-3 text-center text-gray-600">x{l.qty}</td>
-              <td className="py-3 text-right tabular-nums text-gray-500 whitespace-nowrap">
-                {eur(l.baseProducte)} <span className="text-gray-300">+</span> {eur(l.transport)} <span className="text-gray-300">+</span> {eur(l.iva)}
+              <td className="py-3 text-center text-ink-2">x{l.qty}</td>
+              <td className="py-3 text-right tabular-nums text-ink-soft whitespace-nowrap">
+                {eur(l.baseProducte)} <span className="text-muted-foreground">+</span> {eur(l.transport)} <span className="text-muted-foreground">+</span> {eur(l.iva)}
               </td>
               <td className="py-3 text-right tabular-nums font-oswald text-[13px]">{eur(l.preu)}</td>
             </tr>
           ))}
           {files.length === 0 && (
-            <tr><td colSpan="4" className="py-6 text-center text-gray-400">Aquesta factura encara no té línies.</td></tr>
+            <tr><td colSpan="4" className="py-6 text-center text-muted-2">Aquesta factura encara no té línies.</td></tr>
           )}
           {files.length > 0 && (
-            <tr className="border-b-2 border-gray-900">
+            <tr className="border-b-2 border-ink-strong">
               <td colSpan="3" className="py-3 pr-2">
                 <span className="font-oswald text-[13px] uppercase tracking-[0.06em]">Total factura</span>
               </td>
@@ -281,11 +281,11 @@ export default function InvoiceSheet({
       </table>
 
       {/* Totals i notes */}
-      <div className="grid grid-cols-2 gap-10 mt-8 text-[11.5px] leading-relaxed text-gray-500">
+      <div className="grid grid-cols-2 gap-10 mt-8 text-[11.5px] leading-relaxed text-ink-soft">
         <div>
-          <div className="font-oswald text-[10px] tracking-[0.18em] uppercase text-gray-400 mb-1">Informació</div>
+          <div className="font-oswald text-[10px] tracking-[0.18em] uppercase text-muted-2 mb-1">Informació</div>
           <p className="m-0">
-            Producte fabricat sota demanda amb impressió <strong className="text-gray-700">DTF</strong> (Direct-to-Film).
+            Producte fabricat sota demanda amb impressió <strong className="text-ink-2">DTF</strong> (Direct-to-Film).
             El termini de producció és de 2 a 4 dies feiners i el de lliurament, de 3 a 6 dies feiners addicionals.
           </p>
           <p className="mt-3 m-0">
@@ -293,18 +293,18 @@ export default function InvoiceSheet({
             aquí es desglossa per conceptes. Operació subjecta al règim general d&apos;IVA.
           </p>
         </div>
-        <div className="text-[12px] text-gray-900">
-          <div className="flex justify-between py-1"><span className="text-gray-500">Base de les samarretes</span><span className="tabular-nums">{eur(doc?.base_products)}</span></div>
-          <div className="flex justify-between py-1"><span className="text-gray-500">Transport</span><span className="tabular-nums">{eur(doc?.base_shipping)}</span></div>
-          <div className="flex justify-between py-1"><span className="text-gray-500">IVA 21% (de tots dos)</span><span className="tabular-nums">{eur(doc?.iva)}</span></div>
-          <div className="flex justify-between items-baseline mt-2 pt-2 border-t-2 border-gray-900 font-oswald text-[17px] uppercase">
+        <div className="text-[12px] text-ink-strong">
+          <div className="flex justify-between py-1"><span className="text-ink-soft">Base de les samarretes</span><span className="tabular-nums">{eur(doc?.base_products)}</span></div>
+          <div className="flex justify-between py-1"><span className="text-ink-soft">Transport</span><span className="tabular-nums">{eur(doc?.base_shipping)}</span></div>
+          <div className="flex justify-between py-1"><span className="text-ink-soft">IVA 21% (de tots dos)</span><span className="tabular-nums">{eur(doc?.iva)}</span></div>
+          <div className="flex justify-between items-baseline mt-2 pt-2 border-t-2 border-ink-strong font-oswald text-[17px] uppercase">
             <span>Total factura</span><span className="tabular-nums">{eur(doc?.total)}</span>
           </div>
         </div>
       </div>
 
       {/* Peu legal */}
-      <div className="mt-10 pt-4 border-t border-gray-200 text-center text-[10px] text-gray-400">
+      <div className="mt-10 pt-4 border-t border-line text-center text-[10px] text-muted-2">
         <div>{issuerLine()}</div>
         <div className="mt-1">Factura emesa electrònicament. Conserva aquest document com a justificant de compra.</div>
       </div>

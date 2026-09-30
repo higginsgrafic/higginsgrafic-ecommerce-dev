@@ -14,8 +14,8 @@ export default function PromotionsManagerPage() {
   const [config, setConfig] = useState({
     enabled: true,
     text: 'Transport inclòs',
-    bgColor: '#111827',
-    textColor: '#ffffff',
+    bgColor: 'hsl(var(--grey-ink-strong))',
+    textColor: 'hsl(var(--grey-paper))',
     fontSize: '14px',
     font: 'Roboto',
     link: '',
@@ -168,7 +168,7 @@ export default function PromotionsManagerPage() {
     <>
       <SEO title="Gestor de Promocions" description="Gestiona el banner de promocions" />
 
-      <div className="h-screen bg-gray-50 overflow-y-auto">
+      <div className="h-screen bg-paper-soft overflow-y-auto">
         <div className="max-w-4xl mx-auto p-8">
         {/* Header amb botó activar/desactivar */}
         <div className="flex items-center justify-between mb-6">
@@ -179,7 +179,7 @@ export default function PromotionsManagerPage() {
             className={`px-4 py-2 text-sm disabled:opacity-50 ${
               config.enabled
                 ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-paper-soft text-ink-2 hover:bg-paper-tint'
             }`}
           >
             {config.enabled ? 'Activat' : 'Desactivat'}
@@ -188,8 +188,8 @@ export default function PromotionsManagerPage() {
 
         {/* Preview */}
         <div className="mb-4">
-          <label className="block text-xs text-gray-500 mb-2">Vista prèvia</label>
-          <div className="border border-gray-200">
+          <label className="block text-xs text-ink-soft mb-2">Vista prèvia</label>
+          <div className="border border-line">
             <div
               className="h-10 flex items-center justify-center"
               style={{
@@ -204,7 +204,7 @@ export default function PromotionsManagerPage() {
             </div>
           </div>
           {config.clickable && config.link && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-ink-soft mt-1">
               Enllaç: <span className="font-mono">{config.link}</span>
             </p>
           )}
@@ -215,50 +215,50 @@ export default function PromotionsManagerPage() {
           {/* Text Editor amb històric */}
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <label className="block text-xs text-gray-500">Text</label>
+              <label className="block text-xs text-ink-soft">Text</label>
               <button
                 onClick={() => setShowHistory(!showHistory)}
-                className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+                className="text-xs text-muted-2 hover:text-ink-2 flex items-center gap-1"
               >
                 <ChevronDown className={`h-3 w-3 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
                 Històric
               </button>
               <button
                 onClick={exportTexts}
-                className="text-xs text-gray-400 hover:text-gray-600"
+                className="text-xs text-muted-2 hover:text-ink-2"
                 title="Exportar"
               >
                 <Download className="h-3 w-3" />
               </button>
-              <label className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer" title="Importar">
+              <label className="text-xs text-muted-2 hover:text-ink-2 cursor-pointer" title="Importar">
                 <Download className="h-3 w-3 rotate-180" />
                 <input type="file" accept=".json" onChange={importTexts} className="hidden" />
               </label>
             </div>
 
             {showHistory && allTexts.length > 0 && (
-              <div className="mb-2 border border-gray-200 bg-gray-50 max-h-40 overflow-y-auto">
+              <div className="mb-2 border border-line bg-paper-soft max-h-40 overflow-y-auto">
                 {allTexts.map((text, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-2 px-3 py-2 hover:bg-white border-b border-gray-100 last:border-0"
+                    className="flex items-center gap-2 px-3 py-2 hover:bg-paper border-b border-line last:border-0"
                   >
                     <button
                       onClick={() => handleChange('text', text)}
-                      className="flex-1 text-left text-sm text-gray-700 hover:text-gray-900"
+                      className="flex-1 text-left text-sm text-ink-2 hover:text-ink-strong"
                     >
                       {text}
                     </button>
                     <button
                       onClick={() => togglePin(text)}
-                      className={`${pinnedTexts.includes(text) ? 'text-blue-500' : 'text-gray-300'} hover:text-blue-600`}
+                      className={`${pinnedTexts.includes(text) ? 'text-blue-500' : 'text-muted-foreground'} hover:text-blue-600`}
                       title="Fixar"
                     >
                       <Pin className="h-3 w-3" />
                     </button>
                     <button
                       onClick={() => deleteFromHistory(text)}
-                      className="text-gray-300 hover:text-red-500"
+                      className="text-muted-foreground hover:text-red-500"
                       title="Esborrar"
                     >
                       <X className="h-3 w-3" />
@@ -272,13 +272,13 @@ export default function PromotionsManagerPage() {
               value={config.text}
               onChange={(e) => handleChange('text', e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-400"
+              className="w-full px-3 py-2 border border-line-strong text-sm focus:outline-none focus:border-muted-2"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Color de fons</label>
+              <label className="block text-xs text-ink-soft mb-1">Color de fons</label>
               <div className="flex gap-2">
                 <input
                   type="color"
@@ -290,13 +290,13 @@ export default function PromotionsManagerPage() {
                   type="text"
                   value={config.bgColor}
                   onChange={(e) => handleChange('bgColor', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 font-mono text-xs focus:outline-none focus:border-gray-400"
+                  className="flex-1 px-3 py-2 border border-line-strong font-mono text-xs focus:outline-none focus:border-muted-2"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Color del text</label>
+              <label className="block text-xs text-ink-soft mb-1">Color del text</label>
               <div className="flex gap-2">
                 <input
                   type="color"
@@ -308,27 +308,27 @@ export default function PromotionsManagerPage() {
                   type="text"
                   value={config.textColor}
                   onChange={(e) => handleChange('textColor', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 font-mono text-xs focus:outline-none focus:border-gray-400"
+                  className="flex-1 px-3 py-2 border border-line-strong font-mono text-xs focus:outline-none focus:border-muted-2"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Mida</label>
+              <label className="block text-xs text-ink-soft mb-1">Mida</label>
               <input
                 type="text"
                 value={config.fontSize}
                 onChange={(e) => handleChange('fontSize', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 font-mono text-xs focus:outline-none focus:border-gray-400"
+                className="w-full px-3 py-2 border border-line-strong font-mono text-xs focus:outline-none focus:border-muted-2"
               />
             </div>
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Tipografia</label>
+              <label className="block text-xs text-ink-soft mb-1">Tipografia</label>
               <select
                 value={config.font}
                 onChange={(e) => handleChange('font', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-400"
+                className="w-full px-3 py-2 border border-line-strong text-sm focus:outline-none focus:border-muted-2"
               >
                 <option value="Roboto">Roboto</option>
                 <option value="Arial">Arial</option>
@@ -341,7 +341,7 @@ export default function PromotionsManagerPage() {
           </div>
 
           {/* Descompte */}
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-line pt-4">
             <h2 className="text-sm font-medium mb-3">Descompte</h2>
 
             <div className="space-y-3">
@@ -360,7 +360,7 @@ export default function PromotionsManagerPage() {
 
               {config.discountEnabled && (
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
+                  <label className="block text-xs text-ink-soft mb-1">
                     Percentatge de descompte (%)
                   </label>
                   <input
@@ -369,10 +369,10 @@ export default function PromotionsManagerPage() {
                     max="100"
                     value={config.discountRate}
                     onChange={(e) => handleChange('discountRate', parseInt(e.target.value) || 0)}
-                    className="w-24 px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-400"
+                    className="w-24 px-3 py-2 border border-line-strong text-sm focus:outline-none focus:border-muted-2"
                   />
                   {config.discountRate > 0 && (
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-muted-2 mt-1">
                       Es mostrarà "Descompte (-{config.discountRate}%)" al checkout i a la confirmació de comanda.
                     </p>
                   )}
@@ -382,7 +382,7 @@ export default function PromotionsManagerPage() {
           </div>
 
           {/* Link i Clickable */}
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-line pt-4">
             <h2 className="text-sm font-medium mb-3">Configuració d'enllaç</h2>
 
             <div className="space-y-3">
@@ -401,7 +401,7 @@ export default function PromotionsManagerPage() {
 
               {config.clickable && (
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
+                  <label className="block text-xs text-ink-soft mb-1">
                     Enllaç (URL interna o externa)
                   </label>
                   <input
@@ -409,9 +409,9 @@ export default function PromotionsManagerPage() {
                     value={config.link || ''}
                     onChange={(e) => handleChange('link', e.target.value)}
                     placeholder="/offers o https://exemple.com"
-                    className="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-400"
+                    className="w-full px-3 py-2 border border-line-strong text-sm focus:outline-none focus:border-muted-2"
                   />
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-muted-2 mt-1">
                     Exemples: /offers (intern) o https://exemple.com (extern)
                   </p>
                 </div>
@@ -423,7 +423,7 @@ export default function PromotionsManagerPage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-6 py-2 bg-gray-900 text-white text-sm disabled:opacity-50 hover:bg-gray-800"
+              className="px-6 py-2 bg-ink-strong text-paper text-sm disabled:opacity-50 hover:bg-ink"
             >
               {saving ? 'Desant...' : 'Desar'}
             </button>

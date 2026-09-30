@@ -14,13 +14,12 @@
  * la que despres es veura.
  */
 
-import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
-
-const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
-const TSHIRT_SUFFIX = '_gpr-4-0_front.webp';
+import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS, invertLineInk } from '@/lib/mockupPaths';
+import { tshirtSrc as mockupGildanSrc } from '@/utils/placeholders';
 
 const COLORS_FOSCOS = new Set([
-  'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
+  'royal', 'navy', 'red', 'irish-green', 'military-green', 'black',
+  'charcoal', 'dark-chocolate',
 ]);
 
 const ACABAT_A_TINTA = { BLANC: INK_WHITE, COLOR: 'multi', NEGRE: INK_BLACK };
@@ -32,7 +31,7 @@ export function colorSlug(c) {
 }
 
 export function tshirtSrc(color) {
-  return `${TSHIRT_BASE}${colorSlug(color)}${TSHIRT_SUFFIX}`;
+  return mockupGildanSrc(color);
 }
 
 export function resolveInk(collectionSlug, shirtColor, finish) {
@@ -41,8 +40,7 @@ export function resolveInk(collectionSlug, shirtColor, finish) {
   let ink = effFinish
     ? ACABAT_A_TINTA[effFinish]
     : (COLORS_FOSCOS.has(shirtColor) ? INK_WHITE : INK_BLACK);
-  if (ink === INK_WHITE && shirtColor === 'white') ink = INK_BLACK;
-  else if (ink === INK_BLACK && shirtColor === 'black') ink = INK_WHITE;
+  ink = invertLineInk(ink, shirtColor);
   if (!inks.includes(ink)) ink = inks[0];
   return ink;
 }

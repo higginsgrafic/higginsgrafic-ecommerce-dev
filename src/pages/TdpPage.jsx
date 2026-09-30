@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const PAUTA_ROWS = 33;
 const PAUTA_COLS = 3;
@@ -152,7 +153,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
                       padding: '2px 6px',
                       backgroundColor: 'rgba(255, 255, 255, 0.92)',
                       border: '1px solid rgba(71, 80, 89, 0.18)',
-                      color: '#475059',
+                      color: 'hsl(var(--grey-ink-2))',
                       fontFamily: 'Roboto Condensed, sans-serif',
                       fontSize: '11px',
                       lineHeight: 1,
@@ -184,7 +185,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
             productName="NOM DE PRODUCTE"
             description={tdpEditableDescription}
             price="15,50€"
-            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp"
+            imageSrc={tshirtSrc('white')}
             imageAlt="Samarreta blanca Gildan 64000"
             sizes={sizes}
             selectedSize={selectedSize}
@@ -202,7 +203,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
             productName="NOM DE PRODUCTE"
             description={tdpEditableDescription}
             price="15,50€"
-            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp"
+            imageSrc={tshirtSrc('white')}
             imageAlt="Samarreta blanca Gildan 64000"
             sizes={sizes}
             selectedSize={selectedSize}
@@ -218,7 +219,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
             productName="NOM DE PRODUCTE"
             description={tdpEditableDescription}
             price="15,50€"
-            imageSrc="/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp"
+            imageSrc={tshirtSrc('white')}
             imageAlt="Samarreta blanca Gildan 64000"
             sizes={sizes}
             selectedSize={selectedSize}

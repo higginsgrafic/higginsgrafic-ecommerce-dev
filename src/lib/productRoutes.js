@@ -80,14 +80,16 @@ export const PRODUCT_PATHS = [
 
 // 14 colors oficials Gildan 64000.
 export const ALL_COLORS = [
-  'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
-  'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
+  'white', 'light-blue', 'royal', 'navy', 'irish-green', 'military-green',
+  'daisy', 'gold', 'red', 'dark-chocolate', 'ice-grey', 'rs-sport-grey',
+  'charcoal', 'black',
 ];
 
 // Colors foscos (sincronitzat amb pdpMockup.js): sobre samarreta fosca el dibuix
 // és BLANC; sobre samarreta clara el dibuix és NEGRE.
 const DARK_COLORS = [
-  'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
+  'royal', 'navy', 'red', 'irish-green', 'military-green', 'black',
+  'charcoal', 'dark-chocolate',
 ];
 const LIGHT_COLORS = ALL_COLORS.filter((c) => !DARK_COLORS.includes(c));
 

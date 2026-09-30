@@ -62,13 +62,13 @@ export const COLORS = {
   WHITE: {
     id: 'white',
     label: 'White',
-    hex: '#FFFFFF',
+    hex: 'hsl(var(--grey-paper))',
     image: '/tshirt-white.webp'
   },
   BLACK: {
     id: 'black',
     label: 'Black',
-    hex: '#181818',
+    hex: 'hsl(var(--grey-ink-strong))',
     image: '/tshirt-black.webp'
   },
   BLUE: {

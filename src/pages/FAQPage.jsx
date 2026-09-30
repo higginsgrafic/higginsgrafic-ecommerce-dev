@@ -136,17 +136,17 @@ function FAQPage() {
         />
       ) : (
       <div
-        className="min-h-screen bg-white relative"
+        className="min-h-screen bg-paper relative"
       >
         {/* Top spacer for fixed header */}
         <div className="pt-[129px] lg:pt-[145px] relative" style={{ zIndex: 1 }} />
 
         {/* Title + subtitle — centered, outside columns */}
         <div className="relative text-center" style={{ zIndex: 1 }}>
-          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1 whitespace-nowrap">
+          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[hsl(var(--grey-ink-strong))] mb-1 whitespace-nowrap">
             Preguntes Freqüents
           </h1>
-          <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
+          <p className="font-roboto text-[10pt] font-normal text-ink-soft mb-24 text-center">
             Darrera actualització, juliol 2026
           </p>
         </div>
@@ -169,8 +169,8 @@ function FAQPage() {
         <div className="mx-auto relative" style={{ zIndex: 1, maxWidth: '500px' }}>
           <div className="w-full">
             {/* Intro */}
-            <div className="mb-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
-              <p className="font-roboto text-[8pt] font-bold text-gray-800 leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
+            <div className="mb-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
+              <p className="font-roboto text-[8pt] font-bold text-ink leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
                 Aquí trobaràs respostes a les preguntes més freqüents sobre comandes, enviaments, devolucions, productes i sostenibilitat a Higgins GRÀFIC.
               </p>
             </div>
@@ -178,12 +178,12 @@ function FAQPage() {
             {/* Sections */}
             {sections.map((section, i) => (
               <div key={i} className="mb-7">
-                <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
-                  <span className="text-[#141414]">•</span>
+                <h2 className="font-roboto text-[10pt] font-normal text-[hsl(var(--grey-ink-strong))] mb-0 flex items-start gap-2">
+                  <span className="text-[hsl(var(--grey-ink-strong))]">•</span>
                   <span>{section.bullet}</span>
                 </h2>
                 {section.paragraph && (
-                  <p className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] mb-2 pl-5">
+                  <p className="font-roboto text-[10pt] font-light text-ink-2 leading-[1.5] mb-2 pl-5">
                     {section.paragraph}
                   </p>
                 )}
@@ -191,8 +191,8 @@ function FAQPage() {
                   <div className="pl-5 mb-3">
                     {zones.map((zone, zi) => (
                       <div key={zi} className="mb-4">
-                        <p className="font-roboto text-[9pt] font-bold text-gray-800 mb-1">
-                          {zone.title} <span className="font-light text-gray-500">({zone.time} dies)</span>
+                        <p className="font-roboto text-[9pt] font-bold text-ink mb-1">
+                          {zone.title} <span className="font-light text-ink-soft">({zone.time} dies)</span>
                         </p>
                         <table className="w-full mb-1" style={{ borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                           <colgroup>
@@ -202,25 +202,25 @@ function FAQPage() {
                             <col style={{ width: '20%' }} />
                           </colgroup>
                           <thead>
-                            <tr style={{ borderBottom: '1px solid #E6E8EC' }}>
-                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-left py-1">País</th>
-                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">1a peça</th>
-                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">Addicional</th>
-                              <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">Gratuït</th>
+                            <tr style={{ borderBottom: '1px solid hsl(var(--grey-line))' }}>
+                              <th className="font-roboto text-[7pt] font-normal text-ink-soft text-left py-1">País</th>
+                              <th className="font-roboto text-[7pt] font-normal text-ink-soft text-right py-1">1a peça</th>
+                              <th className="font-roboto text-[7pt] font-normal text-ink-soft text-right py-1">Addicional</th>
+                              <th className="font-roboto text-[7pt] font-normal text-ink-soft text-right py-1">Gratuït</th>
                             </tr>
                           </thead>
                           <tbody>
                             {zone.countries.map((c, ci) => (
-                              <tr key={ci} style={{ borderBottom: '1px solid #F0F0F0' }}>
-                                <td className="font-roboto text-[8pt] font-light text-gray-700 py-1">
+                              <tr key={ci} style={{ borderBottom: '1px solid hsl(var(--grey-paper))' }}>
+                                <td className="font-roboto text-[8pt] font-light text-ink-2 py-1">
                                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', verticalAlign: 'middle' }}>
                                     <Flag code={c.code} size={11} />
                                     {c.name}
                                   </span>
                                 </td>
-                                <td className="font-roboto text-[8pt] font-normal text-gray-700 text-right py-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.first}€</td>
-                                <td className="font-roboto text-[8pt] font-light text-gray-700 text-right py-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.additional}€</td>
-                                <td className="font-roboto text-[8pt] font-light text-right py-1" style={{ color: c.free ? '#00a651' : '#999', fontVariantNumeric: 'tabular-nums' }}>
+                                <td className="font-roboto text-[8pt] font-normal text-ink-2 text-right py-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.first}€</td>
+                                <td className="font-roboto text-[8pt] font-light text-ink-2 text-right py-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.additional}€</td>
+                                <td className="font-roboto text-[8pt] font-light text-right py-1" style={{ color: c.free ? '#00a651' : 'hsl(var(--grey-muted-2))', fontVariantNumeric: 'tabular-nums' }}>
                                   {c.free ? `${c.free}€` : '—'}
                                 </td>
                               </tr>
@@ -238,8 +238,8 @@ function FAQPage() {
                       const boldPart = dashIdx >= 0 ? item.substring(0, dashIdx) : item;
                       const restPart = dashIdx >= 0 ? item.substring(dashIdx) : '';
                       return (
-                        <li key={j} className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] flex items-start gap-2">
-                          <span className="text-gray-700 mt-[-1px]">-</span>
+                        <li key={j} className="font-roboto text-[10pt] font-light text-ink-2 leading-[1.5] flex items-start gap-2">
+                          <span className="text-ink-2 mt-[-1px]">-</span>
                           <span><span className="font-normal">{boldPart}</span>{restPart}</span>
                         </li>
                       );
@@ -247,10 +247,10 @@ function FAQPage() {
                   </ul>
                 )}
                 {section.contact && (
-                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px] text-center">
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px] text-center">
                     <div className="inline-block text-left">
                       {section.contact.map((line, j) => (
-                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-gray-700 ${j === 0 ? 'font-normal' : 'font-light'}`}>
+                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-ink-2 ${j === 0 ? 'font-normal' : 'font-light'}`}>
                           {line}
                         </p>
                       ))}
@@ -258,14 +258,14 @@ function FAQPage() {
                   </div>
                 )}
                 {section.note && section.noteBold && (
-                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
-                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700">
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
+                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-ink-2">
                       {section.note}
                     </p>
                   </div>
                 )}
                 {section.note && !section.noteBold && (
-                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-gray-700">
+                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-ink-2">
                     {section.note}
                   </p>
                 )}
@@ -273,8 +273,8 @@ function FAQPage() {
             ))}
 
             {/* Footer */}
-            <div className="mt-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
-              <p className="font-roboto text-[8pt] font-bold text-gray-700 leading-[1.25]">
+            <div className="mt-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
+              <p className="font-roboto text-[8pt] font-bold text-ink-2 leading-[1.25]">
                 Aquesta FAQ està subjecta, obligatòriament, a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, d'aquesta informació.
               </p>
             </div>

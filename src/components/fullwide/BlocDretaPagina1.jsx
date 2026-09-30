@@ -1,5 +1,8 @@
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ALCADA_PASTILLA_SELECTOR_PX } from './estilsBlocs.js';
+import useDeviceLayout from '@/hooks/useDeviceLayout';
+import { esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 
 /**
  * EL BLOC DE LA DRETA DE LA PAGINA 1 (26/09/2026)
@@ -68,18 +71,38 @@ export const MIDA_BLOC_DRETA_PAGINA1_PX = 110;
  * mana es l'ordre del DOM.
  */
 export function PastillaBlancaPagina1({ topPct, alcadaPct = 100 / 3, inset = 5 }) {
+  // NOME S A LA COMPOSICIO ESTRETA (02/10/2026): alla la pastilla va amb 10 px de
+  // coixi a cada costat i amb l'alcada declarada; a 1920/1440 tot queda com era
+  // («Tot això que hem fet no ha d'afectar les vistes 1920 i 1440»).
+  const { isLandscapeTablet } = useDeviceLayout();
+  const composicioEstreta = esComposicioEstretaMegaslide({
+    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+    isLandscapeTablet,
+  });
+  // LA PASTILLA, D'AMPLADA DE TOTA LA SEVA COLUMNA A LA COMPOSICIO ESTRETA
+  // (02/10/2026). En Marc: «Que la pastilla del selector ocupi el seu mig quadrat
+  // d'amplada»: alla el selector i les fletxes van en dues columnes i la pastilla
+  // ha d'omplir la seva, sense el coixi de costat. A la resta de mides, com era.
+  const coixiCostat = composicioEstreta ? 0 : inset;
   return (
     <span
       aria-hidden="true"
       style={{
         position: 'absolute',
-        left: `${inset}px`,
-        right: `${inset}px`,
-        top: `calc(${topPct}% + ${inset}px)`,
-        height: `calc(${alcadaPct}% - ${inset * 2}px)`,
-        backgroundColor: '#FFFFFF',
+        left: `${coixiCostat}px`,
+        right: `${coixiCostat}px`,
+        // A la composicio estreta, la mateixa alcada que la pastilla de la franja
+        // de colleccions (centrada dins la cella); a la resta, com sempre.
+        top: composicioEstreta
+          ? `calc(${topPct}% + ${alcadaPct / 2}% - ${ALCADA_PASTILLA_SELECTOR_PX / 2}px)`
+          : `calc(${topPct}% + ${inset}px)`,
+        height: composicioEstreta
+          ? `${ALCADA_PASTILLA_SELECTOR_PX}px`
+          : `calc(${alcadaPct}% - ${inset * 2}px)`,
+        backgroundColor: 'hsl(var(--grey-paper))',
         borderRadius: '3px',
-        border: '1px solid #D1D5DB',
+        // SENSE CONTORN nome s A LA COMPOSICIO ESTRETA (02/10/2026).
+        border: composicioEstreta ? 'none' : '1px solid hsl(var(--grey-line-strong))',
         boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
         boxSizing: 'border-box',
         pointerEvents: 'none',
@@ -131,6 +154,12 @@ export function SelectorQuadratPagina1({
   ];
   const ORDRE = ['white', 'color', 'black'];
   const slotPct = 100 / ORDRE.length;
+  // Vegeu `PastillaBlancaPagina1`: la composicio estreta nome s mana a 1024-1366.
+  const { isLandscapeTablet: esApaissadaP1 } = useDeviceLayout();
+  const esComposicioEstreta = esComposicioEstretaMegaslide({
+    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+    isLandscapeTablet: esApaissadaP1,
+  });
   const selectedKey = buttons.some((b) => b.key === selectedVariant) ? selectedVariant : 'color';
   const getTopPct = (key) => ORDRE.indexOf(key) * slotPct;
   const sliderTopPct = getTopPct(selectedKey);
@@ -142,11 +171,18 @@ export function SelectorQuadratPagina1({
       data-stripe-buttonbar="bn-p1"
       style={{
         ...(dinsBloc ? null : {
-          border: '1px solid #D1D5DB',
           borderRadius: '5.3px',
-          backgroundColor: '#F3F4F6',
           boxSizing: 'border-box',
           overflow: 'hidden',
+          // SENSE FONS NI CONTORN NOME S A LA COMPOSICIO ESTRETA (02/10/2026,
+          // «Treu-los el fons als selectors» + «Recupera el contorn a les
+          // versions 1920/1440»).
+          ...(esComposicioEstreta
+            ? null
+            : {
+              border: '1px solid hsl(var(--grey-line-strong))',
+              backgroundColor: 'hsl(var(--grey-paper-soft))',
+            }),
         }),
         pointerEvents: 'auto',
       }}
@@ -181,7 +217,7 @@ export function SelectorQuadratPagina1({
                 fontSize: `max(10px, ${carrilPx(13.5)})`,
                 fontWeight: 400,
                 textTransform: 'uppercase',
-                color: desactivat ? '#C4C8CE' : (selectedKey === btn.key ? '#1A1A1A' : '#6B7280'),
+                color: desactivat ? 'hsl(var(--grey-muted))' : (selectedKey === btn.key ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-ink-soft))'),
                 pointerEvents: 'none',
                 lineHeight: 1,
                 transition: 'color 200ms ease',

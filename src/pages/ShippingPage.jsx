@@ -220,7 +220,7 @@ function ShippingPage() {
                             <col style={{ width: '16%' }} />
                           </colgroup>
                           <thead>
-                            <tr style={{ borderBottom: '1px solid #E6E8EC' }}>
+                            <tr style={{ borderBottom: '1px solid hsl(var(--grey-line))' }}>
                               <th className="font-roboto text-[7pt] font-normal text-gray-500 text-left py-1">País</th>
                               <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">1a peça</th>
                               <th className="font-roboto text-[7pt] font-normal text-gray-500 text-right py-1">Addicional</th>

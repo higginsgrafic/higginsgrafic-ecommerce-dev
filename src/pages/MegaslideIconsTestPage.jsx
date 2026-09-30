@@ -142,21 +142,21 @@ export default function MegaslideIconsTestPage() {
     <div className="mx-auto max-w-[1500px] p-6">
       {/* Capçalera */}
       <div className="mb-6">
-        <Link to="/constructor/full-wide-slide" className="mb-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.12em] text-gray-500 hover:text-black">
+        <Link to="/constructor/full-wide-slide" className="mb-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.12em] text-ink-soft hover:text-ink-pure">
           <ArrowLeft className="h-3.5 w-3.5" /> Tornar al megaslide
         </Link>
         <h1 className="font-oswald text-2xl uppercase tracking-[0.04em]">Dibuixos · graella {COLUMNES}×{FILES} (prova)</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-ink-soft">
           El dibuix de cada producte del catàleg. <strong>No toca el megaslide.</strong>
         </p>
       </div>
 
-      <section className="border border-gray-200 bg-white p-6">
+      <section className="border border-line bg-paper p-6">
         <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-oswald text-[10px] uppercase tracking-[0.16em] text-gray-400">
+          <h2 className="font-oswald text-[10px] uppercase tracking-[0.16em] text-muted-2">
             {carregant ? 'Carregant…' : `${files.length} productes · ${files.length - sense.length} amb dibuix · ${sense.length} sense`}
           </h2>
-          <span className="text-[10px] uppercase tracking-wider text-gray-400">
+          <span className="text-[10px] uppercase tracking-wider text-muted-2">
             caselles de {COSTAT} px · {COLUMNES} columnes × {FILES} files
           </span>
         </div>
@@ -186,7 +186,7 @@ export default function MegaslideIconsTestPage() {
                     width: COSTAT,
                     height: COSTAT,
                     borderRadius: '50%',
-                    backgroundColor: '#E8EAED',
+                    backgroundColor: 'hsl(var(--grey-paper-tint))',
                     border: '0.5px solid rgba(0,0,0,0.22)',
                     boxSizing: 'border-box',
                     display: 'block',
@@ -209,7 +209,7 @@ export default function MegaslideIconsTestPage() {
                   // el dibuix quedaria de 48 px en comptes de 50. El senyal de
                   // seleccionat es fa amb `boxShadow`, que no ocupa espai.
                   border: 'none',
-                  boxShadow: actiu ? 'inset 0 0 0 1px #000000' : undefined,
+                  boxShadow: actiu ? 'inset 0 0 0 1px hsl(var(--grey-ink-pure))' : undefined,
                   background: 'transparent',
                   cursor: 'pointer',
                   padding: 0,

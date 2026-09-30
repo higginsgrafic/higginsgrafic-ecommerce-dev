@@ -296,13 +296,13 @@ function App() {
       ) : showProductsLoadingScreen ? (
         <LoadingScreen />
       ) : showProductsErrorScreen ? (
-        <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="min-h-screen flex items-center justify-center bg-paper">
           <div className="text-center p-8 max-w-md">
-            <h1 className="text-2xl font-bold mb-4 text-black">Error carregant productes</h1>
-            <p className="text-gray-600 mb-4">{error?.message || 'Si us plau, torna-ho a intentar.'}</p>
+            <h1 className="text-2xl font-bold mb-4 text-ink-pure">Error carregant productes</h1>
+            <p className="text-ink-2 mb-4">{error?.message || 'Si us plau, torna-ho a intentar.'}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+              className="px-6 py-2 bg-ink-pure text-paper rounded-md hover:bg-ink transition-colors"
             >
               Recarregar
             </button>
@@ -346,7 +346,7 @@ function App() {
 
         <main
           id="main-content"
-          className={`flex-grow ${isAdminRoute ? 'overflow-y-auto' : ''} ${(!isFullScreenRoute && transicionsLayoutActives) ? 'transition-[padding-top] duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)]' : ''} ${layoutInspectorActive ? 'debug-containers' : ''}`}
+          className={`flex-grow ${isAdminRoute ? 'overflow-y-auto' : ''} ${(!isFullScreenRoute && transicionsLayoutActives) ? 'transition-[padding-top] [transition-duration:350ms] [transition-timing-function:cubic-bezier(0.32,0.72,0,1)]' : ''} ${layoutInspectorActive ? 'debug-containers' : ''}`}
           style={!isFullScreenRoute ? (
             isAdminRoute
               ? { paddingTop: adminRouteOffset, paddingLeft: `${rulerInset}px`, '--appHeaderOffset': adminRouteOffset, '--rulerInset': `${rulerInset}px` }

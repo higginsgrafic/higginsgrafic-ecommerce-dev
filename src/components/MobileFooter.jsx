@@ -23,7 +23,7 @@ export default function MobileFooter() {
   }, [navigate]);
 
   const linkStyle = {
-    color: '#475059',
+    color: 'hsl(var(--grey-ink-2))',
     fontFamily: 'Roboto, sans-serif',
     fontSize: '11px',
     lineHeight: 1.4,
@@ -67,7 +67,7 @@ export default function MobileFooter() {
 
   return (
     <footer>
-      <div style={{ background: '#e5e5e5', padding: '44px 16px' }}>
+      <div style={{ background: 'hsl(var(--grey-paper-tint))', padding: '44px 16px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', alignItems: 'start', gap: '12px', maxWidth: '430px', margin: '0 auto' }}>
           {COLLECTIONS_MENU.map((collection) => (
             <Link key={collection.id} to={collection.href} aria-label={collection.name} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', minHeight: '58px' }}>
@@ -77,22 +77,22 @@ export default function MobileFooter() {
         </div>
       </div>
 
-      <div style={{ background: '#fff', padding: '60px 20px' }}>
+      <div style={{ background: 'hsl(var(--grey-paper))', padding: '60px 20px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '6px', maxWidth: '260px', margin: '0 auto', transform: 'translateX(-18px)' }}>
           <div style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
-            <p style={{ margin: '0 0 12px', color: '#0b0d10', fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600 }}>Client</p>
+            <p style={{ margin: '0 0 12px', color: 'hsl(var(--grey-ink-strong))', fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600 }}>Client</p>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
               {clientLinks.map(({ label, action, href }) => href ? renderLink(label, href) : renderLink(label, action))}
             </div>
           </div>
           <div style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
-            <p style={{ margin: '0 0 12px', color: '#0b0d10', fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600 }}>Informació</p>
+            <p style={{ margin: '0 0 12px', color: 'hsl(var(--grey-ink-strong))', fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600 }}>Informació</p>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
               {infoLinks.map(([label, href]) => renderLink(label, href))}
             </div>
           </div>
           <div style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
-            <p style={{ margin: '0 0 12px', color: '#0b0d10', fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600 }}>Legal</p>
+            <p style={{ margin: '0 0 12px', color: 'hsl(var(--grey-ink-strong))', fontFamily: 'Oswald, sans-serif', fontSize: '13px', fontWeight: 600 }}>Legal</p>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
               {legalLinks.map(([label, href]) => renderLink(label, href))}
             </div>
@@ -100,14 +100,14 @@ export default function MobileFooter() {
         </div>
       </div>
 
-      <div style={{ background: '#e5e5e5', padding: '40px 16px' }}>
+      <div style={{ background: 'hsl(var(--grey-paper-tint))', padding: '40px 16px' }}>
         <Link to="/" aria-label="Higgins Gràfic - Inici" style={{ display: 'flex', justifyContent: 'center' }}>
           <img src="/custom_logos/brand/higgins-grafic-negre.webp" alt="Higgins Gràfic" style={{ display: 'block', width: '160px', height: '37.5px', objectFit: 'contain' }} />
         </Link>
       </div>
 
-      <div style={{ background: '#fff', padding: '44px 16px 96px', textAlign: 'center' }}>
-        <p style={{ margin: 0, color: '#475059', fontFamily: 'Roboto, sans-serif', fontSize: '14px', opacity: 0.7 }}>
+      <div style={{ background: 'hsl(var(--grey-paper))', padding: '44px 16px 96px', textAlign: 'center' }}>
+        <p style={{ margin: 0, color: 'hsl(var(--grey-ink-2))', fontFamily: 'Roboto, sans-serif', fontSize: '14px', opacity: 0.7 }}>
           GRÀFIC · CC 2023–{new Date().getFullYear()}
         </p>
       </div>

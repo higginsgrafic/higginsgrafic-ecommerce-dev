@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './HeroSlider.module.css';
+import { tshirtSrc } from '@/utils/placeholders';
 
 function clampIndex(nextIndex, length) {
   if (length <= 0) return 0;
@@ -112,7 +113,7 @@ export default function HeroSlider({
     const fallback = [
       {
         id: 'slide-1',
-        imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.webp',
+        imageSrc: tshirtSrc('royal'),
         imageAlt: "Per marcar la diferència",
         kicker: 'Per marcar la diferència',
         headline: 'Mou-te i marca la diferència',
@@ -121,7 +122,7 @@ export default function HeroSlider({
       },
       {
         id: 'slide-2',
-        imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp',
+        imageSrc: tshirtSrc('black'),
         imageAlt: 'Essencials',
         kicker: 'Essencials',
         headline: 'Minimalisme que combina amb tot',
@@ -130,7 +131,7 @@ export default function HeroSlider({
       },
       {
         id: 'slide-3',
-        imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.webp',
+        imageSrc: tshirtSrc('rs-sport-grey'),
         imageAlt: 'Studio',
         kicker: 'Studio',
         headline: 'Confort i presència, sense soroll',

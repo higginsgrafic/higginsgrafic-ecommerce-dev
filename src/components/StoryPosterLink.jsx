@@ -43,7 +43,7 @@ function StoryPosterLink({ style }) {
         lineHeight: 1.1,
         letterSpacing: '0.04em',
         textTransform: 'uppercase',
-        color: '#111827',
+        color: 'hsl(var(--grey-ink-strong))',
         cursor: 'pointer',
         pointerEvents: 'auto',
         userSelect: 'none',

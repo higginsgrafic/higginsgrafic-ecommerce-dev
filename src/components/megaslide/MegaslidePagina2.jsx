@@ -7,9 +7,13 @@ import {
   desplacTopSelector,
   visualOffsetYFranjaPagina2,
   desplacamentCentratgeFranja,
-  quantsGrupActiuFranja,
   casaIniciGrupActiu,
+  buscaGrupActiuFranja,
+  desplacamentGrupActiuFranja,
+  AIRE_FRANJA_COLLECCIONS_PX,
+  esComposicioEstretaMegaslide,
 } from './geometriaMegaslide.js';
+import { COIX_ENLLAC_COLLECCIONS_PX } from '../fullwide/estilsBlocs.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
@@ -28,6 +32,19 @@ import {
   CONTROL_TILE_ARROWS,
 } from '../fullwide/MegaColumn.jsx';
 import { FirstContactDibuix00Buttons } from '../fullwide/firstContactPanels.jsx';
+
+/**
+ * L'AIRE DE DALT DEL BLOC DE LA P2 A LA COMPOSICIO ESTRETA (02/10/2026).
+ *
+ * En Marc: «Alinea el bloc p2 a 20 px del bottom del header» i, tot seguit,
+ * «En lloc de 20 px que siguin 15 px. Per sobre i per sota». El panell arrenca al
+ * bottom del header, o sigui que son 15 px des del sostre del megaslide.
+ *
+ * PER SOBRE I PER SOTA: els 15 px son el minim de dalt; a sota en queda el que
+ * sobra del megaslide, que sempre es mes (el bloc te una alcada fixa: selector,
+ * els dos aires de 5 px de la franja de colleccions i la franja de samarretes).
+ */
+const AIRE_DALT_BLOC_P2_PX = 15;
 import { VEL_SAMARRETA_BUIDA_ALFA } from '../../config/stripeCalibrationsVertical.js';
 import { computeStripeTileOverlaySrcs, srcDibuixVelatEnNegre } from '@/utils/resolveStripeTile.js';
 
@@ -58,6 +75,7 @@ export default function MegaslidePagina2({
   page1StripePreviewHPx,
   page1PageLift = 0,
   resolvedMegaFiltered,
+  resolvedMega,
   showStripe,
   stripeOverlayLoadState,
   resolvedOverlaySrc,
@@ -132,6 +150,13 @@ export default function MegaslidePagina2({
     && !isLandscapeTablet
     && window.innerWidth >= 768 && window.innerWidth <= 1366
     && window.innerWidth >= window.innerHeight;
+  // LA COMPOSICIO ESTRETA (1024-1366, 02/10/2026): alla els enllacos de
+  // colleccions son una franja sota la tira de colors i el bloc sencer es mou
+  // perque els seus dos aires facin 5 px (vegeu el bucle d'alineacio).
+  const esComposicioEstreta = esComposicioEstretaMegaslide({
+    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+    isLandscapeTablet,
+  });
   const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   // L'OMBRA DE LA MANIGA (26/09/2026, A3; refeta el 27/09/2026).
@@ -172,6 +197,75 @@ export default function MegaslidePagina2({
   const alignRefY = useRef(0);
   const centraRefY = useRef(0);
   const snapTimerRef = useRef(0);
+  // EL BAIX DE LA FRANJA DE LA P2, QUADRAT AMB EL DE LA P1 (02/10/2026).
+  //
+  // A la banda de les tauletes apaissades la franja de la p2 es mes curta que la
+  // de la p1 (cada pagina escala la seva fins a la vora del seu bloc de la
+  // dreta) i, com que el `visualOffsetY` quadra els tops, el seu baix queia
+  // 41-79 px per sobre: l'amo ho va veure i ho va demanar («baixa la stripe fins
+  // al limit del megaslide», concretat com «a 30 px del final, com la p1»).
+  //
+  // L'alcada de la franja de la p2 es MESURA (surt de l'amplada del seu carril
+  // objectiu), o sigui que l'ajust no es pot declarar: es la diferencia entre
+  // els dos baixos, i la resol el bucle de sota, que es qui te les dues franges
+  // al DOM. El valor viatja amb el `visualOffsetY` de la franja I amb el sostre
+  // de la franja (`topFranjaPagina2`), que es el que fa que la columna de
+  // colleccions hi acabi.
+  const ajustFranjaRefY = useRef(0);
+  const [ajustFranjaP2Y, setAjustFranjaP2Y] = useState(0);
+
+  // L'AMPLE DE LA CAIXA DEL SELECTOR B/C/N, CLAVAT AMB LA PASTILLA DE LA FRANJA
+  // (02/10/2026). En Marc: «la pill del selector b/c/n s'ha d'eixamplar
+  // simetricament fins que coincideixi, en x, al final de la pastilla de la tira
+  // de colleccions en la posicio First Contact».
+  //
+  // La referencia es la PRIMERA casa de la franja (FIRST CONTACT, que es la que
+  // cau a la vora esquerra del carril) i el seu ample depen de la font i del
+  // carril, o sigui que es MESURA del DOM. D'aqui surt l'amplada de la CAIXA del
+  // selector:
+  //
+  //   caixa = ample de la primera casa + COIX_ENLLAC_COLLECCIONS_PX
+  //   pastilla = caixa - 2 x COIX_ENLLAC_COLLECCIONS_PX   (els coixos es
+  //                                                        conserven, simetrics)
+  //
+  // i el final de la pastilla cau exactament al final de la de la franja. Fora
+  // d'aquesta composicio (escriptori, on els enllacos son una columna) no hi ha
+  // franja i el valor es queda nul: mana l'amplada de disseny de sempre.
+  const [ampleCaixaBcnPx, setAmpleCaixaBcnPx] = useState(null);
+  useLayoutEffect(() => {
+    if (!active) return undefined;
+    const viewport = viewportRef.current;
+    if (!viewport) return undefined;
+    let frame = 0;
+    const mesura = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const primera = viewport.querySelector('[data-colleccions-franja-item="1"]');
+        if (!primera) {
+          setAmpleCaixaBcnPx((prev) => (prev === null ? prev : null));
+          return;
+        }
+        const ample = primera.getBoundingClientRect().width;
+        if (!(ample > 0)) return;
+        const caixa = Math.round((ample + COIX_ENLLAC_COLLECCIONS_PX) * 10) / 10;
+        setAmpleCaixaBcnPx((prev) => (prev != null && Math.abs(prev - caixa) < 0.5 ? prev : caixa));
+      });
+    };
+    mesura();
+    const t = window.setTimeout(mesura, 400);
+    window.addEventListener('resize', mesura);
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(mesura) : null;
+    const primera = viewport.querySelector('[data-colleccions-franja-item="1"]');
+    if (primera) observer?.observe(primera);
+    const franja = viewport.querySelector('[data-colleccions-franja="1"]');
+    if (franja) observer?.observe(franja);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(t);
+      window.removeEventListener('resize', mesura);
+      observer?.disconnect();
+    };
+  }, [active, esComposicioEstreta]);
 
 
   const scrollToProgress = useCallback((progress, behavior = 'smooth') => {
@@ -292,10 +386,71 @@ export default function MegaslidePagina2({
       //    més l'offset; el centratge no hi compta perquè va a sobre.
       //    Amb les graelles l'objectiu es la graella de la p1 i no hi ha offset:
       //    les dues tires han d'arrencar al mateix lloc.
+      //
+      //    A LA COMPOSICIO ESTRETA (1024-1366) L'OBJECTIU ES ABSOLUT
+      //    (02/10/2026). Alla els enllacos de colleccions son una franja sota la
+      //    tira de colors, amb 5 px per sobre (el cul del selector B/C/N), i
+      //    l'amo hi vol el bloc CENTRAT: el mateix aire per sobre del selector
+      //    que per sota de la franja de colleccions. Com que el bloc no ho pot
+      //    resoldre tot sol (a 1024x768 l'espai entre el selector i la tinta de
+      //    les samarretes en fa 49,1 i a 1366x768 nome s 29,2, per a un selector
+      //    de 112,8 i una franja de 28,6), el que es mou es TOT EL BLOC: la
+      //    graella, la tira de colors, el selector i la franja. Ho va triar
+      //    l'amo tot i que la graella de la p2 deixa d'arrencar a la mateixa
+      //    alcada que la de la p1.
+      //
+      //    L'objectiu es ABSOLUT (es mesura respecte la tinta de la franja de
+      //    samarretes i el sostre del megaslide, que no es mouen) i per tant el
+      //    bucle no s'alimenta d'ell mateix: l'unica distancia que hi entra de
+      //    dins del bloc (`topBcn - topGraella`) no canvia quan el bloc es mou.
       const offset = (!perGraelles && typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
+      let objectiuTop = null;
+      if (perGraelles && esComposicioEstreta) {
+        const rGraella = page2Graella.getBoundingClientRect();
+        const bcnBox = viewportRef.current.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+        const bandaEl = viewportRef.current.querySelector('[data-colleccions-franja="1"]');
+        const franjaEl = viewportRef.current.querySelector('[data-stripe-visual-content="2"]');
+        const panelEl = document.querySelector('[data-mega-panel-surface]');
+        if (bcnBox && bandaEl && franjaEl && panelEl) {
+          const rBcn = bcnBox.getBoundingClientRect();
+          const alcadaFranja = bandaEl.getBoundingClientRect().height;
+          const rFranja = franjaEl.getBoundingClientRect();
+          const panelTop = panelEl.getBoundingClientRect().top;
+          const panelAlt = panelEl.getBoundingClientRect().height;
+          const topBcn = rBcn.top - rGraella.top;   // el sostre del selector, dins del bloc
+          // EL BLOC, CENTRAT (02/10/2026, «centra el bloc p2 al megaslide, en y»).
+          //
+          // El BLOC es tota la composicio de la p2: el selector B/C/N, la graella
+          // de dibuixos, la tira de colors, la franja de colleccions I la franja
+          // de samarretes. Amb els dos aires de 5 px (el de dins i el de sota la
+          // franja de colleccions), la seva alcada es:
+          //
+          //   selector + 5 + franja de colleccions + 5 + franja de samarretes
+          //
+          // i el que queda del megaslide es reparteix a parts iguals a dalt i a
+          // baix. A 1366x768 en queden 28,9 (14,5 i 14,5) i a 1024x768 45,1 (22,5
+          // i 22,5). Aixo es el que fa que el selector deixi de topar amb el
+          // sostre i que els dos aires de 5 px hi càpiguen sempre.
+          //
+          // La franja de samarretes tambe es mou (es part del bloc): ho fa el
+          // bucle de sota, que la deixa a 5 px del baix de la franja de
+          // colleccions. I alla on mana el bloc ja no mana l'alineacio amb la p1.
+          // A 20 px DEL BOTTOM DEL HEADER (02/10/2026). En Marc: «Alinea el bloc p2
+          // a 20 px del bottom del header». El panell arrenca exactament al bottom
+          // del header (mesurat a 1366x768: el header fa 53 i el panell comença
+          // alla mateix), o sigui que l'aire de dalt son aquests 20 px i el que
+          // sobra del megaslide queda a sota. Amb el bloc mes alt que l'espai, el
+          // `max(0, ...)` no hi cap i el bucle de sota ja el deixa arran.
+          const aire = Math.max(0, Math.min(
+            AIRE_DALT_BLOC_P2_PX,
+            panelAlt - rBcn.height - alcadaFranja - rFranja.height - 2 * AIRE_FRANJA_COLLECCIONS_PX,
+          ));
+          objectiuTop = panelTop + aire - topBcn;
+        }
+      }
       //    (Amb el selector, el centratge del selector tambe mou el seu top i
       //    s'ha de descomptar; amb la graella, no.)
-      const deltaAlign = (p1Top + offset) - (p2Top - (perGraelles ? 0 : centraAplicat));
+      const deltaAlign = (objectiuTop != null ? objectiuTop : p1Top + offset) - (p2Top - (perGraelles ? 0 : centraAplicat));
 
       // 2) CENTRATGE (DECLARAT, 26/09/2026): el centre del selector ha de
       //    coincidir amb el de la filera que flanquegen el selector i les
@@ -369,12 +524,98 @@ export default function MegaslidePagina2({
     // s'ha de tornar a calcular. Com que l'avís arriba des d'un efecte de
     // layout del fill (abans que aquest), la passada nova ja mesura el DOM amb
     // la mida bona: el selector neix centrat i no s'ha de corregir després.
-  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, topGraellaColors, mesuraGraellaP2]);
+  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, esComposicioEstreta, topGraellaColors, mesuraGraellaP2]);
 
   // (El centratge del selector amb la graella de colors s'ha fusionat amb
   // l'efecte de dalt. Era un segon bucle que reescrivia el valor que el primer
   // llegia, i per això l'ordre i el nombre d'iteracions en canviaven el
   // resultat.)
+
+  // EL BAIX DE LA FRANJA DE LA P2, AL DE LA P1 (02/10/2026).
+  //
+  // Nomes a la banda de les tauletes apaissades, que es on les dues franges fan
+  // alcades diferents: alla el `visualOffsetY` quadra els tops i els baixos
+  // queden desquadrats (mesurat: l'aire de sota la franja de la p2 era 41,4 px
+  // mes gran que el de la p1 a 1366x768, 51,1 a 1280x720 i 78,6 a 1024x768).
+  // L'objectiu es el baix de la franja de la p1, que es qui dona l'alcada al
+  // panell (i que sempre queda a 30 px del seu final).
+  //
+  // Es un bucle d'acumulacio, com el de l'alineacio de la graella: s'arrenca del
+  // valor JA aplicat (la ref, no l'estat) i nome's s'hi suma la diferencia, amb
+  // un llindar de 0,5 px perque no es posi a mesurar a cada passada. Les
+  // repassades de 180 i 340 ms hi son perque l'alcada de la franja triga uns
+  // quants fotogrames a assentar-se (la seva escala es mesura), i el
+  // ResizeObserver les cobreix si canvia mes tard.
+  useLayoutEffect(() => {
+    if (!active) return undefined;
+    const viewport = viewportRef.current;
+    if (!viewport) return undefined;
+    let frame = 0;
+    let t1 = 0;
+    let t2 = 0;
+
+    const ajusta = () => {
+      const f1 = document.querySelector('[data-mega-page-viewport="1"] [data-stripe-visual-content="1"]');
+      const f2 = viewport.querySelector('[data-stripe-visual-content="2"]');
+      // Fora de la banda, el valor ha de tornar a zero: si s'hi entra i se'n
+      // surt (una finestra que s'engrandeix), el desplaçament no s'ha de quedar.
+      if (!isLandscapeTablet || !f1 || !f2) {
+        if (ajustFranjaRefY.current !== 0) {
+          ajustFranjaRefY.current = 0;
+          setAjustFranjaP2Y(0);
+        }
+        return;
+      }
+      // A LA COMPOSICIO ESTRETA (1024-1366) LA FRANJA ES PART DEL BLOC CENTRAT
+      // (02/10/2026): el seu objectiu no es la franja de la p1 sino quedar a 5 px
+      // del baix de la franja de colleccions, que es qui la governa (el bloc el
+      // col·loca el bucle d'alineacio i la franja de colleccions hi va 5 px per
+      // sota del selector). Es una mesura ABSOLUTA, o sigui que el bucle no
+      // s'alimenta d'ell mateix.
+      let delta;
+      if (esComposicioEstreta) {
+        const bandaEl = viewport.querySelector('[data-colleccions-franja="1"]');
+        if (!bandaEl) return;
+        const objectiu = bandaEl.getBoundingClientRect().bottom + AIRE_FRANJA_COLLECCIONS_PX;
+        delta = objectiu - f2.getBoundingClientRect().top;
+      } else {
+        delta = f1.getBoundingClientRect().bottom - f2.getBoundingClientRect().bottom;
+      }
+      if (Math.abs(delta) < 0.5) return;
+      ajustFranjaRefY.current += delta;
+      setAjustFranjaP2Y(ajustFranjaRefY.current);
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(ajusta);
+    };
+
+    ajusta();
+    t1 = window.setTimeout(schedule, 180);
+    t2 = window.setTimeout(schedule, 340);
+    window.addEventListener('resize', schedule);
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null;
+    const f1 = document.querySelector('[data-mega-page-viewport="1"] [data-stripe-visual-content="1"]');
+    const f2 = viewport.querySelector('[data-stripe-visual-content="2"]');
+    if (f1) observer?.observe(f1);
+    if (f2) observer?.observe(f2);
+    // EL PANELL TAMBE ES MIRA (02/10/2026). La franja de samarretes no te
+    // posicio propia: cau de la reserva del panell, i l'alcada del panell surt
+    // d'una mesura de la pagina 1 que arriba uns centenars de mil·lisegons
+    // despres. Mentre no s'ha assentat, l'objectiu d'aquest bucle es mou (i el
+    // desplaçament es quedava 52 px curt a 1366x768). Amb el panell observat, la
+    // correccio es torna a fer quan l'alcada canvia.
+    const panell = document.querySelector('[data-mega-panel-surface]');
+    if (panell) observer?.observe(panell);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', schedule);
+      observer?.disconnect();
+    };
+  }, [active, isLandscapeTablet, esComposicioEstreta, topVisualAlignmentY, mesuraGraellaP2]);
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
@@ -452,21 +693,80 @@ export default function MegaslidePagina2({
         subcollections.push(ctxSubcollection || null);
       }
     };
-    // Primer la colleccio activa, amb el SEU ordre; despres les altres, en
-    // l'ordre de la graella.
+    // LA TIRA ES SEMPRE LA MATEIXA: 64 FITXES EN L'ORDRE CANONIC (29/09/2026).
     //
-    // LA COLLECCIO ACTIVA ES QUEDA AGRUPADA (25/09/2026, ho ha demanat l'amo:
-    // «Prefereixo que es veguin agrupats a la stripe. Torna a deixar les imatges
-    // com estaven ordenades abans»). La llista ve del mega configurat, i alla
-    // els quatre solids de LOOKING FOR MY DARCY hi son seguits i els quatre
-    // marcs darrere: agrupats. Ordenar-la pel rang de la graella els
-    // intercalava, i allo es el que no vol.
-    afegeix(drawable, active, variant, active, austenSubcollection);
-    for (const it of dibuixosGraella16x4()) {
-      if (!it.stripeItem || it.collection === active) continue;
-      // L'ultim argument: aquesta casa es d'una altra colleccio, o sigui que va
-      // VELADA i el seu dibuix es demana en negre (vegeu `afegeix`).
-      afegeix([it.stripeItem], it.collection, it.collection === 'the_human_inside' ? humanInsideVariant : firstContactVariant, it.collection, it.subcollection, true);
+    // Ho va dictar l'amo, amb el comptatge exacte:
+    //
+    //   FIRST CONTACT 7 · THE HUMAN INSIDE 15 · AUSTEN 27 · CUBE 10 · MISCEL·LANIA 5
+    //
+    // i, dins d'AUSTEN, les subcolleccions en aquest ordre:
+    //
+    //   PEMBERLEY 1 · KEEP CALM 1 · QUOTES 5 · CROSSWORDS 12 · LFMD 8
+    //
+    // (7 + 15 + 27 + 10 + 5 = 64.) Son AQUESTES i per AQUEST ordre, tant si una
+    // colleccio es l'activa com si no.
+    //
+    // PER QUE CALIA: la tira es construia amb la COLLECCIO ACTIVA AL PRINCIPI i
+    // les altres amb UNA SOLA fitxa, o sigui que (a) la triada sortia sempre entre
+    // MISCEL·LANIA i FIRST CONTACT -la casa 0 d'una tira circular-, (b) totes les
+    // altres es desplaçaven, i (c) les subcolleccions d'Austen ni hi eren.
+    // L'amo ho va veure: «les colleccions es mouen de lloc cada cop que les
+    // selecciones» i «continuen desapareixent les subcolleccions d'Austen».
+    //
+    // CADA ENTRADA: [item, colleccio, subcolleccio, mitja]. `mitja` es el nom o el
+    // cami amb que `resolveForItem` sap resoldre el dibuix d'aquella colleccio:
+    // first_contact, the_human_inside i cube resolen per NOM; miscellania i les
+    // subcolleccions d'austen, per CAMI.
+    const G = '/custom_logos/drawings/images_grid';
+    const NOMS_CUBE = ['Afrodita C', 'Cube 3 P0', 'Cyber Cube', 'Cylon Cube', 'Darth Cube',
+      'Iron Kong', 'Iron Cube 68', 'MaschinenCube', 'Mazinger C', 'RoboCube'];
+    const TIRA_ITEMS = [
+      // FIRST CONTACT (7)
+      ...['NX-01', 'NCC-1701', 'NCC-1701-D', 'Wormhole', 'The Phoenix', "Vulcan's End", 'Plasma Escape']
+        .map((n) => [n, 'first_contact', null, n]),
+      // THE HUMAN INSIDE (15)
+      // Els noms han de ser EXACTAMENT els que el resolutor te al seu mapa
+      // (`mapBlack` de `resolveForItem`): alla son sense apostrofs.
+      ...['Afrodita-A', 'C3-P0', 'Cyberman', 'Cylon 03', 'Cylon 78', 'Iron Man 08', 'Iron Man 68',
+        'Maschinenmensch', 'Mazinger-Z', 'R2-D2', 'Robbie The Robot', 'Robocop', 'Terminator',
+        'The Dalek', 'Vader'].map((n) => [n, 'the_human_inside', null, n]),
+      // AUSTEN · PEMBERLEY (1) i KEEP CALM (1)
+      ['pemberley-house', 'austen', 'pemberley', `${G}/austen/pemberley_house/pemberley-house-b-grid.webp`],
+      ['keep-calm', 'austen', 'keep_calm', `${G}/austen/keep_calm/keep-calm-b-grid.webp`],
+      // AUSTEN · QUOTES (5)
+      ...['i-admire-and-love-you', 'you-have-bewitched-me', 'half-agony-half-hope', 'unsociable-and-taciturn', 'it-is-a-truth']
+        .map((n) => [n, 'austen', 'quotes', `${G}/austen/quotes/${n}-b-grid.webp`]),
+      // AUSTEN · CROSSWORDS (12)
+      ...[1, 2, 3, 4].flatMap((k) => [
+        [`persuasion-${k}`, 'austen', 'crosswords', `${G}/austen/crosswords/persuasion-${k}-grid.webp`],
+        [`pride-and-prejudice-${k}`, 'austen', 'crosswords', `${G}/austen/crosswords/pride-and-prejudice-${k}-grid.webp`],
+        [`sense-and-sensibility-${k}`, 'austen', 'crosswords', `${G}/austen/crosswords/sense-and-sensibility-${k}-grid.webp`],
+      ]),
+      // AUSTEN · LOOKING FOR MY DARCY (8)
+      ...['blue', 'fuchsia', 'red', 'yellow'].flatMap((c) => [
+        [`${c}-solid`, 'austen', 'looking_for_my_darcy', `${G}/austen/looking_for_my_darcy/${c}-solid-grid.webp`],
+        [`${c}-frame`, 'austen', 'looking_for_my_darcy', `${G}/austen/looking_for_my_darcy/${c}-frame-grid.webp`],
+      ]),
+      // CUBE (10)
+      ...NOMS_CUBE.map((n) => [n, 'cube', null, n]),
+      // MISCEL·LANIA (5)
+      ...['arthur-d-the-second', 'death-star2d2', 'dj-vader', 'pont-del-diable', 'r2d2-quote']
+        .map((n) => [n, 'miscellania', null, `${G}/miscellania/${n}-b-grid.webp`]),
+    ];
+    // S'AFEGEIX COLLECCIO A COLLECCIO, perque `computeStripeTileOverlaySrcs` resol
+    // amb el context de la SEVA colleccio; amb una llista barrejada retornava
+    // `null` a tot el que no fos l'activa.
+    let inici = 0;
+    while (inici < TIRA_ITEMS.length) {
+      const [it0, coll0, sub0] = TIRA_ITEMS[inici];
+      let fi = inici;
+      while (fi < TIRA_ITEMS.length && TIRA_ITEMS[fi][1] === coll0 && TIRA_ITEMS[fi][2] === sub0) fi += 1;
+      const mitjans = TIRA_ITEMS.slice(inici, fi).map(([, , , m]) => m);
+      // A AUSTEN el vel va per SUBCAPçALERA: si la colleccio es l'activa pero la
+      // subcolleccio no, tambe va velada.
+      const velada = coll0 !== active || (coll0 === 'austen' && sub0 !== austenSubcollection);
+      afegeix(mitjans, coll0, variant, coll0, sub0, velada);
+      inici = fi;
     }
     return { items, srcs, collections, subcollections };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -510,14 +810,15 @@ export default function MegaslidePagina2({
   // (`desplacamentCentratgeFranja`) i es calcula al PRIMER render, no en un
   // efecte. Abans naixia a 0 i mig segon despres girava tres cases, amb la
   // creueta dels dibuixos: es el moviment que va veure l'amo.
-  const quantsGrupActiu = quantsGrupActiuFranja({ collections: tiraFranja.collections, active });
-  const stripeStripOffsetInicial = desplacamentCentratgeFranja({
-    quants: quantsGrupActiu,
-    n: tiraFranja.srcs.length,
-    // A la vertical, el grup arrenca a la primera casa (la filera de dalt), pero
-    // una colleccio d'UNA sola samarreta es queda centrada: a la punta sembla
-    // que es perdi (vegeu `casaIniciGrupActiu`).
-    casaInici: casaIniciGrupActiu(quantsGrupActiu, isPortraitTablet),
+  // El grup actiu ja no comença a la casa 0: es busca on es (vegeu
+  // `desplacamentGrupActiuFranja`). I a AUSTEN el grup el mana la
+  // SUBCAPÇALERA activa (PEMBERLEY, QUOTES, CROSSWORDS…), no la collecció.
+  const stripeStripOffsetInicial = desplacamentGrupActiuFranja({
+    collections: tiraFranja.collections,
+    subcollections: tiraFranja.subcollections,
+    sub: austenSubcollection ?? null,
+    active,
+    isPortraitTablet,
   });
   const [stripeStripOffset, setStripeStripOffset] = useState(stripeStripOffsetInicial);
   const stripeStripOffsetRef = useRef(stripeStripOffsetInicial);
@@ -578,29 +879,32 @@ export default function MegaslidePagina2({
     // la llista sencera de dibuixos es `tiraFranja`.
     const n = tiraFranja.srcs.length;
     if (!n) return;
-    // El grup actiu es contigu i comença a la casa 0 (aixi es construeix
-    // `tiraFranja`): el que cal saber-ne es quants dibuixos te.
-    let quants = 0;
-    for (const c of (tiraFranja.collections || [])) {
-      if (c !== active) break;
-      quants += 1;
-    }
+    // El grup actiu ja no comença a la casa 0: cal buscar on es i quants
+    // dibuixos te (vegeu `desplacamentGrupActiuFranja`). A AUSTEN el grup es el
+    // de la SUBCAPÇALERA activa, i per aixo tambe entra a la clau: canviar de
+    // subcol·lecció ha de tornar a centrar la franja.
+    const sub = austenSubcollection ?? null;
+    const { quants } = buscaGrupActiuFranja(tiraFranja.collections, active, {
+      subcollections: tiraFranja.subcollections, sub,
+    });
     if (!quants) return;
-    const clau = `${active}|${quants}|${n}`;
+    const clau = `${active}|${sub ?? ''}|${quants}|${n}`;
     if (grupActiuRef.current === clau) return;
     grupActiuRef.current = clau;
-    // El centre del grup cau a la casa `(quants - 1) / 2` i el mig de la franja
-    // es la casa 6,5 (catorze cases): el desplaçament que els fa coincidir es la
-    // diferencia. Com que la tira es circular, es tria la volta mes propera al
-    // desplaçament que ja hi hagi, perque no faci cap salt (mateix criteri que
-    // el centratge de la graella, a `CercadorTextRow`).
+    // Es tria la volta mes propera al desplacament que ja hi hagi, perque el
+    // canvi de colleccio no faci cap salt.
     const actual = stripeStripOffsetRef.current;
-    const objectiu = desplacamentCentratgeFranja({
-      quants, n, actual, casaInici: casaIniciGrupActiu(quants, isPortraitTablet),
+    const objectiu = desplacamentGrupActiuFranja({
+      collections: tiraFranja.collections,
+      subcollections: tiraFranja.subcollections,
+      sub,
+      active,
+      isPortraitTablet,
+      actual,
     });
     if (objectiu === actual) return;
     aplicaStripOffset(objectiu);
-  }, [stripeStrip, tiraFranja, active, aplicaStripOffset, isPortraitTablet]);
+  }, [stripeStrip, tiraFranja, active, austenSubcollection, aplicaStripOffset, isPortraitTablet]);
 
   // EL DIBUIX CLICAT D'UNA SAMARRETA VELADA ES QUEDA A LA SEVA CASA
   // (26/09/2026).
@@ -623,17 +927,18 @@ export default function MegaslidePagina2({
     if (!n) return;
     const k = tiraFranja.srcs.indexOf(anc.src);
     if (k < 0) return;
-    let quants = 0;
-    for (const c of (tiraFranja.collections || [])) {
-      if (c !== active) break;
-      quants += 1;
-    }
-    grupActiuRef.current = `${active}|${quants}|${n}`;
+    const sub = austenSubcollection ?? null;
+    // La mateixa clau que el centratge, amb la subcol·lecció a dins: si no hi
+    // son iguals, el centratge desfaria aquest ancoratge al render seguent.
+    const { quants } = buscaGrupActiuFranja(tiraFranja.collections, active, {
+      subcollections: tiraFranja.subcollections, sub,
+    });
+    grupActiuRef.current = `${active}|${sub ?? ''}|${quants}|${n}`;
     const objectiuBase = k - anc.cell;
     const actual = stripeStripOffsetRef.current;
     const objectiu = objectiuBase + Math.round((actual - objectiuBase) / n) * n;
     aplicaStripOffset(objectiu);
-  }, [tiraFranja, active, aplicaStripOffset]);
+  }, [tiraFranja, active, austenSubcollection, aplicaStripOffset]);
 
   // Quantes caselles porten dibuix: les altres son samarretes buides i a la
   // vista vertical s'atenuen amb un vel blanc.
@@ -679,14 +984,45 @@ export default function MegaslidePagina2({
   const indicesSamarretesInactivesFranja = useMemo(() => {
     const n = tiraFranja.srcs.length;
     if (!n || !active) return [];
+    // LA SUBCAPçALERA TAMBE MANA (29/09/2026).
+    //
+    // Fins ara es mirava nome's la COLLECCIO, i com que totes les
+    // subcolleccions d'austen (PEMBERLEY, KEEP CALM, QUOTES, CROSSWORDS i
+    // LOOKING FOR MY DARCY) comparteixen `collection === 'austen'`, en clicar
+    // una d'elles les altres es quedaven sense vel: «Quan clico una colleccio
+    // d'Austen, les altres d'Austen, desapareixen de la stripe».
+    //
+    // Amb la subcolleccio, una casa esta activa nome's si tambe ho es la seva
+    // subcolleccio. Si el context no en te (les altres colleccions), el
+    // comportament es el de sempre.
+    const sub = austenSubcollection ?? null;
     const out = [];
     for (let i = 0; i < 14; i++) {
       const j = ((((i + stripeStripOffset) % n) + n) % n);
       const coll = tiraFranja.collections[j];
-      if (coll && coll !== active) out.push(i);
+      const subDeLaCasa = tiraFranja.subcollections?.[j] ?? null;
+      const esActiva = coll === active && (coll !== 'austen' || !sub || subDeLaCasa === sub);
+      if (coll && !esActiva) out.push(i);
     }
     return out;
-  }, [tiraFranja, stripeStripOffset, active]);
+  }, [tiraFranja, stripeStripOffset, active, austenSubcollection]);
+  // Pista de taller (nome's en desenvolupament): estat de la franja i una
+  // manera de moure-la des de la consola per comprovar el vel. Va DINS D'UN
+  // EFECTE i no al cos del render: escriure a `window` mentre es pinta es mutar
+  // un valor de fora i el lint (`react-hooks/immutability`) ho atura.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return undefined;
+    window.__HG_STRIPE_INACTIUS__ = {
+      offset: stripeStripOffset,
+      active,
+      sub: austenSubcollection ?? null,
+      inactius: indicesSamarretesInactivesFranja,
+      collections: tiraFranja.collections,
+      subcollections: tiraFranja.subcollections,
+      mou: setStripeStripOffset,
+    };
+    return undefined;
+  }, [stripeStripOffset, active, austenSubcollection, indicesSamarretesInactivesFranja, tiraFranja]);
 
   const emptyTileIndices = useMemo(() => {
     if (!Array.isArray(stripeTileItems)) return [];
@@ -915,6 +1251,11 @@ export default function MegaslidePagina2({
             // La meitat que sobra trepitjava les primeres caselles del carrusel
             // (Playwright: «intercepts pointer events»), i per aixo el
             // contenidor no rep clics: els rep la pastilla.
+            //
+            // La CAIXA (el fill) pot dur l'amplada manada des del 02/10/2026
+            // (`ampleCaixaBcnPx`): la seva pastilla ha d'acabar on acaba la de la
+            // franja de colleccions amb FIRST CONTACT actiu. El contenidor es
+            // queda l'ample de disseny, que sempre es mes ample.
             width: carrilPx(bnSliderSize),
             height: carrilPx(bnSliderSize),
             zIndex: 4,
@@ -936,6 +1277,12 @@ export default function MegaslidePagina2({
                 // `FirstContactDibuix00Buttons`). Aqui torna a ser el de sempre:
                 // la meitat d'amplada i el doble d'alçada.
                 format="rectangle"
+                // LA CAIXA, CLAVADA AMB LA PASTILLA DE LA FRANJA (02/10/2026):
+                // l'amplada surt de la primera casa de la franja (vegeu
+                // `ampleCaixaBcnPx`) i l'alçada es queda la de disseny (el doble
+                // de l'amplada de disseny, que es el que feia l'aspecte 1/2).
+                ampladaPx={ampleCaixaBcnPx != null ? `${ampleCaixaBcnPx}px` : null}
+                alcadaPx={carrilPx(bnSliderSize)}
                 onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
                 onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
                 onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
@@ -974,7 +1321,27 @@ export default function MegaslidePagina2({
             // selector quan era sencer, i quan es va fer la meitat (24/09) va
             // quedar com a coixi de 34 px, o sigui que els dibuixos no
             // arrencaven on acaba el selector.
-            esquerra={bnSliderSize ? `calc(${carrilPx(bnSliderSize / 2)} + ${carrilPx(10)})` : undefined}
+            //
+            // I A LA COMPOSICIO ESTRETA ARRENCA ON ACABA EL SELECTOR DE DEBO
+            // (02/10/2026). En Marc: «Aprofitarem que es d'aquesta mida. 1.
+            // Redueix la tira de colors perque hi capiga entre el selector i la
+            // dreta del carril. 2. Tanca el viewport de la graella de dibuixos
+            // pel punt on comenci la tira de colors».
+            //
+            // El valor de disseny (`bnSliderSize / 2` + 10) ve de quan el
+            // selector era el doble d'ample, i amb la caixa nova el retall dels
+            // dibuixos i la tira de colors arrencaven 31 px ABANS del final del
+            // selector (mesurat a 1366: 336,4 en lloc de 367,5), o sigui que
+            // s'hi endinsaven. L'amplada de la caixa ja es mesura
+            // (`ampleCaixaBcnPx`, vegeu mes amunt) i la caixa arrenca a la vora
+            // esquerra del carril: el seu final es exactament aquesta amplada.
+            // La franja de colleccions no s'hi mou: `franjaPlena` li descompta
+            // l'`esquerra` i continua anant de vora a vora del carril.
+            esquerra={bnSliderSize
+              ? (esComposicioEstreta && ampleCaixaBcnPx != null
+                ? carrilPx(ampleCaixaBcnPx)
+                : `calc(${carrilPx(bnSliderSize / 2)} + ${carrilPx(10)})`)
+              : undefined}
             desplacamentVertical={40 - topGraellaColors}
             // El desplaçament vertical d'aquesta filera, el que aplica el bucle
             // d'alineació de sota. La graella el necessita com a dependència: la
@@ -1059,6 +1426,10 @@ export default function MegaslidePagina2({
             // L'OMBRA DE LA MANIGA: la caixa del contingut de la franja dins de
             // la columna de colleccions (la pinta la columna, que la retalla).
             ombraManiga={ombraManiga}
+            // El desplaçament que ha baixat la franja en aquesta banda: el
+            // sostre de la franja (`topFranjaPagina2`) l'ha de portar perque la
+            // columna de colleccions hi continuï acabant.
+            ajustFranjaY={ajustFranjaP2Y}
           />
         </div>
 
@@ -1103,12 +1474,15 @@ export default function MegaslidePagina2({
             // La franja ha de quedar a la mateixa alcada que la de la pagina 1.
             // El desplacament es DECLARAT (`visualOffsetYFranjaPagina2`): era
             // una composicio en línia aquí i el calcul del sostre de la franja
-            // tambe el necessita.
+            // tambe el necessita. `ajustFranjaP2Y` es el que hi afegeix el bucle
+            // de dalt a la banda de les tauletes apaissades, on les dues franges
+            // no fan la mateixa alcada i els baixos s'han de quadrar igualment.
             visualOffsetY={visualOffsetYFranjaPagina2({
               ample: typeof window !== 'undefined' ? window.innerWidth : 0,
               alt: typeof window !== 'undefined' ? window.innerHeight : 0,
               isPortraitTablet,
               isLandscapeTablet,
+              ajustBaixY: ajustFranjaP2Y,
             })}
           />
         </div>

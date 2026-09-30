@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 function invertHex(hex) {
-  const h = String(hex || '#FFFFFF').replace('#', '');
-  if (h.length < 6) return '#000000';
+  const h = String(hex || 'hsl(var(--grey-paper))').replace('#', '');
+  if (h.length < 6) return 'hsl(var(--grey-ink-pure))';
   const r = 255 - parseInt(h.substring(0, 2), 16);
   const g = 255 - parseInt(h.substring(2, 4), 16);
   const b = 255 - parseInt(h.substring(4, 6), 16);
@@ -73,7 +73,7 @@ function ClicAreaOverlayP1({ src, highlightAll, highlightIndices, tshirtColor, d
       <style>{`
         .clic-area-overlay-p1 { position: absolute; top: 0; left: 50%; transform: translateX(calc(-50% - 0.25px)) scaleX(var(--hg-clic-scale-x, 0.979)) scaleY(var(--hg-clic-scale-y, 1.02)); transform-origin: center center; height: 100%; width: 103%; z-index: 30; pointer-events: none; }
         .clic-area-overlay-p1 svg { display: block; width: 100%; height: 100%; }
-        .clic-area-overlay-p1 .tshirt-outline { opacity: 0; pointer-events: all; cursor: pointer; stroke: var(--hg-outline-color, #000000) !important; }
+        .clic-area-overlay-p1 .tshirt-outline { opacity: 0; pointer-events: all; cursor: pointer; stroke: var(--hg-outline-color, hsl(var(--grey-ink-pure))) !important; }
         .clic-area-overlay-p1 .tshirt-outline.is-disabled { pointer-events: none; cursor: default; opacity: 0; stroke: none !important; fill: none !important; }
         .clic-area-fallback-p1 { position: absolute; inset: 0; pointer-events: all; cursor: pointer; z-index: 29; background: transparent; }
       `}</style>

@@ -14,7 +14,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
   const { toast } = useToast();
 
   const getGradientCSS = () => {
-    if (!stops || stops.length === 0) return 'linear-gradient(90deg, #000 0%, #fff 100%)';
+    if (!stops || stops.length === 0) return 'linear-gradient(90deg, hsl(var(--grey-ink-pure)) 0%, hsl(var(--grey-paper)) 100%)';
     const sortedStops = [...stops].sort((a, b) => a.position - b.position);
     const gradient = sortedStops.map(stop => `${stop.color} ${stop.position}%`).join(', ');
     return `linear-gradient(90deg, ${gradient})`;
@@ -35,7 +35,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
     const clampedPosition = Math.max(0, Math.min(100, position));
 
     const newStop = {
-      color: '#888888',
+      color: 'hsl(var(--grey-muted-2))',
       position: clampedPosition
     };
 
@@ -95,8 +95,8 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
 
   const handleResetGradient = () => {
     const defaultStops = [
-      { color: '#000000', position: 0 },
-      { color: '#ffffff', position: 100 }
+      { color: 'hsl(var(--grey-ink-pure))', position: 0 },
+      { color: 'hsl(var(--grey-paper))', position: 100 }
     ];
     onStopsChange(defaultStops);
     setSelectedStopIndex(null);
@@ -228,7 +228,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
           <button
             type="button"
             onClick={() => setShowSaveDialog(!showSaveDialog)}
-            className="flex items-center gap-1 text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            className="flex items-center gap-1 text-xs px-2 py-1 bg-green-600 text-paper rounded hover:bg-green-700 transition-colors"
           >
             <Save className="w-3 h-3" />
             Guardar
@@ -250,7 +250,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
               <button
                 type="button"
                 onClick={savePreset}
-                className="px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                className="px-3 py-2 text-sm bg-green-600 text-paper rounded hover:bg-green-700 transition-colors"
               >
                 Guardar
               </button>
@@ -270,13 +270,13 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
                   <button
                     type="button"
                     onClick={() => loadPreset(preset)}
-                    className="w-full h-12 rounded-lg border-2 border-gray-300 hover:border-blue-500 transition-all overflow-hidden"
+                    className="w-full h-12 rounded-lg border-2 border-line-strong hover:border-blue-500 transition-all overflow-hidden"
                     style={{
                       background: `linear-gradient(${preset.angle}deg, ${[...preset.stops].sort((a, b) => a.position - b.position).map(s => `${s.color} ${s.position}%`).join(', ')})`
                     }}
                     title={preset.name}
                   />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs px-2 py-1 truncate">
+                  <div className="absolute bottom-0 left-0 right-0 bg-ink-pure/60 text-paper text-xs px-2 py-1 truncate">
                     {preset.name}
                   </div>
                   <button
@@ -285,7 +285,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
                       e.stopPropagation();
                       deletePreset(preset.id);
                     }}
-                    className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 p-1 bg-red-600 text-paper rounded opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Eliminar preset"
                   >
                     <Trash2 className="w-3 h-3" />
@@ -299,7 +299,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
         <div className="relative">
           <div
             ref={barRef}
-            className="relative h-12 rounded-lg border-2 border-gray-300 cursor-crosshair overflow-visible"
+            className="relative h-12 rounded-lg border-2 border-line-strong cursor-crosshair overflow-visible"
             style={{ background: getGradientCSS() }}
             onClick={handleBarClick}
           >
@@ -315,13 +315,13 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
                   className={`w-6 h-6 rounded-full border-3 shadow-lg transition-all ${
                     selectedStopIndex === index
                       ? 'border-blue-500 scale-110'
-                      : 'border-white'
+                      : 'border-line'
                   }`}
                   style={{ backgroundColor: stop.color }}
                 />
 
                 <div
-                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full w-0.5 h-3 bg-gray-400"
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full w-0.5 h-3 bg-muted-2"
                 />
               </div>
             ))}
@@ -331,7 +331,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
         </div>
 
         {selectedStopIndex !== null && stops[selectedStopIndex] && (
-          <div className="mt-4 p-3 bg-white border rounded-lg space-y-2">
+          <div className="mt-4 p-3 bg-paper border rounded-lg space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium">
                 Color a {stops[selectedStopIndex].position}%
@@ -340,7 +340,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
                 <button
                   type="button"
                   onClick={handleResetGradient}
-                  className="p-1 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                  className="p-1 text-ink-2 hover:bg-paper-soft rounded transition-colors"
                   title="Resetejar degradat"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -370,7 +370,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
                 value={stops[selectedStopIndex].color}
                 onChange={(e) => handleColorChange(selectedStopIndex, e.target.value)}
                 className="flex-1 px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="#000000"
+                placeholder="hsl(var(--grey-ink-pure))"
               />
             </div>
 
@@ -397,7 +397,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
           </div>
         )}
 
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs text-ink-soft mt-2">
           Clica la barra per afegir colors • Arrossega els cercles per moure'ls • Clica un cercle per editar-lo
         </p>
       </div>
@@ -409,7 +409,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
           style={{
             background: stops && stops.length > 0
               ? `linear-gradient(${angle}deg, ${[...stops].sort((a, b) => a.position - b.position).map(s => `${s.color} ${s.position}%`).join(', ')})`
-              : '#000000'
+              : 'hsl(var(--grey-ink-pure))'
           }}
         />
       </div>

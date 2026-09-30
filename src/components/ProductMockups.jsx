@@ -93,8 +93,8 @@ export default function ProductMockups({
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregant mockups...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ink-strong mx-auto"></div>
+          <p className="mt-4 text-ink-2">Carregant mockups...</p>
         </div>
       </div>
     );
@@ -102,8 +102,8 @@ export default function ProductMockups({
 
   if (mockups.length === 0) {
     return (
-      <div className="bg-gray-100 rounded-lg p-8 text-center">
-        <p className="text-gray-600">No hi ha mockups disponibles per aquest producte</p>
+      <div className="bg-paper-soft rounded-lg p-8 text-center">
+        <p className="text-ink-2">No hi ha mockups disponibles per aquest producte</p>
       </div>
     );
   }
@@ -114,7 +114,7 @@ export default function ProductMockups({
         <div className="space-y-4">
           {availableColors.base.length > 1 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-ink-2 mb-2">
                 Color base
               </label>
               <div className="flex flex-wrap gap-2">
@@ -122,8 +122,8 @@ export default function ProductMockups({
                   onClick={() => setFilters({ ...filters, base_color: null })}
                   className={`px-4 py-2 rounded-lg border ${
                     filters.base_color === null
-                      ? 'bg-gray-900 text-white border-gray-900'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                      ? 'bg-ink-strong text-paper border-ink-strong'
+                      : 'bg-paper text-ink-2 border-line-strong hover:border-muted-2'
                   }`}
                 >
                   Tots
@@ -134,8 +134,8 @@ export default function ProductMockups({
                     onClick={() => setFilters({ ...filters, base_color: color })}
                     className={`px-4 py-2 rounded-lg border capitalize ${
                       filters.base_color === color
-                        ? 'bg-gray-900 text-white border-gray-900'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                        ? 'bg-ink-strong text-paper border-ink-strong'
+                        : 'bg-paper text-ink-2 border-line-strong hover:border-muted-2'
                     }`}
                   >
                     {color}
@@ -147,7 +147,7 @@ export default function ProductMockups({
 
           {availableColors.drawing.length > 1 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-ink-2 mb-2">
                 Color del disseny
               </label>
               <div className="flex flex-wrap gap-2">
@@ -155,8 +155,8 @@ export default function ProductMockups({
                   onClick={() => setFilters({ ...filters, drawing_color: null })}
                   className={`px-4 py-2 rounded-lg border ${
                     filters.drawing_color === null
-                      ? 'bg-gray-900 text-white border-gray-900'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                      ? 'bg-ink-strong text-paper border-ink-strong'
+                      : 'bg-paper text-ink-2 border-line-strong hover:border-muted-2'
                   }`}
                 >
                   Tots
@@ -167,8 +167,8 @@ export default function ProductMockups({
                     onClick={() => setFilters({ ...filters, drawing_color: color })}
                     className={`px-4 py-2 rounded-lg border capitalize ${
                       filters.drawing_color === color
-                        ? 'bg-gray-900 text-white border-gray-900'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                        ? 'bg-ink-strong text-paper border-ink-strong'
+                        : 'bg-paper text-ink-2 border-line-strong hover:border-muted-2'
                     }`}
                   >
                     {color}
@@ -182,7 +182,7 @@ export default function ProductMockups({
 
       {selectedMockup && (
         <div className="relative">
-          <div className="relative bg-gray-100 rounded-lg overflow-hidden">
+          <div className="relative bg-paper-soft rounded-lg overflow-hidden">
             <img
               src={selectedMockup.file_path}
               alt={`${selectedMockup.design_name} - ${selectedMockup.base_color}`}
@@ -196,7 +196,7 @@ export default function ProductMockups({
               <>
                 <button
                   onClick={prevMockup}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-paper/90 hover:bg-paper p-2 rounded-full shadow-lg transition-all"
                   aria-label="Mockup anterior"
                 >
                   <ChevronLeft className="w-6 h-6" />
@@ -204,7 +204,7 @@ export default function ProductMockups({
 
                 <button
                   onClick={nextMockup}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-paper/90 hover:bg-paper p-2 rounded-full shadow-lg transition-all"
                   aria-label="Següent mockup"
                 >
                   <ChevronRight className="w-6 h-6" />
@@ -213,7 +213,7 @@ export default function ProductMockups({
             )}
           </div>
 
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
+          <div className="mt-4 flex items-center justify-between text-sm text-ink-2">
             <div className="space-y-1">
               <p>
                 <span className="font-medium">Color base:</span>{' '}
@@ -232,7 +232,7 @@ export default function ProductMockups({
             </div>
 
             {filteredMockups.length > 1 && (
-              <div className="text-gray-500">
+              <div className="text-ink-soft">
                 {currentIndex + 1} / {filteredMockups.length}
               </div>
             )}
@@ -248,8 +248,8 @@ export default function ProductMockups({
               onClick={() => selectMockup(mockup, index)}
               className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                 selectedMockup?.id === mockup.id
-                  ? 'border-gray-900 ring-2 ring-gray-900 ring-offset-2'
-                  : 'border-gray-200 hover:border-gray-400'
+                  ? 'border-ink-strong ring-2 ring-ink-strong ring-offset-2'
+                  : 'border-line hover:border-muted-2'
               }`}
             >
               <img

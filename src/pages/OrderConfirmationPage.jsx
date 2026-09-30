@@ -93,18 +93,18 @@ const OrderConfirmationPage = () => {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'hsl(var(--grey-paper-soft))' }}>
+        <Loader2 className="w-8 h-8 animate-spin text-muted-2" />
       </div>
     );
   }
 
   if (error || !orderData) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'hsl(var(--grey-paper-soft))' }}>
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '18px', fontWeight: 500, marginBottom: '8px', color: '#141414' }}>{error || 'Comanda no trobada'}</p>
-          <Link to="/" style={{ display: 'inline-block', marginTop: '16px', padding: '12px 32px', backgroundColor: '#141414', color: '#FFFFFF', textDecoration: 'none', borderRadius: '4px' }}>
+          <p style={{ fontSize: '18px', fontWeight: 500, marginBottom: '8px', color: 'hsl(var(--grey-ink-strong))' }}>{error || 'Comanda no trobada'}</p>
+          <Link to="/" style={{ display: 'inline-block', marginTop: '16px', padding: '12px 32px', backgroundColor: 'hsl(var(--grey-ink-strong))', color: 'hsl(var(--grey-paper))', textDecoration: 'none', borderRadius: '4px' }}>
             Tornar a l'inici
           </Link>
         </div>

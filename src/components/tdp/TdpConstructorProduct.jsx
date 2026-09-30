@@ -22,14 +22,15 @@ export const TDP_PRODUCT_NAME_SETTINGS = {
   x: 0,
   y: 0,
   fontFamily: 'Oswald',
-  fontSize: responsiveFont(24, 9),
+  // LA MATEIXA MIDA QUE EL TITOL `ESPECIFICACIONS` DE LA TDP (30/09/2026).
+  fontSize: responsiveFont(20, 9),
   fontWeight: 300,
   selectedFontWeight: 700,
   letterSpacing: 0.04,
   lineHeight: 1,
   textAlign: 'center',
   verticalAlign: 'center',
-  color: '#475059',
+  color: 'hsl(var(--grey-ink-2))',
   textTransform: 'uppercase',
 };
 
@@ -44,7 +45,7 @@ const TDP_PRODUCT_DESCRIPTION_SETTINGS = {
   lineHeight: 1.65,
   textAlign: 'left',
   verticalAlign: 'center',
-  color: '#111827',
+  color: 'hsl(var(--grey-ink-strong))',
   textTransform: 'none',
 };
 
@@ -59,7 +60,7 @@ export const TDP_PRICE_SETTINGS = {
   lineHeight: 1,
   textAlign: 'center',
   verticalAlign: 'center',
-  color: '#475059',
+  color: 'hsl(var(--grey-ink-2))',
   textTransform: 'none',
 };
 
@@ -74,7 +75,7 @@ export const TDP_SIZE_BUTTON_TEXT_SETTINGS = {
   lineHeight: 1,
   textAlign: 'center',
   verticalAlign: 'center',
-  color: '#475059',
+  color: 'hsl(var(--grey-ink-2))',
   textTransform: 'none',
 };
 
@@ -89,7 +90,7 @@ export const TDP_CART_SIZE_SETTINGS = {
   lineHeight: 1,
   textAlign: 'center',
   verticalAlign: 'center',
-  color: '#475059',
+  color: 'hsl(var(--grey-ink-2))',
   textTransform: 'none',
 };
 
@@ -349,7 +350,7 @@ function TdpConstructorProduct({
                 width: '100%',
                 height: '100%',
                 textDecoration: 'none',
-                color: nameHovered ? '#111827' : TDP_PRODUCT_NAME_SETTINGS.color,
+                color: nameHovered ? 'hsl(var(--grey-ink-strong))' : TDP_PRODUCT_NAME_SETTINGS.color,
                 transition: 'color 200ms',
                 fontFamily: `${TDP_PRODUCT_NAME_SETTINGS.fontFamily}, sans-serif`,
                 fontSize: TDP_PRODUCT_NAME_SETTINGS.fontSize,
@@ -518,7 +519,7 @@ function TdpConstructorProduct({
           <div key={`pauta-size-${copyMode ? 'copy-' : ''}${size}`} className="h-full overflow-visible">
             <button
               onClick={() => onSizeChange?.(size)}
-              className={`relative flex h-full w-full items-center justify-center overflow-visible transition-all duration-200 active:scale-95 ${selectedSize === size ? 'bg-[#475059] text-whiteStrong' : 'bg-muted text-[#475059] hover:text-muted-foreground'}`}
+              className={`relative flex h-full w-full items-center justify-center overflow-visible transition-all duration-200 active:scale-95 ${selectedSize === size ? 'bg-[hsl(var(--grey-ink-2))] text-whiteStrong' : 'bg-muted text-[hsl(var(--grey-ink-2))] hover:text-muted-foreground'}`}
               style={{
                 borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
                 fontFamily: `${sizeButtonTextSettings.fontFamily}, sans-serif`,

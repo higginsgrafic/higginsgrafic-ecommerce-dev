@@ -10,12 +10,12 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 import { caminsSiluetes, precarregaSiluetesSamarreta } from './siluetesSamarreta.js';
-import { ESTIL_CAIXA_BLOC } from './estilsBlocs.js';
+import { estilCaixaBloc, ALCADA_PASTILLA_SELECTOR_PX, COIX_ENLLAC_COLLECCIONS_PX } from './estilsBlocs.js';
 
 /**
  * CercadorTextRow
@@ -62,9 +62,9 @@ const LINE_THICK = 0.0665;  // gruix línia connectora (3px)
 const BULLET_D = 0.288;     // diàmetre bullet (13px)
 const BULLET_CX = 0.40;     // centre x del bullet des del connector (18px)
 const TEXT_X = 0.886;       // inici del text des del connector (40px)
-const INK = '#2B2B2B';
+const INK = 'hsl(var(--grey-ink))';
 const INK_HOVER = INK;
-const INK_SELECTED = '#000000';
+const INK_SELECTED = 'hsl(var(--grey-ink-pure))';
 
 
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
@@ -98,10 +98,10 @@ const STRIPE_MAP = {
   // AUSTEN - Keep Calm
   'Keep Calm': '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp',
   // AUSTEN - Quotes
-  'Allow Me To Tell You': '/custom_logos/drawings/images_grid/austen/quotes/you-must-allow-me-b-grid.webp',
-  'Body And Soul': '/custom_logos/drawings/images_grid/austen/quotes/body-and-soul-b-grid.webp',
+  'I Admire And Love You': '/custom_logos/drawings/images_grid/austen/quotes/i-admire-and-love-you-b-grid.webp',
+  'You Have Bewitched Me': '/custom_logos/drawings/images_grid/austen/quotes/you-have-bewitched-me-b-grid.webp',
   'Half Agony Half Hope': '/custom_logos/drawings/images_grid/austen/quotes/half-agony-half-hope-b-grid.webp',
-  'I Prefer To Be': '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
+  'Unsociable And Taciturn': '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
   'It Is A Truth': '/custom_logos/drawings/images_grid/austen/quotes/it-is-a-truth-b-grid.webp',
   // AUSTEN - Persuasion
   'Persuasion 1': '/custom_logos/drawings/images_grid/austen/crosswords/persuasion-1-grid.webp',
@@ -209,6 +209,45 @@ function dibuixDelNom(label) {
   return ruta.replace('/custom_logos/drawings/images_grid/', '/custom_logos/drawings/images_grid_trim/');
 }
 
+/**
+ * EL TITOL SURT DEL NOM DEL FITXER (29/09/2026, ho ha demanat l'amo).
+ *
+ * «Que el nom que surt a la pagina reflecteixi el nom del fitxer. Pero nome's la
+ * part del titol.» O sigui: del cami del dibuix se'n pren el nom del fitxer,
+ * sense extensio ni sufixos tecnics (`-b-grid`, `-w-grid`, `-grid`), i els
+ * guions es tornen espais amb cada paraula en majuscula.
+ *
+ *   images_grid_trim/austen/quotes/you-have-bewitched-me-b-grid.webp
+ *     ->  You Have Bewitched Me
+ *
+ * Nome's s'aplica a les QUOTES d'austen, que es on els titols escrits a ma no
+ * coincidien amb els fitxers. A la resta de colleccions el nom escrit a ma ja hi
+ * lliga i no es toca.
+ */
+function titolDelFitxer(ruta) {
+  if (!ruta || typeof ruta !== 'string') return null;
+  const fitxer = ruta.split('/').pop() || '';
+  const nom = fitxer
+    .replace(/\.(webp|png|jpe?g)$/i, '')
+    .replace(/-(b|w)-grid$/i, '')
+    .replace(/-grid$/i, '')
+    .replace(/-+$/, '');
+  if (!nom) return null;
+  return nom
+    .split('-')
+    .filter(Boolean)
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join(' ');
+}
+
+/** El titol d'un item: el del fitxer si es una quote d'austen; si no, l'escrit. */
+function titolDeLItem({ label, collection, subcollection, dibuix }) {
+  if (collection === 'austen' && subcollection === 'quotes') {
+    return titolDelFitxer(dibuix) || label;
+  }
+  return label;
+}
+
 // 8 columnes -> grups -> ítems. bullet=true mostra bullet+stub al primer ítem.
 // Cada grup té una clau de col·lecció per poder filtrar/marcar segons el botó actiu.
 const COLUMNS = [
@@ -224,7 +263,7 @@ const COLUMNS = [
   ],
   // 4 · AUSTEN (quotes + Persuasion)
   [
-    { bullet: true, collection: 'austen', subcollection: 'quotes', items: ['Allow Me To Tell You', 'Body And Soul', 'Half Agony Half Hope', 'I Prefer To Be', 'It Is A Truth'] },
+    { bullet: true, collection: 'austen', subcollection: 'quotes', items: ['I Admire And Love You', 'You Have Bewitched Me', 'Half Agony Half Hope', 'Unsociable And Taciturn', 'It Is A Truth'] },
     { bullet: true, collection: 'austen', subcollection: 'crosswords', items: ['Persuasion 1', 'Persuasion 2', 'Persuasion 3', 'Persuasion 4'] },
   ],
   // 5 · AUSTEN (Pride And Prejudice + Sense And Sensibility)
@@ -741,6 +780,9 @@ export function CercadorDibuixosGraella({
       ? true
       : activeCollection === 'austen' && collection === 'austen' && activeSubcollection && subcollection !== activeSubcollection);
     const dibuix = dibuixDelNom(label);
+    // El titol que es veu (i el `title` de l'element) surt del nom del fitxer
+    // a les quotes d'austen; a la resta, del nom escrit de sempre.
+    const titol = titolDeLItem({ label, collection, subcollection, dibuix });
     // A la vista vertical, alguns dibuixos es pinten mes grans o mes petits
     // dins la seva casella (GRAELLA_DIBUIXOS_ESCALA_VERTICAL).
     const factorGraella = isPortraitTablet ? (GRAELLA_DIBUIXOS_ESCALA_VERTICAL[label] ?? 1) : 1;
@@ -750,8 +792,8 @@ export function CercadorDibuixosGraella({
         // unica, i l'index ho es.
         key={`${i}-${label}`}
         type="button"
-        title={label}
-        aria-label={label}
+        title={titol}
+        aria-label={titol}
         onClick={() => {
           // EN TRIAR UN DIBUIX, LA COLLECCIO TORNA AL CENTRE I LES FLETXES A
           // ZERO (28/09/2026). En Marc: «Quan cliques un dibuix la colleccio
@@ -841,7 +883,7 @@ export function CercadorDibuixosGraella({
             }}
           />
         ) : (
-          <span style={{ color: '#2B2B2B', fontSize: (isPortraitTablet || isLandscapeTablet) ? `max(12px, ${8 + fontBoost}px)` : `max(12px, ${carrilPx(11 + fontBoost)})`, whiteSpace: 'nowrap' }}>
+          <span style={{ color: 'hsl(var(--grey-ink))', fontSize: (isPortraitTablet || isLandscapeTablet) ? `max(12px, ${8 + fontBoost}px)` : `max(12px, ${carrilPx(11 + fontBoost)})`, whiteSpace: 'nowrap' }}>
             {label.replace(/^Looking For My Darcy/, 'LFMD')}
           </span>
         )}
@@ -1064,6 +1106,10 @@ export function CercadorColorsGrid({
       onPointerCancel={() => { arrossegant.current = false; }}
       style={{
       display: 'grid',
+      // NO S'ENCOGEIX (02/10/2026): la cel·la on viu la tira es ara una columna
+      // flexible (les barres i, a sota, la franja de colleccions) i la tira hi
+      // ha de conservar l'alcada.
+      flexShrink: 0,
       gridTemplateColumns: `repeat(${CERCADOR_COLORS.length}, 1fr)`,
       alignItems: 'start',
       // AMB EL DIT TAMBÉ ES POT MOURE (26/09/2026): el gest horitzontal es
@@ -1095,7 +1141,7 @@ export function CercadorColorsGrid({
               padding: 0,
               borderRadius: '1px',
               border: '0.5px solid rgba(0,0,0,0.22)',
-              outline: selected ? '1px solid #111827' : 'none',
+              outline: selected ? '1px solid hsl(var(--grey-ink-strong))' : 'none',
               outlineOffset: '3px',
               backgroundColor: hex,
               boxSizing: 'border-box',
@@ -1118,6 +1164,16 @@ export function CercadorColleccionsColumna({
   isLandscapeTablet = false,
   caixes = false,
   linia = false,
+  // LA FRANJA HORITZONTAL (02/10/2026). En Marc: «Mou la columna de colleccions
+  // a la dreta, fora de la zona de les guies» i tot seguit «Atura-ho.
+  // Prefereixo que la converteixis en una franja sota de la tira de colors».
+  //
+  // Els nou noms son els MATEIXOS nou de sempre, amb el mateix estil (la caixa
+  // del selector: vora d'1 px, radi 6, fons `paper-soft`, i la pastilla blanca
+  // de l'actiu amb la seva ombra), pero repartits al llarg del carril en una
+  // fila en comptes de dalt a baix en una columna. Qui la col·loca es la filera
+  // del cercador (vegeu `CercadorTextRow`, branca `compact`).
+  franja = false,
   // L'OMBRA DE LA MANIGA (27/09/2026): la caixa del contingut de la franja
   // dins d'aquesta columna (les distancies i la mida). La pinta la columna, que
   // te `overflow: hidden` i radi: l'ombra queda dins del selector i SOTA la
@@ -1184,7 +1240,7 @@ export function CercadorColleccionsColumna({
           // LA CAIXA DEL SELECTOR (28/09/2026, ho va demanar l'amo): la mateixa
           // que el bloc BLANC/COLOR/NEGRE (`ESTIL_CAIXA_BLOC`), amb el seu fons i
           // el seu contorn. Els marges propis de la graella hi van al damunt.
-          ...ESTIL_CAIXA_BLOC,
+          ...estilCaixaBloc(false),
           width: '100%',
           height: '100%',
           display: 'grid',
@@ -1232,10 +1288,10 @@ export function CercadorColleccionsColumna({
               appearance: 'none',
               boxSizing: 'border-box',
               // LA PASTILLA BLANCA DE LA COLUMNA DE LA P2 HORITZONTAL
-              // (28/09/2026, ho ha demanat l'amo): fons blanc, vora #D1D5DB i
+              // (28/09/2026, ho ha demanat l'amo): fons blanc, vora hsl(var(--grey-muted)) i
               // ombra, i nome's a la colleccio activa. Abans l'activa es marcava
               // amb un gris de fons.
-              border: key === activeKey ? '1px solid #D1D5DB' : '1px solid transparent',
+              border: key === activeKey ? '1px solid hsl(var(--grey-line-strong))' : '1px solid transparent',
               display: 'flex',
               alignItems: 'center',
               // COM EL SELECTOR (28/09/2026, ho ha demanat l'amo): les paraules, centrades.
@@ -1245,7 +1301,7 @@ export function CercadorColleccionsColumna({
               borderRadius: '3px',
               // El SELECTOR es la pastilla de fons: nomes la porta la colleccio
               // activa. Cap negreta.
-              backgroundColor: key === activeKey ? '#FFFFFF' : 'transparent',
+              backgroundColor: key === activeKey ? 'hsl(var(--grey-paper))' : 'transparent',
               boxShadow: key === activeKey ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
               // LA PASTILLA, AMB EL MATEIX COIXI QUE LA DEL SELECTOR (28/09/2026,
               // ho ha demanat l'amo): alla la pastilla va 5 px endinsada de la
@@ -1277,7 +1333,7 @@ export function CercadorColleccionsColumna({
               // LA FONT, AMB EL CRITERI DE LA COLUMNA DE LA P2 HORITZONTAL
               // (28/09/2026, ho ha demanat l'amo): Oswald, 13,5 px, l'activa en
               // regular (400) i la resta en Extra Light (200), en majuscules.
-              color: key === activeKey ? '#1A1A1A' : '#6B7280',
+              color: key === activeKey ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-ink-soft))',
               fontFamily: 'inherit',
               // 12 PX (28/09/2026, ho ha demanat l'amo). La resta del criteri
               // (Oswald, 400/200, majuscules) no es toca.
@@ -1340,7 +1396,7 @@ export function CercadorColleccionsColumna({
               padding: 0,
               border: 0,
               background: 'transparent',
-              color: '#2B2B2B',
+              color: 'hsl(var(--grey-ink))',
               // Mes grossos que la columna (11 -> 13 unitats): omplen la
               // linia de la graella de dibuixos i es llegeixen millor. El terra
               // de 10 px es el de sempre: a les finestres estretes, on
@@ -1367,12 +1423,12 @@ export function CercadorColleccionsColumna({
   // La referencia es el selector BLANC/COLOR/NEGRE (`FirstContactDibuix00Buttons`
   // / `SelectorQuadratPagina1`), amb les seves xifres EXACTES:
   //
-  //   - contenidor: `1px solid #D1D5DB`, radi 6, fons `#F3F4F6`;
-  //   - la caixa de l'actiu: fons `#FFFFFF`, `1px solid #D1D5DB`, radi 4 i
+  //   - contenidor: `1px solid hsl(var(--grey-muted))`, radi 6, fons `hsl(var(--grey-paper))`;
+  //   - la caixa de l'actiu: fons `hsl(var(--grey-paper))`, `1px solid hsl(var(--grey-muted))`, radi 4 i
   //     `box-shadow: 0 1px 3px rgba(0,0,0,0.12)`, amb 3 px de coixi lateral
   //     (`sliderInset`);
   //   - el text: `font-oswald`, `max(10px, carrilPx(14))`, majuscules, i el
-  //     color de l'actiu `#1A1A1A` (els altres, `#6B7280`).
+  //     color de l'actiu `hsl(var(--grey-ink-strong))` (els altres, `hsl(var(--grey-ink-soft))`).
   //
   // Amb nou noms en comptes de tres, les franges son nou i es reparteixen tota
   // l'alcada (`flex: 1`), totes amb `data-colleccions-targeta` perque
@@ -1402,9 +1458,145 @@ export function CercadorColleccionsColumna({
   const BORA_CAIXA_PX = 1;
   const COIX_COLUMNA_PX = COIX_LATERAL_PX;
   const coixInset = COIX_LATERAL_PX;
+  // LA LLETRA DELS ENLLACOS, PROPORCIONAL TAMBE A LES TAULETES (01/10/2026).
+  //
+  // Era fixa de 13,5 px a les dues tauletes, i la columna no hi arriba: a 1024
+  // fa 62 px i l'etiqueta mes llarga («THE HUMAN INSIDE») en fa 91 — es veia
+  // tallada per l'esquerra, i empitjorava com mes petit el format («els enllacos
+  // de la p1 queden tallats a mesura que el format es fa mes petit»). A
+  // l'escriptori la mida ja era proporcional (`carrilPx`) i alla hi cap.
+  //
+  // Mesurat (amplada de l'etiqueta mes llarga / amplada de la columna):
+  //   1024 -> 91/62, 1150 -> 91/71, 1280 -> 91/79, 1366 -> 91/85 (tot tallat)
+  //   1440 -> 67/90 i 1920 -> 90/123 (hi cap)
+  // Amb el 0,85vw: 1024 -> 8,7 px (59), 1280 -> 10,9 (73), 1366 -> 11,6 (78).
   const midaText = (isPortraitTablet || isLandscapeTablet)
-    ? 'max(10px, 13.5px)'
+    ? 'clamp(8.5px, 0.85vw, 13.5px)'
     : `max(10px, ${carrilPx(13.5)})`;
+
+  // LA FRANJA DE COLLECCIONS (02/10/2026): els nou noms en una fila, amb el
+  // MATEIX estil que la columna (vegeu la prop `franja`), i l'actiu amb la
+  // pastilla blanca. L'alcada no es declara: la fa el contingut (una linia de
+  // text mes la vora de la pastilla i el coixi de la caixa), perque ha de cabre
+  // a l'espai que queda entre les catorze barres de color i la franja de
+  // samarretes, que a l'escriptori nome's fa uns 32 px.
+  if (franja) {
+    return (
+      <div
+        data-colleccions-franja="1"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          // L'ALCADA, I LA PASTILLA QUE L'OM PLE (02/10/2026).
+          //
+          // Fins ara el contenidor tenia 3 px de coixi a cada costat i la
+          // pastilla de l'actiu en feia 22,59 (les xifres de la columna). L'amo
+          // ha demanat que la pastilla sigui MES ALTA: ara el coixi vertical es
+          // zero i la pastilla, que va `stretch`, fa TOTA l'alçada de la franja
+          // (28,59 px). La franja no canvia de mida, o sigui que els dos aires de
+          // 5 px i el centratge del bloc segueixen igual.
+          height: `${ALCADA_PASTILLA_SELECTOR_PX}px`,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'stretch',
+          // ELS ENLLACOS, EQUIDISTANTS (02/10/2026, ho ha demanat l'amo: «Els
+          // enllaços de la tira de col·lecció s'han de separar equidistantment
+          // entre ells»). Abans cada enllac es repartia l'amplada a parts iguals
+          // (`flex: 1`) i, com que cada nom fa una amplada diferent, el que
+          // quedava descompensat eren les SEPARACIONS (entre FIRST CONTACT i THE
+          // HUMAN INSIDE hi havia molt menys aire que entre CUBE i MISCEL·LÀNIA).
+          // Ara cada enllac fa la seva mida (la del nom, mes el seu coixi) i el
+          // que es reparteix a parts iguals es l'espai ENTRE ells.
+          justifyContent: 'space-between',
+          // SENSE FONS NI CONTORN NI COIXI (02/10/2026, «Treu-los el fons als
+          // selectors», «Treu-los el contorn, també» i «ajusta la tira a la dreta
+          // del carril (que Misc hi toqui)»). Sense coixi, el primer nom arrenca
+          // a la vora esquerra del carril i l'ultim hi acaba a la dreta: es el
+          // coixi del PROPI enllac el que el separa de la vora, i per aixo els
+          // dos de les puntes el perden pel costat de fora (vegeu el `map`).
+          padding: 0,
+          // SENSE RETALL (02/10/2026, ho ha dit l'amo: «La pastilla queda tapada
+          // per sobre i per sota»). Amb el coixi a zero la pastilla fa tota
+          // l'alçada de la franja, i amb `overflow: hidden` el que es retallava
+          // era la SEVA OMBRA (la de dalt i la de baix), que es justament el que
+          // la fa visible sobre el paper blanc: semblava tallada. La franja no
+          // pinta res (ni fons ni vora), o sigui que no ha de retallar res.
+          overflow: 'visible',
+        }}
+      >
+        {CERCADOR_COLLECTIONS.map(({ key, label }) => {
+          const activa = key === activeKey;
+          return (
+            <button
+              key={key}
+              type="button"
+              // NO PORTA `data-colleccions-targeta` (02/10/2026): aquella marca
+              // deia «aqui comença el bloc de la dreta» i `useEscalaFranjaCarril`
+              // la fa servir per escalar la franja de samarretes fins a la seva
+              // vora esquerra. Amb la franja de colleccions al davant, la franja
+              // de samarretes es quedava amb 3 px d'amplada (la vora de la caixa
+              // nova). Sense la marca, l'objectiu torna a ser EL CARRIL SENCER,
+              // que es el que es vol: les cintures de les catorze samarretes
+              // d'una vora a l'altra (`FRACCIO_COSSOS_FRANJA`).
+              data-colleccions-franja-item="1"
+              onClick={() => onSelect?.(key)}
+              aria-current={activa ? 'true' : undefined}
+              className="focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              style={{
+                // CADA ENLLAC FA LA SEVA MIDA (02/10/2026): el que es reparteix
+                // a parts iguals es l'aire entre ells, no l'amplada (vegeu el
+                // `justifyContent: 'space-between'` del contenidor).
+                flex: '0 0 auto',
+                boxSizing: 'border-box',
+                lineHeight: 1,
+                display: 'flex',
+                alignItems: 'center',
+                // EL TEXT, CENTRAT A LA SEVA FRANJA (a la columna anava enrasat
+                // a la dreta, que era on acabava la caixa).
+                justifyContent: 'center',
+                // EL COIXI DE L'ENLLAC, DE 10 px PER BANDA (02/10/2026, ho ha dit
+                // l'amo: «La tira de col·leccions ha d'estar ajustada al carril,
+                // pero la pastilla també hi ha de cabre bé. Deixa-li, 10 px per
+                // banda, com a minim»). Es el coixi que fa la pastilla blanca de
+                // l'actiu al voltant del seu text, i es el MATEIX a tots nou
+                // enllacos (tambe als dos de les puntes), perque les separacions
+                // segueixin sent iguals entre elles.
+                padding: `0 ${COIX_ENLLAC_COLLECCIONS_PX}px`,
+                backgroundColor: activa ? 'hsl(var(--grey-paper))' : 'transparent',
+                // SENSE CONTORN (02/10/2026, «Treu-los el contorn, també»):
+                // la vora es queda d'1 px TRANSPARENT perque les caixes no
+                // canviin de mida i les separacions equidistants segueixin
+                // quadrant; el que es veu es nome s el fons blanc i l'ombra.
+                border: '1px solid transparent',
+                borderRadius: '3px',
+                ...(activa ? { boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } : null),
+                margin: 0,
+                cursor: 'pointer',
+                overflow: 'hidden',
+              }}
+            >
+              <span
+                className="font-oswald"
+                style={{
+                  fontSize: midaText,
+                  fontWeight: activa ? 400 : 200,
+                  textTransform: 'uppercase',
+                  color: activa ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-ink-soft))',
+                  pointerEvents: 'none',
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                  transition: 'color 200ms ease',
+                }}
+              >
+                {etiquetaColleccio(label)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -1434,9 +1626,13 @@ export function CercadorColleccionsColumna({
         // radi exterior 6 px, caixa de 128 x 247 px i caixa blanca de 122 x
         // 22,59. Amb 1 px de vora i 5,5 px de coixi lateral, la caixa blanca fa
         // exactament 122,2 px d'ample (128 - 2 - 11).
-        border: '1px solid #D1D5DB',
+        // LA CAIXA DE SEMPRE (02/10/2026). Aquesta columna nome s viu FORA de la
+        // composicio estreta (a 1024-1366 els enllacos son la franja), i allo es
+        // l'unic que l'amo vol amb el contorn recuperat: «Recupera el contorn a
+        // les versions 1920/1440».
+        border: '1px solid hsl(var(--grey-line-strong))',
         borderRadius: '6px',
-        backgroundColor: '#F3F4F6',
+        backgroundColor: 'hsl(var(--grey-paper-soft))',
         // EL COIXI DE LA COLUMNA (26/09/2026), amb les xifres de l'amo:
         // l'offset entre la caixa blanca i la columna es de 3 px, i el contorn
         // de les dues caixes es d'1 px interior (`border`).
@@ -1534,8 +1730,9 @@ export function CercadorColleccionsColumna({
               // CONTORN D'1 PX interior (ho ha dit l'amo: «els contorns, tant de
               // la caixa com del selector blanc, son 1 px interior»), radi 3 i
               // l'ombra de la casa.
-              backgroundColor: activa ? '#FFFFFF' : 'transparent',
-              border: activa ? '1px solid #D1D5DB' : '1px solid transparent',
+              backgroundColor: activa ? 'hsl(var(--grey-paper))' : 'transparent',
+              // SENSE CONTORN (02/10/2026): vora transparent, com a la franja.
+              border: '1px solid transparent',
               borderRadius: '3px',
               ...(activa ? { boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } : null),
               // LA CAIXA DE L'ACTIU: el coixi el fa el CONTENIDOR (5,5 px
@@ -1555,7 +1752,7 @@ export function CercadorColleccionsColumna({
                 fontSize: midaText,
                 fontWeight: activa ? 400 : 200,
                 textTransform: 'uppercase',
-                color: activa ? '#1A1A1A' : '#6B7280',
+                color: activa ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-ink-soft))',
                 pointerEvents: 'none',
                 lineHeight: 1,
                 whiteSpace: 'nowrap',
@@ -1580,7 +1777,31 @@ export function CercadorColleccionsColumna({
 // el de la casella COLOR) i la segona filera no toca la franja.
 const DESPLACAMENT_FILES_P1_PX = -16;
 
-function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0, onMides = null, ombraManiga = null }) {
+// LA COMPOSICIO ESTRETA DE LA PAGINA 2 I ELS SEUS DOS GAPS (02/10/2026).
+//
+// «Aquests canvis nome s s'han d'aplicar de 1366 a 1024. 1920/1440 no hi
+// entren»: en aquesta banda la composicio de la pagina 2 fa TOT el carril (el
+// retall dels dibuixos i la tira de colors hi arriben, i la franja de
+// colleccions s'hi estira de vora a vora sota les barres). Fora d'aqui la
+// composicio es la de sempre: hi ha la columna de la dreta i la franja de
+// colleccions arrenca on arrenca la graella.
+//
+// I alla la franja te dos aires de 5 px (xifra de l'amo): «El gap entre el
+// selector b/c/n i la tira de colleccions ha de ser de 5 px i, el gap entre la
+// tira de colleccions i la stripe, ha de ser de 5 px». Com que els dos alhora
+// volen dir que l'espai entre el cul del selector i la tinta de les samarretes
+// faci 38,6 px (28,6 de franja + 10), i alla n'hi ha entre 29,2 i 49,1, qui es
+// mou es TOT EL BLOC de la p2: ho fa el bucle d'alineacio de `MegaslidePagina2`
+// amb l'objectiu absolut de `geometriaMegaslide` (vegeu
+// `AIRE_FRANJA_COLLECCIONS_PX` i `esComposicioEstretaMegaslide`).
+//
+// El marge de dalt de la franja mentre no s'ha pogut mesurar (el valor de debò
+// viu a `mesures`) i el que val FORA de la composicio estreta, que es el de
+// sempre (3 px, el que ha estat tota la vida).
+const MARGE_FRANJA_COLLECCIONS_PX = 13;
+const MARGE_FRANJA_COLLECCIONS_FORA_PX = 3;
+
+function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave, onCarouselStep, compact = false, selectedColor = 'white', onSelectColor, onSelectCollection, isPortraitTablet = false, isLandscapeTablet = false, fontBoost = 0, desplacamentVertical = 0, esquerra, midaSelector = 56, alineacioY = 0, onMides = null, ombraManiga = null, ajustFranjaY = 0 }) {
   // UNA SOLA PASSADA PER A TOT EL QUE ES MESURA DE LA FILERA (26/09/2026).
   //
   // Abans aixo eren TRES bucles independents en aquest mateix component (les
@@ -1600,10 +1821,21 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
   //     s'ha decidit: la correccio es idempotent;
   //   - un sol ResizeObserver i un sol listener de `resize`.
   const graellaRef = useRef(null);
+  // LA COMPOSICIO ESTRETA (1024-1366): la fa servir el bucle de mesura (per
+  // col·locar la franja de colleccions) i la branca `compact` (per fer la
+  // graella, la tira de colors i la franja de vora a vora). Vegeu les constants
+  // de sobre.
+  const composicioEstreta = esComposicioEstretaMegaslide({
+    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+    isLandscapeTablet,
+  });
   const [mesures, setMesures] = useState({
     midesGraella: null,
     margesEnllacos: { dalt: 0, baix: 0 },
     desnivellColors: 0,
+    margeFranjaColleccions: composicioEstreta
+      ? MARGE_FRANJA_COLLECCIONS_PX
+      : MARGE_FRANJA_COLLECCIONS_FORA_PX,
   });
   // El valor PINTAT (s'actualitza DESPRES de pintar): els acumuladors hi
   // arrenquen i la correccio es idempotent encara que dos passos caiguin a la
@@ -1671,6 +1903,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             alt: typeof window !== 'undefined' ? window.innerHeight : 0,
             isPortraitTablet,
             isLandscapeTablet,
+            ajustBaixY: ajustFranjaY,
           })
           : null;
         // L'ESPAI FINS A LA FRANJA NOME'S QUAN ES REPETEIX (25/09/2026).
@@ -1792,12 +2025,38 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           alt: typeof window !== 'undefined' ? window.innerHeight : 0,
           isPortraitTablet,
           isLandscapeTablet,
+          ajustBaixY: ajustFranjaY,
         });
         const baix = (pagina.getBoundingClientRect().top + topDeclarat + franja.getBoundingClientRect().height) - f.bottom - COLUMNA_BAIX_AJUST_PX;
         if (Math.abs(pintat.margesEnllacos.dalt - dalt) >= 0.01
           || Math.abs(pintat.margesEnllacos.baix - baix) >= 0.5) {
           nou.margesEnllacos = { dalt, baix };
           canvia = true;
+        }
+      }
+
+      // 4) ON CAU LA FRANJA DE COLLECCIONS (02/10/2026). Nomes a la composicio
+      //    estreta (1024-1366): alla la franja fa tot el carril i va a 5 px del
+      //    cul del selector B/C/N.
+      //
+      //    NOME S DEPEN DEL SELECTOR, NO DE LA FRANJA DE SAMARRETES (02/10/2026).
+      //    La franja de samarretes la col·loca el bloc (vegeu el bucle
+      //    d'alineacio de `MegaslidePagina2`, que tambe la mou): si aquest marge
+      //    s'hi mirés, els dos bucles es farien la feina l'un a l'altre i el
+      //    resultat depenia de qui arribés primer (mesurat: la franja de
+      //    colleccions queia 57 px sota el selector en una de cada dues
+      //    obertures).
+      if (compact && composicioEstreta && pagina) {
+        const colorsEl = pagina.querySelector('[data-p2-color-grid]');
+        const bcnEl = pagina.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+        if (colorsEl && bcnEl) {
+          const culColors = colorsEl.getBoundingClientRect().bottom;
+          const culBcn = bcnEl.getBoundingClientRect().bottom;
+          const marge = Math.max(0, (culBcn + AIRE_FRANJA_COLLECCIONS_PX) - culColors);
+          if (Math.abs((pintat.margeFranjaColleccions ?? 0) - marge) >= 0.5) {
+            nou.margeFranjaColleccions = marge;
+            canvia = true;
+          }
         }
       }
 
@@ -1831,7 +2090,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // que els del pare, o sigui que la primera mesura el veu a baix. Quan el
     // pare aplica el desplaçament, aquesta passada es torna a fer DINS el mateix
     // commit (abans de pintar) i el primer fotograma ja surt bé.
-  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY, midaSelector, onMides]);
+    //
+    // `ajustFranjaY` tambe ho es (02/10/2026): es el desplaçament que el pare ha
+    // donat a la franja per quadrar-ne el baix amb el de la p1, i el sostre de la
+    // franja (que es on acaba la columna de colleccions) l'ha de portar.
+    //
+    // I `composicioEstreta` (02/10/2026): es la bandera que diu si la franja de
+    // colleccions ha de caure entre el selector B/C/N i la franja de samarretes.
+  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY, midaSelector, onMides, ajustFranjaY, composicioEstreta]);
 
 
   if (compact) {
@@ -1889,6 +2155,47 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     const reservaDreta = (!isPortraitTablet && !isLandscapeTablet)
       ? `calc(${carrilPx(midaSelector / 2)} + ${carrilPx(10)})`
       : 0;
+    // LA COMPOSICIO ESTRETA FA TOT EL CARRIL (02/10/2026).
+    //
+    // En Marc, en cinc missatges seguits: «Obre el viewport de la graella fins
+    // al limit dret del carril», «Estira la tira de colors fins el limit dret
+    // del carril», «Baixa el selector de colleccions perque no es trepitgi amb
+    // el selector b/c/n» i, finalment, la mida: «Aquests canvis nome s s'han
+    // d'aplicar de 1366 a 1024. 1920/1440 no hi entren».
+    //
+    // A la resta de mides la composicio es la de sempre: la columna de la dreta
+    // te la seva amplada declarada (142 de 1350), el retall dels dibuixos i la
+    // tira de colors s'hi aturen, i la franja de colleccions arrenca on arrenca
+    // la graella de dibuixos (aixi el selector B/C/N no la trepitja). La bandera
+    // viu a dalt del component: el bucle de mesura tambe la necessita.
+    // LA FRANJA DE COLLECCIONS, DE TOT EL CARRIL (02/10/2026, ho va demanar
+    // l'amo: vegeu la prop `franja`). La franja viu dins la cel·la de les barres
+    // de color, que es la columna 1 de la graella i arrenca on arrenca la
+    // graella de dibuixos (el carril mes `esquerra`): perque arribi a les DUES
+    // vores del carril se li descompta l'`esquerra` per l'esquerra i se li
+    // torna a sumar per la dreta (a la composicio ampla, tambe la columna de la
+    // dreta, que a la composta ja no hi es).
+    const esquerraFila = esquerra || carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX);
+    const franjaPlena = composicioEstreta
+      ? {
+        marginLeft: `calc(-1 * (${esquerraFila}))`,
+        width: `calc(100% + (${esquerraFila}))`,
+      }
+      : {
+        width: `calc(100% + ${carrilLane(GRAELLA_GAP_COLUMNES_PX)} + ${carrilLane(GRAELLA_COLUMNA_DRETA_CARRIL_PX)})`,
+      };
+    // ON COMENÇA LA FRANJA DE COLLECCIONS.
+    //
+    // El selector B/C/N ocupa la vora esquerra del carril i baixa mes que la
+    // tira de colors: amb la franja a 3 px de les barres, la seva vora li
+    // trepitjava la cantonada de sota (mesurat a 1024-1366: 9,9 px a 1366x768,
+    // 10,4 a 1280x720 i 11,7 a 1024x768). A la composicio estreta el marge el
+    // resol el bucle de mesura (bloc 4): el que hi ha aqui es el declarat, que
+    // es el que val a la resta de mides i el que es pinta abans de la primera
+    // mesura.
+    const margeDaltFranja = composicioEstreta
+      ? `${mesures.margeFranjaColleccions ?? MARGE_FRANJA_COLLECCIONS_PX}px`
+      : `${MARGE_FRANJA_COLLECCIONS_FORA_PX}px`;
 
     return (
       <div
@@ -1910,7 +2217,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // La filera arrenca on acaba el bloc del selector mes 10 px (vegeu
           // MegaSlidePagina2). Si no s'hi passa res, es queda a la posicio de
           // disseny (13% del carril).
-          left: esquerra || carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX),
+          left: esquerraFila,
           // El marge dret es el MATEIX 3% del carril que el coixi del header
           // (`carrilLane`, no `carrilPx`): a tauleta 40 px fixos no son el 3%
           // del carril (en son 29,4) i la fila 1 no encaixava amb la franja del
@@ -1951,7 +2258,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // `max-content`, canviar el contingut d'aquella columna (la graella de
           // colors abans, els enllacos ara) n'amplava o estrenyia l'amplada i,
           // amb ella, la del carrusel, la de les fletxes i la de la franja.
-          gridTemplateColumns: `minmax(0, 1fr) ${carrilLane(GRAELLA_COLUMNA_DRETA_CARRIL_PX)}`,
+          //
+          // I A LA COMPOSICIO DE 1024-1280 NO HI ES (02/10/2026): la columna era
+          // per als enllacos de colleccions, que ara son una franja sota les
+          // barres, i el seu lloc el fa servir tota la composicio (el retall dels
+          // dibuixos i la tira de colors arriben a la vora dreta del carril).
+          gridTemplateColumns: composicioEstreta
+            ? 'minmax(0, 1fr)'
+            : `minmax(0, 1fr) ${carrilLane(GRAELLA_COLUMNA_DRETA_CARRIL_PX)}`,
           // LA FILA 2 ARRIBA AL BAIX DEL SELECTOR (24/09/2026, ho va demanar
           // l'amo). El baix del selector cau `carrilLane(40)` per sota del
           // baix de la graella de dibuixos (es el coixi de 40 de la
@@ -1998,10 +2312,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           onCarouselStep={onCarouselStep}
         />
 
-        {/* LA GRAELLA DE COLORS 14x1, AL LLOC ON ERA EL TEXT (24/09/2026, ho va
-            demanar l'amo): fila 2 de la primera columna, entre el selector i les
-            fletxes, com feia la linia d'enllacos. */}
-        <div style={{ gridColumn: '1', gridRow: '2', minWidth: 0 }}>
+        {/* LA GRAELLA DE COLORS 14x1 I, A SOTA SEU, LA FRANJA DE COLLECCIONS
+            (02/10/2026). Les barres son la fila 2 de la primera columna, i la
+            franja de colleccions hi va a sota: la cel·la es una columna flexible
+            perque la franja caigui exactament sota les barres (i no sota la
+            fila sencera, que arriba mes avall) i sobre l'espai que queda fins a
+            la franja de samarretes. Els fills no s'encongeixen: la cel·la te una
+            alcada declarada i el que hi ha a dins no l'ha de deformar. */}
+        <div style={{ gridColumn: '1', gridRow: '2', minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
           <CercadorColorsGrid
             selectedColor={selectedColor}
             onSelectColor={onSelectColor}
@@ -2009,30 +2327,49 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             reservaDreta={reservaDreta}
             marginTop={-mesures.desnivellColors}
           />
+          {composicioEstreta ? (
+            /* LA FRANJA DE COLLECCIONS (1024-1366): de la vora esquerra del
+               carril a la dreta, sota les barres. Es el mateix component de
+               sempre amb la variant `franja` (vegeu
+               `CercadorColleccionsColumna`). */
+            <div data-colleccions-franja-cella="1" style={{ flexShrink: 0, marginTop: margeDaltFranja, ...franjaPlena }}>
+              <CercadorColleccionsColumna
+                franja
+                activeKey={activeKey}
+                onSelect={onSelectCollection}
+                isPortraitTablet={isPortraitTablet}
+                isLandscapeTablet={isLandscapeTablet}
+              />
+            </div>
+          ) : null}
         </div>
 
-        {/* ELS ENLLACOS DE COLLECCIONS, UNA COLUMNA A LA DRETA. Va en una capa
-            propia (`position: absolute`) perque les nou linies son mes altes que
-            el carrusel i, dins del flux, estirarien la fila 1 i farien marxar
-            les fletxes i el selector. Fora del flux no estira res. */}
+        {/* ELS ENLLACOS DE COLLECCIONS, UNA COLUMNA A LA DRETA (la composicio de
+            sempre, que es la que val FORA de 1024-1366: ho va dir l'amo, «1920 i
+            1440 encara tenen els canvis aplicats»). Va en una capa propia
+            (`position: absolute`) perque les nou linies son mes altes que el
+            carrusel i, dins del flux, estirarien la fila 1 i farien marxar les
+            fletxes i el selector. Fora del flux no estira res. */}
         {/* EL MARGES DE LA COLUMNA ES MESUREN DES D'AQUESTA CAPA: es qui la
             conté, i per aixo s'estira a les dues files (`alignSelf: stretch`).
             Amb la capa de 0 px d'alçada (el seu únic fill és absolut), el
             `bottom` de la columna es comptava des d'un zero i la llista no
             arribava mai al bottom de la slide. */}
-        <div style={{ gridColumn: '2', gridRow: '1 / span 2', minWidth: 0, position: 'relative', alignSelf: 'stretch' }}>
-          <CercadorColleccionsColumna
-            absolut
-            reservaDreta={reservaDreta}
-            margeDalt={mesures.margesEnllacos.dalt}
-            margeBaix={mesures.margesEnllacos.baix}
-            activeKey={activeKey}
-            onSelect={onSelectCollection}
-            isPortraitTablet={isPortraitTablet}
-            isLandscapeTablet={isLandscapeTablet}
-            ombraManiga={ombraManiga}
-          />
-        </div>
+        {composicioEstreta ? null : (
+          <div style={{ gridColumn: '2', gridRow: '1 / span 2', minWidth: 0, position: 'relative', alignSelf: 'stretch' }}>
+            <CercadorColleccionsColumna
+              absolut
+              reservaDreta={reservaDreta}
+              margeDalt={mesures.margesEnllacos.dalt}
+              margeBaix={mesures.margesEnllacos.baix}
+              activeKey={activeKey}
+              onSelect={onSelectCollection}
+              isPortraitTablet={isPortraitTablet}
+              isLandscapeTablet={isLandscapeTablet}
+              ombraManiga={ombraManiga}
+            />
+          </div>
+        )}
       </div>
     );
   }

@@ -7,13 +7,14 @@ import { trackPurchase } from '@/utils/analytics';
 import { useShippingCosts, normalizeCountry } from '@/hooks/useShippingCosts';
 import { createMockOrder } from '@/lib/mockOrderStore';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS } from '@/lib/mockupPaths';
+import { getMockupPath, INK_BLACK, INK_WHITE, COLLECTIONS, invertLineInk } from '@/lib/mockupPaths';
 import { imatgeArticle as imatgeArticleCompartida } from '@/lib/cartImage';
 import { useOffersConfig } from '@/hooks/useOffersConfig';
 import { getStripe, createPaymentIntent, modeProvesActiu } from '@/api/stripe';
 import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
 import { IVA_RATE } from '@/config/pricing';
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
+import { tshirtSrc } from '@/utils/placeholders';
 
 function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPortraitTablet = false }) {
   const stripe = useStripe();
@@ -337,8 +338,8 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
 
   const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
 
-  const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
-  const INPUT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: '#4A5057', fontSize: '10.5pt', outline: 'none' };
+  const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'hsl(var(--grey-ink-2))' };
+  const INPUT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, color: 'hsl(var(--grey-ink-2))', fontSize: '10.5pt', outline: 'none' };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -497,7 +498,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       setIsProcessing(false);
       if (onCloseMegaSlide) onCloseMegaSlide();
       // Codifiquem el número de comanda: el trigger de la base de dades el
-      // genera amb '#' al davant ('#000…1'), i sense codificar el '#' es
+      // genera amb '#' al davant ('hsl(var(--grey-ink-pure))…1'), i sense codificar el '#' es
       // converteix en fragment d'URL, la ruta /order-confirmation/:orderId ja
       // no casa i el client acaba en una pàgina de "no trobat" després de pagar.
       // Hi afegim el token de seguiment perquè el client (sobretot un convidat,
@@ -518,7 +519,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     // A la vertical els camps fan la MATEIXA alcada que el boto de pagar
     // (39px), que es la del camp de la targeta.
     height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '28px' : '34px'),
-    border: '1px solid #D8DDE3',
+    border: '1px solid hsl(var(--grey-line-strong))',
     borderRadius: '4px',
     padding: '0 10px',
     boxSizing: 'border-box',
@@ -530,10 +531,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // tocar el coixí: canviar-ne el `display` deixa l'iframe de Stripe sense
   // amplada.
   const capsaTargeta = {
-    border: '1px solid #D8DDE3',
+    border: '1px solid hsl(var(--grey-line-strong))',
     borderRadius: '4px',
     overflow: 'hidden',
-    background: '#FFFFFF',
+    background: 'hsl(var(--grey-paper))',
     padding: isNarrowForm ? '6px 10px' : '10px 12px',
   };
 
@@ -554,21 +555,17 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     marginTop: '2px',
   };
 
-  const TSHIRT_BASE = '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_';
-  const TSHIRT_SUFFIX = '_gpr-4-0_front.webp';
   // El cistell guarda el color amb el nom que es mostra ('Black', 'Light Pink'),
   // però els ajudants d'imatge l'esperen en format slug ('black', 'light-pink').
   // Sense aquesta conversió la imatge de la fitxa no es trobava i sortia trencada.
   const colorSlug = (c) => String(c || '').trim().toLowerCase().replace(/\s+/g, '-');
-  const tshirtSrc = (color) => `${TSHIRT_BASE}${colorSlug(color)}${TSHIRT_SUFFIX}`;
-  const DARK_COLORS = new Set(['royal','purple','navy','red','irish-green','military-green','forest-green','black']);
+  const DARK_COLORS = new Set(['royal','navy','red','irish-green','military-green','black','charcoal','dark-chocolate']);
   const FINISH_TO_INK = { BLANC: INK_WHITE, COLOR: 'multi', NEGRE: INK_BLACK };
   const resolveInk = (collectionSlug, shirtColor, finish) => {
     const inks = COLLECTIONS[collectionSlug]?.inks ?? [];
     const effFinish = finish && ['BLANC','COLOR','NEGRE'].includes(finish) ? finish : null;
     let ink = effFinish ? FINISH_TO_INK[effFinish] : (DARK_COLORS.has(shirtColor) ? INK_WHITE : INK_BLACK);
-    if (ink === INK_WHITE && shirtColor === 'white') ink = INK_BLACK;
-    else if (ink === INK_BLACK && shirtColor === 'black') ink = INK_WHITE;
+    ink = invertLineInk(ink, shirtColor);
     if (!inks.includes(ink)) ink = inks[0];
     return ink;
   };
@@ -610,7 +607,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     <div style={{ marginTop: isPortraitTablet ? '-10px' : undefined, marginBottom: isPortraitTablet ? undefined : `${FIELD_GAP}px` }}>
       <label style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'9.5pt', lineHeight:1.25, fontWeight:300 }}>
         <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop:'1px' }} />
-        <span>Accepto els <a href="/terms" style={{ color:'#4A5057', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'#4A5057', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'#4A5057', textDecoration:'underline' }}>Política d'enviaments</a>.</span>
+        <span>Accepto els <a href="/terms" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Política d'enviaments</a>.</span>
       </label>
     </div>
   );
@@ -628,7 +625,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
       </button>
       <div style={{ position: isPortraitTablet ? undefined : 'absolute', top: isPortraitTablet ? undefined : '100%', left: 0, right: 0 }}>
         {paymentError && <div style={{ marginTop:'10px', color:'#D04B4B', fontSize:'10pt', textAlign:'center' }}>{paymentError}</div>}
-        <div style={{ marginTop:'10px', textAlign:'center', color:'#98A2B4', fontSize:'8.5pt', fontWeight:300 }}>Powered by Stripe&nbsp;&nbsp;|&nbsp;&nbsp;Termes&nbsp;&nbsp;Privacitat</div>
+        <div style={{ marginTop:'10px', textAlign:'center', color:'hsl(var(--grey-muted))', fontSize:'8.5pt', fontWeight:300 }}>Powered by Stripe&nbsp;&nbsp;|&nbsp;&nbsp;Termes&nbsp;&nbsp;Privacitat</div>
       </div>
     </div>
   );
@@ -644,9 +641,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         <span>Necessites factura?</span>
       </label>
       {needsInvoice && (
-        <div style={{ border:'1px solid #D8DDE3', borderRadius:'4px', overflow:'hidden', background:'#FFFFFF' }}>
-          <input type="text" name="company" placeholder="Nom de l'empresa" value={formData.company} onChange={handleChange} style={{ width:'100%', height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '26px' : '31px'), border:'none', borderBottom:'1px solid #E6E8EC', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'#4A5057', outline:'none', boxSizing:'border-box' }} />
-          <input type="text" name="taxId" placeholder="CIF (ex: ESA12345672)" value={formData.taxId} onChange={handleChange} style={{ width:'100%', height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '26px' : '31px'), border:'none', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'#4A5057', outline:'none', boxSizing:'border-box' }} />
+        <div style={{ border:'1px solid hsl(var(--grey-line-strong))', borderRadius:'4px', overflow:'hidden', background:'hsl(var(--grey-paper))' }}>
+          <input type="text" name="company" placeholder="Nom de l'empresa" value={formData.company} onChange={handleChange} style={{ width:'100%', height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '26px' : '31px'), border:'none', borderBottom:'1px solid hsl(var(--grey-line))', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'hsl(var(--grey-ink-2))', outline:'none', boxSizing:'border-box' }} />
+          <input type="text" name="taxId" placeholder="CIF (ex: ESA12345672)" value={formData.taxId} onChange={handleChange} style={{ width:'100%', height: isPortraitTablet ? `${P_CARD_FIELD_H}px` : (isNarrowForm ? '26px' : '31px'), border:'none', padding:'0 10px', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '9pt' : '10.5pt', color:'hsl(var(--grey-ink-2))', outline:'none', boxSizing:'border-box' }} />
         </div>
       )}
     </div>
@@ -660,13 +657,13 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   // handleSubmit): aquí només canvia com es dibuixa, no què fa.
   // ---------------------------------------------------------------------
   if (isPhone) {
-    const camp = { width: '100%', height: '40px', border: '1px solid #D8DDE3', borderRadius: '6px', padding: '0 12px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '11pt', color: '#4A5057', backgroundColor: '#FFFFFF', boxSizing: 'border-box', outline: 'none' };
-    const bloc = { backgroundColor: '#FFFFFF', border: '1px solid #E6E8EC', borderRadius: '8px', padding: '16px', marginBottom: '14px' };
+    const camp = { width: '100%', height: '40px', border: '1px solid hsl(var(--grey-line-strong))', borderRadius: '6px', padding: '0 12px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '11pt', color: 'hsl(var(--grey-ink-2))', backgroundColor: 'hsl(var(--grey-paper))', boxSizing: 'border-box', outline: 'none' };
+    const bloc = { backgroundColor: 'hsl(var(--grey-paper))', border: '1px solid hsl(var(--grey-line))', borderRadius: '8px', padding: '16px', marginBottom: '14px' };
     const titol = { ...HEAD, fontSize: '13pt', marginBottom: '12px' };
-    const etiqueta = { display: 'block', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '9.5pt', color: '#667085', marginBottom: '4px' };
+    const etiqueta = { display: 'block', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '9.5pt', color: 'hsl(var(--grey-muted-2))', marginBottom: '4px' };
 
-    const estilTargeta = { style: { base: { color: '#4A5057', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14px', '::placeholder': { color: '#98A2B4' } }, invalid: { color: '#ef4444' } } };
-    const capsaTargeta = { border: '1px solid #D8DDE3', borderRadius: '6px', backgroundColor: '#FFFFFF', padding: '12px' };
+    const estilTargeta = { style: { base: { color: 'hsl(var(--grey-ink-2))', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14px', '::placeholder': { color: 'hsl(var(--grey-muted))' } }, invalid: { color: '#ef4444' } } };
+    const capsaTargeta = { border: '1px solid hsl(var(--grey-line-strong))', borderRadius: '6px', backgroundColor: 'hsl(var(--grey-paper))', padding: '12px' };
 
     const campsEnviament = [
       ['firstName', 'Nom'], ['lastName', 'Cognoms'], ['address', 'Adreça (carrer i número)'],
@@ -674,7 +671,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     ];
 
     return (
-      <div style={{ width: '100%', maxWidth: '560px', margin: '0 auto', fontFamily: 'Roboto Condensed, sans-serif', color: '#4A5057' }}>
+      <div style={{ width: '100%', maxWidth: '560px', margin: '0 auto', fontFamily: 'Roboto Condensed, sans-serif', color: 'hsl(var(--grey-ink-2))' }}>
         <h1 style={{ ...HEAD, fontSize: '20pt', margin: '0 0 18px' }}>Pagament</h1>
 
         <div style={bloc}>
@@ -686,7 +683,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             <div key={it.id || i} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', padding: '6px 0', borderBottom: '1px solid #F0F2F6' }}>
               <span style={{ fontSize: '10.5pt' }}>
                 {it.title || it.name}
-                <span style={{ color: '#98A2B4' }}> · Talla {it.size} · {it.qty || 1} u.</span>
+                <span style={{ color: 'hsl(var(--grey-muted))' }}> · Talla {it.size} · {it.qty || 1} u.</span>
               </span>
               <span style={{ whiteSpace: 'nowrap' }}>{it.price}</span>
             </div>
@@ -760,9 +757,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '16px', fontSize: '9.5pt', lineHeight: 1.3 }}>
             <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop: '2px' }} />
             <span>
-              Accepto els <a href="/terms" style={{ color: '#4A5057', textDecoration: 'underline' }}>Termes del Servei</a>, la{' '}
-              <a href="/privacy" style={{ color: '#4A5057', textDecoration: 'underline' }}>Política de Privacitat</a> i la{' '}
-              <a href="/shipping" style={{ color: '#4A5057', textDecoration: 'underline' }}>Política d'enviaments</a>.
+              Accepto els <a href="/terms" style={{ color: 'hsl(var(--grey-ink-2))', textDecoration: 'underline' }}>Termes del Servei</a>, la{' '}
+              <a href="/privacy" style={{ color: 'hsl(var(--grey-ink-2))', textDecoration: 'underline' }}>Política de Privacitat</a> i la{' '}
+              <a href="/shipping" style={{ color: 'hsl(var(--grey-ink-2))', textDecoration: 'underline' }}>Política d'enviaments</a>.
             </span>
           </label>
 
@@ -780,7 +777,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           </button>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: '9pt', color: '#98A2B4', marginBottom: '24px' }}>
+        <p style={{ textAlign: 'center', fontSize: '9pt', color: 'hsl(var(--grey-muted))', marginBottom: '24px' }}>
           Pagament segur amb Stripe
         </p>
       </div>
@@ -788,7 +785,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
   }
 
   return (
-    <div style={{ width:'100%', position:'relative', display:'flex', flexDirection:'column', justifyContent:'flex-start', fontFamily:'Roboto Condensed, sans-serif', color:'#4A5057', overflow:'visible', padding:0 }}>
+    <div style={{ width:'100%', position:'relative', display:'flex', flexDirection:'column', justifyContent:'flex-start', fontFamily:'Roboto Condensed, sans-serif', color:'hsl(var(--grey-ink-2))', overflow:'visible', padding:0 }}>
       {/* AQUESTA DISPOSICIÓ ÉS LA MATEIXA DE SEMPRE, NOMÉS MOVIDA.
           El pagament viu en una pàgina pròpia que entra per sota del mega-slide.
           L'ordre nou és:
@@ -824,10 +821,10 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             la targeta dels totals clavada a la dreta, per sobre de les fitxes
             (que hi passen per sota). Ocupa una franja d'alçada fixa: el
             formulari de pagament no es mou mai, faci els productes que faci.
-            La franja porta un degradat de #F9FAFB (a l'esquerra) a #FFFFFF,
+            La franja porta un degradat de hsl(var(--grey-paper)) (a l'esquerra) a hsl(var(--grey-paper)),
             d'una banda a l'altra del contingut (del logo a la icona de
             l'usuari), a totes les versions. */}
-        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0, marginTop: isPortraitTablet ? undefined : (isLandscapeTablet ? `${L_FRANJA_TOP}px` : `${D_FRANJA_TOP}px`), background:'linear-gradient(to right, #F9FAFB 0%, #FFFFFF 100%)' }}>
+        <div style={{ gridColumn:'1 / -1', position:'relative', display:'flex', minHeight:0, marginTop: isPortraitTablet ? undefined : (isLandscapeTablet ? `${L_FRANJA_TOP}px` : `${D_FRANJA_TOP}px`), background:'linear-gradient(to right, hsl(var(--grey-paper-soft)) 0%, hsl(var(--grey-paper)) 100%)' }}>
           {/* Cinta de fitxes. L'espaiador del davant empeny les fitxes cap a la
               dreta (quan n'hi ha poques) i s'arronsa a zero quan no hi caben:
               així sempre creixen cap a l'esquerra, des de la targeta dels
@@ -836,14 +833,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
           {/* Linia fosca al marge esquerre: nome s surt si hi ha fitxes
               amagades en aquesta banda, i serveix per indicar que la cinta
               continua. Abans era un degradat; ara es una linia de 2px, d'un gris suau. */}
-          <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'2px', pointerEvents:'none', opacity: cintaAmbMes ? 1 : 0, transition:'opacity 160ms ease', background:'#98A2B4', zIndex:2 }} />
+          <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'2px', pointerEvents:'none', opacity: cintaAmbMes ? 1 : 0, transition:'opacity 160ms ease', background:'hsl(var(--grey-muted-2))', zIndex:2 }} />
           <div ref={cintaRef} style={{ flex:'1 1 auto', minWidth:0, display:'flex', alignItems:'stretch', gap:`${GAP_FITXES}px`, overflowX:'auto', overflowY:'hidden', paddingRight:`${TOTALS_W + TOTALS_GAP}px`, scrollbarWidth:'none', msOverflowStyle:'none' }} className="cinta-sense-scrollbar">
             <div style={{ flex:'1 1 auto', minWidth:0 }} />
             {activeItems.map((item, idx) => {
               const ip = parseFloat(String(item.price).replace('€','').replace(/\s/g,'').replace(',','.'))||0;
               const q = item.qty||1;
               return (
-                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height: isPortraitTablet ? `${P_FITXA_H}px` : (isLandscapeTablet ? `${L_FITXA_H}px` : `${D_FITXA_H}px`), boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid #E6E8EC', borderRadius:'6px', background:'#FFFFFF', padding:'8px' }}>
+                <div key={`c-${item.id}-${idx}`} style={{ flex:'0 0 auto', width:`${FITXA_W}px`, height: isPortraitTablet ? `${P_FITXA_H}px` : (isLandscapeTablet ? `${L_FITXA_H}px` : `${D_FITXA_H}px`), boxSizing:'border-box', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', border:'1px solid hsl(var(--grey-line))', borderRadius:'6px', background:'hsl(var(--grey-paper))', padding:'8px' }}>
                   <div style={{ width:'100%', height: undefined, flex:'1 1 auto', minHeight:0, overflow:'hidden', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <img
                       src={imatgeArticle(item)}
@@ -858,7 +855,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                     />
                   </div>
                   <div style={{ width:'100%', fontSize:'9pt', lineHeight:1.2, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title||item.name||'Producte'}</div>
-                  <div style={{ fontSize:'8pt', lineHeight:1.2, color:'#667085', textAlign:'center' }}>Talla {item.size||'-'} · {q} u.</div>
+                  <div style={{ fontSize:'8pt', lineHeight:1.2, color:'hsl(var(--grey-muted-2))', textAlign:'center' }}>Talla {item.size||'-'} · {q} u.</div>
                   <div style={{ fontSize:'10pt', lineHeight:1.2, fontVariantNumeric:'tabular-nums' }}>{(ip*q).toFixed(2).replace('.',',')}€</div>
                 </div>
               );
@@ -870,24 +867,24 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               La disposicio interior es la mateixa que la de la vertical: en
               Roboto, els conceptes aplegats a baix (flex-end) amb un junt de
               2px i a 11pt, i TOT PLEGAT FA en Roboto Condensed a 12.5pt. */}
-          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily:'Roboto, sans-serif', justifyContent:'flex-end', gap:'2px', padding:'10px 12px', background:'#FFFFFF', border:'none', borderRadius:'6px' }}>
+          <div style={{ position:'absolute', top:0, bottom:0, right:0, width:`${TOTALS_W}px`, boxSizing:'border-box', display:'flex', flexDirection:'column', fontFamily:'Roboto, sans-serif', justifyContent:'flex-end', gap:'2px', padding:'10px 12px', background:'hsl(var(--grey-paper))', border:'none', borderRadius:'6px' }}>
             {/* Linia fixa d'1px a la vora esquerra, del mateix gris que la linia
-                gruixuda de la cinta (#98A2B4). A diferencia d'aquella, aquesta
+                gruixuda de la cinta (hsl(var(--grey-muted-2))). A diferencia d'aquella, aquesta
                 hi es sempre. */}
-            <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'1px', pointerEvents:'none', background:'#98A2B4', borderRadius:'6px 0 0 6px' }} />
+            <div aria-hidden="true" style={{ position:'absolute', left:0, top:0, bottom:0, width:'1px', pointerEvents:'none', background:'hsl(var(--grey-muted-2))', borderRadius:'6px 0 0 6px' }} />
             {/* Els totals són una suma: cada concepte a la seva ratlla, el nom a
                 l'esquerra i la xifra a la dreta, com una columna de números.
                 El Subtotal és el preu de la peça sense transport i sense IVA;
                 el transport i l'IVA són dins del preu, però es desglossen aquí
                 perquè es vegi d'on surt el total. Les tres ratlles sumen
                 exactament TOT PLEGAT FA. */}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{subtotalNet.toFixed(2).replace('.',',')}€</span></div>
-            {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{transport === 0 ? 'Gratuït' : `${transportNet.toFixed(2).replace('.',',')}€`}</span></div>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'#667085' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'hsl(var(--grey-muted-2))' }}><span>Subtotal</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{subtotalNet.toFixed(2).replace('.',',')}€</span></div>
+            {discountEnabled && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'hsl(var(--grey-muted-2))' }}><span>Descompte (-{offersConfig.discountRate}%)</span><span style={{ fontVariantNumeric:'tabular-nums' }}>-{descompte.toFixed(2).replace('.',',')}€</span></div>}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'hsl(var(--grey-muted-2))' }}><span>Transport</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{transport === 0 ? 'Gratuït' : `${transportNet.toFixed(2).replace('.',',')}€`}</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontSize:'11pt', lineHeight:1.2, color:'hsl(var(--grey-muted-2))' }}><span>IVA 21%</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{ivaAmount.toFixed(2).replace('.',',')}€</span></div>
             {/* TOT PLEGAT FA es queda en Roboto Condensed encara que la resta
                 de la targeta vagi en Roboto. */}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontFamily:'Roboto Condensed, sans-serif', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid #E6E8EC' }}><span>TOT PLEGAT FA</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', fontFamily:'Roboto Condensed, sans-serif', fontSize:'12.5pt', fontWeight:500, lineHeight:1.2, paddingTop:'6px', borderTop:'1px solid hsl(var(--grey-line))' }}><span>TOT PLEGAT FA</span><span style={{ fontVariantNumeric:'tabular-nums' }}>{totalFinal.toFixed(2).replace('.',',')}€</span></div>
           </div>
         </div>
         {/* COL 2: Dades d'enviament. Baixa a la fila de sota i ocupa mitja
@@ -937,9 +934,9 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             <div style={{ display:'grid', rowGap: '8px' }}>
               {/* El bloc de la targeta porta contorn propi: des que la pàgina és
                   blanca, sense la vora no es distingiria del fons. */}
-              <div style={{ background:'#FFFFFF', border:'1px solid #D8DDE3', borderRadius:'6px', overflow:'hidden' }}>
-                <div style={{ padding: isPortraitTablet ? '9px 12px 0px' : (isNarrowForm ? '6px 10px' : '10px 12px'), display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '11pt', fontWeight:500, color:'#4A5057' }}>
-                  <span style={{ width:'13px', height:'10px', border:'1px solid #4A5057', borderRadius:'2px', display:'inline-block' }} />
+              <div style={{ background:'hsl(var(--grey-paper))', border:'1px solid hsl(var(--grey-line-strong))', borderRadius:'6px', overflow:'hidden' }}>
+                <div style={{ padding: isPortraitTablet ? '9px 12px 0px' : (isNarrowForm ? '6px 10px' : '10px 12px'), display:'flex', alignItems:'center', gap:'8px', fontSize: isNarrowForm ? '9pt' : '11pt', fontWeight:500, color:'hsl(var(--grey-ink-2))' }}>
+                  <span style={{ width:'13px', height:'10px', border:'1px solid hsl(var(--grey-ink-2))', borderRadius:'2px', display:'inline-block' }} />
                   <span>Targeta</span>
                 </div>
                 {/* A la vertical, el junt entre la capsa del numero i la filera
@@ -947,14 +944,14 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
                     amb el camp "Pis, porta" (690,7). */}
                 <div style={{ padding: isPortraitTablet ? '10px 12px 2px' : '10px 12px', display:'grid', rowGap: isPortraitTablet ? '3.257px' : '8px' }}>
                   <div style={capsaTargeta}>
-                    <CardNumberElement options={{ style: { base: { color:'#4A5057', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'#98A2B4' } }, invalid: { color:'#ef4444' } } }} />
+                    <CardNumberElement options={{ style: { base: { color:'hsl(var(--grey-ink-2))', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'hsl(var(--grey-muted))' } }, invalid: { color:'#ef4444' } } }} />
                   </div>
                   <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'8px' }}>
                     <div style={capsaTargeta}>
-                      <CardExpiryElement options={{ style: { base: { color:'#4A5057', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'#98A2B4' } }, invalid: { color:'#ef4444' } } }} />
+                      <CardExpiryElement options={{ style: { base: { color:'hsl(var(--grey-ink-2))', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'hsl(var(--grey-muted))' } }, invalid: { color:'#ef4444' } } }} />
                     </div>
                     <div style={capsaTargeta}>
-                      <CardCvcElement options={{ style: { base: { color:'#4A5057', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'#98A2B4' } }, invalid: { color:'#ef4444' } } }} />
+                      <CardCvcElement options={{ style: { base: { color:'hsl(var(--grey-ink-2))', fontFamily:'Roboto Condensed, sans-serif', fontSize: isNarrowForm ? '11px' : '14px', '::placeholder': { color:'hsl(var(--grey-muted))' } }, invalid: { color:'#ef4444' } } }} />
                     </div>
                   </div>
                 </div>

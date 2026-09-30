@@ -419,7 +419,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
                       />
                     </div>
                   ) : (
-                    <div className="mt-2 aspect-square w-full rounded-md bg-black/5" ref={shouldMeasure ? tileSizeRef : undefined} />
+                    <div className="mt-2 aspect-square w-full rounded-md bg-ink-pure/5" ref={shouldMeasure ? tileSizeRef : undefined} />
                   )}
                 </div>
               );

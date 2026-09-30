@@ -23,8 +23,8 @@ export default function CollectionIconsBar() {
         // 19 px mes amunt (4 + 5 + 5 + 5).
         bottom: `${BAR_HEIGHT + 19}px`,
         zIndex: 50,
-        background: '#fff',
-        border: '1px solid #e5e7eb',
+        background: 'hsl(var(--grey-paper))',
+        border: '1px solid hsl(var(--grey-line))',
         borderRadius: '9999px',
         boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
         display: 'flex',

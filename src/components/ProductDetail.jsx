@@ -59,7 +59,7 @@ function ProductDetail({ product, onClose, onAddToCart }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
+        className="fixed inset-0 bg-ink-pure/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
         onClick={onClose}
       >
         <motion.div
@@ -68,12 +68,12 @@ function ProductDetail({ product, onClose, onAddToCart }) {
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-2xl"
+          className="bg-paper rounded-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-2xl"
           style={isSectionEnabled('productDetail') ? getDebugStyle('productDetail', 'main') : {}}
         >
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center z-10">
-            <h2 className="font-oswald text-xl sm:text-2xl font-bold truncate pr-4" style={{ color: "#141414" }}>
+          <div className="sticky top-0 bg-paper border-b border-line px-4 sm:px-6 py-4 flex justify-between items-center z-10">
+            <h2 className="font-oswald text-xl sm:text-2xl font-bold truncate pr-4" style={{ color: "hsl(var(--grey-ink-strong))" }}>
               {product.name}
             </h2>
             <Tooltip>
@@ -84,7 +84,7 @@ function ProductDetail({ product, onClose, onAddToCart }) {
               size="sm"
               onClick={onClose}
               className="rounded-full flex-shrink-0"
-              style={{ color: "#141414" }}
+              style={{ color: "hsl(var(--grey-ink-strong))" }}
               aria-label="Tancar detall del producte"
             >
               <X className="h-5 w-5" />
@@ -103,7 +103,7 @@ function ProductDetail({ product, onClose, onAddToCart }) {
               {/* Galeria d'imatges */}
               <div className="space-y-4">
                 {/* Imatge principal */}
-                <div className="relative aspect-square bg-gray-100 rounded-xl overflow-hidden group">
+                <div className="relative aspect-square bg-paper-soft rounded-xl overflow-hidden group">
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={selectedImageIndex}
@@ -123,8 +123,8 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                   {/* Zoom indicator */}
                   <Tooltip>
                   <TooltipTrigger asChild>
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={() => setIsZoomed(!isZoomed)}>
-                    <ZoomIn className="h-4 w-4" style={{ color: "#141414" }} />
+                  <div className="absolute top-4 right-4 bg-paper/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={() => setIsZoomed(!isZoomed)}>
+                    <ZoomIn className="h-4 w-4" style={{ color: "hsl(var(--grey-ink-strong))" }} />
                   </div>
                   </TooltipTrigger>
                   <TooltipContent>Zoom</TooltipContent>
@@ -137,8 +137,8 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                       <TooltipTrigger asChild>
                       <button
                         onClick={prevImage}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
-                        style={{ color: "#141414" }}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-paper/90 backdrop-blur-sm rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-paper"
+                        style={{ color: "hsl(var(--grey-ink-strong))" }}
                         aria-label="Imatge anterior"
                       >
                         <ChevronLeft className="h-5 w-5" />
@@ -150,8 +150,8 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                       <TooltipTrigger asChild>
                       <button
                         onClick={nextImage}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
-                        style={{ color: "#141414" }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-paper/90 backdrop-blur-sm rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-paper"
+                        style={{ color: "hsl(var(--grey-ink-strong))" }}
                         aria-label="Imatge següent"
                       >
                         <ChevronRight className="h-5 w-5" />
@@ -170,8 +170,8 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                         onClick={() => setSelectedImageIndex(index)}
                         className={`w-2 h-2 rounded-full transition-all ${
                           index === selectedImageIndex
-                            ? 'bg-white w-6'
-                            : 'bg-white/50 hover:bg-white/80'
+                            ? 'bg-paper w-6'
+                            : 'bg-paper/50 hover:bg-paper/80'
                         }`}
                       />
                     ))}
@@ -184,10 +184,10 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-all ${
+                      className={`aspect-square bg-paper-soft rounded-lg overflow-hidden border-2 transition-all ${
                         index === selectedImageIndex
-                          ? 'border-gray-900 shadow-md'
-                          : 'border-transparent hover:border-gray-300'
+                          ? 'border-ink-strong shadow-md'
+                          : 'border-transparent hover:border-line-strong'
                       }`}
                     >
                       <img
@@ -204,17 +204,17 @@ function ProductDetail({ product, onClose, onAddToCart }) {
               <div className="space-y-6">
                 {/* Preu i descripció */}
                 <div>
-                  <p className="font-oswald text-3xl sm:text-4xl font-normal mb-3" style={{ color: "#141414" }}>
+                  <p className="font-oswald text-3xl sm:text-4xl font-normal mb-3" style={{ color: "hsl(var(--grey-ink-strong))" }}>
                     {formatPrice(product.price)}
                   </p>
-                  <p className="text-base leading-relaxed text-justify" style={{ color: "#141414", opacity: 0.7 }}>
+                  <p className="text-base leading-relaxed text-justify" style={{ color: "hsl(var(--grey-ink-strong))", opacity: 0.7 }}>
                     {product.description}
                   </p>
                 </div>
 
                 {/* Selector de talla */}
                 <div>
-                  <h3 className="font-oswald font-semibold text-lg mb-3" style={{ color: "#141414" }}>
+                  <h3 className="font-oswald font-semibold text-lg mb-3" style={{ color: "hsl(var(--grey-ink-strong))" }}>
                     Selecciona la Talla
                   </h3>
                   <div className="grid grid-cols-4 gap-2">
@@ -224,10 +224,10 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                         onClick={() => setSelectedSize(size)}
                         className={`font-oswald py-3 px-4 border-2 rounded-lg font-medium transition-all ${
                           selectedSize === size
-                            ? 'border-gray-900 bg-gray-900 text-white scale-105'
-                            : 'border-gray-200 hover:border-gray-400'
+                            ? 'border-ink-strong bg-ink-strong text-paper scale-105'
+                            : 'border-line hover:border-muted-2'
                         }`}
-                        style={selectedSize !== size ? { color: "#141414" } : {}}
+                        style={selectedSize !== size ? { color: "hsl(var(--grey-ink-strong))" } : {}}
                       >
                         {size}
                       </button>
@@ -239,68 +239,68 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                 <Button
                   onClick={handleAddToCart}
                   className="w-full h-14 text-base font-oswald uppercase tracking-wider rounded-lg"
-                  style={{ backgroundColor: '#141414', color: '#FFFFFF' }}
+                  style={{ backgroundColor: 'hsl(var(--grey-ink-strong))', color: 'hsl(var(--grey-paper))' }}
                 >
                   Afegeix al cistell - {formatPrice(product.price)}
                 </Button>
 
                 {/* Detalls del producte */}
-                <div className="space-y-3 pt-6 border-t border-gray-200">
-                  <h3 className="font-oswald font-semibold text-lg" style={{ color: "#141414" }}>
+                <div className="space-y-3 pt-6 border-t border-line">
+                  <h3 className="font-oswald font-semibold text-lg" style={{ color: "hsl(var(--grey-ink-strong))" }}>
                     Detalls del Producte
                   </h3>
-                  <ul className="font-roboto space-y-2 text-sm" style={{ color: "#141414", opacity: 0.7 }}>
+                  <ul className="font-roboto space-y-2 text-sm" style={{ color: "hsl(var(--grey-ink-strong))", opacity: 0.7 }}>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Gildan® 64000 Softstyle — 100% Cotó Ring-Spun filat en anell</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Impressió DTF (Direct-to-Film) d'alta definició i màxima intensitat</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Gramatge 153 g/m²: teixit lleuger, fresc i de tacte ultra-suau</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Tall clàssic modern amb coll fi de canalé sense costures</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Espatlles i coll reforçats i encintats per a major confort</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Teixit pre-encongit de fibra compacta</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Disseny d'il·lustració d'autor exclusiu</span>
                     </li>
                   </ul>
                 </div>
 
                 {/* Guia de cura */}
-                <div className="space-y-3 pt-6 border-t border-gray-200">
-                  <h3 className="font-oswald font-semibold text-lg" style={{ color: "#141414" }}>
+                <div className="space-y-3 pt-6 border-t border-line">
+                  <h3 className="font-oswald font-semibold text-lg" style={{ color: "hsl(var(--grey-ink-strong))" }}>
                     Cura del Producte
                   </h3>
-                  <ul className="font-roboto space-y-2 text-sm" style={{ color: "#141414", opacity: 0.7 }}>
+                  <ul className="font-roboto space-y-2 text-sm" style={{ color: "hsl(var(--grey-ink-strong))", opacity: 0.7 }}>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Rentar a màquina a 30°C màxim</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>No utilitzar lleixiu</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>Planxar a baixa temperatura del revés</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-gray-900 mt-0.5">•</span>
+                      <span className="text-ink-strong mt-0.5">•</span>
                       <span>No rentar en sec</span>
                     </li>
                   </ul>

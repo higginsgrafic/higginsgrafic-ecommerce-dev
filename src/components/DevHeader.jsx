@@ -18,17 +18,17 @@ function DevHeader({
 
   const [strongHex, setStrongHex] = useState(() => {
     try {
-      return window.localStorage.getItem('DEV_THEME_STRONG_HEX') || '#171717';
+      return window.localStorage.getItem('DEV_THEME_STRONG_HEX') || 'hsl(var(--grey-ink-strong))';
     } catch {
-      return '#171717';
+      return 'hsl(var(--grey-ink-strong))';
     }
   });
 
   const [softHex, setSoftHex] = useState(() => {
     try {
-      return window.localStorage.getItem('DEV_THEME_SOFT_HEX') || '#b2b2b2';
+      return window.localStorage.getItem('DEV_THEME_SOFT_HEX') || 'hsl(var(--grey-muted))';
     } catch {
-      return '#b2b2b2';
+      return 'hsl(var(--grey-muted))';
     }
   });
 
@@ -170,7 +170,7 @@ function DevHeader({
                 key={link.href}
                 className="font-roboto text-sm font-normal text-foreground transition-all inline-block whitespace-nowrap cursor-default"
                 onMouseEnter={(e) => {
-                  const color = document.documentElement.classList.contains('dark') ? '#ffffff' : 'hsl(var(--foreground))';
+                  const color = document.documentElement.classList.contains('dark') ? 'hsl(var(--grey-paper))' : 'hsl(var(--foreground))';
                   e.currentTarget.style.textShadow = `0 0 0.55px ${color}, 0 0 0.55px ${color}`;
                 }}
                 onMouseLeave={(e) => {

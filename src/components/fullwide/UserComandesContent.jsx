@@ -144,7 +144,7 @@ function UserComandesContent({ userEmail }) {
   const handleDeleteLastCard = () => {
     setPaymentMethods(prev => prev.length > 1 ? prev.slice(0, -1) : prev);
   };
-  const roundBtnStyle = (bg, color = '#FFFFFF') => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color, fontSize: '14pt', fontWeight: 400, width: '22px', height: '22px', borderRadius: '50%', background: bg, lineHeight: 1 });
+  const roundBtnStyle = (bg, color = 'hsl(var(--grey-paper))') => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color, fontSize: '14pt', fontWeight: 400, width: '22px', height: '22px', borderRadius: '50%', background: bg, lineHeight: 1 });
   const minusBtn = (
     <span role="button" aria-label="Eliminar última targeta" onClick={(e) => { e.stopPropagation(); handleDeleteLastCard(); }} style={roundBtnStyle('#FEE2E2', '#DC2626')}>−</span>
   );
@@ -173,8 +173,8 @@ function UserComandesContent({ userEmail }) {
     'Stripe, Redsys, Google Pay, etc.',
     "Google Authenticator, Authy, etc.",
   ];
-  const TEXT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '12pt', color: '#475059' };
-  const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#475059' };
+  const TEXT = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '12pt', color: 'hsl(var(--grey-ink-2))' };
+  const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'hsl(var(--grey-ink-2))' };
 
   // Graella de 5 columnes irregulars amb gutter de 7.5px (mesurades del mockup)
   const COL_TEMPLATE = '374px 299px 186px 188px 288px';
@@ -233,7 +233,7 @@ function UserComandesContent({ userEmail }) {
               fontSize: isActive ? '15pt' : '12pt',
               fontWeight: isActive ? 600 : 400,
               letterSpacing: isActive ? '1.5px' : HEAD.letterSpacing,
-              color: isActive ? '#2F61B2' : '#475059',
+              color: isActive ? '#2F61B2' : 'hsl(var(--grey-ink-2))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -251,7 +251,7 @@ function UserComandesContent({ userEmail }) {
                 right: 0,
                 bottom: '2.5px',
                 height: isActive ? '3px' : '1px',
-                backgroundColor: isActive ? '#2F61B2' : '#7D8895',
+                backgroundColor: isActive ? '#2F61B2' : 'hsl(var(--grey-muted-2))',
               }} />
             </div>
           );
@@ -278,7 +278,7 @@ function UserComandesContent({ userEmail }) {
             font-family: 'Roboto Condensed', sans-serif;
             font-weight: 400;
             font-size: 12pt;
-            color: #475059;
+            color: hsl(var(--grey-ink-2));
             display: block;
           }
           .compte-ph-wrap .compte-ph {
@@ -297,9 +297,9 @@ function UserComandesContent({ userEmail }) {
           .compte-ph-wrap input:-webkit-autofill:hover,
           .compte-ph-wrap input:-webkit-autofill:focus,
           .compte-ph-wrap input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important;
-            -webkit-text-fill-color: #475059 !important;
-            caret-color: #475059;
+            -webkit-box-shadow: 0 0 0 1000px hsl(var(--grey-paper)) inset !important;
+            -webkit-text-fill-color: hsl(var(--grey-ink-2)) !important;
+            caret-color: hsl(var(--grey-ink-2));
             transition: background-color 9999s ease-in-out 0s;
           }
         `}</style>
@@ -321,11 +321,11 @@ function UserComandesContent({ userEmail }) {
             </colgroup>
             <tbody>
               {(() => {
-                const headStyle = { ...HEAD, fontSize: '12pt', padding: '0 10px', display: 'flex', alignItems: 'center', height: '100%', boxSizing: 'border-box', borderBottom: '2px solid #98A2B4' };
+                const headStyle = { ...HEAD, fontSize: '12pt', padding: '0 10px', display: 'flex', alignItems: 'center', height: '100%', boxSizing: 'border-box', borderBottom: '2px solid hsl(var(--grey-muted-2))' };
                 const labelStyle = { ...TEXT, fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', padding: '0 10px', verticalAlign: 'middle' };
                 const supStyle = { fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.65em', verticalAlign: 'baseline', position: 'relative', top: '-0.35em', marginLeft: '2px' };
-                const COL_STRONG = '#475059';
-                const COL_WEAK = '#C5CACF';
+                const COL_STRONG = 'hsl(var(--grey-ink-2))';
+                const COL_WEAK = 'hsl(var(--grey-muted))';
                 const lbl = (text, req = false, strong = false) => (
                   <div className="compte-ph-wrap">
                     <input type="text" placeholder=" " />
@@ -336,7 +336,7 @@ function UserComandesContent({ userEmail }) {
                 );
                 const chk = (text, req = false, active = false, onClick) => (
                   <div onClick={onClick} style={{ ...labelStyle, height: '100%', display: 'flex', alignItems: 'center', gap: '8px', color: COL_STRONG, boxSizing: 'border-box', cursor: onClick ? 'pointer' : 'default', userSelect: 'none' }}>
-                    <span style={{ width: '14px', height: '14px', border: `1.5px solid ${active ? COL_STRONG : '#98A2B4'}`, borderRadius: '2px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', flexShrink: 0 }}>
+                    <span style={{ width: '14px', height: '14px', border: `1.5px solid ${active ? COL_STRONG : 'hsl(var(--grey-muted-2))'}`, borderRadius: '2px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', flexShrink: 0 }}>
                       {active && <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: COL_STRONG }} />}
                     </span>
                     <span>{text}{req && <span style={supStyle}>1</span>}</span>
@@ -364,9 +364,9 @@ function UserComandesContent({ userEmail }) {
                   </div>
                 );
                 const facturacioHead = (
-                  <div onClick={() => setFacturacioActive(v => !v)} style={{ ...labelStyle, height: '100%', display: 'flex', alignItems: 'center', gap: '8px', boxSizing: 'border-box', cursor: 'pointer', userSelect: 'none', borderBottom: '2px solid #98A2B4', justifyContent: 'space-between' }}>
+                  <div onClick={() => setFacturacioActive(v => !v)} style={{ ...labelStyle, height: '100%', display: 'flex', alignItems: 'center', gap: '8px', boxSizing: 'border-box', cursor: 'pointer', userSelect: 'none', borderBottom: '2px solid hsl(var(--grey-muted-2))', justifyContent: 'space-between' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ width: '14px', height: '14px', border: `1.5px solid ${facturacioActive ? COL_STRONG : '#98A2B4'}`, borderRadius: '2px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', flexShrink: 0 }}>
+                      <span style={{ width: '14px', height: '14px', border: `1.5px solid ${facturacioActive ? COL_STRONG : 'hsl(var(--grey-muted-2))'}`, borderRadius: '2px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', flexShrink: 0 }}>
                         {facturacioActive && <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: COL_STRONG }} />}
                       </span>
                       <span style={{ ...HEAD, fontSize: '12pt', color: COL_STRONG }}>FACTURACIÓ</span>
@@ -468,7 +468,7 @@ function UserComandesContent({ userEmail }) {
                       role="button"
                       aria-label={segVisible ? 'Amaga les dades' : 'Mostra les dades'}
                       onClick={(e) => { e.stopPropagation(); setSegVisible(v => !v); }}
-                      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: '#475059', transform: 'translateX(57px)', position: 'relative', zIndex: 3 }}
+                      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'hsl(var(--grey-ink-2))', transform: 'translateX(57px)', position: 'relative', zIndex: 3 }}
                     >
                       {segVisible ? <EyeOff size={18} /> : <Eye size={18} />}
                     </span>
@@ -510,7 +510,7 @@ function UserComandesContent({ userEmail }) {
                     ];
                     const d = segDemo[r - 2];
                     const rect = (
-                      <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%) scale(0.525)', transformOrigin: 'left center', width: '85px', height: '55px', background: '#E5E7EB', borderRadius: '5px', zIndex: 1, pointerEvents: 'none' }} />
+                      <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%) scale(0.525)', transformOrigin: 'left center', width: '85px', height: '55px', background: 'hsl(var(--grey-paper-tint))', borderRadius: '5px', zIndex: 1, pointerEvents: 'none' }} />
                     );
                     const segCells = segVisible ? [
                       <>{rect}{withEye(d.ent)}</>,
@@ -573,7 +573,7 @@ function UserComandesContent({ userEmail }) {
           fontSize: '9.5pt',
           letterSpacing: '0.05em',
           lineHeight: 1,
-          color: '#474F58',
+          color: 'hsl(var(--grey-ink-2))',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -620,8 +620,8 @@ function UserComandesContent({ userEmail }) {
                 fontFamily: 'Roboto Condensed, sans-serif',
                 fontSize: '11pt',
                 fontWeight: 500,
-                color: '#98A2B4',
-                backgroundColor: '#F4F6F8',
+                color: 'hsl(var(--grey-muted))',
+                backgroundColor: 'hsl(var(--grey-paper-soft))',
                 border: 'none',
                 borderRadius: '3px',
                 boxSizing: 'border-box',
@@ -644,7 +644,7 @@ function UserComandesContent({ userEmail }) {
             width: '1365px',
             marginLeft: '-7.5px',
             marginTop: '-5px',
-            color: '#475059',
+            color: 'hsl(var(--grey-ink-2))',
             tableLayout: 'fixed',
             borderCollapse: 'separate',
             borderSpacing: '7.5px 3.05px',
@@ -665,7 +665,7 @@ function UserComandesContent({ userEmail }) {
             </colgroup>
             <tbody>
               {(() => {
-                const headStyle = { ...HEAD, fontSize: '12pt', padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100%', boxSizing: 'border-box', borderBottom: '2px solid #98A2B4' };
+                const headStyle = { ...HEAD, fontSize: '12pt', padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100%', boxSizing: 'border-box', borderBottom: '2px solid hsl(var(--grey-muted-2))' };
                 const headerNode = (title, open = true, onToggle = null) => (
                   <div onClick={onToggle || undefined} style={{ ...headStyle, cursor: onToggle ? 'pointer' : 'default' }}>
                     <span>{title}</span>
@@ -674,12 +674,12 @@ function UserComandesContent({ userEmail }) {
                 );
                 const cellStyle = { ...TEXT, padding: '0 10px', display: 'flex', alignItems: 'center', height: '100%', boxSizing: 'border-box' };
                 const supSt = { fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.65em', verticalAlign: 'baseline', position: 'relative', top: '-0.35em', marginLeft: '2px' };
-                const RED = '#475059';
+                const RED = 'hsl(var(--grey-ink-2))';
                 const SEG_SHIFT_X = '7.55px';
                 const optRow = (label, checked = false, muted = false, sup = null) => (
-                  <div style={{ ...cellStyle, fontSize: '11pt', color: muted ? '#B7BDC6' : '#475059', gap: '8px' }}>
-                    <span style={{ width: '12px', height: '12px', borderRadius: '3px', border: `1px solid ${muted ? '#C9CED6' : '#8892A0'}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', flexShrink: 0 }}>
-                      {checked ? <span style={{ width: '6px', height: '6px', borderRadius: '2px', background: muted ? '#AEB5BF' : '#475059' }} /> : null}
+                  <div style={{ ...cellStyle, fontSize: '11pt', color: muted ? 'hsl(var(--grey-muted))' : 'hsl(var(--grey-ink-2))', gap: '8px' }}>
+                    <span style={{ width: '12px', height: '12px', borderRadius: '3px', border: `1px solid ${muted ? 'hsl(var(--grey-line-strong))' : 'hsl(var(--grey-muted-2))'}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', flexShrink: 0 }}>
+                      {checked ? <span style={{ width: '6px', height: '6px', borderRadius: '2px', background: muted ? 'hsl(var(--grey-muted))' : 'hsl(var(--grey-ink-2))' }} /> : null}
                     </span>
                     <span>{label}{sup ? <sup style={supSt}>{sup}</sup> : null}</span>
                   </div>
@@ -705,7 +705,7 @@ function UserComandesContent({ userEmail }) {
                   null,
                   null,
                 ];
-                const segPwdStyle = { width: '100%', height: '24px', border: '1px solid #C9CED6', borderRadius: '3px', padding: '0 6px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', color: '#475059', boxSizing: 'border-box', outline: 'none', background: 'transparent' };
+                const segPwdStyle = { width: '100%', height: '24px', border: '1px solid hsl(var(--grey-line-strong))', borderRadius: '3px', padding: '0 6px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', color: 'hsl(var(--grey-ink-2))', boxSizing: 'border-box', outline: 'none', background: 'transparent' };
                 const segPwd = (text) => (
                   <div style={{ ...cellStyle, padding: '0 4px' }}>
                     <input type="password" placeholder={text} autoComplete="new-password" style={segPwdStyle} />
@@ -713,7 +713,7 @@ function UserComandesContent({ userEmail }) {
                 );
                 const segPwdMask = () => (
                   <div style={{ ...cellStyle, padding: '0 10px' }}>
-                    <span style={{ color: '#C5CACF', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14pt', letterSpacing: '4px', lineHeight: 1 }}>{'\u2022'.repeat(5)}</span>
+                    <span style={{ color: 'hsl(var(--grey-muted))', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14pt', letterSpacing: '4px', lineHeight: 1 }}>{'\u2022'.repeat(5)}</span>
                   </div>
                 );
                 const gestioRows = [
@@ -729,7 +729,7 @@ function UserComandesContent({ userEmail }) {
                     role="button"
                     aria-label={segVisible ? 'Amaga les dades' : 'Mostra les dades'}
                     onClick={(e) => { e.stopPropagation(); setSegVisible(v => !v); }}
-                    style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: '#475059' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'hsl(var(--grey-ink-2))' }}
                   >
                     {segVisible ? <EyeOff size={18} /> : <Eye size={18} />}
                   </span>
@@ -788,7 +788,7 @@ function UserComandesContent({ userEmail }) {
                     const d = paymentMethods[cardIdx];
                     const noPupilEye = (
                       <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M1 5C2.8 2.3 5.6 1 9 1C12.4 1 15.2 2.3 17 5C15.2 7.7 12.4 9 9 9C5.6 9 2.8 7.7 1 5Z" stroke="#C3C8CD" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M1 5C2.8 2.3 5.6 1 9 1C12.4 1 15.2 2.3 17 5C15.2 7.7 12.4 9 9 9C5.6 9 2.8 7.7 1 5Z" stroke="hsl(var(--grey-muted))" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     );
                     const CARD_BRANDS = {
@@ -798,10 +798,10 @@ function UserComandesContent({ userEmail }) {
                       'Maestro':    { gradient: 'linear-gradient(135deg, #0099DF 0%, #ED0006 100%)',         text: 'MAESTRO' },
                       'Discover':   { gradient: 'linear-gradient(135deg, #FF6F00 0%, #FF8F00 100%)',         text: 'DISC' },
                       'PayPal':     { gradient: 'linear-gradient(135deg, #003087 0%, #009CDE 100%)',         text: 'PP' },
-                      'Apple Pay':  { gradient: 'linear-gradient(135deg, #1A1A1A 0%, #3A3A3A 100%)',         text: 'PAY' },
+                      'Apple Pay':  { gradient: 'linear-gradient(135deg, hsl(var(--grey-ink-strong)) 0%, hsl(var(--grey-ink)) 100%)',         text: 'PAY' },
                       'Google Pay': { gradient: 'linear-gradient(135deg, #4285F4 0%, #34A853 100%)',         text: 'G PAY' },
                     };
-                    const getBrandStyle = (ent) => CARD_BRANDS[ent] || { gradient: 'linear-gradient(to bottom, #B8BCC4, #DCE0E6)', text: ent ? ent.toUpperCase().slice(0, 4) : '' };
+                    const getBrandStyle = (ent) => CARD_BRANDS[ent] || { gradient: 'linear-gradient(to bottom, hsl(var(--grey-muted)), #DCE0E6)', text: ent ? ent.toUpperCase().slice(0, 4) : '' };
                     const rect = (
                       <span style={{
                         width: '45px', height: '29px', borderRadius: '4px', flexShrink: 0,
@@ -809,11 +809,11 @@ function UserComandesContent({ userEmail }) {
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
                       }}>
-                        <span style={{ color: '#FFFFFF', fontSize: '7pt', fontWeight: 700, fontFamily: 'Oswald, sans-serif', letterSpacing: '0.3px', lineHeight: 1 }}>{getBrandStyle(d ? d.ent : '').text}</span>
+                        <span style={{ color: 'hsl(var(--grey-paper))', fontSize: '7pt', fontWeight: 700, fontFamily: 'Oswald, sans-serif', letterSpacing: '0.3px', lineHeight: 1 }}>{getBrandStyle(d ? d.ent : '').text}</span>
                       </span>
                     );
-                    const inputStyle = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '12pt', color: '#475059', border: '1px solid #C9CED6', borderRadius: '3px', padding: '2px 6px', width: '100%', boxSizing: 'border-box', height: '24px', outline: 'none' };
-                    const cardActionBtn = (icon, label, onClick, color = '#8892A0') => (
+                    const inputStyle = { fontFamily: 'Roboto Condensed, sans-serif', fontWeight: 400, fontSize: '12pt', color: 'hsl(var(--grey-ink-2))', border: '1px solid hsl(var(--grey-line-strong))', borderRadius: '3px', padding: '2px 6px', width: '100%', boxSizing: 'border-box', height: '24px', outline: 'none' };
+                    const cardActionBtn = (icon, label, onClick, color = 'hsl(var(--grey-muted-2))') => (
                       <span role="button" aria-label={label} onClick={(e) => { e.stopPropagation(); onClick(); }} style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color, padding: '0 2px' }}>
                         {icon}
                       </span>
@@ -886,30 +886,30 @@ function UserComandesContent({ userEmail }) {
                       );
                     }
                     return (
-                      <tr key={r} style={{ height: '29.75px', color: '#C3C8CD' }}>
+                      <tr key={r} style={{ height: '29.75px', color: 'hsl(var(--grey-muted))' }}>
                         <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD', justifyContent: 'center' }}>
+                          <div style={{ ...cellStyle, color: 'hsl(var(--grey-muted))', justifyContent: 'center' }}>
                             {rect}
                             <span style={{ flex: 1, textAlign: 'center' }}>{segVisible ? d.ent : ''}</span>
                           </div>
                         </td>
                         <td colSpan={4} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD' }}>{d.nom}</div>
+                          <div style={{ ...cellStyle, color: 'hsl(var(--grey-muted))' }}>{d.nom}</div>
                         </td>
                         <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
                           <div style={{ ...cellStyle, justifyContent: 'center', gap: '2px' }}>
-                            {cardActionBtn(<Pencil size={14} strokeWidth={1.5} />, 'Editar', () => handleEditCard(d), '#8892A0')}
-                            {cardActionBtn(<Copy size={14} strokeWidth={1.5} />, 'Duplicar', () => handleDuplicateCard(d), '#8892A0')}
+                            {cardActionBtn(<Pencil size={14} strokeWidth={1.5} />, 'Editar', () => handleEditCard(d), 'hsl(var(--grey-muted-2))')}
+                            {cardActionBtn(<Copy size={14} strokeWidth={1.5} />, 'Duplicar', () => handleDuplicateCard(d), 'hsl(var(--grey-muted-2))')}
                           </div>
                         </td>
                         <td colSpan={3} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', justifyContent: 'center' }}>{segVisible ? d.num : cardDots}</div>
+                          <div style={{ ...cellStyle, color: 'hsl(var(--grey-muted))', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', justifyContent: 'center' }}>{segVisible ? d.num : cardDots}</div>
                         </td>
                         <td colSpan={2} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', justifyContent: 'center' }}>{segVisible ? d.exp : '••/••'}</div>
+                          <div style={{ ...cellStyle, color: 'hsl(var(--grey-muted))', whiteSpace: 'nowrap', letterSpacing: segVisible ? 'normal' : '2px', fontSize: segVisible ? '12pt' : '14pt', justifyContent: 'center' }}>{segVisible ? d.exp : '••/••'}</div>
                         </td>
                         <td colSpan={1} style={{ height: '29.75px', padding: 0 }}>
-                          <div style={{ ...cellStyle, color: '#C3C8CD', justifyContent: 'center' }}>
+                          <div style={{ ...cellStyle, color: 'hsl(var(--grey-muted))', justifyContent: 'center' }}>
                             {d.cvvVerified ? (
                               <Check size={16} strokeWidth={2} style={{ color: '#16A34A' }} />
                             ) : (
@@ -1006,7 +1006,7 @@ function UserComandesContent({ userEmail }) {
               fontSize: '9.5pt',
               letterSpacing: '0.03em',
               lineHeight: 1,
-              color: '#474F58',
+              color: 'hsl(var(--grey-ink-2))',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -1038,8 +1038,8 @@ function UserComandesContent({ userEmail }) {
                   fontSize: '11pt',
                   lineHeight: 1,
                   fontWeight: 500,
-                  color: '#98A2B4',
-                  backgroundColor: '#F4F6F8',
+                  color: 'hsl(var(--grey-muted))',
+                  backgroundColor: 'hsl(var(--grey-paper-soft))',
                   border: 'none',
                   borderRadius: '3px',
                   boxSizing: 'border-box',
@@ -1060,7 +1060,7 @@ function UserComandesContent({ userEmail }) {
               fontSize: '11pt',
               lineHeight: 1,
               fontWeight: 500,
-              color: '#FFFFFF',
+              color: 'hsl(var(--grey-paper))',
               backgroundColor: '#FF0000',
               letterSpacing: '0.1em',
               border: 'none',
@@ -1110,7 +1110,7 @@ function UserComandesContent({ userEmail }) {
             font-weight: 400;
             font-size: 12pt;
             line-height: 1;
-            color: #98A2B4;
+            color: hsl(var(--grey-muted-2));
           }
           .msg-ph-wrap .msg-ph > span { display: inline; }
           .msg-ph-wrap .msg-ph sup {
@@ -1177,9 +1177,9 @@ function UserComandesContent({ userEmail }) {
                             fontFamily: 'Roboto Condensed, sans-serif',
                             fontSize: '11pt',
                             fontWeight: isActive ? 600 : 300,
-                            color: isActive ? '#3163B2' : '#474F58',
-                            backgroundColor: '#FFFFFF',
-                            border: isActive ? '2px solid #2F61B2' : '1px solid #989898',
+                            color: isActive ? '#3163B2' : 'hsl(var(--grey-ink-2))',
+                            backgroundColor: 'hsl(var(--grey-paper))',
+                            border: isActive ? '2px solid #2F61B2' : '1px solid hsl(var(--grey-muted-2))',
                             borderRadius: '3px',
                             boxSizing: 'border-box',
                             cursor: 'pointer',
@@ -1200,10 +1200,10 @@ function UserComandesContent({ userEmail }) {
                         fontFamily: 'Roboto Condensed, sans-serif',
                         fontSize: '11pt',
                         fontWeight: 500,
-                        color: '#475059',
-                        backgroundColor: '#FFFFFF',
+                        color: 'hsl(var(--grey-ink-2))',
+                        backgroundColor: 'hsl(var(--grey-paper))',
                         border: 'none',
-                        borderBottom: '2px solid #98A2B4',
+                        borderBottom: '2px solid hsl(var(--grey-muted-2))',
                         borderRadius: 0,
                         boxSizing: 'border-box',
                         cursor: 'pointer',
@@ -1223,8 +1223,8 @@ function UserComandesContent({ userEmail }) {
                           >
                             <span>{nameSortDir === 'asc' ? 'A-Z' : 'Z-A'}</span>
                             {nameSortDir === 'asc'
-                              ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />
-                              : <ChevronUp size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />}
+                              ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: 'hsl(var(--grey-muted-2))' }} />
+                              : <ChevronUp size={16} strokeWidth={1.5} style={{ color: 'hsl(var(--grey-muted-2))' }} />}
                           </button>
                           <button
                             key="bot-row1-data"
@@ -1233,8 +1233,8 @@ function UserComandesContent({ userEmail }) {
                           >
                             <span>DATA</span>
                             {dateSortDir === 'asc'
-                              ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />
-                              : <ChevronUp size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />}
+                              ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: 'hsl(var(--grey-muted-2))' }} />
+                              : <ChevronUp size={16} strokeWidth={1.5} style={{ color: 'hsl(var(--grey-muted-2))' }} />}
                           </button>
                         </>
                       );
@@ -1249,8 +1249,8 @@ function UserComandesContent({ userEmail }) {
                   ...TEXT,
                   fontFamily: 'Roboto Condensed, sans-serif',
                   fontSize: '11pt',
-                  color: '#475059',
-                  backgroundColor: '#F8FAFC',
+                  color: 'hsl(var(--grey-ink-2))',
+                  backgroundColor: 'hsl(var(--grey-paper))',
                   border: 'none',
                   borderRadius: '3px',
                   boxSizing: 'border-box',
@@ -1371,7 +1371,7 @@ function UserComandesContent({ userEmail }) {
                           fontSize: '9.5pt',
                           letterSpacing: '0.05em',
                           lineHeight: 1,
-                          color: msgFeedback ? (msgFeedback.type === 'error' ? '#DC2626' : '#16A34A') : '#474F58',
+                          color: msgFeedback ? (msgFeedback.type === 'error' ? '#DC2626' : '#16A34A') : 'hsl(var(--grey-ink-2))',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -1407,7 +1407,7 @@ function UserComandesContent({ userEmail }) {
                     ...btnBase,
                     fontWeight: 700,
                     color: '#2F61B2',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: 'hsl(var(--grey-paper))',
                     border: '1px solid #2F61B2',
                     width: 'calc(100% - 1px)',
                     marginLeft: '1px',
@@ -1415,8 +1415,8 @@ function UserComandesContent({ userEmail }) {
                   const sendBtnStyle = {
                     ...btnBase,
                     fontWeight: 900,
-                    color: '#FFFFFF',
-                    backgroundColor: isMessageFormValid ? '#2F61B2' : '#98A2B4',
+                    color: 'hsl(var(--grey-paper))',
+                    backgroundColor: isMessageFormValid ? '#2F61B2' : 'hsl(var(--grey-muted-2))',
                     border: 'none',
                     opacity: isMessageFormValid && !isSendingMsg ? 1 : 0.6,
                     cursor: isMessageFormValid && !isSendingMsg ? 'pointer' : 'not-allowed',
@@ -1501,7 +1501,7 @@ function UserComandesContent({ userEmail }) {
                   textAlign: 'center',
                   verticalAlign: 'middle',
                   textIndent: '0.4px',
-                  borderBottom: '1px solid #ccc',
+                  borderBottom: '1px solid hsl(var(--grey-muted))',
                   padding: 0,
                   fontWeight: 500,
                   position: 'relative',
@@ -1514,8 +1514,8 @@ function UserComandesContent({ userEmail }) {
                 {sortable && (
                   <span style={{ position: 'absolute', right: '1em', top: '50%', transform: 'translateY(-50%)', display: 'inline-flex', alignItems: 'center', lineHeight: 1, pointerEvents: 'none' }}>
                     {sortDirs[h] === 'asc'
-                      ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />
-                      : <ChevronUp size={16} strokeWidth={1.5} style={{ color: '#7D8895' }} />}
+                      ? <ChevronDown size={16} strokeWidth={1.5} style={{ color: 'hsl(var(--grey-muted-2))' }} />
+                      : <ChevronUp size={16} strokeWidth={1.5} style={{ color: 'hsl(var(--grey-muted-2))' }} />}
                   </span>
                 )}
               </th>
@@ -1531,7 +1531,7 @@ function UserComandesContent({ userEmail }) {
                   fontFamily: 'Oswald, sans-serif',
                   fontWeight: 200,
                   fontSize: '18pt',
-                  color: '#C3C8CD',
+                  color: 'hsl(var(--grey-muted))',
                   letterSpacing: '1px',
                   textTransform: 'uppercase',
                   textAlign: 'center',
@@ -1542,7 +1542,7 @@ function UserComandesContent({ userEmail }) {
                   fontFamily: 'Roboto Condensed, sans-serif',
                   fontWeight: 300,
                   fontSize: '10pt',
-                  color: '#E0E3E8',
+                  color: 'hsl(var(--grey-paper))',
                   marginTop: '12px',
                   letterSpacing: '0.5px',
                   textAlign: 'center',
@@ -1555,7 +1555,7 @@ function UserComandesContent({ userEmail }) {
             const Icon = o.icon;
             const isStruck = o.status === 'CANCEL·LADA' || o.status === 'ATURADA';
             const opacity = o.active ? 1 : (isStruck ? 0.7 : 0.35);
-            const rowColor = o.active ? '#2F61B2' : '#99A3B5';
+            const rowColor = o.active ? '#2F61B2' : 'hsl(var(--grey-muted-2))';
             return (
               <React.Fragment key={idx}>
                 <tr style={{ height: '30px', ...(rowColor ? { color: rowColor } : null) }}>
@@ -1571,16 +1571,16 @@ function UserComandesContent({ userEmail }) {
                       <span style={{ fontSize: '12pt', marginLeft: '23px', letterSpacing: '1px' }}>{o.num}</span>
                     </div>
                   </td>
-                  <td style={{ height: '30px', padding: '0 8px 0 123px', verticalAlign: 'middle', opacity, color: isStruck ? '#475059' : undefined }}>
+                  <td style={{ height: '30px', padding: '0 8px 0 123px', verticalAlign: 'middle', opacity, color: isStruck ? 'hsl(var(--grey-ink-2))' : undefined }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Icon size={21} strokeWidth={2} style={{ color: isStruck ? '#475059' : rowColor, position: 'relative', left: '-25px' }} />
+                      <Icon size={21} strokeWidth={2} style={{ color: isStruck ? 'hsl(var(--grey-ink-2))' : rowColor, position: 'relative', left: '-25px' }} />
                       <span style={{ fontSize: '12pt' }}>{o.status}</span>
                     </div>
                   </td>
                   <td style={{ height: '30px', padding: 0, textAlign: 'center', verticalAlign: 'middle', fontSize: '12pt', opacity }}>
                     {o.date}
                   </td>
-                  <td style={{ height: '30px', padding: 0, textAlign: 'center', verticalAlign: 'middle', fontSize: '12pt', opacity, textDecoration: isStruck ? 'line-through' : 'none', textDecorationColor: isStruck ? '#475059' : undefined, textDecorationThickness: isStruck ? '1.5px' : undefined }}>
+                  <td style={{ height: '30px', padding: 0, textAlign: 'center', verticalAlign: 'middle', fontSize: '12pt', opacity, textDecoration: isStruck ? 'line-through' : 'none', textDecorationColor: isStruck ? 'hsl(var(--grey-ink-2))' : undefined, textDecorationThickness: isStruck ? '1.5px' : undefined }}>
                     {o.total}
                   </td>
                   <td style={{ height: '30px', padding: 0 }} />
@@ -1620,7 +1620,7 @@ function UserComandesContent({ userEmail }) {
             fontSize: '7.5pt',
             fontWeight: 300,
             letterSpacing: '0em',
-            color: '#475059',
+            color: 'hsl(var(--grey-ink-2))',
             whiteSpace: 'nowrap',
           }}>
             <Icon size={12} strokeWidth={2} style={{ color: '#1E62B8' }} />
@@ -1653,8 +1653,8 @@ function UserComandesContent({ userEmail }) {
               fontFamily: 'Roboto Condensed, sans-serif',
               fontSize: '11pt',
               fontWeight: 500,
-              color: '#98A2B4',
-              backgroundColor: '#F4F6F8',
+              color: 'hsl(var(--grey-muted))',
+              backgroundColor: 'hsl(var(--grey-paper-soft))',
               border: 'none',
               borderRadius: '3px',
               boxSizing: 'border-box',

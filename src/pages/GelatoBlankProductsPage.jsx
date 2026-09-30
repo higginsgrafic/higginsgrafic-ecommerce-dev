@@ -70,7 +70,7 @@ export default function GelatoBlankProductsPage() {
       weight: fullData.weight ? `${fullData.weight.value} ${fullData.weight.measureUnit}` : 'N/A',
       fabric: dims['Fabric Composition']?.value || 'N/A',
       gsm: dims.GSM ? `${dims.GSM.value} ${dims.GSM.measureUnit}` : 'N/A',
-      colorHex: dims['Color HEX Code']?.value || '#000000'
+      colorHex: dims['Color HEX Code']?.value || 'hsl(var(--grey-ink-pure))'
     };
   }
 
@@ -88,32 +88,32 @@ export default function GelatoBlankProductsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-paper-soft flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregant productes...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ink-strong mx-auto mb-4"></div>
+          <p className="text-ink-2">Carregant productes...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper-soft">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-ink-strong mb-2">
             Productes en Blanc de Gelato
           </h1>
-          <p className="text-gray-600">
+          <p className="text-ink-2">
             Dades de referència dels productes base de Gelato per a comparació
           </p>
         </div>
 
         {products.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500 mb-4">No hi ha productes guardats</p>
-            <p className="text-sm text-gray-400">
-              Executa: <code className="bg-gray-100 px-2 py-1 rounded">npm run fetch-blank "t-shirt"</code>
+          <div className="bg-paper rounded-lg shadow p-8 text-center">
+            <p className="text-ink-soft mb-4">No hi ha productes guardats</p>
+            <p className="text-sm text-muted-2">
+              Executa: <code className="bg-paper-soft px-2 py-1 rounded">npm run fetch-blank "t-shirt"</code>
             </p>
           </div>
         ) : (
@@ -125,25 +125,25 @@ export default function GelatoBlankProductsPage() {
               const brand = extractBrandFromUid(product.gelato_product_uid);
 
               return (
-                <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div key={product.id} className="bg-paper rounded-lg shadow-lg overflow-hidden">
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h2 className="text-xl font-bold text-gray-900">
+                          <h2 className="text-xl font-bold text-ink-strong">
                             {info.category} - {info.quality}
                           </h2>
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                             {brand}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 font-mono break-all">
+                        <p className="text-sm text-ink-soft font-mono break-all">
                           {product.gelato_product_uid}
                         </p>
                       </div>
                       <button
                         onClick={() => setSelectedProduct(selectedProduct?.id === product.id ? null : product)}
-                        className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                        className="px-4 py-2 text-sm bg-paper-soft hover:bg-paper-tint rounded-lg transition-colors"
                       >
                         {selectedProduct?.id === product.id ? 'Amagar' : 'Veure detalls'}
                       </button>
@@ -151,51 +151,51 @@ export default function GelatoBlankProductsPage() {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Categoria</p>
+                        <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">Categoria</p>
                         <p className="font-medium">{info.subcategory}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Talla</p>
+                        <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">Talla</p>
                         <p className="font-medium">{info.size}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Color</p>
+                          <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">Color</p>
                           <p className="font-medium">{info.color}</p>
                         </div>
                         <div
-                          className="w-8 h-8 rounded border-2 border-gray-200 mt-4"
+                          className="w-8 h-8 rounded border-2 border-line mt-4"
                           style={{ backgroundColor: dims.colorHex }}
                           title={dims.colorHex}
                         />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Tall</p>
+                        <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">Tall</p>
                         <p className="font-medium">{info.cut}</p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4 pt-4 border-t border-gray-200">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4 pt-4 border-t border-line">
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Pes</p>
+                        <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">Pes</p>
                         <p className="font-medium">{dims.weight}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">GSM</p>
+                        <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">GSM</p>
                         <p className="font-medium">{dims.gsm}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Tela</p>
+                        <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">Tela</p>
                         <p className="font-medium text-sm">{dims.fabric}</p>
                       </div>
                       {pricing && (
                         <>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Preu</p>
+                            <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">Preu</p>
                             <p className="font-medium">{pricing.price} {pricing.currency}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">País</p>
+                            <p className="text-xs text-ink-soft uppercase tracking-wide mb-1">País</p>
                             <p className="font-medium">{pricing.country}</p>
                           </div>
                         </>
@@ -204,8 +204,8 @@ export default function GelatoBlankProductsPage() {
 
                     {/* Images Section */}
                     {product.stored_images && product.stored_images.length > 0 && (
-                      <div className="pt-4 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">
+                      <div className="pt-4 border-t border-line">
+                        <p className="text-xs text-ink-soft uppercase tracking-wide mb-3">
                           Imatges guardades ({product.stored_images.length})
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -214,9 +214,9 @@ export default function GelatoBlankProductsPage() {
                               <img
                                 src={img.stored_url}
                                 alt={img.type}
-                                className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                                className="w-full h-32 object-cover rounded-lg border border-line"
                               />
-                              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="absolute bottom-0 left-0 right-0 bg-ink-pure bg-opacity-75 text-paper text-xs px-2 py-1 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
                                 {img.type}
                               </div>
                             </div>
@@ -225,8 +225,8 @@ export default function GelatoBlankProductsPage() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="text-sm text-gray-500">
+                    <div className="flex items-center justify-between pt-4 border-t border-line">
+                      <div className="text-sm text-ink-soft">
                         Obtingut: {formatDate(product.fetched_at)}
                         {product.stored_images && product.stored_images.length > 0 && (
                           <span className="ml-2 text-green-600">
@@ -236,30 +236,30 @@ export default function GelatoBlankProductsPage() {
                       </div>
                       {info.manufacturer !== 'N/A' && info.manufacturer !== 'none' && (
                         <div className="text-sm">
-                          <span className="text-gray-500">Fabricant:</span>
+                          <span className="text-ink-soft">Fabricant:</span>
                           <span className="font-medium ml-2">{info.manufacturer}</span>
                           {info.sku !== 'N/A' && info.sku !== 'none' && (
-                            <span className="text-gray-500 ml-2">SKU: {info.sku}</span>
+                            <span className="text-ink-soft ml-2">SKU: {info.sku}</span>
                           )}
                         </div>
                       )}
                     </div>
 
                     {selectedProduct?.id === product.id && (
-                      <div className="mt-6 pt-6 border-t border-gray-200">
-                        <h3 className="font-semibold text-gray-900 mb-3">Dades completes JSON</h3>
+                      <div className="mt-6 pt-6 border-t border-line">
+                        <h3 className="font-semibold text-ink-strong mb-3">Dades completes JSON</h3>
 
                         <div className="mb-4">
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Full Data:</h4>
-                          <pre className="bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-96">
+                          <h4 className="text-sm font-medium text-ink-2 mb-2">Full Data:</h4>
+                          <pre className="bg-paper-soft p-4 rounded-lg overflow-auto text-xs max-h-96">
                             {JSON.stringify(product.full_data, null, 2)}
                           </pre>
                         </div>
 
                         {product.pricing_data && product.pricing_data.length > 0 && (
                           <div>
-                            <h4 className="text-sm font-medium text-gray-700 mb-2">Pricing Data:</h4>
-                            <pre className="bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-48">
+                            <h4 className="text-sm font-medium text-ink-2 mb-2">Pricing Data:</h4>
+                            <pre className="bg-paper-soft p-4 rounded-lg overflow-auto text-xs max-h-48">
                               {JSON.stringify(product.pricing_data, null, 2)}
                             </pre>
                           </div>
@@ -267,8 +267,8 @@ export default function GelatoBlankProductsPage() {
 
                         {product.notes && (
                           <div className="mt-4">
-                            <h4 className="text-sm font-medium text-gray-700 mb-2">Notes:</h4>
-                            <p className="text-sm text-gray-600 bg-yellow-50 p-3 rounded-lg">
+                            <h4 className="text-sm font-medium text-ink-2 mb-2">Notes:</h4>
+                            <p className="text-sm text-ink-2 bg-yellow-50 p-3 rounded-lg">
                               {product.notes}
                             </p>
                           </div>

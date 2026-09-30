@@ -130,7 +130,7 @@ function defaultState() {
 function badgeForStatus(status) {
   if (status === 'in_progress') return { label: 'En curs', cls: 'bg-blue-50 text-blue-700 border-blue-200' };
   if (status === 'done') return { label: 'Fet', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
-  return { label: 'Pendent', cls: 'bg-gray-50 text-gray-700 border-gray-200' };
+  return { label: 'Pendent', cls: 'bg-paper-soft text-ink-2 border-line' };
 }
 
 async function copyToClipboard(text) {
@@ -287,43 +287,43 @@ export default function UnitatsCanviPage() {
     <>
       <SEO title="Unitats de Canvi" description="Gestió d'unitats de canvi i consolidació de feina" />
 
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-        <div className="p-5 border-b border-gray-200 flex items-start justify-between gap-4">
+      <div className="bg-paper rounded-2xl shadow-lg border border-line overflow-hidden">
+        <div className="p-5 border-b border-line flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg">
-              <ClipboardList className="w-6 h-6 text-white" />
+            <div className="p-2 rounded-xl bg-gradient-to-br from-ink to-ink-strong shadow-lg">
+              <ClipboardList className="w-6 h-6 text-paper" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Unitats de Canvi</h2>
-              <p className="text-sm text-gray-600">Crea categories i unitats. Una unitat = una branca + commits coherents.</p>
+              <h2 className="text-xl font-bold text-ink-strong">Unitats de Canvi</h2>
+              <p className="text-sm text-ink-2">Crea categories i unitats. Una unitat = una branca + commits coherents.</p>
             </div>
           </div>
         </div>
 
         <div className="p-5 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <div className="bg-paper-soft border border-line rounded-xl p-4">
               <div className="flex items-center justify-between gap-3 mb-3">
-                <h3 className="text-sm font-semibold text-gray-900">Categories</h3>
-                <span className="text-xs text-gray-500">{(state.categories || []).length}</span>
+                <h3 className="text-sm font-semibold text-ink-strong">Categories</h3>
+                <span className="text-xs text-ink-soft">{(state.categories || []).length}</span>
               </div>
 
               <div className="flex flex-col gap-2 mb-4">
                 <button
                   type="button"
                   onClick={() => setActiveCategory('all')}
-                  className={`text-left px-3 py-2 rounded-lg border transition ${activeCategory === 'all' ? 'bg-white border-gray-300' : 'bg-transparent border-transparent hover:bg-white/60 hover:border-gray-200'}`}
+                  className={`text-left px-3 py-2 rounded-lg border transition ${activeCategory === 'all' ? 'bg-paper border-line-strong' : 'bg-transparent border-transparent hover:bg-paper/60 hover:border-line'}`}
                 >
-                  <div className="text-sm font-medium text-gray-900">Totes</div>
-                  <div className="text-xs text-gray-500">{(state.tasks || []).length} unitats</div>
+                  <div className="text-sm font-medium text-ink-strong">Totes</div>
+                  <div className="text-xs text-ink-soft">{(state.tasks || []).length} unitats</div>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveCategory('active')}
-                  className={`text-left px-3 py-2 rounded-lg border transition ${activeCategory === 'active' ? 'bg-white border-gray-300' : 'bg-transparent border-transparent hover:bg-white/60 hover:border-gray-200'}`}
+                  className={`text-left px-3 py-2 rounded-lg border transition ${activeCategory === 'active' ? 'bg-paper border-line-strong' : 'bg-transparent border-transparent hover:bg-paper/60 hover:border-line'}`}
                 >
-                  <div className="text-sm font-medium text-gray-900">En curs</div>
-                  <div className="text-xs text-gray-500">{(state.tasks || []).filter((t) => t.status === 'in_progress').length} unitats</div>
+                  <div className="text-sm font-medium text-ink-strong">En curs</div>
+                  <div className="text-xs text-ink-soft">{(state.tasks || []).filter((t) => t.status === 'in_progress').length} unitats</div>
                 </button>
               </div>
 
@@ -333,36 +333,36 @@ export default function UnitatsCanviPage() {
                     <button
                       type="button"
                       onClick={() => setActiveCategory(c.id)}
-                      className={`flex-1 text-left px-3 py-2 rounded-lg border transition ${activeCategory === c.id ? 'bg-white border-gray-300' : 'bg-transparent border-transparent hover:bg-white/60 hover:border-gray-200'}`}
+                      className={`flex-1 text-left px-3 py-2 rounded-lg border transition ${activeCategory === c.id ? 'bg-paper border-line-strong' : 'bg-transparent border-transparent hover:bg-paper/60 hover:border-line'}`}
                     >
-                      <div className="text-sm font-medium text-gray-900">{c.name}</div>
-                      <div className="text-xs text-gray-500">{(state.tasks || []).filter((t) => t.categoryId === c.id).length} unitats</div>
+                      <div className="text-sm font-medium text-ink-strong">{c.name}</div>
+                      <div className="text-xs text-ink-soft">{(state.tasks || []).filter((t) => t.categoryId === c.id).length} unitats</div>
                     </button>
                     <button
                       type="button"
                       onClick={() => deleteCategory(c.id)}
-                      className={`p-2 rounded-lg border ${['git','calibratge','mockups','ui','api','infra','assets'].includes(c.id) ? 'opacity-30 cursor-not-allowed bg-white border-gray-200' : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
+                      className={`p-2 rounded-lg border ${['git','calibratge','mockups','ui','api','infra','assets'].includes(c.id) ? 'opacity-30 cursor-not-allowed bg-paper border-line' : 'bg-paper border-line hover:border-line-strong hover:bg-paper-soft'}`}
                       disabled={['git','calibratge','mockups','ui','api','infra','assets'].includes(c.id)}
                       aria-label="Esborrar categoria"
                     >
-                      <Trash2 className="w-4 h-4 text-gray-600" />
+                      <Trash2 className="w-4 h-4 text-ink-2" />
                     </button>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4 border-t border-line">
                 <div className="flex items-center gap-2">
                   <input
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                    className="flex-1 px-3 py-2 rounded-lg border border-line-strong bg-paper text-sm"
                     placeholder="Nova categoria (ex: netlify)"
                   />
                   <button
                     type="button"
                     onClick={createCategory}
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-900 text-white text-sm hover:bg-gray-800"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-ink-strong text-paper text-sm hover:bg-ink"
                   >
                     <Plus className="w-4 h-4" />
                     Afegir
@@ -371,13 +371,13 @@ export default function UnitatsCanviPage() {
               </div>
             </div>
 
-            <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Crear unitat</h3>
+            <div className="mt-4 bg-paper-soft border border-line rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-ink-strong mb-3">Crear unitat</h3>
               <div className="flex flex-col gap-2">
                 <select
                   value={newTaskCat}
                   onChange={(e) => setNewTaskCat(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="px-3 py-2 rounded-lg border border-line-strong bg-paper text-sm"
                 >
                   {(state.categories || []).map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
@@ -386,13 +386,13 @@ export default function UnitatsCanviPage() {
                 <input
                   value={newTaskName}
                   onChange={(e) => setNewTaskName(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="px-3 py-2 rounded-lg border border-line-strong bg-paper text-sm"
                   placeholder="Nom unitat (ex: Unificar git)"
                 />
                 <button
                   type="button"
                   onClick={createTask}
-                  className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-900 text-white text-sm hover:bg-gray-800"
+                  className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-ink-strong text-paper text-sm hover:bg-ink"
                 >
                   <Plus className="w-4 h-4" />
                   Crear
@@ -402,16 +402,16 @@ export default function UnitatsCanviPage() {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-gray-900">Unitats</h3>
-                <div className="text-xs text-gray-500">{tasksFiltered.length}</div>
+            <div className="bg-paper border border-line rounded-xl overflow-hidden">
+              <div className="p-4 border-b border-line flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-ink-strong">Unitats</h3>
+                <div className="text-xs text-ink-soft">{tasksFiltered.length}</div>
               </div>
 
               {tasksFiltered.length === 0 ? (
-                <div className="p-8 text-center text-gray-500 text-sm">No hi ha unitats en aquest filtre.</div>
+                <div className="p-8 text-center text-ink-soft text-sm">No hi ha unitats en aquest filtre.</div>
               ) : (
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-line">
                   {tasksFiltered.map((t) => {
                     const catName = categoriesById.get(t.categoryId)?.name || t.categoryId;
                     const badge = badgeForStatus(t.status);
@@ -421,9 +421,9 @@ export default function UnitatsCanviPage() {
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <div className="text-sm font-semibold text-gray-900 break-words">{t.title}</div>
+                              <div className="text-sm font-semibold text-ink-strong break-words">{t.title}</div>
                               <span className={`text-xs px-2 py-0.5 rounded-full border ${badge.cls}`}>{badge.label}</span>
-                              <span className="text-xs px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-gray-700">{catName}</span>
+                              <span className="text-xs px-2 py-0.5 rounded-full border border-line bg-paper-soft text-ink-2">{catName}</span>
                             </div>
                             <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
                               {[
@@ -431,19 +431,19 @@ export default function UnitatsCanviPage() {
                                 { key: 'start', label: 'Start', value: cmds.start },
                                 { key: 'finish', label: 'Finish', value: cmds.finish }
                               ].map((c) => (
-                                <div key={c.key} className="bg-gray-50 border border-gray-200 rounded-lg p-2">
+                                <div key={c.key} className="bg-paper-soft border border-line rounded-lg p-2">
                                   <div className="flex items-center justify-between gap-2">
-                                    <div className="text-[11px] font-semibold text-gray-700">{c.label}</div>
+                                    <div className="text-[11px] font-semibold text-ink-2">{c.label}</div>
                                     <button
                                       type="button"
                                       onClick={() => copyCmd(`${t.id}:${c.key}`, c.value)}
-                                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-[11px]"
+                                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-line bg-paper hover:bg-paper-soft text-[11px]"
                                     >
                                       <Copy className="w-3 h-3" />
                                       {copyStatus.key === `${t.id}:${c.key}` ? (copyStatus.ok ? 'Copiat' : 'Error') : 'Copiar'}
                                     </button>
                                   </div>
-                                  <div className="mt-1 font-mono text-[11px] text-gray-800 break-all">{c.value}</div>
+                                  <div className="mt-1 font-mono text-[11px] text-ink break-all">{c.value}</div>
                                 </div>
                               ))}
                             </div>
@@ -452,7 +452,7 @@ export default function UnitatsCanviPage() {
                               <textarea
                                 value={t.notes || ''}
                                 onChange={(e) => setTaskNotes(t.id, e.target.value)}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                                className="w-full px-3 py-2 rounded-lg border border-line-strong bg-paper text-sm"
                                 rows={2}
                                 placeholder="Notes (opcional)"
                               />
@@ -463,7 +463,7 @@ export default function UnitatsCanviPage() {
                             <button
                               type="button"
                               onClick={() => setTaskStatus(t.id, 'pending')}
-                              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${t.status === 'pending' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${t.status === 'pending' ? 'bg-ink-strong text-paper border-ink-strong' : 'bg-paper border-line hover:bg-paper-soft'}`}
                             >
                               <Circle className="w-4 h-4" />
                               Pendent
@@ -471,7 +471,7 @@ export default function UnitatsCanviPage() {
                             <button
                               type="button"
                               onClick={() => setTaskStatus(t.id, 'in_progress')}
-                              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${t.status === 'in_progress' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${t.status === 'in_progress' ? 'bg-blue-600 text-paper border-blue-600' : 'bg-paper border-line hover:bg-paper-soft'}`}
                             >
                               <Play className="w-4 h-4" />
                               En curs
@@ -479,7 +479,7 @@ export default function UnitatsCanviPage() {
                             <button
                               type="button"
                               onClick={() => setTaskStatus(t.id, 'done')}
-                              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${t.status === 'done' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${t.status === 'done' ? 'bg-emerald-600 text-paper border-emerald-600' : 'bg-paper border-line hover:bg-paper-soft'}`}
                             >
                               <CheckCircle2 className="w-4 h-4" />
                               Fet
@@ -487,9 +487,9 @@ export default function UnitatsCanviPage() {
                             <button
                               type="button"
                               onClick={() => deleteTask(t.id)}
-                              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-sm"
+                              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-line bg-paper hover:bg-paper-soft text-sm"
                             >
-                              <Trash2 className="w-4 h-4 text-gray-700" />
+                              <Trash2 className="w-4 h-4 text-ink-2" />
                               Esborrar
                             </button>
                           </div>
@@ -501,15 +501,15 @@ export default function UnitatsCanviPage() {
               )}
             </div>
 
-            <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">Unitat activa</h3>
+            <div className="mt-4 bg-paper-soft border border-line rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-ink-strong mb-2">Unitat activa</h3>
               {activeTask ? (
-                <div className="text-sm text-gray-700">
-                  <div className="font-semibold text-gray-900">{activeTask.title}</div>
-                  <div className="mt-1 text-xs text-gray-600">{cmdFor(activeTask).start}</div>
+                <div className="text-sm text-ink-2">
+                  <div className="font-semibold text-ink-strong">{activeTask.title}</div>
+                  <div className="mt-1 text-xs text-ink-2">{cmdFor(activeTask).start}</div>
                 </div>
               ) : (
-                <div className="text-sm text-gray-600">No n'hi ha cap en curs.</div>
+                <div className="text-sm text-ink-2">No n'hi ha cap en curs.</div>
               )}
             </div>
           </div>

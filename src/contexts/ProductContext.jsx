@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const ProductContext = createContext();
 
@@ -104,7 +105,7 @@ const sanitizeMiscellaniaProducts = (items) => {
     // If product has no variants (common for Gelato store products in this app), do NOT guess/override images.
     // We'll only fallback if the image is missing.
     const fallbackImage =
-      '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp';
+      tshirtSrc('black');
     const hasAnyImage =
       (typeof p?.image === 'string' && p.image.length > 0) ||
       (Array.isArray(p?.images) && p.images.length > 0);
@@ -319,7 +320,7 @@ export const ProductProvider = ({ children }) => {
         sku: v?.sku || '',
         size,
         color,
-        colorHex: '#FFFFFF',
+        colorHex: 'hsl(var(--grey-paper))',
         price: v?.price || storeProduct?.price || 29.99,
         stock: 999,
         isAvailable: true,

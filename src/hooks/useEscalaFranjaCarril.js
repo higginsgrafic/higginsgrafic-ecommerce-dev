@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 import { factorFranjaCarril, ESCALA_CALIBRADA_FRANJA } from '../utils/franjaCarril';
+import { FRACCIO_COSSOS_FRANJA } from '../config/stripeCalibrations';
 import { carrilDeFinestra } from '../components/megaslide/geometriaMegaslide';
 import { getLayoutViewportWidth } from '../utils/layoutMetrics';
 
@@ -21,6 +22,9 @@ import { getLayoutViewportWidth } from '../utils/layoutMetrics';
  *
  * @param {object} filaRef - ref de la filera (l'inline-block que conte la imatge).
  * @param {boolean} actiu - si la franja s'ha d'ajustar al carril.
+ * @param {number} [ampleCarrilPaginaPx=0] - l'amplada de la IMATGE de la franja
+ *   quan qui la crida vol el CARRIL DE LA PAGINA i no el del megaslide (a 1024,
+ *   la pagina 1: vegeu-ho dins de `mesura`). 0 vol dir «el de sempre».
  * @returns {number} factor que multiplica el calibratge (1 quan no s'hi aplica).
  */
 /**
@@ -30,7 +34,7 @@ import { getLayoutViewportWidth } from '../utils/layoutMetrics';
  *
  * @returns {number} amplada en px (0 si no es pot mesurar).
  */
-function ampladaObjectiu() {
+function ampladaObjectiu(filaEl = null) {
   if (typeof document === 'undefined') return 0;
   const estil = getComputedStyle(document.documentElement);
   // EL CARRIL DECLARAT, MENTRE EL HEADER NO HA PUBLICAT LES VARS (25/09/2026).
@@ -86,10 +90,104 @@ function ampladaObjectiu() {
     const dreta = fletxa.getBoundingClientRect().right - desplac;
     if (dreta - xCarril > 0) return dreta - xCarril;
   }
+  // SENSE FLETXES (LES DUES TAULETES): FINS A LA VORA DEL BLOC DE LA DRETA.
+  //
+  // A la tauleta el carrusel no porta fletxes i l'objectiu era el CARRIL SENCER,
+  // pero alla el carril tambe conte el bloc de la dreta (el selector
+  // BLANC/COLOR/NEGRE): la franja s'hi escalava de ple i li passava per sota les
+  // ultimes samarretes (01/10/2026, «de 1366 a 1024, la stripe es reconfigura i
+  // trepitja coses»). Mesurat a 1024: el bloc de la dreta va de 678 a 807 i la
+  // franja arribava a 822. L'objectiu bo es la GRAELLA de dalt, que acaba on
+  // arrenca el bloc (`[data-graella-files-*]`): la franja queda alineada amb la
+  // graella i el selector queda lliure.
+  //
+  // A l'escriptori no s'hi arriba mai: alla hi ha fletxes i el cami de dalt ja
+  // ha tornat.
+  // A la pagina 2 (el cercador) el bloc de la dreta es la LLISTA DE
+  // COLLECCIONS, que no porta `data-bloc-dreta`: la marca que hi ha a cada
+  // enllac es `data-colleccions-targeta` (la mateixa que fa servir
+  // `scripts/compara-vistes.mjs`), i la seva vora esquerra es la de la columna.
+  // EL BLOC DE LA DRETA, DE LA MATEIXA PAGINA (01/10/2026).
+  //
+  // El megaslide te TOTES les pagines al DOM (desplacades amb `translateX`), i
+  // aixo va fer caure el primer intent: buscant el bloc a tot el document,
+  // s'agafava el de la pagina 2 mentre s'estava mesurant la franja de la 1, i
+  // la franja de la 1 es quedava ample i passava per sota del selector. Ara es
+  // mira primer DINS de la pagina de la franja que s'esta mesurant.
+  const mateixaPagina = filaEl && typeof filaEl.closest === 'function'
+    ? filaEl.closest('[data-mega-page-viewport]')
+    : null;
+  const selectorBloc = '[data-bloc-dreta-p1="1"], [data-bloc-dreta-p2="1"], [data-colleccions-targeta="1"]';
+  if (mateixaPagina && Number.isFinite(xCarril)) {
+    // A LA COMPOSICIO ESTRETA LA FRANJA FA EL CARRIL SENCER (02/10/2026). En
+    // Marc: «La stripe de la p1 ha de ser de la mateixa mida i posicio que la de
+    // la p2» i, quan la de la p1 encara es quedava curta, «No es com la p2». A
+    // 1024-1366 el bloc de la dreta (el selector i les fletxes) es DINS del carril
+    // i la franja hi passa per sota, com a la p2: l'objectiu no pot ser la seva
+    // vora esquerra (682 px a 1366 en comptes dels 811 del carril), que es el que
+    // deixava la franja de la p1 un 16% mes curta que la de la p2.
+    const estreta = typeof window !== 'undefined'
+      && window.innerWidth >= 1024 && window.innerWidth <= 1366
+      && window.innerWidth >= window.innerHeight;
+    if (estreta) return Number.isFinite(carril) && carril > 0 ? carril : 0;
+    const bloc = mateixaPagina.querySelector(selectorBloc);
+    if (bloc) {
+      const r = bloc.getBoundingClientRect();
+      const v = mateixaPagina.getBoundingClientRect();
+      const esquerra = r.left - v.left;
+      if (r.width > 0 && esquerra - xCarril > 0) return esquerra - xCarril;
+    }
+    // SI LA PAGINA NO TE BLOC DE LA DRETA, LA FRANJA FA EL CARRIL SENCER
+    // (02/10/2026). I no es mira cap ALTRA pagina: mentre el panell s'obre, la
+    // pagina 1 encara es dins la finestra i el seu bloc donava un objectiu mes
+    // estret (682 px a 1366x768 en comptes dels 811 del carril), que es quedava
+    // congelat perque la mesura nome s es repeteix amb un canvi de mida. La
+    // franja de la p2 es queda curta i no encaixa per les cintures.
+    //
+    // Passa des del 02/10/2026, que la columna de colleccions de la p2 es una
+    // franja sota les barres de color i ja no n'hi ha cap a la dreta.
+    return Number.isFinite(carril) && carril > 0 ? carril : 0;
+  }
+  const blocsDreta = [...document.querySelectorAll(selectorBloc)]
+    .filter((el) => el.getBoundingClientRect().width > 0)
+    .filter((el) => {
+      const vista = el.closest('[data-mega-page-viewport]');
+      if (!vista || !ampladaVista) return true;
+      const x = vista.getBoundingClientRect().left;
+      return x > -1 && x < ampladaVista;
+    });
+  const blocDreta = blocsDreta[blocsDreta.length - 1];
+  if (blocDreta && Number.isFinite(xCarril)) {
+    const pagina = blocDreta.closest('[data-mega-page-viewport]');
+    const desplac = pagina ? pagina.getBoundingClientRect().left : 0;
+    const esquerra = blocDreta.getBoundingClientRect().left - desplac;
+    if (esquerra - xCarril > 0) return esquerra - xCarril;
+  }
   return Number.isFinite(carril) && carril > 0 ? carril : 0;
 }
 
-export default function useEscalaFranjaCarril(filaRef, actiu) {
+/**
+ * La x del carril del megaslide, en px de finestra: la variable que publica el
+ * header i, si encara no hi es, la declarada (`carrilDeFinestra`, la MATEIXA que
+ * el header publicara).
+ *
+ * Serveix per centrar una cosa al CARRIL DE LA PAGINA (02/10/2026): la filera de
+ * la franja viu DINS del carril del megaslide, o sigui que el seu `left` es
+ * mesura des d'alla i, per posar-la al centre de la finestra (que es on es
+ * centra el carril de la pagina), s'ha de descomptar aquesta x.
+ *
+ * @returns {number} x en px (0 si no s'ha pogut llegir).
+ */
+function xCarrilMegaslide() {
+  if (typeof document === 'undefined') return 0;
+  const estil = getComputedStyle(document.documentElement);
+  const publicada = Number.parseFloat(estil.getPropertyValue('--hg-mega-x'));
+  if (Number.isFinite(publicada)) return publicada;
+  const declarat = carrilDeFinestra(getLayoutViewportWidth(), typeof window !== 'undefined' ? window.innerHeight || 0 : 0);
+  return declarat ? declarat.x : 0;
+}
+
+export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaPx = 0) {
   const [estat, setEstat] = useState({ factor: 1, centre: 0 });
 
   useLayoutEffect(() => {
@@ -100,7 +198,20 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
     const mesura = () => {
       const ampleDibuix = el.offsetWidth;
       const estil = getComputedStyle(document.documentElement);
-      const objectiu = ampladaObjectiu();
+      // EL CARRIL DE LA PAGINA, QUAN QUI CRIDA LA SAP (02/10/2026).
+      //
+      // En Marc: «Acaba d'alinear la stripe p1 a la mida del segon carril». A
+      // 1024 la stripe de la p1 no ha de fer el carril del MEGASLIDE sino el de
+      // la PAGINA (`min(939.2px, 100vw - 80px)`: el del header, la hero i les
+      // segones guies). Qui ho demana passa l'amplada de la IMATGE que vol; el
+      // factor de la franja es calcula sobre els COSSOS, o sigui que es
+      // multiplica per `FRACCIO_COSSOS_FRANJA` abans de passar-lo per
+      // `factorFranjaCarril`. Sense aquest parametre tot queda com estava (la
+      // pagina 2 tambe fa servir aquest ganxo i ha de seguir al carril del
+      // megaslide).
+      const objectiu = ampleCarrilPaginaPx > 0
+        ? ampleCarrilPaginaPx * FRACCIO_COSSOS_FRANJA
+        : ampladaObjectiu(el);
       if (!ampleDibuix || !objectiu) return;
       // L'ESCALA CALIBRADA, LLEGIDA DEL DOM I NO LA NOMINAL.
       //
@@ -117,7 +228,14 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
       const nou = factorFranjaCarril(objectiu, ampleDibuix, escala);
       // El centre de la filera: a mig cami entre la vora esquerra del carril i
       // la dreta de les fletxes, que es on ha de caure el centre del dibuix.
-      const centre = objectiu / 2;
+      // Amb el carril de la pagina mana la FINESTRA: el seu carril va centrat a
+      // `100vw` (com el header, la hero i les segones guies) i no a l'amplada de
+      // maquetacio del cos, que reserva la barra i esta 7,5 px a l'esquerra a
+      // 1024. El `left` de la filera es mesura des de la vora esquerra del
+      // carril del megaslide: es descompta.
+      const centre = ampleCarrilPaginaPx > 0
+        ? (window.innerWidth / 2) - xCarrilMegaslide()
+        : objectiu / 2;
       // Sense el marge, cada mesura tornaria a pintar i el ResizeObserver no
       // pararia.
       setEstat((actual) => (
@@ -149,7 +267,7 @@ export default function useEscalaFranjaCarril(filaRef, actiu) {
       if (observadorEstil) observadorEstil.disconnect();
       window.removeEventListener('resize', mesura);
     };
-  }, [filaRef, actiu]);
+  }, [filaRef, actiu, ampleCarrilPaginaPx]);
 
   // Quan no s'hi aplica (la vista vertical), no es toca res: es fa aqui i no
   // dins de l'efecte, que no ha de cridar `setState`.

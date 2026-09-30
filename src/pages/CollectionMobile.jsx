@@ -76,7 +76,7 @@ function MobileProductCard({ product, colors, index, collectionSlug }) {
       flexDirection: 'column',
       alignItems: 'center',
       color: 'inherit',
-      backgroundColor: '#fbfcfd',
+      backgroundColor: 'hsl(var(--grey-paper))',
       borderRadius: '4px',
       padding: '12px',
     }}>
@@ -92,7 +92,7 @@ function MobileProductCard({ product, colors, index, collectionSlug }) {
           fontSize: '18px',
           textTransform: 'uppercase',
           letterSpacing: '0.02em',
-          color: '#0b0d10',
+          color: 'hsl(var(--grey-ink-strong))',
           margin: '0 0 8px 0',
           textAlign: 'center',
         }}>
@@ -112,8 +112,8 @@ function MobileProductCard({ product, colors, index, collectionSlug }) {
               padding: 0,
               border: 0,
               borderRadius: '3px',
-              color: selectedSize === size ? '#fff' : '#475059',
-              background: selectedSize === size ? '#475059' : '#eef0f2',
+              color: selectedSize === size ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-2))',
+              background: selectedSize === size ? 'hsl(var(--grey-ink-2))' : 'hsl(var(--grey-paper-tint))',
               fontFamily: 'Oswald, sans-serif',
               fontSize: size === 'XXL' ? '8px' : '10px',
               cursor: 'pointer',
@@ -125,7 +125,7 @@ function MobileProductCard({ product, colors, index, collectionSlug }) {
       </div>
 
       <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', marginTop: '10px' }}>
-        <span style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 200, fontSize: '20px', color: '#475059', lineHeight: 1, display: 'inline-flex', alignItems: 'center', transform: 'translateY(3px)' }}>15,50€</span>
+        <span style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 200, fontSize: '20px', color: 'hsl(var(--grey-ink-2))', lineHeight: 1, display: 'inline-flex', alignItems: 'center', transform: 'translateY(3px)' }}>15,50€</span>
         <button type="button" onClick={handleAddToCart} aria-label="Afegeix al cistell" style={{ width: '30px', height: '30px', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
           <img src={cartIcon} alt="" aria-hidden="true" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
         </button>
@@ -205,7 +205,7 @@ export default function CollectionMobile({
           fontSize: '32px',
           letterSpacing: '0.02em',
           lineHeight: 0.9,
-          color: '#0b0d10',
+          color: 'hsl(var(--grey-ink-strong))',
           textTransform: 'uppercase',
         }}>
           {collectionTitle}
@@ -234,7 +234,7 @@ export default function CollectionMobile({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#fbfcfd',
+            backgroundColor: 'hsl(var(--grey-paper))',
             borderRadius: '4px',
             padding: '12px',
           }}>
@@ -261,7 +261,7 @@ export default function CollectionMobile({
             lineHeight: 1.1,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            color: '#111827',
+            color: 'hsl(var(--grey-ink-strong))',
             textAlign: 'center',
           }}>
             {posterLines.map((line, index) => <div key={index}>{line.text}</div>)}

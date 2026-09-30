@@ -41,12 +41,12 @@ const ScrollToTop = () => {
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           onClick={scrollToTop}
-          className="fixed bottom-12 lg:bottom-16 right-8 z-50 p-3 rounded-full shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-900"
-          style={{ backgroundColor: '#141414' }}
+          className="fixed bottom-12 lg:bottom-16 right-8 z-50 p-3 rounded-full shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink-strong"
+          style={{ backgroundColor: 'hsl(var(--grey-ink-strong))' }}
           aria-label="Tornar a dalt"
           title="Tornar a dalt"
         >
-          <ArrowUp className="w-6 h-6 text-white" />
+          <ArrowUp className="w-6 h-6 text-paper" />
         </motion.button>
       )}
     </AnimatePresence>

@@ -26,7 +26,7 @@ function ProductTeaserCard({
   return (
     <Link to={to} className="block" data-component="product-teaser-link">
       <div className="w-full" data-component="product-teaser">
-        <div className="w-full aspect-square bg-[#f5f5f5] overflow-hidden p-10" data-component="product-teaser-media">
+        <div className="w-full aspect-square bg-[hsl(var(--grey-paper-soft))] overflow-hidden p-10" data-component="product-teaser-media">
           <img src={imgSrc} alt={name} className="h-full w-full object-contain" loading="lazy" decoding="async" />
         </div>
 
@@ -37,7 +37,7 @@ function ProductTeaserCard({
                 <span key={c} className="inline-block h-2 w-2 rounded-full" style={colorDotStyle ? colorDotStyle(c) : undefined} />
               ))}
               {colorCount > 3 ? (
-                <span className="inline-block h-2 w-2 rounded-full" style={{ background: '#6b7280' }} />
+                <span className="inline-block h-2 w-2 rounded-full" style={{ background: 'hsl(var(--grey-ink-soft))' }} />
               ) : null}
             </div>
 
@@ -49,18 +49,18 @@ function ProductTeaserCard({
           </div>
 
           <div className="mt-2" data-component="product-teaser-text">
-            <div className="font-roboto text-[15px] font-semibold" style={{ color: '#111111' }} data-component="product-teaser-name">
+            <div className="font-roboto text-[15px] font-semibold" style={{ color: 'hsl(var(--grey-ink-strong))' }} data-component="product-teaser-name">
               {name}
             </div>
             {subtitle ? (
-              <div className="font-roboto text-[13px]" style={{ color: '#6b7280' }} data-component="product-teaser-subtitle">
+              <div className="font-roboto text-[13px]" style={{ color: 'hsl(var(--grey-muted-2))' }} data-component="product-teaser-subtitle">
                 {subtitle}
               </div>
             ) : null}
-            <div className="mt-1 font-roboto text-[13px]" style={{ color: '#6b7280' }} data-component="product-teaser-color-count">
+            <div className="mt-1 font-roboto text-[13px]" style={{ color: 'hsl(var(--grey-muted-2))' }} data-component="product-teaser-color-count">
               {colorCount > 0 ? `${colorCount} colors` : null}
             </div>
-            <div className="mt-2 font-roboto text-[15px] font-semibold" style={{ color: '#111111' }} data-component="product-teaser-price">
+            <div className="mt-2 font-roboto text-[15px] font-semibold" style={{ color: 'hsl(var(--grey-ink-strong))' }} data-component="product-teaser-price">
               {priceText}
             </div>
           </div>

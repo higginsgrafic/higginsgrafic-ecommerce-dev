@@ -273,6 +273,23 @@ export const PADDING_VERTICAL_PANELL_ESCRIPTORI_PX =
   PADDING_DALT_PANELL_ESCRIPTORI_PX + PADDING_BAIX_PANELL_PX;
 
 /**
+ * EL COIXI VERTICAL DEL PANELL A LA COMPOSICIO ESTRETA (02/10/2026).
+ * -----------------------------------------------------------------------------
+ * Son els 64 px de sempre MES 16, i no menys: a `alcadaPanellMegaslide` aquest
+ * coixi RESTA (`p1ContentBottom + gap - padding`), o sigui que com mes gran es
+ * el numero mes curt queda el megaslide. En Marc: «Escurça els megaslide que
+ * hagis d'escurçar. De fet, per aixo ho faig, perque la hero hi capiga be»,
+ * despres d'haver demanat 15 px d'aire entre el bottom del header i el bloc de
+ * la p2 i 15 px mes entre el bloc i el final del megaslide. El bloc fa una
+ * alcada fixa (selector + els dos aires de 5 px de la franja de colleccions +
+ * franja de samarretes = 242,1 px a 1366) i el megaslide en feia 288: sobraven
+ * 45,9, o sigui que amb 15 a dalt en quedaven 30,9 a baix. Amb aquests 16 px
+ * mes de retall, els dos aires queden a 15 i el megaslide acaba 16 px mes amunt.
+ * Les vistes verticals i el mobil no s'hi toquen.
+ */
+export const PADDING_VERTICAL_PANELL_ESTRETA_PX = 80;
+
+/**
  * EL PAGELIFT DE LA PÀGINA 1, DECLARAT (26/09/2026)
  * -----------------------------------------------------------------------------
  * La pàgina 1 es puja (`transform: translateY(-pageLift)`) perquè el seu bloc
@@ -713,6 +730,36 @@ export function alcadaReservaGraellaPanellCss({
 }
 
 /**
+ * EL QUE LA FRANJA DE LA P2 BAIXA PER TANCAR AMB LA DE LA P1 (02/10/2026)
+ * -----------------------------------------------------------------------------
+ * A la BANDA DE LES TAULETES APAISSADES (768-1366 en horitzontal) les dues
+ * franges NO fan la mateixa alcada, i aixo es volgut: cada pagina escala la
+ * seva fins a la vora del SEU bloc de la dreta (`ampladaObjectiu`, a
+ * `useEscalaFranjaCarril`), i a la p1 aquest bloc es el selector B/C/N mentre
+ * que a la p2 es la columna de colleccions. La de la p2 queda mes curta (a 1366
+ * fa 80,8 px i la de la p1 95,0; a 1024, 60,4 contra 88,9).
+ *
+ * Com que el `visualOffsetY` quadra els TOPS i les alcades no coincideixen, els
+ * BAIXOS es desquadraven: l'aire de sota la franja de la p2 era de 71,5 px a
+ * 1366x768, 81,4 a 1280x720, 90,5 a 1200x800 i 108,8 a 1024x768, mentre que la
+ * p1 en te 30 a totes (l'amo ho va veure: «baixa la stripe fins al limit del
+ * megaslide», i ho va concretar com «a 30 px del final, com la p1»).
+ *
+ * NO es pot declarar amb una formula: l'alcada de la franja de la p2 surt de
+ * l'amplada del seu carril objectiu, que es MESURA (pot acabar a la vora del
+ * bloc de la dreta, que depen del text de la columna). El que si que es declara
+ * es la REGLA: «el baix de la franja de la p2 ha de coincidir amb el de la p1»,
+ * i el valor el resol el bucle de `MegaslidePagina2` (`ajustFranjaP2Y`), que es
+ * qui te les dues franges a mà. Aquest parametre es el que el bucle hi aboca, i
+ * viatja amb el `visualOffsetY` perque el sostre de la franja (`topFranjaPagina2`)
+ * segueixi essent el mateix número que el seu desplaçament.
+ *
+ * Fora de la banda val 0 i no es toca res: a l'escriptori les dues franges ja
+ * hi acaben igual (mesurat: 0,0 px de diferencia a 1920, 0,7 a 1440) i a la
+ * vista vertical la franja te el seu propi calibratge.
+ */
+
+/**
  * El `visualOffsetY` que la pagina 2 passa a la franja: el que la baixa (o la
  * puja) perque quedi a la mateixa alçada que la de la pagina 1. Es la
  * composicio que tenia en línia `MegaslidePagina2`, declarada perque tambe la
@@ -723,19 +770,24 @@ export function alcadaReservaGraellaPanellCss({
  * @param {number} o.alt alcada de la finestra (window.innerHeight)
  * @param {boolean} [o.isPortraitTablet]
  * @param {boolean} [o.isLandscapeTablet]
+ * @param {number} [o.ajustBaixY] els px de mes que baixa la franja de la p2 per
+ *   tancar amb la de la p1 (vegeu la nota de sobre). Fora de la banda de tauleta
+ *   apaissada es 0, i no s'hi passa res.
  * @returns {number} px
  */
 export function visualOffsetYFranjaPagina2({
-  ample, alt, isPortraitTablet = false, isLandscapeTablet = false,
+  ample, alt, isPortraitTablet = false, isLandscapeTablet = false, ajustBaixY = 0,
 } = {}) {
   const tauleta = isPortraitTablet || isLandscapeTablet;
   const pageLift = pageLiftPagina1({ isPortraitTablet, isLandscapeTablet });
   const desplacament = desplacamentFranjaEscriptori({ ample, alt, esTauleta: tauleta });
+  const ajust = Number.isFinite(ajustBaixY) ? ajustBaixY : 0;
   return (
     -pageLift
     + (isLandscapeTablet ? AJUST_FRANJA_TAULETA_APAISSADA_PX : 0)
     - (tauleta ? 0 : AJUST_FRANJA_ESCRIPTORI_PX)
     + desplacament
+    + ajust
   );
 }
 
@@ -750,18 +802,71 @@ export function visualOffsetYFranjaPagina2({
  * @param {number} [o.alt] alcada de la finestra (window.innerHeight)
  * @param {boolean} [o.isPortraitTablet]
  * @param {boolean} [o.isLandscapeTablet]
+ * @param {number} [o.ajustBaixY] el desplaçament extra de la franja de la p2 a
+ *   la banda de tauleta apaissada (vegeu `visualOffsetYFranjaPagina2`): el
+ *   sostre de la franja ha de portar el MATEIX ajust que la franja, o la
+ *   columna de colleccions (que hi acaba) es desquadraria.
  * @returns {number} px
  */
 export function topFranjaPagina2({
-  carril, escala = 1, ample, alt, isPortraitTablet = false, isLandscapeTablet = false,
+  carril, escala = 1, ample, alt, isPortraitTablet = false, isLandscapeTablet = false, ajustBaixY = 0,
 } = {}) {
   const ajustBloc = esBandaEstretaFranja({ ample, alt }) ? 0 : AJUST_BAIX_BLOC_FRANJA_PX;
   return (
     MARGE_DALT_BLOC_FRANJA_PX
     + alcadaReservaGraellaPanell({ carril, escala })
     + ajustBloc
-    + visualOffsetYFranjaPagina2({ ample, alt, isPortraitTablet, isLandscapeTablet })
+    + visualOffsetYFranjaPagina2({ ample, alt, isPortraitTablet, isLandscapeTablet, ajustBaixY })
   );
+}
+
+/**
+ * LA FRANJA DE COLLECCIONS I ELS SEUS DOS GAPS (02/10/2026)
+ * -----------------------------------------------------------------------------
+ * A la composicio estreta (1024-1366) els enllacos de colleccions de la p2 son
+ * una franja horitzontal sota la tira de colors, i l'amo n'ha fixat els dos
+ * aires: «El gap entre el selector b/c/n i la tira de colleccions ha de ser de
+ * 5 px i, el gap entre la tira de colleccions i la stripe, ha de ser de 5 px».
+ *
+ * Els dos gaps alhora volen dir que l'espai entre el cul del selector B/C/N i
+ * la tinta de les samarretes ha de fer exactament:
+ *
+ *   alçada de la franja (28,6) + 5 + 5 = 38,6 px
+ *
+ * I allo no ho pot resoldre la franja tota sola: a 1024x768 l'espai en fa 49,1
+ * (en sobren 10,5), a 1112x834 44,3 (5,7) i a 1200x800 39,3 (0,7), pero a
+ * 1280x720 nome s 34,5 (en falten 4,1) i a 1366x768 29,2 (9,4). El que es mou,
+ * doncs, es TOT EL BLOC de la p2 (la graella de dibuixos, la tira de colors, el
+ * selector i la franja), i ho fa el bucle d'alineacio de `MegaslidePagina2` amb
+ * un objectiu ABSOLUT: el cul del selector a `2 x AIRE + alcada` per sobre de la
+ * tinta de les samarretes.
+ *
+ * Conseqüencia (dita per l'amo): en aquesta banda la graella de la p2 ja no
+ * arrenca a la mateixa alcada que la de la p1, que es el que feia fins ara.
+ *
+ * A 1366x768 no hi cap ni movent el bloc: el selector hi toparia amb el sostre
+ * del megaslide, i els gaps queden 5 i 2,8.
+ */
+export const AIRE_FRANJA_COLLECCIONS_PX = 5;
+export const COMPOSICIO_ESTRETA_MIN_PX = 1024;
+export const COMPOSICIO_ESTRETA_MAX_PX = 1366;
+
+/**
+ * Si la finestra es dins la composicio estreta de la pagina 2 (1024-1366 en
+ * horitzontal). La fan servir la filera del cercador (que hi posa la franja de
+ * colleccions) i el bucle d'alineacio de `MegaslidePagina2` (que hi mou el bloc
+ * perque els dos gaps facin 5 px).
+ *
+ * @param {object} o
+ * @param {number} o.ample amplada de la finestra (window.innerWidth)
+ * @param {boolean} [o.isLandscapeTablet]
+ * @returns {boolean}
+ */
+export function esComposicioEstretaMegaslide({ ample, isLandscapeTablet = false } = {}) {
+  return !!isLandscapeTablet
+    && Number.isFinite(ample)
+    && ample >= COMPOSICIO_ESTRETA_MIN_PX
+    && ample <= COMPOSICIO_ESTRETA_MAX_PX;
 }
 
 /**
@@ -769,7 +874,7 @@ export function topFranjaPagina2({
  * -----------------------------------------------------------------------------
  * La tira de dibuixos (64) circula per les catorze cases fixes amb
  * `stripeStripOffset`, i quan canvia la colleccio activa se li dona el valor que
- * CENTRA el seu grup. Aixo es feia nome's amb un efecte, i a l'obertura de la
+ * CENTRA el seu grup. Aixo es feia nome s amb un efecte, i a l'obertura de la
  * pagina 2 el desplacament encara valia 0: la franja naixia amb el grup a
  * l'esquerra i, mig segon despres, GIRAVA tres cases (mesurat: 0 -> -3 amb
  * FIRST CONTACT), amb la creueta de 160 ms dels dibuixos. Ho va veure l'amo
@@ -824,6 +929,70 @@ export function quantsGrupActiuFranja({ collections, active } = {}) {
     quants += 1;
   }
   return quants;
+}
+
+/**
+ * ON ES EL GRUP D'UNA COLLECCIO DINS LA TIRA (29/09/2026).
+ *
+ * `quantsGrupActiuFranja` dona per fet que el grup actiu comença a la casa 0,
+ * perque la tira es construia amb la colleccio activa al principi. Des del
+ * 29/09/2026 aixo ja no es aixi: la tira te SEMPRE el mateix ordre (les
+ * colleccions en l'ordre de la graella) i l'activa nome's canvia el vel. Per
+ * tant, el grup s'ha de BUSCAR.
+ *
+ * @returns {{casaInici: number, quants: number}} la casa on arrenca i quants
+ *   dibuixos te; `quants: 0` si no hi es.
+ */
+export function buscaGrupActiuFranja(collections, active, { subcollections = null, sub = null } = {}) {
+  if (!Array.isArray(collections) || !active) return { casaInici: 0, quants: 0 };
+  // LA SUBCAPÇALERA TAMBE MANA (01/10/2026).
+  //
+  // Les cinc subcol·leccions d'AUSTEN comparteixen `collection === 'austen'`, i
+  // el grup de debò quan se n'activa una és NOMÉS el seu tram (les 5 cites, els
+  // 12 mots encreuats…). Buscant per collecció, el grup era tot AUSTEN (27
+  // dibuixos) i la franja s'hi centrava: les cases que queien a la vora no
+  // portaven cap dibuix de la subcol·lecció activa i totes quedaven velades
+  // —«la col·lecció activa no se centra a la franja»—. Sense `sub` (la resta de
+  // colleccions) el comportament és exactament el d'abans.
+  // Nomes AUSTEN te subcol·leccions: si la colleccio activa es una altra, la
+  // `sub` que arrossegui l'estat no hi ha de filtrar res (si no, no es trobaria
+  // cap grup i la franja es quedaria on era).
+  const filtraPerSub = Boolean(sub) && active === 'austen';
+  const esDelGrup = (i) => collections[i] === active
+    && (!filtraPerSub || (Array.isArray(subcollections) && (subcollections[i] ?? null) === sub));
+  const casaInici = collections.findIndex((_, i) => esDelGrup(i));
+  if (casaInici < 0) return { casaInici: 0, quants: 0 };
+  let quants = 0;
+  for (let i = casaInici; i < collections.length && esDelGrup(i); i++) quants += 1;
+  return { casaInici, quants };
+}
+
+/**
+ * El desplaçament que centra el grup de la colleccio activa, on sigui que sigui
+ * dins la tira.
+ *
+ * Es el mateix calcul que `desplacamentCentratgeFranja`, pero tenint en compte
+ * que el grup no comença a la casa 0: primer es calcula el desplaçament que el
+ * posaria a la casa 0 i despres se li suma la casa on es de debò.
+ */
+export function desplacamentGrupActiuFranja({
+  collections, active, subcollections = null, sub = null,
+  isPortraitTablet = false, actual = 0, cases = FRANJA_CASES,
+} = {}) {
+  if (!Array.isArray(collections) || !collections.length) return Math.round(actual) || 0;
+  const { casaInici, quants } = buscaGrupActiuFranja(collections, active, { subcollections, sub });
+  if (!quants) return Math.round(actual) || 0;
+  const n = collections.length;
+  const base = desplacamentCentratgeFranja({
+    quants,
+    n,
+    actual,
+    cases,
+    casaInici: casaIniciGrupActiu(quants, isPortraitTablet),
+  });
+  // El `base` deixa el grup a la casa 0; com que arrenca a `casaInici`, cal
+  // desplaçar-se aquestes cases mes. El modul el deixa dins de la tira.
+  return ((base + casaInici) % n + n) % n;
 }
 
 /**

@@ -60,13 +60,13 @@ const EpisodeDisplay = ({
             <div className="flex gap-2 mt-2">
               <button
                 onClick={onSave}
-                className="bg-green-600 text-white px-4 py-1 rounded text-sm font-oswald hover:bg-green-700 transition-colors"
+                className="bg-green-600 text-paper px-4 py-1 rounded text-sm font-oswald hover:bg-green-700 transition-colors"
               >
                 GUARDAR
               </button>
               <button
                 onClick={onCancel}
-                className="bg-gray-400 text-white px-4 py-1 rounded text-sm font-oswald hover:bg-gray-500 transition-colors"
+                className="bg-muted-2 text-paper px-4 py-1 rounded text-sm font-oswald hover:bg-ink-soft transition-colors"
               >
                 CANCEL·LAR
               </button>
@@ -74,7 +74,7 @@ const EpisodeDisplay = ({
           </div>
         ) : (
           <div
-            className="font-roboto font-normal cursor-pointer hover:bg-gray-50 transition-colors p-1 rounded"
+            className="font-roboto font-normal cursor-pointer hover:bg-paper-soft transition-colors p-1 rounded"
             style={{
               fontSize: '16pt',
               lineHeight: '24pt',
@@ -108,13 +108,13 @@ const EpisodeDisplay = ({
           <div className="flex gap-2 mt-2">
             <button
               onClick={onSave}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg font-oswald hover:bg-green-700"
+              className="bg-green-600 text-paper px-4 py-2 rounded-lg font-oswald hover:bg-green-700"
             >
               GUARDAR
             </button>
             <button
               onClick={onCancel}
-              className="bg-gray-400 text-white px-4 py-2 rounded-lg font-oswald hover:bg-gray-500"
+              className="bg-muted-2 text-paper px-4 py-2 rounded-lg font-oswald hover:bg-ink-soft"
             >
               CANCEL·LAR
             </button>
@@ -122,7 +122,7 @@ const EpisodeDisplay = ({
         </div>
       ) : (
         <div
-          className="font-roboto text-base leading-relaxed cursor-pointer p-4 rounded-lg border border-gray-300"
+          className="font-roboto text-base leading-relaxed cursor-pointer p-4 rounded-lg border border-line-strong"
           onDoubleClick={onDoubleClick}
           title="Fes doble clic per editar"
         >

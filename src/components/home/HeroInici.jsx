@@ -42,6 +42,42 @@ function HeroInici() {
   // gairebe la mida que te a 1440 (321).
   const esVertical = typeof window !== 'undefined'
     && deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isPortraitTablet;
+  // LA HERO, UN 25 % MES GRAN A QUATRE VISTES APAIXADES (02/10/2026).
+  //
+  // En Marc: «Escalat de la hero: 1440 com 1920, 1180x820 +25 %, 1200x800 +25 %,
+  // 1024x768 +25 %» i, quan li vaig dir que a 1440 no hi cap la mida de 1920,
+  // «Augmenta un 25 % la 1440».
+  //
+  // La caixa fa el 80 % del carril (`paddingInline: 10 %`), i un 25 % mes es
+  // EXACTAMENT el carril sencer: 684 x 1,25 = 855 a 1440. Alla el coixi passa a
+  // zero, com a la vista vertical.
+  //
+  // I EL 1440, UN 10 % MES A LES TRES PETITES (02/10/2026). En Marc: «Escalat de la
+  // hero: 1180x820 +10 %, 1200x800 +10 %, 1024x768 +10 %» i, quan li vaig aplicar
+  // el 10 % sobre el 80 % de disseny, «No, home, que li pugis un 10 % mes!»: el
+  // 10 % es sobre el carril sencer que ja hi havia, o sigui que la caixa fa el
+  // 110 % del carril i en surt un 5 % per banda (per aixo va amb `marginInline`
+  // negatiu).
+  const ampleFinestra = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const esApaissada = typeof window !== 'undefined' && window.innerWidth >= window.innerHeight;
+  // El 1440 va amb un marge de 40 px perque la finestra pot no fer-los exactes.
+  const esHeroCarrilSencer = esApaissada && ampleFinestra >= 1400 && ampleFinestra <= 1480;
+  const esHeroDeuPerCent = esApaissada && ampleFinestra >= 1024 && ampleFinestra <= 1200;
+  // I LA DE 1920, A TOT EL CARRIL (02/10/2026). En Marc: «Augmenta la hero de la
+  // 1920 un 10 % mes» (del 80 % al 88 %) i tot seguit «Eixampla la hero a tot el
+  // carril»: tambe a 1920, com a 1440.
+  const esHeroCarrilSencer1920 = esApaissada && ampleFinestra > 1480;
+  // A 1280 I 1366, NOMES LA SECCIO (02/10/2026). En Marc: «A les 1366 i 1280,
+  // tambe, pero nome's l'amplada de la seccio, no escalis les franges». La caixa
+  // va de vora a vora del carril, pero la seva alcada es queda la del 80 % de
+  // disseny, o sigui que les franges no creixen: la samarreta de fons es pinta
+  // amb `auto 100 %` de l'alcada de la franja, i si l'alcada no canvia, la
+  // samarreta tampoc.
+  const esHeroSeccioAmpla = esApaissada && ampleFinestra > 1200 && ampleFinestra <= 1366;
+  // A LA VISTA 1024, EL TRACKING DELS NOMS A LA MEITAT (02/10/2026). En Marc: «A
+  // la vista 1024 redueix el traking de les colleccions de la hero a la meitat»:
+  // allo on els noms hi van justos, el `letterSpacing` passa de 0,18em a 0,09em.
+  const esHeroTrackingMig = ampleFinestra > 0 && ampleFinestra <= 1024;
   const [plan, setPlan] = useState(() => buildHeroStripePlan());
   const franges = useMemo(() => plan, [plan]);
 
@@ -52,13 +88,22 @@ function HeroInici() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        // LA HERO AL 80 % DEL CARRIL, I AL 100 % A LA VERTICAL.
+        // LA HERO, AL 75 % DEL QUE FAIA (02/10/2026). En Marc: «Redueix la hero un
+        // 25 %»: sobre totes les vistes, tambe les que s'havien eixamplat. El
+        // percentatge va al BLOC i no a la caixa perque el padding d'un
+        // percentatge es mesura sobre l'amplada del PARE, que es el carril: aixi
+        // la caixa queda centrada i l'aire es reparteix a parts iguals.
         //
-        // El percentatge va al BLOC i no a la caixa perque el padding d'un
-        // percentatge es mesura sobre l'amplada del PARE, que es el carril:
-        // aixi la caixa fa el 20 % del CARRIL i queda centrada. L'aire es
-        // reparteix a parts iguals a cada costat, i a la vertical no n'hi ha.
-        paddingInline: esVertical ? 0 : '10%',
+        //   80 % de disseny  x 0,75 = 60 %   -> 20 % d'aire per banda
+        //   carril sencer    x 0,75 = 75 %   -> 12,5 %
+        //   110 % (petites)  x 0,75 = 82,5 % -> 8,75 %
+        //
+        // I a la vertical no hi ha aire: la caixa fa el carril.
+        paddingInline: esVertical
+          ? 0
+          : (esHeroCarrilSencer || esHeroCarrilSencer1920 || esHeroSeccioAmpla
+            ? '12.5%'
+            : (esHeroDeuPerCent ? '8.75%' : '20%')),
       }}
     >
       <div
@@ -66,6 +111,17 @@ function HeroInici() {
         className="hg-hero-caixa"
         data-franges={franges.length}
         style={{
+          // A 1280 I 1366 LA SECCIO FA EL 75 % DEL CARRIL I L'ALCADA NO CANVIA
+          // DE PROPORCIO. Sense l'`aspect-ratio`, l'alcada surt del 60 % del
+          // carril (el 80 % de disseny ja reduit un 25 %) amb la proporcio
+          // 952/401, que es la de sempre.
+          ...(esHeroSeccioAmpla
+            ? {
+              width: '100%',
+              aspectRatio: 'auto',
+              height: 'calc(var(--contingut-max, 1350px) * 0.6 * 401 / 952)',
+            }
+            : null),
           display: 'flex',
           flexDirection: 'column',
           gap: '2px',
@@ -92,7 +148,7 @@ function HeroInici() {
                 display: 'flex',
                 alignItems: 'center',
                 overflow: 'hidden',
-                background: '#FFFFFF',
+                background: 'hsl(var(--grey-paper))',
                 textDecoration: 'none',
               }}
             >
@@ -153,13 +209,14 @@ function HeroInici() {
                 />
               ) : null}
               {/* EL NOM de la colleccio, a l'esquerra. */}
-              <div style={{ position: 'relative', zIndex: 2, paddingLeft: '24px', color: '#475059' }}>
+              <div style={{ position: 'relative', zIndex: 2, paddingLeft: '24px', color: 'hsl(var(--grey-ink-2))' }}>
                 <p
                   style={{
                     fontFamily: 'Oswald, sans-serif',
                     fontSize: isMobile ? '13px' : '18px',
                     fontWeight: 600,
-                    letterSpacing: '0.18em',
+                    // A 1024, la meitat (vegeu `esHeroTrackingMig`).
+                    letterSpacing: esHeroTrackingMig ? '0.09em' : '0.18em',
                     textTransform: 'uppercase',
                     margin: 0,
                     opacity: 0.95,
@@ -197,9 +254,9 @@ function HeroInici() {
           cursor: 'pointer',
           backdropFilter: 'blur(4px)',
         }}
-        className="hover:bg-white transition-colors"
+        className="hover:bg-paper transition-colors"
         >
-        <Shuffle size={50} color="#475059" />
+        <Shuffle size={50} color="hsl(var(--grey-ink-2))" />
         </button>
       </div>
 

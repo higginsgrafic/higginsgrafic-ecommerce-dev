@@ -21,6 +21,7 @@
 import { getMockupPath } from '@/lib/mockupPaths';
 import { collectionGridHoverVariantsFor } from '@/lib/pdpMockup';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const STRIPE_BASE = '/custom_logos/drawings/images_stripe';
 
@@ -133,7 +134,7 @@ const AUSTEN = [
   // quotes (negre + blanc) — totes tenen mockup pre-composat a austen/cites/quotes
   ...[
     'half-agony-half-hope', 'i-admire-and-love-you', 'it-is-a-truth',
-    'unsociable-and-taciturn', 'you-have-bewitched-me', 'you-must-allow-me',
+    'unsociable-and-taciturn', 'you-have-bewitched-me', 'i-admire-and-love-you',
   ].map((n) => bw('austen', n, 'austen/quotes',
     AUSTEN_QUOTES_WITH_MOCKUP.has(n) ? { collection: 'austen-quotes', design: `quotes-${n}` } : undefined)),
   // looking_for_my_darcy (NOMÉS color) — design = `looking-for-my-darcy-<variant>`.
@@ -158,15 +159,17 @@ export const HOME_DRAWINGS = {
 // Ordre de les seccions a la home.
 export const HOME_COLLECTIONS_ORDER = ['first-contact', 'the-human-inside', 'austen', 'cube', 'miscellania'];
 
-// 14 colors canònics (de TDP_GRID_COLORS / FullWideSlideHeader).
+// 14 colors canònics (mockupPaths.SHIRT_COLORS).
 export const SHIRT_COLORS = [
-  'white', 'light-blue', 'royal', 'purple', 'navy', 'daisy', 'gold',
-  'light-pink', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
+  'white', 'light-blue', 'royal', 'navy', 'irish-green', 'military-green',
+  'daisy', 'gold', 'red', 'dark-chocolate', 'ice-grey', 'rs-sport-grey',
+  'charcoal', 'black',
 ];
 
 // Colors foscos → necessiten el dibuix en BLANC (per a dibuixos amb b/w).
 export const DARK_COLORS = new Set([
-  'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
+  'royal', 'navy', 'red', 'irish-green', 'military-green', 'black',
+  'charcoal', 'dark-chocolate',
 ]);
 
 // Ajustos de mida (overlayScale) per dibuixos concrets. Per defecte: 0.345.
@@ -181,9 +184,9 @@ const OVERLAY_SCALE_OVERRIDES = {
   'first_contact/vulcans-end': 0.3105,
   'first_contact/wormhole': 0.3105,
   'austen/it-is-a-truth': 0.207,
-  'austen/body-and-soul': 0.207,
+  'austen/you-have-bewitched-me': 0.207,
   'austen/half-agony-half-hope': 0.207,
-  'austen/you-must-allow-me': 0.207,
+  'austen/i-admire-and-love-you': 0.207,
   // Looking For My Darcy: 25% més petit (0.345 × 0.75).
   'austen/lfmd/blue-solid': 0.25875,
   'austen/lfmd/fuchsia-solid': 0.25875,
@@ -260,13 +263,13 @@ const DRAWING_LABELS = {
   // Austen (no crosswords / no lfmd)
   'austen/keep-calm': 'Keep Calm',
   'austen/pemberley-house': 'Pemberley House',
-  'austen/body-and-soul': 'Body and Soul',
+  'austen/you-have-bewitched-me': 'Body and Soul',
   'austen/half-agony-half-hope': 'Half Agony, Half Hope',
   'austen/it-is-a-truth': 'It is a Truth',
   'austen/i-admire-and-love-you': 'I Admire and Love You',
   'austen/unsociable-and-taciturn': 'Unsociable and Taciturn',
   'austen/you-have-bewitched-me': 'You Have Bewitched Me',
-  'austen/you-must-allow-me': 'You Must Allow Me',
+  'austen/i-admire-and-love-you': 'You Must Allow Me',
 };
 
 function prettify(s) {
@@ -362,7 +365,7 @@ export function drawingLabel(drawing) {
 }
 
 export const shirtMockupSrc = (color) =>
-  `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.webp`;
+  tshirtSrc(color);
 
 /**
  * Resol el camí al mockup pre-composat (samarreta + dibuix ja imprimits) per a
@@ -469,7 +472,7 @@ const STRIPE2_ONLY_IDS = new Set([
   'austen/unsociable-and-taciturn',
   'austen/i-admire-and-love-you',
   'austen/you-have-bewitched-me',
-  'austen/you-must-allow-me',
+  'austen/i-admire-and-love-you',
   'first_contact/nx-01',
   'first_contact/ncc-1701',
   'first_contact/ncc-1701-d',

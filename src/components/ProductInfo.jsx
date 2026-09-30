@@ -131,7 +131,7 @@ const ProductInfo = ({
             top: '8px',
             left: '645px',
             fontSize: `${titleFontPx}px`,
-            color: '#141414',
+            color: 'hsl(var(--grey-ink-strong))',
             transform: 'scale(1.01)',
             width: pillWidth || '322.5px',
             overflow: 'visible',
@@ -143,9 +143,9 @@ const ProductInfo = ({
           {humanizeLabel(product.name)}
         </h1>
 
-        <div style={{ position: 'absolute', top: '74px', left: '645px', width: pillWidth || '322.5px', height: '40px', backgroundColor: '#F9FAFB', borderRadius: '4px', transform: 'scale(1.01)', zIndex: 1 }} />
+        <div style={{ position: 'absolute', top: '74px', left: '645px', width: pillWidth || '322.5px', height: '40px', backgroundColor: 'hsl(var(--grey-paper))', borderRadius: '4px', transform: 'scale(1.01)', zIndex: 1 }} />
 
-        <p className="font-oswald leading-none font-normal" style={{ position: 'absolute', top: '78px', left: '655px', fontSize: '22.5pt', color: '#141414', transform: 'scale(1.01)', zIndex: 2 }}>
+        <p className="font-oswald leading-none font-normal" style={{ position: 'absolute', top: '78px', left: '655px', fontSize: '22.5pt', color: 'hsl(var(--grey-ink-strong))', transform: 'scale(1.01)', zIndex: 2 }}>
           {formatPrice(product.price)}
         </p>
 
@@ -153,7 +153,7 @@ const ProductInfo = ({
         <div className="flex items-center gap-4" style={{ position: 'absolute', top: '360px', left: '645px', transform: 'scale(1.01)', zIndex: 10 }}>
           <button
             onClick={onWishlistToggle}
-            className="bg-[#F9FAFB] hover:bg-gray-300 transition-all flex items-center justify-center"
+            className="bg-[hsl(var(--grey-paper-soft))] hover:bg-muted-foreground transition-all flex items-center justify-center"
             style={{ width: '70px', height: '35px', position: 'relative', top: '0px', left: '0.5px', clipPath: 'polygon(0 0, calc(100% - 10.1px) 0, 100% 50%, calc(100% - 10.1px) 100%, 0 100%)', borderRadius: '6px 0 0 6px' }}
             aria-label="Afegir a favorits"
           >
@@ -161,7 +161,7 @@ const ProductInfo = ({
           </button>
           <button
             onClick={onAddToCart}
-            className="bg-[#F9FAFB] hover:bg-gray-300 transition-all font-oswald text-xl tracking-wide"
+            className="bg-[hsl(var(--grey-paper-soft))] hover:bg-muted-foreground transition-all font-oswald text-xl tracking-wide"
             style={{ width: '154.5px', height: '35px', position: 'relative', top: '0px', left: '-0.75px', clipPath: 'polygon(0 0, calc(100% - 10.1px) 0, 100% 50%, calc(100% - 10.1px) 100%, 0 100%)', borderRadius: '6px 0 0 6px', fontWeight: 500 }}
             aria-label="Afegir al cistell"
           >
@@ -169,7 +169,7 @@ const ProductInfo = ({
           </button>
           <button
             onClick={onShare}
-            className="bg-[#F9FAFB] hover:bg-gray-300 transition-all flex items-center justify-center"
+            className="bg-[hsl(var(--grey-paper-soft))] hover:bg-muted-foreground transition-all flex items-center justify-center"
             style={{ width: '70px', height: '35px', position: 'relative', top: '0px', left: '-2px', clipPath: 'polygon(0 0, calc(100% - 10.1px) 0, 100% 50%, calc(100% - 10.1px) 100%, 0 100%)', borderRadius: '6px 0 0 6px' }}
             aria-label="Compartir"
           >
@@ -203,12 +203,12 @@ const ProductInfo = ({
                   data-size-layout="desktop"
                   className={`transition-all duration-200 rounded-md text-xl font-oswald
                     ${isUniOnly
-                      ? 'bg-[#F9FAFB] text-black font-light cursor-default'
+                      ? 'bg-[hsl(var(--grey-paper-soft))] text-ink-pure font-light cursor-default'
                       : isSelected
-                      ? 'bg-black text-white font-semibold'
+                      ? 'bg-ink-pure text-paper font-semibold'
                       : isEnabled
-                      ? 'bg-[#F9FAFB] text-black font-light hover:bg-gray-300'
-                      : 'bg-[#F9FAFB] text-black font-light cursor-default'}`}
+                      ? 'bg-[hsl(var(--grey-paper-soft))] text-ink-pure font-light hover:bg-muted-foreground'
+                      : 'bg-[hsl(var(--grey-paper-soft))] text-ink-pure font-light cursor-default'}`}
                   style={{
                     width: '70px',
                     height: '35px',
@@ -295,13 +295,13 @@ const ProductInfo = ({
                 onClick={() => onColorChange(colorObj.color)}
                 className={`transition-all duration-200 rounded-full border-2 overflow-hidden ${
                   selectedColor === colorObj.color
-                    ? 'border-black ring-2 ring-black ring-offset-2'
-                    : 'border-gray-300 hover:border-gray-500'
+                    ? 'border-ink-pure ring-2 ring-ink-pure ring-offset-2'
+                    : 'border-line-strong hover:border-ink-soft'
                 }`}
                 style={{
                   width: '45px',
                   height: '45px',
-                  backgroundColor: colorObj.hex || '#FFFFFF'
+                  backgroundColor: colorObj.hex || 'hsl(var(--grey-paper))'
                 }}
                 title={colorObj.color}
                 aria-label={`Seleccionar color ${colorObj.color}`}
@@ -319,7 +319,7 @@ const ProductInfo = ({
             ))}
           </div>
           {selectedColor && (
-            <p className="mt-2 text-sm text-gray-600 capitalize">
+            <p className="mt-2 text-sm text-ink-2 capitalize">
               Seleccionat: {selectedColor}
             </p>
           )}
@@ -336,8 +336,8 @@ const ProductInfo = ({
               onClick={() => onSizeChange(size)}
               className={`py-3 rounded-md text-lg font-oswald transition-all ${
                 selectedSize === size
-                  ? 'bg-black text-white font-semibold'
-                  : 'bg-[#F9FAFB] text-black font-light hover:bg-gray-300'
+                  ? 'bg-ink-pure text-paper font-semibold'
+                  : 'bg-[hsl(var(--grey-paper-soft))] text-ink-pure font-light hover:bg-muted-foreground'
               }`}
             >
               {size}
@@ -349,20 +349,20 @@ const ProductInfo = ({
       <div className="flex gap-3 mb-6">
         <button
           onClick={onWishlistToggle}
-          className="bg-[#F9FAFB] hover:bg-gray-300 p-3 rounded-md transition-all flex items-center justify-center"
+          className="bg-[hsl(var(--grey-paper-soft))] hover:bg-muted-foreground p-3 rounded-md transition-all flex items-center justify-center"
         >
           <Heart className={`h-6 w-6 ${isInWishlist ? 'fill-current text-red-500' : ''}`} />
         </button>
         <button
           onClick={onAddToCart}
-          className="flex-1 bg-black text-white py-3 px-6 rounded-md font-oswald text-lg hover:bg-gray-800 transition-all"
+          className="flex-1 bg-ink-pure text-paper py-3 px-6 rounded-md font-oswald text-lg hover:bg-ink transition-all"
           style={{ fontWeight: 500 }}
         >
           CISTELL
         </button>
         <button
           onClick={onShare}
-          className="bg-[#F9FAFB] hover:bg-gray-300 p-3 rounded-md transition-all flex items-center justify-center"
+          className="bg-[hsl(var(--grey-paper-soft))] hover:bg-muted-foreground p-3 rounded-md transition-all flex items-center justify-center"
         >
           <Share2 className="h-6 w-6" />
         </button>

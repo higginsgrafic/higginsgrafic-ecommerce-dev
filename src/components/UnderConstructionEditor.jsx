@@ -11,7 +11,7 @@ export default function UnderConstructionEditor() {
     backgroundType: 'color',
     videoUrl: '',
     imageUrl: '',
-    backgroundColor: '#000000',
+    backgroundColor: 'hsl(var(--grey-ink-pure))',
     gradientStops: null,
     gradientAngle: 180,
     title: 'Estem treballant en alguna cosa increïble',
@@ -20,7 +20,7 @@ export default function UnderConstructionEditor() {
     buttonText: 'Tornar a l\'inici',
     buttonLink: '/',
     showButton: true,
-    textColor: '#ffffff',
+    textColor: 'hsl(var(--grey-paper))',
     redirectUrl: '',
     autoRedirect: false,
     globalRedirect: false
@@ -53,7 +53,7 @@ export default function UnderConstructionEditor() {
           backgroundType: data.background_type || 'color',
           videoUrl: data.video_url || '',
           imageUrl: data.image_url || '',
-          backgroundColor: data.background_color || '#000000',
+          backgroundColor: data.background_color || 'hsl(var(--grey-ink-pure))',
           gradientStops: data.gradient_stops || null,
           gradientAngle: data.gradient_angle ?? 180,
           title: data.title || '',
@@ -62,7 +62,7 @@ export default function UnderConstructionEditor() {
           buttonText: data.button_text || '',
           buttonLink: data.button_link || '/',
           showButton: data.show_button ?? true,
-          textColor: data.text_color || '#ffffff',
+          textColor: data.text_color || 'hsl(var(--grey-paper))',
           redirectUrl: data.redirect_url || '',
           autoRedirect: data.auto_redirect ?? false,
           globalRedirect: data.global_redirect ?? false
@@ -145,7 +145,7 @@ export default function UnderConstructionEditor() {
         backgroundType: 'color',
         videoUrl: '',
         imageUrl: '',
-        backgroundColor: '#000000',
+        backgroundColor: 'hsl(var(--grey-ink-pure))',
         gradientStops: null,
         gradientAngle: 180,
         title: 'Estem treballant en alguna cosa increïble',
@@ -154,7 +154,7 @@ export default function UnderConstructionEditor() {
         buttonText: 'Tornar a l\'inici',
         buttonLink: '/',
         showButton: true,
-        textColor: '#ffffff',
+        textColor: 'hsl(var(--grey-paper))',
         redirectUrl: '',
         autoRedirect: false,
         globalRedirect: false
@@ -184,8 +184,8 @@ export default function UnderConstructionEditor() {
       setConfig({
         ...config,
         gradientStops: [
-          { color: '#000000', position: 0 },
-          { color: '#ffffff', position: 100 }
+          { color: 'hsl(var(--grey-ink-pure))', position: 0 },
+          { color: 'hsl(var(--grey-paper))', position: 100 }
         ]
       });
     }
@@ -194,7 +194,7 @@ export default function UnderConstructionEditor() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-gray-600">Carregant...</div>
+        <div className="text-ink-2">Carregant...</div>
       </div>
     );
   }
@@ -205,7 +205,7 @@ export default function UnderConstructionEditor() {
         <div>
           <h2 className="text-2xl font-bold">Configuració "En Construcció"</h2>
           <div className="flex items-center gap-2">
-            <p className="text-gray-600 text-sm">Personalitzeu la pàgina de manteniment del lloc web</p>
+            <p className="text-ink-2 text-sm">Personalitzeu la pàgina de manteniment del lloc web</p>
             <span className={`text-xs px-2 py-1 rounded-full ${
               autoSaveStatus === 'saved' ? 'bg-green-100 text-green-700' :
               autoSaveStatus === 'saving' ? 'bg-blue-100 text-blue-700' :
@@ -239,19 +239,19 @@ export default function UnderConstructionEditor() {
           <div className={`rounded-lg border-2 p-4 ${
             config.globalRedirect
               ? 'bg-red-50 border-red-300'
-              : 'bg-gray-50 border-gray-200'
+              : 'bg-paper-soft border-line'
           }`}>
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="text-base font-bold">Mode "En Construcció"</h3>
                   {config.globalRedirect && (
-                    <span className="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded-full">
+                    <span className="px-2 py-1 bg-red-600 text-paper text-xs font-bold rounded-full">
                       ACTIU
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-700 mb-1">
+                <p className="text-sm text-ink-2 mb-1">
                   {config.globalRedirect
                     ? '⚠️ Tots els visitants del web seran redirigits a la pàgina "En Construcció"'
                     : 'Activa aquesta opció per mostrar la pàgina "En Construcció" a tots els visitants'
@@ -278,9 +278,9 @@ export default function UnderConstructionEditor() {
                     className="sr-only"
                   />
                   <div className={`w-14 h-8 rounded-full transition-colors ${
-                    config.globalRedirect ? 'bg-red-600' : 'bg-gray-300'
+                    config.globalRedirect ? 'bg-red-600' : 'bg-muted-foreground'
                   }`}>
-                    <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                    <div className={`absolute top-1 left-1 w-6 h-6 bg-paper rounded-full transition-transform ${
                       config.globalRedirect ? 'transform translate-x-6' : ''
                     }`} />
                   </div>
@@ -290,7 +290,7 @@ export default function UnderConstructionEditor() {
           </div>
 
           {/* Background Type - Full Width */}
-          <div className="bg-white rounded-lg border p-3">
+          <div className="bg-paper rounded-lg border p-3">
             <h3 className="text-base font-semibold mb-3">Tipus de Fons</h3>
             <div className="grid grid-cols-3 gap-2">
               <button
@@ -298,7 +298,7 @@ export default function UnderConstructionEditor() {
                 className={`p-3 rounded-lg border-2 transition-all ${
                   config.backgroundType === 'color'
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-line hover:border-line-strong'
                 }`}
               >
                 <Palette className="w-6 h-6 mx-auto mb-1 text-blue-600" />
@@ -309,7 +309,7 @@ export default function UnderConstructionEditor() {
                 className={`p-3 rounded-lg border-2 transition-all ${
                   config.backgroundType === 'image'
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-line hover:border-line-strong'
                 }`}
               >
                 <ImageIcon className="w-6 h-6 mx-auto mb-1 text-green-600" />
@@ -320,7 +320,7 @@ export default function UnderConstructionEditor() {
                 className={`p-3 rounded-lg border-2 transition-all ${
                   config.backgroundType === 'video'
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-line hover:border-line-strong'
                 }`}
               >
                 <Video className="w-6 h-6 mx-auto mb-1 text-red-600" />
@@ -355,11 +355,11 @@ export default function UnderConstructionEditor() {
                         value={config.backgroundColor}
                         onChange={(e) => setConfig({ ...config, backgroundColor: e.target.value })}
                         className="flex-1 px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="#000000"
+                        placeholder="hsl(var(--grey-ink-pure))"
                       />
                     </div>
                   ) : (
-                    <div className="border rounded-lg p-3 bg-gray-50">
+                    <div className="border rounded-lg p-3 bg-paper-soft">
                       <GradientEditor
                         stops={config.gradientStops}
                         angle={config.gradientAngle}
@@ -385,13 +385,13 @@ export default function UnderConstructionEditor() {
                     <button
                       type="button"
                       onClick={() => openMediaPicker('image', 'image')}
-                      className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
+                      className="px-3 py-2 bg-blue-600 text-paper text-sm rounded hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
                     >
                       <ImageIcon className="w-4 h-4" />
                       Seleccioneu
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-ink-soft mt-1">
                     Seleccioneu una imatge de la biblioteca o pugeu-ne una de nova
                   </p>
                 </div>
@@ -411,13 +411,13 @@ export default function UnderConstructionEditor() {
                     <button
                       type="button"
                       onClick={() => openMediaPicker('video', 'video')}
-                      className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
+                      className="px-3 py-2 bg-blue-600 text-paper text-sm rounded hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
                     >
                       <Video className="w-4 h-4" />
                       Seleccioneu
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-ink-soft mt-1">
                     Seleccioneu un vídeo de la biblioteca o pugeu-ne un de nou
                   </p>
                 </div>
@@ -429,7 +429,7 @@ export default function UnderConstructionEditor() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {/* Left Column: Content */}
             <div className="space-y-3">
-              <div className="bg-white rounded-lg border p-3">
+              <div className="bg-paper rounded-lg border p-3">
                 <h3 className="text-base font-semibold mb-3">Contingut</h3>
                 <div className="space-y-3">
                   <div>
@@ -479,7 +479,7 @@ export default function UnderConstructionEditor() {
                         value={config.textColor}
                         onChange={(e) => setConfig({ ...config, textColor: e.target.value })}
                         className="flex-1 px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="#ffffff"
+                        placeholder="hsl(var(--grey-paper))"
                       />
                     </div>
                   </div>
@@ -490,7 +490,7 @@ export default function UnderConstructionEditor() {
             {/* Right Column: Button & Redirect */}
             <div className="space-y-3">
               {/* Button */}
-              <div className="bg-white rounded-lg border p-3">
+              <div className="bg-paper rounded-lg border p-3">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-base font-semibold">Botó d'Acció</h3>
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -530,7 +530,7 @@ export default function UnderConstructionEditor() {
               </div>
 
               {/* Redirect */}
-              <div className="bg-white rounded-lg border p-3">
+              <div className="bg-paper rounded-lg border p-3">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-base font-semibold">Redirecció</h3>
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -556,7 +556,7 @@ export default function UnderConstructionEditor() {
                     className="w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="https://example.com o /pagina"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-ink-soft mt-1">
                     Quan el vídeo acabi, es redirigirà automàticament
                   </p>
                 </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { PAGES_MANIFEST, GROUPS, TAG_COLORS } from '@/dev/pagesManifest';
 
@@ -116,7 +116,7 @@ function ThumbCard({ page, targetH, forcedScale, onContentHeight, forceLoad, vie
         flexDirection: 'column',
         gap: 6,
         background: '#ffffff',
-        border: '1px solid #e2e8f0',
+        border: '1px solid hsl(var(--grey-line))',
         borderRadius: 10,
         padding: 10,
         boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
@@ -130,7 +130,7 @@ function ThumbCard({ page, targetH, forcedScale, onContentHeight, forceLoad, vie
           position: 'relative',
           background: '#f8fafc',
           borderRadius: 6,
-          border: '1px solid #e2e8f0',
+          border: '1px solid hsl(var(--grey-line))',
         }}
       >
         {loaded && useSnapshot ? (
@@ -228,7 +228,7 @@ function ThumbCard({ page, targetH, forcedScale, onContentHeight, forceLoad, vie
             fontSize: 10,
             color: '#2563eb',
             textDecoration: 'none',
-            border: '1px solid #cbd5e1',
+            border: '1px solid hsl(var(--grey-line-strong))',
             padding: '2px 6px',
             borderRadius: 4,
             flexShrink: 0,
@@ -251,6 +251,74 @@ function ContactSheetPage() {
   const [viewMode, setViewMode] = useState('live'); // 'snapshot' | 'live'
   const [snapshotIndex, setSnapshotIndex] = useState(null); // { generatedAt, pages: { path: { src, width, height } } }
   const [snapshotError, setSnapshotError] = useState(null);
+
+  // ---- LES DUES EINES DEL CONTACT SHEET (01/10/2026) ----------------------
+  //
+  // 1) MEGASLIDE A TOTES: obre el megaslide a totes les iframes alhora, per
+  //    revisar una cosa (un color, un espaiat) a totes les pantalles de cop.
+  //    Fa servir el parametre `?active=` de la propia app (el que llegeix
+  //    `useUrlActiveCollection`): es canvia la URL de cada iframe i se li
+  //    dispareta un `popstate`, que es com React Router se n'enterа. Si la
+  //    finestra no es pot tocar, es recarrega l'iframe amb el parametre.
+  // 2) CAPTURA LES ACTIVES: demana al servidor de desenvolupament que executi
+  //    el guio de sempre (`scripts/contact-sheet-capture.mjs`) nome's amb les
+  //    pantalles que es veuen ara, i despres recarrega l'index de snapshots.
+  const COLLECCIO_MEGASLIDE = 'first_contact';
+  const [megaATotes, setMegaATotes] = useState(false);
+  const [capturant, setCapturant] = useState(false);
+  const [capturaMsg, setCapturaMsg] = useState(null);
+
+  const canviaMegaslideIframes = useCallback((obrir) => {
+    const marcs = [...document.querySelectorAll('iframe')];
+    let fets = 0;
+    for (const marc of marcs) {
+      try {
+        const win = marc.contentWindow;
+        if (!win || !win.location) throw new Error('sense finestra');
+        const u = new URL(win.location.href);
+        if (obrir) {
+          // OBRIR: n'hi ha prou amb la URL. `useUrlActiveCollection` escolta
+          // `?active=` i encen el megaslide sense recarregar la pagina.
+          //
+          // Si el parametre JA hi es pero el megaslide pot estar tancat (s'ha
+          // tancat amb un clic, i la URL s'hi queda), cal recarregar: un
+          // `popstate` amb la mateixa URL no fa res.
+          if (u.searchParams.get('active') === COLLECCIO_MEGASLIDE) {
+            marc.setAttribute('src', `${u.pathname}${u.search}${u.hash}`);
+          } else {
+            u.searchParams.set('active', COLLECCIO_MEGASLIDE);
+            const desti = `${u.pathname}${u.search}${u.hash}`;
+            win.history.replaceState({}, '', desti);
+            win.dispatchEvent(new win.PopStateEvent('popstate'));
+          }
+        } else {
+          // TANCAR: treure el parametre NO el tanca (l'estic de dins es queda
+          // encès), aixi que es clica la capa que l'atrapa —la mateixa que
+          // tanca el megaslide quan es clica fora— i, si no hi es, es recarrega
+          // l'iframe sense el parametre.
+          const doc = win.document;
+          const capa = [...doc.querySelectorAll('div')].find((el) => typeof el.className === 'string' && el.className.includes('z-[9989]'));
+          if (capa) capa.click();
+          else {
+            u.searchParams.delete('active');
+            marc.setAttribute('src', `${u.pathname}${u.search}${u.hash}`);
+          }
+        }
+        fets += 1;
+      } catch {
+        try {
+          const u = new URL(marc.getAttribute('src') || '/', window.location.origin);
+          if (obrir) u.searchParams.set('active', COLLECCIO_MEGASLIDE);
+          else u.searchParams.delete('active');
+          marc.setAttribute('src', u.toString());
+          fets += 1;
+        } catch { /* ignore */ }
+      }
+    }
+    setMegaATotes(obrir);
+    return fets;
+  }, []);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -297,6 +365,35 @@ function ContactSheetPage() {
     }
     return map;
   }, [filtered]);
+
+  const capturaActives = useCallback(async () => {
+    if (capturant) return;
+    const paths = filtered.map((p) => p.path);
+    if (!paths.length) return;
+    setCapturant(true);
+    setCapturaMsg(`Capturant ${paths.length} pantalles… (cada una triga uns 5 s)`);
+    try {
+      const r = await fetch('/__dev/contact-sheet-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paths }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (j.ok) {
+        setCapturaMsg(`Fet: ${j.paths} pantalles en ${Math.round((j.ms || 0) / 1000)} s`);
+        const idx = await fetch(`/contact-sheet/index.json?t=${Date.now()}`, { cache: 'no-store' })
+          .then((x) => (x.ok ? x.json() : null))
+          .catch(() => null);
+        if (idx) { setSnapshotIndex(idx); setViewMode('snapshot'); }
+      } else {
+        setCapturaMsg(`Ha fallat: ${String(j.error || r.status).split('\n').slice(-1)[0].slice(0, 160)}`);
+      }
+    } catch (e) {
+      setCapturaMsg(`Ha fallat: ${String(e?.message || e).slice(0, 160)}`);
+    } finally {
+      setCapturant(false);
+    }
+  }, [capturant, filtered]);
 
   // First filtered page (in the order rendered, group by group).
   const referencePath = useMemo(() => {
@@ -493,7 +590,7 @@ function ContactSheetPage() {
             flex: '1 1 220px',
             minWidth: 180,
             padding: '6px 10px',
-            border: '1px solid #cbd5e1',
+            border: '1px solid hsl(var(--grey-line-strong))',
             borderRadius: 6,
             fontSize: 12,
           }}
@@ -523,7 +620,7 @@ function ContactSheetPage() {
           Carrega-ho tot
         </label>
 
-        <div style={{ display: 'flex', gap: 0, border: '1px solid #cbd5e1', borderRadius: 6, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', gap: 0, border: '1px solid hsl(var(--grey-line-strong))', borderRadius: 6, overflow: 'hidden' }}>
           {[
             { id: 'continuous', label: 'Seguides' },
             { id: 'per-category', label: 'Per categoria' },
@@ -547,7 +644,7 @@ function ContactSheetPage() {
         </div>
 
         <div
-          style={{ display: 'flex', gap: 0, border: '1px solid #cbd5e1', borderRadius: 6, overflow: 'hidden' }}
+          style={{ display: 'flex', gap: 0, border: '1px solid hsl(var(--grey-line-strong))', borderRadius: 6, overflow: 'hidden' }}
           title={
             snapshotIndex
               ? `Snapshots generats: ${new Date(snapshotIndex.generatedAt).toLocaleString()}`
@@ -580,6 +677,45 @@ function ContactSheetPage() {
           ))}
         </div>
 
+        <button
+          type="button"
+          onClick={() => canviaMegaslideIframes(!megaATotes)}
+          title="Obre (o tanca) el megaslide a totes les pantalles que es veuen, alhora"
+          style={{
+            fontSize: 11,
+            padding: '5px 10px',
+            borderRadius: 6,
+            border: '1px solid ' + (megaATotes ? '#2563EB' : 'hsl(var(--grey-line-strong))'),
+            background: megaATotes ? '#2563EB' : '#ffffff',
+            color: megaATotes ? '#ffffff' : '#475569',
+            cursor: 'pointer',
+          }}
+        >
+          {megaATotes ? 'Megaslide obert a totes' : 'Megaslide a totes'}
+        </button>
+
+        <button
+          type="button"
+          onClick={capturaActives}
+          disabled={capturant}
+          title="Captura (PNG) les pantalles que es veuen ara i les deixa al contact sheet"
+          style={{
+            fontSize: 11,
+            padding: '5px 10px',
+            borderRadius: 6,
+            border: '1px solid hsl(var(--grey-line-strong))',
+            background: capturant ? '#e2e8f0' : '#ffffff',
+            color: '#475569',
+            cursor: capturant ? 'wait' : 'pointer',
+          }}
+        >
+          {capturant ? 'Capturant…' : `Captura les ${filtered.length} actives`}
+        </button>
+
+        {capturaMsg ? (
+          <span style={{ fontSize: 11, color: '#475569' }}>{capturaMsg}</span>
+        ) : null}
+
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {GROUPS.map((g) => {
             const active = activeGroups.has(g);
@@ -592,7 +728,7 @@ function ContactSheetPage() {
                   fontSize: 11,
                   padding: '4px 8px',
                   borderRadius: 999,
-                  border: '1px solid ' + (active ? '#0f172a' : '#cbd5e1'),
+                  border: '1px solid ' + (active ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-line-strong))'),
                   background: active ? '#0f172a' : '#ffffff',
                   color: active ? '#ffffff' : '#475569',
                   cursor: 'pointer',

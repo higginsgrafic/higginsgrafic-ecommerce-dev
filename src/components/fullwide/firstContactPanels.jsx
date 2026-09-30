@@ -2,7 +2,10 @@ import { carrilPx } from '../../utils/layoutMetrics.js';
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import OptimizedImg from './OptimizedImg.jsx';
-import { ESTIL_CAIXA_BLOC } from './estilsBlocs.js';
+import { estilCaixaBloc, ALCADA_PASTILLA_SELECTOR_PX } from './estilsBlocs.js';
+import useDeviceLayout from '@/hooks/useDeviceLayout';
+import { esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
+import { tshirtSrc } from '@/utils/placeholders';
 
 /**
  * firstContactPanels
@@ -35,8 +38,8 @@ export function FirstContactStripeMockupPanel({
 
   const shirtSrc =
     variant === 'white'
-      ? '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp'
-      : '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp';
+      ? tshirtSrc('black')
+      : tshirtSrc('white');
 
   const overlayClass =
     selectedItem === 'The Phoenix'
@@ -87,7 +90,18 @@ export function FirstContactDibuix00Buttons({
   showMulti = true,
   selectedVariant,
   sliderInset = 5,
+  // EL COIXI DE COSTAT I L'ALCADA DE LA PASTILLA NOME S A LA COMPOSICIO ESTRETA
+  // (02/10/2026). L'amo: «Al selector b/c/n, també. 10 px per banda», «Que sigui
+  // la mateixa mida que la pastilla de la tira de col·leccions» i, tot seguit,
+  // «Tot això que hem fet no ha d'afectar les vistes 1920 i 1440». O sigui: a
+  // 1024-1366 el coixi es de 10 px i la pastilla fa l'alcada declarada; a la
+  // resta de mides tot queda com era (coixi de 5 i alcada de la cella menys 2 x
+  // 5). Es decideix amb `esComposicioEstretaMegaslide`, la mateixa bandera que fa
+  // servir la franja de colleccions.
   sliderSideInset = null,
+  // Amplada i alcada manades (vegeu l'estil del contenidor).
+  ampladaPx = null,
+  alcadaPx = null,
   compact = false,
   // LA FORMA ES D'EN QUI EL POSA, I LES DUES PAGINES NO LA VOLEN IGUAL
   // (26/09/2026, ho ha dit l'amo: «És el mateix selector? Han de ser diferents
@@ -110,6 +124,18 @@ export function FirstContactDibuix00Buttons({
   // dues files de dibuixos (mesurat: botons a 139 i graella a 130).
   senseMargeDalt = false,
 }) {
+  // La banda de la composicio estreta (1024-1366): nome s alla la pastilla va amb
+  // 10 px de coixi a cada costat i amb l'alcada declarada. A la resta de mides
+  // tot queda com era (vegeu l'estil de la pastilla). EL HOOK VA A DALT DE TOT:
+  // aquest component te un retorn anticipat mes avall (`if (!buttons.length)`) i
+  // un hook desprès d'un retorn es un hook condicional.
+  const { isLandscapeTablet: esApaissada } = useDeviceLayout();
+  const composicioEstreta = esComposicioEstretaMegaslide({
+    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+    isLandscapeTablet: esApaissada,
+  });
+  const coixiCostat = sliderSideInset ?? (composicioEstreta ? 10 : sliderInset);
+
   // Els noms dels acabats són els catalans (Blanc/Color/Negre) i es mostren en
   // majúscules; la resta de la botiga també els anomena així.
   // ELS TRES ACABATS SURTEN SEMPRE, I ELS QUE NO TOCA ES MOSTREN DESACTIVATS
@@ -177,10 +203,21 @@ export function FirstContactDibuix00Buttons({
       //
       // Va alineat a l'ESQUERRA a posta (sense `mx-auto`): a la pagina 2 el
       // selector arrenca on arrenca el logo del header, i aixo no ha de canviar.
-      className={`relative ${senseMargeDalt ? '' : 'mt-2'} ${format === 'rectangle' ? 'aspect-[1/2] w-1/2' : 'aspect-square w-full'}`}
+      className={`relative ${senseMargeDalt ? '' : 'mt-2'} ${ampladaPx != null ? '' : (format === 'rectangle' ? 'aspect-[1/2] w-1/2' : 'aspect-square w-full')}`}
       data-stripe-buttonbar="bn"
       data-stripe-buttonbar-format={format}
       style={{
+        // L'AMPLADA MANADA (02/10/2026): la pagina 2 la fa servir perque la
+        // pastilla del B/C/N acabi on acaba la de la franja de colleccions. Amb
+        // `ampladaPx` s'anul·la la forma (`w-1/2` + `aspect`), que lligava
+        // amplada i alcada, i l'alçada arriba per `alcadaPx`.
+        ...(ampladaPx != null
+          ? {
+            width: typeof ampladaPx === 'number' ? `${ampladaPx}px` : ampladaPx,
+            flex: '0 0 auto',
+            ...(alcadaPx != null ? { height: typeof alcadaPx === 'number' ? `${alcadaPx}px` : alcadaPx } : null),
+          }
+          : null),
         // LE REQUADRE DE FONS ORIGINAL (24/09/2026). El selector va néixer amb
         // fons gris i contorn, i el commit `3f68cf2` (7/09) els va treure
         // («treu fons gris, contorn selector»): va quedar el slider blanc sol,
@@ -190,7 +227,22 @@ export function FirstContactDibuix00Buttons({
         // DES DEL 28/09/2026 la caixa es compartida i porta ombra
         // (`ESTIL_CAIXA_BLOC_SELECTOR`): el bloc de fletxes de la pagina 2 fa
         // servir la mateixa.
-        ...ESTIL_CAIXA_BLOC,
+        ...estilCaixaBloc(composicioEstreta),
+        // LA VORA NO HA DE MENJAR MIDA A LA PASTILLA (02/10/2026). L'amo: «No
+        // m'he explicat bé. Reverteix els dos canvis de mida de la pastilla
+        // b/c/n». Quan el contorn va tornar a les mides de sempre, la pastilla
+        // va encongir-se 2 px d'amplada i 0,67 px d'alçada (a 1920 passava de
+        // 49,5 x 29,66 a 47,5 x 28,98): la pastilla es absoluta i els seus
+        // percentatges es resolen contra el PADDING BOX de la caixa, que amb
+        // `box-sizing: border-box` fa 2 px menys d'ample i 2 px menys d'alt si
+        // la caixa porta vora. La vora pintada —una ombra interior d'1 px— ocupa
+        // exactament els mateixos píxels que la vora de debò (ni la caixa ni el
+        // contorn es mouen ni un px), pero no en menja cap: la pastilla torna a
+        // fer la mida que feia sense contorn.
+        ...(composicioEstreta ? null : {
+          border: 'none',
+          boxShadow: 'inset 0 0 0 1px hsl(var(--grey-line-strong)), 0 1px 3px rgba(0,0,0,0.12)',
+        }),
         // LA PASTILLA ES QUI REP ELS CLICS (24/09/2026): el contenidor del
         // selector (a MegaSlidePagina2) fa el DOBLE d'ample que la pastilla, i
         // la meitat que sobra trepitja les primeres caselles del carrusel. El
@@ -239,7 +291,7 @@ export function FirstContactDibuix00Buttons({
                 // gris fluix i el cursor de prohibida), pero el nom s'hi veu.
                 // LA PARAULA COLOR, TAMBE EN NEGRE (28/09/2026, ho ha demanat
                 // l'amo): es l'acabat de colors i es sempre fosca, triat o no.
-                color: desactivat ? '#C4C8CE' : ((selectedKey === btn.key || btn.key === 'color') ? '#1A1A1A' : '#6B7280'),
+                color: desactivat ? 'hsl(var(--grey-muted))' : ((selectedKey === btn.key || btn.key === 'color') ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-ink-soft))'),
                 pointerEvents: 'none',
                 lineHeight: 1,
                 transition: 'color 200ms ease',
@@ -254,13 +306,31 @@ export function FirstContactDibuix00Buttons({
         aria-hidden="true"
         style={{
           position: 'absolute',
-          left: `${sliderSideInset ?? sliderInset}px`,
-          right: `${sliderSideInset ?? sliderInset}px`,
-          top: `calc(${sliderTopPct}% + ${sliderInset}px)`,
-          height: `calc(${sliderHeightPct}% - ${sliderInset * 2}px)`,
-          backgroundColor: '#FFFFFF',
+          // A LA COMPOSICIO ESTRETA LA PASTILLA ARRENCA A LA VORA DEL CARRIL
+          // (02/10/2026, correccio de l'amo: «t'he dit que alineessis al final de
+          // la pastilla de la tira de col·leccions en la posicio First Contact,
+          // pero hauria d'haver dit al principi de la pill»). Com que la caixa fa
+          // l'amplada d'aquella casa mes el coixi de la dreta, la pastilla queda
+          // EXACTAMENT com la de la franja: la mateixa amplada i les dues vores
+          // (l'esquerra a la vora del carril i la dreta al coixi de la caixa).
+          left: `${composicioEstreta ? 0 : coixiCostat}px`,
+          right: `${coixiCostat}px`,
+          // A la composicio estreta la pastilla fa la MATEIXA MIDA que la de la
+          // franja de colleccions (alcada declarada, centrada dins la cella); a
+          // la resta de mides, com sempre: la cella menys 2 x inset.
+          top: composicioEstreta
+            ? `calc(${sliderTopPct}% + ${sliderHeightPct / 2}% - ${ALCADA_PASTILLA_SELECTOR_PX / 2}px)`
+            : `calc(${sliderTopPct}% + ${sliderInset}px)`,
+          height: composicioEstreta
+            ? `${ALCADA_PASTILLA_SELECTOR_PX}px`
+            : `calc(${sliderHeightPct}% - ${sliderInset * 2}px)`,
+          backgroundColor: 'hsl(var(--grey-paper))',
           borderRadius: '3px',
-          border: '1px solid #D1D5DB',
+          // SENSE CONTORN nome s A LA COMPOSICIO ESTRETA (02/10/2026, «Treu-los el
+          // contorn, també» + «Recupera el contorn a les versions 1920/1440»). A
+          // un bloc absolut la vora no mou res, o sigui que treure-la o posar-la
+          // no canvia cap mida.
+          border: composicioEstreta ? 'none' : '1px solid hsl(var(--grey-line-strong))',
           boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
           boxSizing: 'border-box',
           pointerEvents: 'none',

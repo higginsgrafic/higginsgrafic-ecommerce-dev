@@ -37,7 +37,7 @@ export function MobileMockupCarousel({ colors, selectedColor, onSelectColor }) {
             borderRadius: '12px',
             overflow: 'hidden',
             boxShadow: selectedColor === c.slug
-              ? '0 0 0 3px #1a1a1a, 0 4px 12px rgba(0,0,0,0.15)'
+              ? '0 0 0 3px hsl(var(--grey-ink-strong)), 0 4px 12px rgba(0,0,0,0.15)'
               : '0 2px 8px rgba(0,0,0,0.1)',
             transition: 'box-shadow 200ms ease',
           }}

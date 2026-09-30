@@ -30,7 +30,7 @@ const UserLoyaltyShirtProgress = ({ current = 4, threshold = 10, rewardsAvailabl
       alignItems: 'center',
       justifyContent: 'flex-start',
       paddingTop: '7px',
-      color: '#475059',
+      color: 'hsl(var(--grey-ink-2))',
       fontFamily: 'Roboto Condensed, sans-serif',
     }}>
       <div style={{
@@ -39,7 +39,7 @@ const UserLoyaltyShirtProgress = ({ current = 4, threshold = 10, rewardsAvailabl
         fontWeight: 500,
         textTransform: 'uppercase',
         letterSpacing: '0.5px',
-        color: '#475059',
+        color: 'hsl(var(--grey-ink-2))',
         lineHeight: 1,
         marginBottom: '7px',
       }}>
@@ -50,7 +50,7 @@ const UserLoyaltyShirtProgress = ({ current = 4, threshold = 10, rewardsAvailabl
         {LEVELS.map((level) => {
           const filled = level <= safeCurrent;
           const isTop = level === 10;
-          const fill = filled ? (complete ? '#2F61B2' : '#078BEA') : '#748596';
+          const fill = filled ? (complete ? '#2F61B2' : '#078BEA') : 'hsl(var(--grey-ink-soft))';
           const stroke = filled ? '#0BA2FF' : '#0F1720';
           const textColor = filled ? '#FFE600' : '#C6D0DB';
           return (
@@ -97,7 +97,7 @@ const UserLoyaltyShirtProgress = ({ current = 4, threshold = 10, rewardsAvailabl
         fontSize: '10.5pt',
         lineHeight: 1.15,
         textAlign: 'center',
-        color: '#475059',
+        color: 'hsl(var(--grey-ink-2))',
       }}>
         {complete
           ? 'Recompensa desbloquejada per aplicar a la propera comanda.'

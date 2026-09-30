@@ -7,8 +7,9 @@ import MobileFooter from '@/components/MobileFooter';
 import { useCart } from '@/contexts/CartContext';
 
 const OFFICIAL_COLORS = [
-  'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
-  'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
+  'white', 'light-blue', 'royal', 'navy', 'irish-green', 'military-green',
+  'daisy', 'gold', 'red', 'dark-chocolate', 'ice-grey', 'rs-sport-grey',
+  'charcoal', 'black',
 ];
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -30,7 +31,7 @@ export default function PdpPage() {
 
   if (!product) {
     return (
-      <div style={{ padding: '90px 16px 60px', textAlign: 'center', color: '#475059' }}>
+      <div style={{ padding: '90px 16px 60px', textAlign: 'center', color: 'hsl(var(--grey-ink-2))' }}>
         Producte no trobat.
       </div>
     );
@@ -100,7 +101,7 @@ export default function PdpPage() {
         {/* Imatge amb fons gris + miniatures verticals a l'esquerra (com desktop) */}
         <div style={{
           position: 'relative',
-          background: '#fbfcfd',
+          background: 'hsl(var(--grey-paper))',
           borderRadius: '4px',
           display: 'flex',
           flexDirection: 'row',
@@ -156,7 +157,7 @@ export default function PdpPage() {
                         top: '4px',
                         bottom: '4px',
                         width: '3px',
-                        background: '#0b0d10',
+                        background: 'hsl(var(--grey-ink-strong))',
                       }}
                     />
                   )}
@@ -223,7 +224,7 @@ export default function PdpPage() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.003em',
                 lineHeight: 1,
-                color: '#475059',
+                color: 'hsl(var(--grey-ink-2))',
                 margin: '0 0 8px 0',
                 textAlign: 'center',
               }}>
@@ -260,7 +261,7 @@ export default function PdpPage() {
                 fontFamily: 'Oswald, sans-serif',
                 fontWeight: 200,
                 fontSize: '24px',
-                color: '#475059',
+                color: 'hsl(var(--grey-ink-2))',
                 lineHeight: 1,
                 textAlign: 'center',
               }}>
@@ -278,7 +279,7 @@ export default function PdpPage() {
               bottom: '72px',
               transform: 'none',
               background: 'rgba(255,255,255,0.8)',
-              border: '1px solid #e5e7eb',
+              border: '1px solid hsl(var(--grey-line))',
               borderRadius: '50%',
               width: '54px',
               height: '54px',
@@ -302,7 +303,7 @@ export default function PdpPage() {
               bottom: '8px',
               transform: 'none',
               background: 'rgba(255,255,255,0.8)',
-              border: '1px solid #e5e7eb',
+              border: '1px solid hsl(var(--grey-line))',
               borderRadius: '50%',
               width: '54px',
               height: '54px',
@@ -329,10 +330,10 @@ export default function PdpPage() {
           <div style={{ marginBottom: '10px', width: '75%', margin: '0 auto 10px auto' }}>
             <div style={{
               display: 'flex',
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'hsl(var(--grey-paper-soft))',
               padding: '2px',
               borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-              border: '1px solid #e5e7eb',
+              border: '1px solid hsl(var(--grey-line))',
               width: '100%',
               height: '44px',
               boxSizing: 'border-box',
@@ -352,8 +353,8 @@ export default function PdpPage() {
                       letterSpacing: '0em',
                       lineHeight: 1,
                       textTransform: 'none',
-                      color: isSelected ? '#111827' : '#9ca3af',
-                      backgroundColor: isSelected ? '#ffffff' : 'transparent',
+                      color: isSelected ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-muted-2))',
+                      backgroundColor: isSelected ? 'hsl(var(--grey-paper))' : 'transparent',
                       border: 'none',
                       borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
                       cursor: 'pointer',
@@ -375,10 +376,10 @@ export default function PdpPage() {
           <div style={{ width: '75%', margin: '0 auto 10px auto' }}>
             <div style={{
               display: 'flex',
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'hsl(var(--grey-paper-soft))',
               padding: '2px',
               borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-              border: '1px solid #e5e7eb',
+              border: '1px solid hsl(var(--grey-line))',
               width: '100%',
               height: '44px',
               boxSizing: 'border-box',
@@ -400,8 +401,8 @@ export default function PdpPage() {
                       letterSpacing: '0em',
                       lineHeight: 1,
                       textTransform: 'uppercase',
-                      color: !isAvailable ? '#d1d5db' : (isActive ? '#111827' : '#9ca3af'),
-                      backgroundColor: isActive ? '#ffffff' : 'transparent',
+                      color: !isAvailable ? 'hsl(var(--grey-muted))' : (isActive ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-muted-2))'),
+                      backgroundColor: isActive ? 'hsl(var(--grey-paper))' : 'transparent',
                       border: 'none',
                       borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
                       cursor: isAvailable ? 'pointer' : 'not-allowed',
@@ -425,12 +426,12 @@ export default function PdpPage() {
             type="button"
             aria-label="Afegeix al cistell"
             onClick={handleAddToCart}
-            className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
+            className="bg-muted text-[hsl(var(--grey-ink-2))] transition-all duration-200 hover:bg-paper hover:text-[hsl(var(--grey-ink-strong))] hover:shadow-sm active:scale-95"
             style={{
               width: '75%',
               margin: '0 auto 24px auto',
               height: '44px',
-              border: '1px solid #e5e7eb',
+              border: '1px solid hsl(var(--grey-line))',
               borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
               padding: '0 16px',
               cursor: 'pointer',
@@ -440,7 +441,7 @@ export default function PdpPage() {
               letterSpacing: '0.04em',
               lineHeight: 1,
               textTransform: 'uppercase',
-              color: '#475059',
+              color: 'hsl(var(--grey-ink-2))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -476,7 +477,7 @@ export default function PdpPage() {
           {/* Especificacions (columna 1 de desktop, a sota) */}
           <div style={{
             paddingTop: '16px',
-            borderTop: '1px solid #e5e7eb',
+            borderTop: '1px solid hsl(var(--grey-line))',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -489,7 +490,7 @@ export default function PdpPage() {
               lineHeight: 1,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
-              color: '#475059',
+              color: 'hsl(var(--grey-ink-2))',
               textAlign: 'left',
             }}>
               ESPECIFICACIONS
@@ -523,7 +524,7 @@ export default function PdpPage() {
                     fontWeight: 700,
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
-                    color: '#111827',
+                    color: 'hsl(var(--grey-ink-strong))',
                     lineHeight: 1.2,
                   }}>
                     {label}
@@ -539,7 +540,7 @@ export default function PdpPage() {
       {/* Separador */}
       <div style={{
         height: '1px',
-        backgroundColor: '#e5e7eb',
+        backgroundColor: 'hsl(var(--grey-paper-tint))',
         margin: '0 16px',
       }} />
 

@@ -15,11 +15,12 @@ import { TDP_MIDES_INTERIOR, COLLECTION_BG_SRC, HOME_COLLECCIO_MARGIN_PX } from 
 import { esTauletaApaisada } from '@/utils/layoutMetrics';
 import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa } from '@/utils/tdpMida';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const HERO_SLIDES = [
   {
     id: 'first-contact',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.webp',
+    imageSrc: tshirtSrc('royal'),
     imageAlt: 'Samarreta de la col·lecció First Contact',
     kicker: 'First Contact',
     headline: 'Ciència-ficció per mirar cap a les estrelles.',
@@ -28,7 +29,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'the-human-inside',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp',
+    imageSrc: tshirtSrc('black'),
     imageAlt: 'Samarreta de la col·lecció The Human Inside',
     kicker: 'The Human Inside',
     headline: 'Robots, identitat i preguntes incòmodes.',
@@ -37,7 +38,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'austen',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_cardinal-red_gpr-4-0_front.webp',
+    imageSrc: tshirtSrc('red'),
     imageAlt: 'Samarreta de la col·lecció Austen',
     kicker: 'Austen',
     headline: 'Diguis el que diguis, fes-ho amb elegància.',
@@ -46,7 +47,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'cube',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_purple_gpr-4-0_front.webp',
+    imageSrc: tshirtSrc('charcoal'),
     imageAlt: 'Samarreta de la col·lecció Cube',
     kicker: 'Cube',
     headline: 'Tots som estranys a ulls nostres.',
@@ -55,7 +56,7 @@ const HERO_SLIDES = [
   },
   {
     id: 'miscellania',
-    imageSrc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.webp',
+    imageSrc: tshirtSrc('dark-chocolate'),
     imageAlt: 'Samarreta de la col·lecció Miscel·lània',
     kicker: 'Miscel·lània',
     headline: 'Per a qui tria el seu propi camí.',
@@ -557,9 +558,9 @@ function Home() {
               cursor: 'pointer',
               backdropFilter: 'blur(4px)',
             }}
-            className="hover:bg-white transition-colors"
+            className="hover:bg-paper transition-colors"
           >
-            <Shuffle size={50} color="#475059" />
+            <Shuffle size={50} color="hsl(var(--grey-ink-2))" />
           </button>
           {heroPlans.current.map((s, i) => {
             const prev = heroPlans.prev ? heroPlans.prev[i] : null;
@@ -613,7 +614,6 @@ function Home() {
                           'austen/unsociable-and-taciturn': isTablet ? 3 : 2.4,
                           'austen/i-admire-and-love-you': isTablet ? 6 : 12.16,
                           'austen/you-have-bewitched-me': isTablet ? 3 : 2.4,
-                          'austen/you-must-allow-me': isTablet ? 12.8 : 12.16,
                           'austen/lfmd/blue-solid': 19,
                           'austen/lfmd/fuchsia-solid': 19,
                           'austen/lfmd/red-solid': 19,
@@ -638,7 +638,7 @@ function Home() {
                     transform: 'translateY(-50%)',
                     zIndex: 2,
                     paddingLeft: '24px',
-                    color: '#475059',
+                    color: 'hsl(var(--grey-ink-2))',
                   }}
                 >
                   {band.collectionName && (() => {
@@ -675,7 +675,7 @@ function Home() {
                   display: 'flex',
                   alignItems: 'center',
                   overflow: 'hidden',
-                  background: '#FFFFFF',
+                  background: 'hsl(var(--grey-paper))',
                   textDecoration: 'none',
                 }}
                 className="group hover:opacity-90 transition-opacity"

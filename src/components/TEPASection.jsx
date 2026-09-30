@@ -9,9 +9,9 @@ function TEPASection({
 }) {
   return (
     <div className={containerClassName}>
-      <div className={`border-t border-gray-200 pt-12 pb-12 ${className}`.trim()}>
+      <div className={`border-t border-line pt-12 pb-12 ${className}`.trim()}>
         {title ? (
-          <h2 className="font-roboto text-[15px] font-normal mb-6" style={{ color: '#141414' }}>
+          <h2 className="font-roboto text-[15px] font-normal mb-6" style={{ color: 'hsl(var(--grey-ink-strong))' }}>
             {title}
           </h2>
         ) : null}

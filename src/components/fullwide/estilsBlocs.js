@@ -30,20 +30,69 @@
  *    pujava 2 px). Amb la vora pintada, la caixa es veu igual i la composicio no
  *    es toca.
  */
-export const ESTIL_CAIXA_BLOC = {
-  boxSizing: 'border-box',
-  border: '1px solid #D1D5DB',
-  borderRadius: '5.3px',
-  backgroundColor: '#F3F4F6',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-  overflow: 'hidden',
-};
+/**
+ * LES DUES CAIXES, AMB LA VORA I EL FONS NOME S FORA DE LA COMPOSICIO ESTRETA
+ * -----------------------------------------------------------------------------
+ * En Marc va demanar de treure'ls el fons, el contorn i l'ombra («Treu-los el
+ * fons als selectors», «Treu-los el contorn, també») i despres va concretar que
+ * allo nome s valia a la composicio de 1024-1366: «Recupera el contorn a les
+ * versions 1920/1440». O sigui que la caixa te dues cares:
+ *
+ *   - a 1024-1366: nome s el radi i el retall (ni fons, ni vora, ni ombra);
+ *   - a la resta (1920, 1440, ...): la caixa de sempre, amb el fons `paper-soft`,
+ *     la vora d'1 px i l'ombra.
+ *
+ * Es una FUNCIO i no una constant perque la decisio es de qui la pinta, que es
+ * qui sap la mida de la finestra.
+ */
+export function estilCaixaBloc(composicioEstreta = false) {
+  return {
+    boxSizing: 'border-box',
+    borderRadius: '5.3px',
+    ...(composicioEstreta ? null : {
+      border: '1px solid hsl(var(--grey-line-strong))',
+      backgroundColor: 'hsl(var(--grey-paper-soft))',
+    }),
+    boxShadow: composicioEstreta ? 'none' : '0 1px 3px rgba(0,0,0,0.12)',
+    overflow: 'hidden',
+  };
+}
 
-export const ESTIL_CAIXA_BLOC_ALCADA_AUTO = {
-  boxSizing: 'border-box',
-  borderRadius: '5.3px',
-  backgroundColor: '#F3F4F6',
-  // La vora, pintada: `0 0 0 1px` fa la ratlla sense ocupar lloc.
-  boxShadow: '0 0 0 1px #D1D5DB, 0 1px 3px rgba(0,0,0,0.12)',
-  overflow: 'hidden',
-};
+/**
+ * La mateixa caixa, pero amb la vora pintada com una ombra de 1 px i sense
+ * `border`: es la del bloc de la pagina 1, que no te alcada escrita (amb una
+ * vora de debò els seus fills s'encongien 2 px).
+ */
+export function estilCaixaBlocAlcadaAuto(composicioEstreta = false) {
+  return {
+    boxSizing: 'border-box',
+    borderRadius: '5.3px',
+    ...(composicioEstreta ? null : { backgroundColor: 'hsl(var(--grey-paper-soft))' }),
+    boxShadow: composicioEstreta
+      ? 'none'
+      : '0 0 0 1px hsl(var(--grey-muted)), 0 1px 3px rgba(0,0,0,0.12)',
+    overflow: 'hidden',
+  };
+}
+
+/**
+ * L'ALÇADA DE LA PASTILLA DELS SELECTORS (02/10/2026)
+ * -----------------------------------------------------------------------------
+ * Es la mateixa per a tots: la de la franja de colleccions (que fa tota l'alçada
+ * de la franja) i la del selector B/C/N. Ho va demanar l'amo: «Que sigui la
+ * mateixa mida que la pastilla de la tira de col·leccions».
+ *
+ * Surt de la franja: la seva alçada es la caixa blanca (22,59) mes el coixi de
+ * dalt i el de baix (2 + 1 px per costat, els que abans eren la vora) = 28,59.
+ */
+export const ALCADA_PASTILLA_SELECTOR_PX = 28.59;
+
+/**
+ * EL COIXI DE COSTAT DE LA PASTILLA DE LA FRANJA DE COLLECCIONS (02/10/2026)
+ * -----------------------------------------------------------------------------
+ * Els 10 px que l'amo va demanar per banda («Deixa-li, 10 px per banda, com a
+ * minim»). Viu aqui perque el selector B/C/N tambe el necessita: la seva
+ * pastilla ha d'acabar on acaba la de la franja amb FIRST CONTACT actiu, i per
+ * aixo la caixa del selector fa l'amplada d'aquella casa mes aquest coixi.
+ */
+export const COIX_ENLLAC_COLLECCIONS_PX = 10;

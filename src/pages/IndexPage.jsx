@@ -131,18 +131,18 @@ export default function IndexPage() {
 
   const TextInput = ({ label, path, value }) => (
     <div className="flex items-start gap-2 py-1.5">
-      <label className="text-xs text-gray-600 w-32 flex-shrink-0 pt-1.5">{label}</label>
+      <label className="text-xs text-ink-2 w-32 flex-shrink-0 pt-1.5">{label}</label>
       <input
         type="text"
         value={value || ''}
         onChange={(e) => updateText(path, e.target.value)}
-        className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+        className="flex-1 px-2 py-1 text-sm border border-line rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
       />
     </div>
   );
 
   const SectionTitle = ({ children }) => (
-    <h3 className="text-sm font-bold text-gray-800 mb-2 pb-1 border-b border-gray-200">{children}</h3>
+    <h3 className="text-sm font-bold text-ink mb-2 pb-1 border-b border-line">{children}</h3>
   );
 
   const Column = ({ children, className = '' }) => (
@@ -150,7 +150,7 @@ export default function IndexPage() {
   );
 
   const MainSectionTitle = ({ children }) => (
-    <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-gray-300">{children}</h2>
+    <h2 className="text-2xl font-bold text-ink-strong mb-6 pb-3 border-b-2 border-line-strong">{children}</h2>
   );
 
   const sections = {
@@ -159,26 +159,26 @@ export default function IndexPage() {
       render: () => (
         <div className="space-y-4">
           {Object.entries(pageTree).map(([key, category]) => (
-            <div key={key} className="border border-gray-200 rounded-lg overflow-hidden">
-              <div className="p-3 bg-gray-50">
+            <div key={key} className="border border-line rounded-lg overflow-hidden">
+              <div className="p-3 bg-paper-soft">
                 <div className="flex items-center gap-2">
                   <Folder className="w-5 h-5 text-blue-600" />
-                  <span className="font-semibold text-gray-900">{category.label}</span>
-                  <span className="text-xs text-gray-500">({category.items.length})</span>
+                  <span className="font-semibold text-ink-strong">{category.label}</span>
+                  <span className="text-xs text-ink-soft">({category.items.length})</span>
                 </div>
               </div>
-              <div className="p-3 bg-white space-y-1">
+              <div className="p-3 bg-paper space-y-1">
                 {category.items.map((item, index) => (
                   item.isFolder ? (
                     <div key={index} className="ml-6 space-y-1">
-                      <div className="flex items-center gap-2 py-1.5 text-sm font-medium text-gray-700">
+                      <div className="flex items-center gap-2 py-1.5 text-sm font-medium text-ink-2">
                         <Folder className="w-4 h-4 text-amber-600" />
                         <span>{item.label}</span>
                       </div>
                       <div className="ml-6 space-y-1">
                         {item.items.map((subItem, subIndex) => (
-                          <div key={subIndex} className="flex items-center gap-2 py-1 text-sm text-gray-600 hover:text-gray-900">
-                            <File className="w-4 h-4 text-gray-400" />
+                          <div key={subIndex} className="flex items-center gap-2 py-1 text-sm text-ink-2 hover:text-ink-strong">
+                            <File className="w-4 h-4 text-muted-2" />
                             <span className="flex-1">{subItem.label}</span>
                             {subItem.status && (
                               <span className={`text-xs px-2 py-0.5 rounded font-medium ${
@@ -192,13 +192,13 @@ export default function IndexPage() {
                             {subItem.path && subItem.path !== '—' && (
                               <Link
                                 to={subItem.path}
-                                className="text-xs bg-gray-100 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-colors font-mono"
+                                className="text-xs bg-paper-soft px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-colors font-mono"
                               >
                                 {subItem.path}
                               </Link>
                             )}
                             {subItem.path === '—' && (
-                              <span className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">
+                              <span className="text-xs bg-paper-soft px-2 py-0.5 rounded text-ink-soft font-mono">
                                 —
                               </span>
                             )}
@@ -207,8 +207,8 @@ export default function IndexPage() {
                       </div>
                     </div>
                   ) : (
-                    <div key={index} className="flex items-center gap-2 py-1.5 text-sm text-gray-600 hover:text-gray-900 ml-6">
-                      <File className="w-4 h-4 text-gray-400" />
+                    <div key={index} className="flex items-center gap-2 py-1.5 text-sm text-ink-2 hover:text-ink-strong ml-6">
+                      <File className="w-4 h-4 text-muted-2" />
                       <span className="flex-1">{item.label}</span>
                       {item.status && (
                         <span className={`text-xs px-2 py-0.5 rounded font-medium ${
@@ -222,13 +222,13 @@ export default function IndexPage() {
                       {item.path && item.path !== '—' && (
                         <Link
                           to={item.path}
-                          className="text-xs bg-gray-100 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-colors font-mono"
+                          className="text-xs bg-paper-soft px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-colors font-mono"
                         >
                           {item.path}
                         </Link>
                       )}
                       {item.path === '—' && (
-                        <span className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">
+                        <span className="text-xs bg-paper-soft px-2 py-0.5 rounded text-ink-soft font-mono">
                           —
                         </span>
                       )}
@@ -534,18 +534,18 @@ export default function IndexPage() {
     <>
       <SEO title="Índex de Textos" description="Edita tots els textos del web" />
 
-      <div className="min-h-screen bg-gray-50">
-        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
+      <div className="min-h-screen bg-paper-soft">
+        <div className="sticky top-0 z-10 bg-paper border-b border-line shadow-sm">
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-gray-700" />
-                <h1 className="text-xl font-bold text-gray-900">Índex de Textos</h1>
+                <FileText className="w-6 h-6 text-ink-2" />
+                <h1 className="text-xl font-bold text-ink-strong">Índex de Textos</h1>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-ink-2 bg-paper border border-line-strong rounded-md hover:bg-paper-soft transition-colors"
                 >
                   <RotateCcw className="w-4 h-4" />
                   Restaurar
@@ -553,7 +553,7 @@ export default function IndexPage() {
                 <button
                   onClick={handleSave}
                   disabled={!hasChanges}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-paper bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   Guardar
@@ -564,13 +564,13 @@ export default function IndexPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <Tabs.Root defaultValue="paginas" className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <Tabs.List className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+          <Tabs.Root defaultValue="paginas" className="bg-paper rounded-lg shadow-sm border border-line overflow-hidden">
+            <Tabs.List className="flex border-b border-line bg-paper-soft overflow-x-auto">
               {Object.entries(sections).map(([key, section]) => (
                 <Tabs.Trigger
                   key={key}
                   value={key}
-                  className="px-6 py-3 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white whitespace-nowrap"
+                  className="px-6 py-3 text-sm font-medium text-ink-2 hover:text-ink-strong hover:bg-paper-soft transition-colors border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white whitespace-nowrap"
                 >
                   {section.title}
                 </Tabs.Trigger>

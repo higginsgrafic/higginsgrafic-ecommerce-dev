@@ -41,10 +41,10 @@ export default function DevLinksPage() {
 
   const badgeClassByTag = {
     ADMIN: 'border-orange-500/30 bg-orange-500/10 text-orange-800',
-    DEMO: 'border-[#337AC6]/35 bg-[#337AC6]/10 text-[#0f172a]',
+    DEMO: 'border-[#337AC6]/35 bg-[#337AC6]/10 text-[hsl(var(--grey-ink-strong))]',
     DEV: 'border-violet-500/30 bg-violet-500/10 text-violet-800',
     TMP: 'border-amber-500/30 bg-amber-500/10 text-amber-800',
-    UTIL: 'border-slate-500/25 bg-slate-500/10 text-slate-800',
+    UTIL: 'border-ink-soft/25 bg-ink-soft/10 text-ink',
     WIP: 'border-red-500/30 bg-red-500/10 text-red-800',
     LEGACY: 'border-border bg-muted text-muted-foreground',
   };

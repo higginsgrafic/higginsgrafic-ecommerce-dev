@@ -30,7 +30,7 @@ export default function RespescaTitle({ leftPx = 0, title = 'també et pot inter
           lineHeight: 1,
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
-          color: '#475059',
+          color: 'hsl(var(--grey-ink-2))',
         }}
       >
         {title}

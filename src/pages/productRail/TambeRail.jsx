@@ -3,22 +3,23 @@ import RespescaTitle from '@/pages/productRail/RespescaTitle';
 import ProductCard from '@/pages/productRail/ProductCard';
 import { computeSiteFrame } from '@/components/layout/SiteFrame';
 import { getSafeBelt } from '@/utils/layoutMetrics';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const DEFAULT_IMAGES = [
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_daisy_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_gold_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_irish-green_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_kiwi_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_light-blue_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_light-pink_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_military-green_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_navy_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_purple_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_red_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.webp',
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp',
+  tshirtSrc('white'),
+  tshirtSrc('light-blue'),
+  tshirtSrc('royal'),
+  tshirtSrc('navy'),
+  tshirtSrc('irish-green'),
+  tshirtSrc('military-green'),
+  tshirtSrc('daisy'),
+  tshirtSrc('gold'),
+  tshirtSrc('red'),
+  tshirtSrc('dark-chocolate'),
+  tshirtSrc('ice-grey'),
+  tshirtSrc('rs-sport-grey'),
+  tshirtSrc('charcoal'),
+  tshirtSrc('black'),
 ];
 
 const CARD_W = 397;
@@ -334,7 +335,7 @@ export default function TambeRail({
   const dynamicTileStyle = useMemo(() => ({
     width: `${renderedCardW}px`,
     height: `${renderedCardW}px`,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'hsl(var(--grey-paper-soft))',
     position: 'relative',
     boxShadow: 'none',
     padding: `${imgPaddingPx}px`,

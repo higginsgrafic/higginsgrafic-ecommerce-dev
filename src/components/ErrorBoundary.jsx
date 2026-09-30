@@ -209,7 +209,7 @@ class ErrorBoundary extends React.Component {
               fontFamily: "'Roboto Condensed', sans-serif",
               fontSize: '32.8125px',
               fontWeight: 500,
-              color: '#475059',
+              color: 'hsl(var(--grey-ink-2))',
               margin: '0 0 8px 0',
             }}>
               Alguna cosa no va alhora
@@ -218,7 +218,7 @@ class ErrorBoundary extends React.Component {
             <div style={{
               width: '100%',
               textAlign: 'center',
-              color: '#98A2B4',
+              color: 'hsl(var(--grey-muted))',
               fontSize: '20.78125px',
               fontWeight: 400,
               margin: '0 0 24px 0',
@@ -237,16 +237,16 @@ class ErrorBoundary extends React.Component {
               <div style={{ marginBottom: '24px' }}>
                 <details style={{
                   textAlign: 'left',
-                  background: '#F4F6F8',
+                  background: 'hsl(var(--grey-paper-soft))',
                   padding: '12px',
                   borderRadius: '6px',
                   fontSize: '13px',
                   maxHeight: '40vh',
                   overflow: 'auto',
-                  color: '#475059',
-                  border: '1px solid #E6E8EC',
+                  color: 'hsl(var(--grey-ink-2))',
+                  border: '1px solid hsl(var(--grey-line))',
                 }}>
-                  <summary style={{ cursor: 'pointer', fontWeight: 500, marginBottom: '8px', color: '#475059' }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 500, marginBottom: '8px', color: 'hsl(var(--grey-ink-2))' }}>
                     Detalls de l'error
                   </summary>
                   <pre style={{
@@ -271,9 +271,9 @@ class ErrorBoundary extends React.Component {
                     justifyContent: 'center',
                     gap: '8px',
                     padding: '8px 16px',
-                    background: '#FFFFFF',
-                    color: '#475059',
-                    border: '1px solid #E6E8EC',
+                    background: 'hsl(var(--grey-paper))',
+                    color: 'hsl(var(--grey-ink-2))',
+                    border: '1px solid hsl(var(--grey-line))',
                     borderRadius: '4px',
                     fontFamily: "'Roboto', sans-serif",
                     fontSize: '13px',
@@ -302,8 +302,8 @@ class ErrorBoundary extends React.Component {
                   lineHeight: 1,
                   cursor: 'pointer',
                   textDecoration: 'none',
-                  background: '#475059',
-                  color: '#FFFFFF',
+                  background: 'hsl(var(--grey-ink-2))',
+                  color: 'hsl(var(--grey-paper))',
                   border: 'none',
                 }}
               >
@@ -322,9 +322,9 @@ class ErrorBoundary extends React.Component {
                   fontSize: '13px',
                   lineHeight: 1,
                   cursor: 'pointer',
-                  background: '#FFFFFF',
-                  border: '1px solid #475059',
-                  color: '#475059',
+                  background: 'hsl(var(--grey-paper))',
+                  border: '1px solid hsl(var(--grey-ink-2))',
+                  color: 'hsl(var(--grey-ink-2))',
                 }}
               >
                 REFRESCA

@@ -5,7 +5,7 @@ import { SELLING_PRICE_LABEL } from '@/config/pricing';
 
 const TDP_CARD_WIDTH = 350;
 const TDP_CARD_HEIGHT = (TDP_CARD_WIDTH * 2130) / 1538;
-const TDP_TEXT_COLOR = '#475059';
+const TDP_TEXT_COLOR = 'hsl(var(--grey-ink-2))';
 const TDP_TITLE_COLOR = 'rgba(71, 80, 89, 0.88)';
 const TDP_DESCRIPTION_COLOR = 'rgba(71, 80, 89, 0.72)';
 const TDP_WHITE_RECT_STYLE = { left: '21.111px', top: '-20px', width: '307.778px', bottom: '21.294px', borderRadius: '0px' };
@@ -51,7 +51,7 @@ function ProductTdpCard({
       ) : (
         <div
           className="pointer-events-none absolute bg-transparent"
-          style={{ ...TDP_GRAY_RECT_STYLE, outline: '2px solid #F9FAFB', zIndex: 1 }}
+          style={{ ...TDP_GRAY_RECT_STYLE, outline: '2px solid hsl(var(--grey-line))', zIndex: 1 }}
         />
       )}
       <img
@@ -90,8 +90,8 @@ function ProductTdpCard({
               size={size}
               selected={selectedSize === size}
               onClick={() => onSizeChange?.(size)}
-              className={`${selectedSize === size ? '!font-bold !bg-[#475059]' : '!font-light !bg-muted'}`}
-              labelClassName={`${selectedSize === size ? '!text-whiteStrong' : '!text-[#475059] group-hover:!text-muted-foreground'} text-[calc(clamp(0.75rem,3.2vw,1.25rem)-0.1667rem)]`}
+              className={`${selectedSize === size ? '!font-bold !bg-[hsl(var(--grey-ink-2))]' : '!font-light !bg-muted'}`}
+              labelClassName={`${selectedSize === size ? '!text-whiteStrong' : '!text-[hsl(var(--grey-ink-2))] group-hover:!text-muted-foreground'} text-[calc(clamp(0.75rem,3.2vw,1.25rem)-0.1667rem)]`}
             />
           </div>
         ))}
@@ -117,7 +117,7 @@ function ProductTdpCard({
             count={cartCount}
             onClick={onAddToCart}
             iconSize="21px"
-            className="!bg-transparent !text-[#475059]"
+            className="!bg-transparent !text-[hsl(var(--grey-ink-2))]"
           />
         </div>
       </div>

@@ -7,7 +7,8 @@ import { computeStripeTileOverlaySrcs } from '../../utils/resolveStripeTile.js';
 import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
 import { SelectorQuadratPagina1, FletxesQuadratPagina1, PastillaBlancaPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
-import { ESTIL_CAIXA_BLOC_ALCADA_AUTO } from './estilsBlocs.js';
+import { estilCaixaBlocAlcadaAuto } from './estilsBlocs.js';
+import { esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, getBeltWidth, escalaMegaslide } from '../../utils/layoutMetrics.js';
@@ -249,7 +250,26 @@ function MegaStripePanelP1({
   // La franja s'ha de quedar dins del carril amb les manigues a fora (com a la
   // pagina 2: les dues pagines han de quadrar). Vegeu l'hook.
   const filaFranjaRef = useRef(null);
-  const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
+  // A 1024, LA GRAELLA INTERCALADA UN 25 % MES PETITA I LA FRANJA UN 25 % MES
+  // GRAN (02/10/2026). En Marc: «Ara treballarem només a la 1024. Res més s'ha de
+  // veure afectat. Redueix la graella intercalada un 25 % i augmenta la stripe un
+  // 25 %». Nome's alla: la resta de mides no s'hi toquen. Es calcula aqui dalt
+  // perque la franja (l'hook de sota) ja en depen.
+  const esAjust1024P1 = typeof window !== 'undefined'
+    && window.innerWidth >= 1000 && window.innerWidth <= 1050
+    && window.innerWidth >= window.innerHeight;
+  // A 1024, LA STRIPE FA EL CARRIL DE LA PAGINA (02/10/2026). En Marc: «Acaba
+  // d'alinear la stripe p1 a la mida del segon carril». El segon carril es el de
+  // la pagina —`min(939.2px, 100vw - 80px)`, el del header, la hero, el bloc de
+  // la dreta i les segones guies verdes— i es el MATEIX calcul que fa l'estil del
+  // bloc. Nome's te valor a 1024: a la resta de mides la franja va amb el carril
+  // del megaslide, com sempre.
+  const ampleCarrilPaginaP1 = esAjust1024P1
+    ? Math.min(939.2, window.innerWidth - 80)
+    : 0;
+  // La franja s'ha de quedar dins del carril amb les manigues a fora (com a la
+  // pagina 2: les dues pagines han de quadrar). Vegeu l'hook.
+  const { factor: factorCarrilFranjaBase, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, ampleCarrilPaginaP1);
   const [pageLift, setPageLift] = useState(0);
   // EL SCROLL DE LA FRANJA DE LA P1 (28/09/2026). En Marc: «Aplica-li un scroll
   // als dibuixos de la franja. Com que a la franja de p1 nome's es mostra un
@@ -479,15 +499,119 @@ function MegaStripePanelP1({
   // el pas i l'alcada del carrusel (operacions matematiques: amb la cadena
   // `calc(...)` que torna `carrilPx` el carrusel naixia amb alcada 0). A la
   // vista vertical l'escala es 1, com el senyal de la casa.
+  // LA COMPOSICIO ESTRETA (1024-1366): nome s alla la caixa del bloc va sense
+  // fons, sense contorn i sense ombra; a 1920/1440 es la de sempre («Recupera el
+  // contorn a les versions 1920/1440»).
+  const esComposicioEstretaP1 = esComposicioEstretaMegaslide({
+    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
+    isLandscapeTablet,
+  });
+  // LA FRANJA, FINS A L'AMPLADA DEL CARRIL DE LA PAGINA (02/10/2026). En Marc:
+  // «Augmenta la stripe fins que encaixi a l'amplada del carril» i, tot seguit,
+  // «Acaba d'alinear la stripe p1 a la mida del segon carril»: a 1024 el carril
+  // de la pagina fa 939,2 px (el mateix del header, de la hero i del bloc de la
+  // dreta) i la franja l'ha de fer EXACTAMENT, tambe de posicio. El factor el
+  // calcula l'hook amb `ampleCarrilPaginaP1` (que es qui sap que alla l'objectiu
+  // no es el carril del megaslide); aqui ja no hi ha cap retoc a ma. Abans hi
+  // havia un `* 1.4834` («939 / 633») que deixava la franja a 938,9 i 7,5 px a
+  // l'esquerra del carril de la pagina: els 939,2 surten de la regla, no d'un
+  // numero calibrat.
+  const factorCarrilFranja = factorCarrilFranjaBase;
   const escalaCarril = (isPortraitTablet || isLandscapeTablet)
     ? 1
     : escalaMegaslide(getBeltWidth(typeof window !== 'undefined' ? window.innerWidth : 1920));
+  // EL QUADRAT DE LES FLETXES I EL SELECTOR, AMB LA GRAELLA (02/10/2026). En
+  // Marc: «Redueix el quadrat fletxes/selector juntament amb la graella»: a 1024
+  // el bloc de la dreta tambe va un 25 % mes petit.
+  //
+  // AQUESTS TRES NUMEROS ES CALCULEN AQUI DALT (02/10/2026) perque el bucle
+  // d'alineacio del bloc (el `useLayoutEffect` de sota) ja fa servir el
+  // `blocDretaPx`: declarats despres, el lint hi veia un us abans de la
+  // declaracio.
+  const escalaBlocDreta = esAjust1024P1 ? 0.75 : 1;
+  const blocDretaPx = pagina1BlocDretaPx(escalaCarril) * escalaBlocDreta;
+  const columnaDretaPx = pagina1ColumnaDretaPx(escalaCarril) * escalaBlocDreta;
+  // EL BLOC DE LA P1: UN QUADRAT, MIG PER A LES FLETXES I MIG PER AL SELECTOR
+  // (02/10/2026).
+  //
+  // En Marc: «Fes que el selector i les fletxes comparteixin quadrat» i tot
+  // seguit «Fes les fletxes en mig quadrat i el selector a l'altre mig quadrat».
+  // A 1920 el bloc fa 128,7 x 256,6 (dues botoneres quadrades apilades); a
+  // 1024-1366 l'alcada sortia del bottom de la franja (223,6) i cada botonera
+  // quedava 128,7 x 111,8, mes baixa que ampla. Ara el bloc fa EL SEU QUADRAT
+  // (costat x costat) i les dues botoneres se'l reparteixen: mig quadrat
+  // cadascuna (128,7 x 64,35).
+  //
+  // Es mesura l'amplada del bloc i se li dona la mateixa alcada.
+  const [alcadaBlocEstretaP1, setAlcadaBlocEstretaP1] = useState(null);
+  const prevAjustRef = useRef(null);
+  useLayoutEffect(() => {
+    if (!esComposicioEstretaP1) return undefined;
+    let frame = 0;
+    const mesura = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        // El bloc, per consulta i no per la `ref`: la ref es declara mes avall i
+        // des d'aquí no s'hi pot arribar (`Cannot access variable before it is
+        // declared`).
+        const bloc = document.querySelector('[data-mega-page-viewport="1"] [data-bloc-dreta-p1]');
+        if (!bloc) return;
+        const costat = esAjust1024P1
+          ? +blocDretaPx.toFixed(1)
+          : +bloc.getBoundingClientRect().width.toFixed(1);
+        if (!(costat > 0)) return;
+        // A 1024 el bloc fa una fila d'un sol quadrat d'alcada.
+        const alcada = costat;
+        // I LA MATEIXA Y QUE LA DE LA P2 (02/10/2026). En Marc: «No es com la p2».
+        // La franja de la p2 la baixa el bucle d'alineacio (que centra el bloc de
+        // la p2 al megaslide) i la de la p1 no en te: a 1024-1366 quedava 18 px
+        // mes amunt. El desplacament es ABSOLUT (el que ja tenim mes la diferencia
+        // que queda) perque el bucle no oscil·li.
+        const vp2 = document.querySelector('[data-mega-page-viewport="2"]');
+        const f2 = vp2?.querySelector('[data-stripe-visual-content="2"]');
+        const f1 = document.querySelector('[data-mega-page-viewport="1"] [data-stripe-visual-content="1"]');
+        if (!f2 || !f1) return;
+        const dy = +(f2.getBoundingClientRect().top - f1.getBoundingClientRect().top).toFixed(1);
+        setAlcadaBlocEstretaP1((prev) => {
+          prevAjustRef.current = prev;
+          const dyAplicat = prev?.dy ?? 0;
+          const nouDy = +(dyAplicat + dy).toFixed(1);
+          // EL QUADRAT, A LA DRETA DEL CARRIL DE LA PAGINA (02/10/2026). En Marc:
+          // «Alinea el quadrat a la dreta del carril» i, en dir-li que el carril
+          // de la pagina es mes ample que el del megaslide, «Sí».
+          const amplePagina = Math.min(939.2, window.innerWidth - 80);
+          const esquerraPagina = (window.innerWidth - amplePagina) / 2;
+          // El desplacament es ABSOLUT (el que ja tenim mes el que falta): la
+          // mesura del bloc ja porta el `transform` aplicat i, sense descomptar-lo,
+          // el bucle anava derivant i el bloc marxava de la pantalla.
+          const dxAplicat = prevAjustRef.current?.dx ?? 0;
+          const dx = Math.round(dxAplicat + (esquerraPagina - bloc.getBoundingClientRect().left));
+          if (prev
+            && Math.abs(prev.alcada - alcada) < 0.5
+            && Math.abs(prev.dy - nouDy) < 0.5
+            && Math.abs(prev.dx - dx) < 0.5) return prev;
+          return { alcada, dy: nouDy, dx };
+        });
+      });
+    };
+    mesura();
+    const t1 = window.setTimeout(mesura, 400);
+    const t2 = window.setTimeout(mesura, 1500);
+    window.addEventListener('resize', mesura);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', mesura);
+    };
+  }, [esComposicioEstretaP1, active, esAjust1024P1, blocDretaPx]);
   // ELS NUMEROS DE LA COMPOSICIO VIUEN A `geometriaMegaslide.js` (B4): aqui
   // nome's es passen a px amb l'escala del carril.
+  // (L'`escalaBlocDreta`, el `blocDretaPx` i el `columnaDretaPx` es calculen
+  // MES AMUNT, abans del bucle d'alineacio: aquell efecte els fa servir i, si
+  // fossin aqui, el lint hi veu un us abans de la declaracio.)
   const alcadaFileraPx = pagina1AlcadaFileraPx(escalaCarril);
   const gapDretaPx = PAGINA1_GAP_DRETA_PX * escalaCarril;
-  const blocDretaPx = pagina1BlocDretaPx(escalaCarril);
-  const columnaDretaPx = pagina1ColumnaDretaPx(escalaCarril);
   // EL TOP DE LA FILERA, EN PX (mesurat: posa la filera de dalt de la graella
   // al centre de la cel·la BLANC del selector).
   const topFileraPx = PAGINA1_TOP_FILERA_PX * escalaCarril;
@@ -584,6 +708,29 @@ function MegaStripePanelP1({
     return () => window.removeEventListener('mega-stripe-full-hit-p1', handler);
   }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
 
+  // LA CAPA DIFOSA DE L'OMBRA DE LA MANIGA (02/10/2026). Es el fons negre difós
+  // retallat per la silueta de l'ultima casa del full (`mascaraManigaP1`); viu
+  // dins d'un embolcall posicionat, que es qui mana on cau. Es la MATEIXA als
+  // dos llocs on es munta: la capa de la caixa del bloc a la composicio ampla
+  // (l'ombra hi queda retallada pel bloc) i la peça del selector a 1024 (que es
+  // qui la retalla). En Marc: «que l'ombra de la maniga vagi amb la peça del
+  // selector, que es on toca».
+  const capaDifosaOmbraManigaP1 = (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      backgroundColor: `rgba(0, 0, 0, ${OMBRA_MANIGA_ALFA})`,
+      WebkitMaskImage: `url("${mascaraManigaP1}")`,
+      maskImage: `url("${mascaraManigaP1}")`,
+      WebkitMaskRepeat: 'no-repeat',
+      maskRepeat: 'no-repeat',
+      WebkitMaskSize: '103% 100%',
+      maskSize: '103% 100%',
+      WebkitMaskPosition: '50% 0',
+      maskPosition: '50% 0',
+    }} />
+  );
+
   return (
     <div
       ref={pageRootRef}
@@ -660,6 +807,7 @@ function MegaStripePanelP1({
             <div
               data-filera-p1="1"
               style={{
+                position: 'relative',
                 display: 'flex',
                 alignItems: 'flex-start',
                 width: '100%',
@@ -672,7 +820,7 @@ function MegaStripePanelP1({
                   onStepper={setStepperP1}
                   activeCollection={active}
                   activeSubcollection={austenSubcollection}
-                  escala={escalaCarril}
+                  escala={esAjust1024P1 ? escalaCarril * 0.75 : escalaCarril}
                   alcadaCarruselPx={alcadaFileraPx}
                   midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
                   onSelectGroup={(collection, subcollection, firstStripeItem) => {
@@ -717,9 +865,11 @@ function MegaStripePanelP1({
                 data-bloc-dreta-p1="1"
                 style={{
                   flex: '0 0 auto',
-                  width: `${blocDretaPx}px`,
+                  width: esAjust1024P1 ? 'min(939.2px, calc(100vw - 80px))' : `${blocDretaPx}px`,
                   minWidth: 0,
                   position: 'relative',
+                  // A 1024, el bloc es desplac, a la dreta del carril de la pagina.
+                  ...((esAjust1024P1 && alcadaBlocEstretaP1) ? { transform: `translateX(${alcadaBlocEstretaP1.dx}px)` } : null),
                   // EL BLOC, SENSE CAPA PROPRIA, PER SOTA DE LA FRANJA (28/09/2026).
                   //
                   // En Marc: «La franja continua per sota del bloc» i «Encara no.
@@ -736,9 +886,17 @@ function MegaStripePanelP1({
                   // apilades l'una sobre l'altra». Cada quadrat fa el costat del bloc
                   // (128,9 a 1920) i el `marginBottom` negatiu compensa el que
                   // creix, perque la filera no s'allargui i la franja no es mogui.
-                  ...(alcadaBlocP1 != null ? {
-                    height: `${alcadaBlocP1}px`,
-                    marginBottom: `${-(alcadaBlocP1 - columnaDretaPx * 3)}px`,
+                  // EL SELECTOR I LES FLETXES, QUADRATS (02/10/2026). En Marc:
+                  // «Fes que el selector i les fletxes comparteixin quadrat». A
+                  // 1920 el bloc ja fa els dos quadrats (256,6 = 2 x 128,3); a
+                  // 1024-1366 l'alcada sortia del bottom de la franja (223,6) i
+                  // cada botonera quedava 128,7 x 111,8, mes baixa que ampla.
+                  // Amb l'ajust el bloc fa els DOS quadrats sencers i el
+                  // `marginBottom` negatiu compensa el que creix, perque la
+                  // filera no s'allargui i la franja no es mogui.
+                  ...((((alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)) != null) ? {
+                    height: `${(alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)}px`,
+                    marginBottom: `${-(((alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)) - columnaDretaPx * 3)}px`,
                   } : null),
                   // LES FLETXES A DALT I EL SELECTOR A SOTA, A LA DRETA (28/09/2026).
                   // El bloc es ample com la columna de la p2 (130 de disseny) perque
@@ -760,7 +918,26 @@ function MegaStripePanelP1({
                     inset: 0,
                     zIndex: 0,
                     pointerEvents: 'none',
-                    ...ESTIL_CAIXA_BLOC_ALCADA_AUTO,
+                    ...estilCaixaBlocAlcadaAuto(esComposicioEstretaP1),
+                    // A 1024 la caixa gran no pinta: cada peca porta la seva.
+                    ...(esAjust1024P1 ? { backgroundColor: 'transparent', boxShadow: 'none' } : null),
+                    // EL FONS DEL QUADRAT DEL SELECTOR I LES FLETXES (02/10/2026).
+                    // En Marc: «Posa-li el fons al quadrat amb el selector i les
+                    // fletxes». A la composicio estreta la caixa va sense fons
+                    // (nomes radi i retall), i el quadrat nou —el selector i les
+                    // fletxes en dues columnes— quedava invisible sobre el paper:
+                    // se li posa el mateix fons que a la resta de caixes. Sense
+                    // vora ni ombra, que allo no ho ha demanat.
+                    //
+                    // A 1024, AIXÒ NO ES PINTA (02/10/2026). En Marc: «Pero ara hi
+                    // ha les fletxes i els enllacos del selector dins de la
+                    // mateixa franja i jo els vull separats». A 1024 el bloc fa
+                    // TOT el carril (939,2) i te les dues peces a les vorades: el
+                    // fons d'aquesta capa les unia amb una franja comuna de 939 px.
+                    // Alla el fons el porten les DUES PECES, cadascuna a la seva
+                    // caixa (vegeu els quadrats de sota): la capa del bloc nome's
+                    // queda el radi i el retall.
+                    ...((esComposicioEstretaP1 && !esAjust1024P1) ? { backgroundColor: 'hsl(var(--grey-paper-soft))' } : null),
                   }}
                 >
                 {/* LA PASTILLA BLANCA DEL SELECTOR, PER SOTA DE L'OMBRA (28/09/2026).
@@ -791,16 +968,19 @@ function MegaStripePanelP1({
                   data-pastilla-p1="1"
                   style={{
                     position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    height: '50%',
+                    // LA PASTILLA VA AMB EL SELECTOR: a la dreta (meitat dreta) a
+                    // la composicio estreta, i a sota (meitat de baix) a la resta.
+                    ...(esAjust1024P1
+                      ? { right: 0, top: 0, bottom: 0, width: `${blocDretaPx}px` }
+                      : (esComposicioEstretaP1
+                        ? { right: 0, top: 0, bottom: 0, width: '50%' }
+                        : { left: 0, right: 0, bottom: 0, height: '50%' })),
                     pointerEvents: 'none',
                   }}
                 >
                   <PastillaBlancaPagina1 topPct={topPastillaP1Pct} />
                 </div>
-                {ombraManigaP1 && mascaraManigaP1 ? (
+                {!esAjust1024P1 && ombraManigaP1 && mascaraManigaP1 ? (
                   <div
                     data-maniga-ombra-p1="1"
                     style={{
@@ -820,19 +1000,7 @@ function MegaStripePanelP1({
                       transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
                     }}
                   >
-                    <div style={{
-                      width: '100%',
-                      height: '100%',
-                      backgroundColor: `rgba(0, 0, 0, ${OMBRA_MANIGA_ALFA})`,
-                      WebkitMaskImage: `url("${mascaraManigaP1}")`,
-                      maskImage: `url("${mascaraManigaP1}")`,
-                      WebkitMaskRepeat: 'no-repeat',
-                      maskRepeat: 'no-repeat',
-                      WebkitMaskSize: '103% 100%',
-                      maskSize: '103% 100%',
-                      WebkitMaskPosition: '50% 0',
-                      maskPosition: '50% 0',
-                    }} />
+                    {capaDifosaOmbraManigaP1}
                   </div>
                 ) : null}
                 </div>
@@ -864,12 +1032,49 @@ function MegaStripePanelP1({
                   height: '100%',
                   width: '100%',
                   display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
+                  // EN DUES COLUMNES NOME'S A LA COMPOSICIO ESTRETA (02/10/2026).
+                  // En Marc: «Fes les fletxes en mig quadrat i el selector a
+                  // l'altre mig quadrat», «En dues columnes» i, en veure que allo
+                  // tambe passava a 1920/1440, «A les vistes 1920 i 1440 el
+                  // selector i les fletxes han d'estar una sota l'altra ocupant tot
+                  // el seu quadrat»: a 1024-1366 van en dues columnes i a la resta
+                  // apilats, com sempre.
+                  // A 1024, DOS QUADRATS APILATS (02/10/2026). En Marc: «Divideix el
+                  // quadrat de les fletxes/selector. Fes una mitosi i converteix-lo
+                  // en dos quadrats de la mateixa mida»: el bloc fa dos costats
+                  // d'alcada i cada botonera un quadrat sencer. A la resta de la
+                  // composicio estreta es queden en dues columnes.
+                  // EL QUADRAT CONJUNT (02/10/2026). En Marc: «Reverteix fins al
+                  // quadrat conjunt»: un sol quadrat amb les fletxes i el selector
+                  // a dins (dues columnes a la composicio estreta, apilats a la
+                  // resta), com estava abans de la mitosi.
+                  // DUES PECES DIFERENTS (02/10/2026). En Marc: «Pots separar les
+                  // fletxes del selector en dues peces diferents?»: a 1024 son DOS
+                  // quadrats de 96,5 independents, el de les fletxes a la vora
+                  // esquerra del carril de la pagina i el del selector a la dreta,
+                  // i cadascun porta la seva caixa (fons, radi i ombra). A la
+                  // resta, el quadrat conjunt de sempre.
+                  flexDirection: (esAjust1024P1 || esComposicioEstretaP1) ? 'row' : 'column',
+                  justifyContent: esAjust1024P1 ? 'space-between' : 'flex-end',
+                  alignItems: (esAjust1024P1 || esComposicioEstretaP1) ? 'stretch' : 'flex-end',
                 }}>
                 {/* EL QUADRAT DE DALT: els dos botons de les fletxes. */}
-                <div style={{ position: 'relative', flex: '1 1 50%', minHeight: 0, width: '100%' }}>
+                <div style={{
+                  position: 'relative',
+                  flex: esAjust1024P1 ? '0 0 auto' : '1 1 50%',
+                  minHeight: 0,
+                  width: esAjust1024P1 ? `${blocDretaPx}px` : '100%',
+                  height: esAjust1024P1 ? `${blocDretaPx}px` : undefined,
+                  // LA CAIXA DE CADA PECA: fons, radi i ombra propis.
+                  ...(esAjust1024P1
+                    ? {
+                      backgroundColor: 'hsl(var(--grey-paper-soft))',
+                      borderRadius: '5.3px',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                      overflow: 'hidden',
+                    }
+                    : null),
+                }}>
                 <FletxesQuadratPagina1
                   omple
                   // LA DIRECCIO DE LES FLETXES, INVERTIDA (28/09/2026). En Marc: «El
@@ -886,7 +1091,53 @@ function MegaStripePanelP1({
                 />
                 </div>
                 {/* EL QUADRAT DE SOTA: els tres botons del selector. */}
-                <div style={{ position: 'relative', flex: '1 1 50%', minHeight: 0, width: '100%' }}>
+                <div style={{
+                  position: 'relative',
+                  flex: esAjust1024P1 ? '0 0 auto' : '1 1 50%',
+                  minHeight: 0,
+                  width: esAjust1024P1 ? `${blocDretaPx}px` : '100%',
+                  height: esAjust1024P1 ? `${blocDretaPx}px` : undefined,
+                  // LA CAIXA DE CADA PECA: fons, radi i ombra propis.
+                  ...(esAjust1024P1
+                    ? {
+                      backgroundColor: 'hsl(var(--grey-paper-soft))',
+                      borderRadius: '5.3px',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                      overflow: 'hidden',
+                    }
+                    : null),
+                }}>
+                {/* L'OMBRA DE LA MANIGA, AMB LA PEÇA DEL SELECTOR (02/10/2026).
+                    En Marc: «Pero ara hi ha les fletxes i els enllacos del
+                    selector dins de la mateixa franja i jo els vull separats» i
+                    «que l'ombra de la maniga vagi amb la peça del selector, que
+                    es on toca». A 1024 l'ombra NO es munta a la capa de la caixa
+                    del bloc (una capa de 939 px que hi pintava una franja
+                    comuna): es munta AQUI, dins de la peça del selector, i es la
+                    mateixa peça qui la retalla (`overflow: hidden`). Com que la
+                    mesura (`ombraManigaP1`) es fa contra el bloc, se li
+                    descompta el que la peça te a la seva esquerra (el bloc menys
+                    la peça: la peça va a la vora dreta). */}
+                {esAjust1024P1 && ombraManigaP1 && mascaraManigaP1 ? (
+                  <div
+                    data-maniga-ombra-p1="1"
+                    style={{
+                      position: 'absolute',
+                      left: `${ombraManigaP1.left - (ampleCarrilPaginaP1 - blocDretaPx)}px`,
+                      top: `${ombraManigaP1.top}px`,
+                      width: `${ombraManigaP1.width}px`,
+                      height: `${ombraManigaP1.height}px`,
+                      pointerEvents: 'none',
+                      zIndex: 0,
+                      // Els MATEIXOS numeros declarats que la columna de la p2
+                      // (`OMBRA_MANIGA_*`, geometriaMegaslide.js).
+                      filter: `blur(${OMBRA_MANIGA_BLUR_PX}px)`,
+                      transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
+                    }}
+                  >
+                    {capaDifosaOmbraManigaP1}
+                  </div>
+                ) : null}
                 <SelectorQuadratPagina1
                   dinsBloc
                   omple
@@ -990,6 +1241,13 @@ function MegaStripePanelP1({
                 // cau a la vora esquerra del carril i la de l'ultima a la guia
                 // de les fletxes. Sense fletxes (tauletes) el centre es el del
                 // carril, que es com estava.
+                // ENCAIXADA A L'AMPLADA DEL CARRIL (02/10/2026). En Marc: «Ara
+                // encaixa la stripe p1 a l'amplada del carril». El contenidor
+                // d'aquesta filera ja fa exactament el carril, o sigui que a la
+                // composicio estreta n'hi ha prou de no centrar-la i donar-li
+                // l'aspecte del full: la franja va de vora a vora del carril i
+                // l'alcada en surt sola (811 x 86,9 a 1366 en lloc de 713,9 x
+                // 76,5). A la resta de mides, com sempre.
                 left: centreCarrilFranja === null ? '50%' : `${centreCarrilFranja}px`,
                 transform: 'translateX(-50%)',
                 // La filera NO s'ha d'encongir per encabir-se al contenidor: la
@@ -1012,7 +1270,7 @@ function MegaStripePanelP1({
                     padding: '6px 8px',
                     borderRadius: 8,
                     background: 'rgba(255, 80, 80, 0.92)',
-                    color: '#fff',
+                    color: 'hsl(var(--grey-paper))',
                     maxWidth: 420,
                     wordBreak: 'break-all',
                   }}
@@ -1029,6 +1287,7 @@ function MegaStripePanelP1({
                 className="relative"
                 data-stripe-visual-content="1"
                 style={{
+                  ...((esComposicioEstretaP1 && alcadaBlocEstretaP1) ? { marginTop: `${alcadaBlocEstretaP1.dy}px` } : null),
                   height: '100%',
                   width: '100%',
                   display: 'block',
@@ -1045,6 +1304,10 @@ function MegaStripePanelP1({
                   // es la mida de la filera (`stripePreviewHPx`), i l'escala que
                   // la porta al carril la calcula `useEscalaFranjaCarril` (les
                   // manigues hi queden a fora, a la mida del dibuix).
+                  // EL LLOC DE LA FRANJA DE LA P2 (02/10/2026): a 1024-1366 la
+                  // franja de la p1 ha de caure on cau la de la p2 dins de la
+                  // seva pagina. El desplacament va ABANS del `translate` i de
+                  // l'`scale` de sempre, o sigui en px del pare.
                   transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja}))`,
                   isolation: 'isolate',
                 }}
@@ -1216,6 +1479,15 @@ function MegaStripePanelP1({
                       style={{
                         height: '100%',
                         width: 'auto',
+                        // SENSE EL LÍMIT DEL PREFLIGHT (02/10/2026). El full de la
+                        // franja fa 9,33:1 i a 1024-1366 el contenidor es mes
+                        // estret que la imatge a aquesta alcada: amb el
+                        // `max-width: 100%` de sempre, la imatge s'encongia
+                        // d'amplada (7,5:1) i les catorze samarretes es
+                        // trepitjaven. Amb `none` la filera s'eixampla fins a
+                        // l'amplada que li toca i despres s'escala sencera, com
+                        // a la pagina 2.
+                        ...(esComposicioEstretaP1 ? { maxWidth: 'none' } : null),
                       }}
                       loading="eager"
                       decoding="async"

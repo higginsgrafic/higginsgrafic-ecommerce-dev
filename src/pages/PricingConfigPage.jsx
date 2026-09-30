@@ -226,21 +226,21 @@ export default function PricingConfigPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-paper-soft flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-paper-soft py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Configuració de Preus</h1>
-        <p className="text-gray-600 mb-8 text-sm sm:text-base">Preu global, per col·lecció i per variant. El preu final és: variant &gt; col·lecció &gt; global.</p>
+        <h1 className="text-3xl font-bold text-ink-strong mb-2">Configuració de Preus</h1>
+        <p className="text-ink-2 mb-8 text-sm sm:text-base">Preu global, per col·lecció i per variant. El preu final és: variant &gt; col·lecció &gt; global.</p>
 
         {/* Global */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Preu Global</h2>
+        <div className="bg-paper rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold text-ink-strong mb-4">Preu Global</h2>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <input
@@ -248,21 +248,21 @@ export default function PricingConfigPage() {
                 step="0.01"
                 value={globalPrice}
                 onChange={(e) => { setGlobalPrice(e.target.value); setDirty(d => ({ ...d, global: true })); }}
-                className="border border-gray-300 rounded px-3 py-2 text-lg w-32"
+                className="border border-line-strong rounded px-3 py-2 text-lg w-32"
               />
-              <span className="text-gray-500">€</span>
+              <span className="text-ink-soft">€</span>
             </div>
             <button
               onClick={saveGlobal}
               disabled={!dirty.global || saving === 'global'}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-300 text-sm font-medium whitespace-nowrap"
+              className="bg-blue-600 text-paper px-4 py-2 rounded hover:bg-blue-700 disabled:bg-muted-foreground text-sm font-medium whitespace-nowrap"
             >
               {saving === 'global' ? 'Desant...' : 'Desar preu global'}
             </button>
             <button
               onClick={applyGlobalToAll}
               disabled={saving === 'apply-all'}
-              className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 disabled:bg-gray-300 text-sm font-medium whitespace-nowrap ml-auto"
+              className="bg-ink-2 text-paper px-4 py-2 rounded hover:bg-ink-2 disabled:bg-muted-foreground text-sm font-medium whitespace-nowrap ml-auto"
             >
               {saving === 'apply-all' ? 'Aplicant...' : 'Aplicar a tots els productes'}
             </button>
@@ -270,12 +270,12 @@ export default function PricingConfigPage() {
         </div>
 
         {/* Collections */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Preu per Col·lecció</h2>
+        <div className="bg-paper rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold text-ink-strong mb-4">Preu per Col·lecció</h2>
           <div className="space-y-3">
             {COLLECTIONS.map(col => (
               <div key={col} className="flex flex-wrap items-center gap-4">
-                <span className="text-sm text-gray-700 w-48 capitalize whitespace-nowrap">{col}</span>
+                <span className="text-sm text-ink-2 w-48 capitalize whitespace-nowrap">{col}</span>
                 <input
                   type="number"
                   step="0.01"
@@ -285,13 +285,13 @@ export default function PricingConfigPage() {
                     setCollectionPrices(d => ({ ...d, [col]: e.target.value }));
                     setDirty(d => ({ ...d, [`coll-${col}`]: true }));
                   }}
-                  className="border border-gray-300 rounded px-3 py-2 text-sm w-32"
+                  className="border border-line-strong rounded px-3 py-2 text-sm w-32"
                 />
-                <span className="text-gray-500 text-sm">€</span>
+                <span className="text-ink-soft text-sm">€</span>
                 <button
                   onClick={() => saveCollection(col)}
                   disabled={!dirty[`coll-${col}`] || saving === `coll-${col}`}
-                  className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-300 text-xs font-medium whitespace-nowrap"
+                  className="bg-blue-600 text-paper px-3 py-1 rounded hover:bg-blue-700 disabled:bg-muted-foreground text-xs font-medium whitespace-nowrap"
                 >
                   {saving === `coll-${col}` ? 'Desant...' : 'Desar'}
                 </button>
@@ -299,7 +299,7 @@ export default function PricingConfigPage() {
                   <button
                     onClick={() => applyCollectionToProducts(col)}
                     disabled={saving === `apply-coll-${col}`}
-                    className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 disabled:bg-gray-300 text-xs font-medium"
+                    className="bg-ink-2 text-paper px-3 py-1 rounded hover:bg-ink-2 disabled:bg-muted-foreground text-xs font-medium"
                   >
                     {saving === `apply-coll-${col}` ? '...' : 'Aplicar a productes'}
                   </button>
@@ -310,23 +310,23 @@ export default function PricingConfigPage() {
         </div>
 
         {/* Variants */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <h2 className="text-lg font-semibold text-gray-900 p-6 pb-4">Preu per Variant</h2>
+        <div className="bg-paper rounded-lg shadow overflow-hidden">
+          <h2 className="text-lg font-semibold text-ink-strong p-6 pb-4">Preu per Variant</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-line">
+              <thead className="bg-paper-soft">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Producte</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Variant</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Cost Gelato</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Transport</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">IVA (21%)</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Preu venda</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Marge</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase whitespace-nowrap">Producte</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase whitespace-nowrap">Variant</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase whitespace-nowrap">Cost Gelato</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase whitespace-nowrap">Transport</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase whitespace-nowrap">IVA (21%)</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase whitespace-nowrap">Preu venda</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase whitespace-nowrap">Marge</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-line">
                 {COLLECTIONS.map(col => {
                   const colProducts = products.filter(p => p.collection === col);
                   if (colProducts.length === 0) return null;
@@ -334,10 +334,10 @@ export default function PricingConfigPage() {
                   return (
                     <Fragment key={`coll-${col}`}>
                       <tr
-                        className="bg-gray-100 cursor-pointer"
+                        className="bg-paper-soft cursor-pointer"
                         onClick={() => setExpandedCollections(d => ({ ...d, [col]: !isExpanded }))}
                       >
-                        <td colSpan={8} className="px-6 py-2 text-sm font-bold text-gray-700 uppercase whitespace-nowrap">
+                        <td colSpan={8} className="px-6 py-2 text-sm font-bold text-ink-2 uppercase whitespace-nowrap">
                           <span className="mr-2">{isExpanded ? '▼' : '▶'}</span>
                           {col} ({colProducts.length} productes)
                         </td>
@@ -346,17 +346,17 @@ export default function PricingConfigPage() {
                         <Fragment key={product.id}>
                           <tr
                             key={product.id}
-                            className="hover:bg-gray-50 cursor-pointer"
+                            className="hover:bg-paper-soft cursor-pointer"
                             onClick={() => setExpandedProduct(expandedProduct === product.id ? null : product.id)}
                           >
-                            <td className="px-6 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">
+                            <td className="px-6 py-3 text-sm font-medium text-ink-strong whitespace-nowrap">
                               <span className="mr-2">{expandedProduct === product.id ? '▼' : '▶'}</span>
                               {product.name}
                             </td>
-                            <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
+                            <td className="px-6 py-3 text-sm text-ink-soft whitespace-nowrap">
                               {(product.product_variants || []).length} variants
                             </td>
-                            <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
+                            <td className="px-6 py-3 text-sm text-ink-soft whitespace-nowrap">
                               {(() => {
                                 const vs = product.product_variants || [];
                                 if (vs.length === 0) return '—';
@@ -364,10 +364,10 @@ export default function PricingConfigPage() {
                                 return avg.toFixed(2) + '€';
                               })()}
                             </td>
-                            <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
+                            <td className="px-6 py-3 text-sm text-ink-soft whitespace-nowrap">
                               {GELATO_SHIPPING.toFixed(2)}€
                             </td>
-                            <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
+                            <td className="px-6 py-3 text-sm text-ink-soft whitespace-nowrap">
                               {(() => {
                                 const price = parseFloat(product.price);
                                 if (isNaN(price)) return '—';
@@ -375,7 +375,7 @@ export default function PricingConfigPage() {
                                 return iva.toFixed(2) + '€';
                               })()}
                             </td>
-                            <td className="px-6 py-3 text-sm text-gray-900 whitespace-nowrap">{product.price}€</td>
+                            <td className="px-6 py-3 text-sm text-ink-strong whitespace-nowrap">{product.price}€</td>
                             <td className="px-6 py-3 text-sm font-medium whitespace-nowrap">
                               {(() => {
                                 const price = parseFloat(product.price);
@@ -392,9 +392,9 @@ export default function PricingConfigPage() {
                             <td className="px-6 py-3"></td>
                           </tr>
                           {expandedProduct === product.id && (product.product_variants || []).map(variant => (
-                            <tr key={variant.id} className="bg-gray-50">
+                            <tr key={variant.id} className="bg-paper-soft">
                               <td className="px-6 py-2"></td>
-                              <td className="px-6 py-2 text-sm text-gray-700 whitespace-nowrap">
+                              <td className="px-6 py-2 text-sm text-ink-2 whitespace-nowrap">
                                 {variant.size} — {variant.color}
                               </td>
                               <td className="px-6 py-2 whitespace-nowrap">
@@ -408,15 +408,15 @@ export default function PricingConfigPage() {
                                       setVariantCosts(d => ({ ...d, [variant.id]: e.target.value }));
                                       setDirty(d => ({ ...d, [`varcost-${variant.id}`]: true }));
                                     }}
-                                    className="border border-gray-300 rounded px-2 py-1 text-sm w-24"
+                                    className="border border-line-strong rounded px-2 py-1 text-sm w-24"
                                   />
-                                  <span className="text-gray-500 text-sm">€</span>
+                                  <span className="text-ink-soft text-sm">€</span>
                                 </div>
                               </td>
-                              <td className="px-6 py-2 text-sm text-gray-500 whitespace-nowrap">
+                              <td className="px-6 py-2 text-sm text-ink-soft whitespace-nowrap">
                                 {GELATO_SHIPPING.toFixed(2)}€
                               </td>
-                              <td className="px-6 py-2 text-sm text-gray-500 whitespace-nowrap">
+                              <td className="px-6 py-2 text-sm text-ink-soft whitespace-nowrap">
                                 {(() => {
                                   const price = parseFloat(variantPrices[variant.id]);
                                   if (isNaN(price)) return '—';
@@ -435,9 +435,9 @@ export default function PricingConfigPage() {
                                       setVariantPrices(d => ({ ...d, [variant.id]: e.target.value }));
                                       setDirty(d => ({ ...d, [`varprice-${variant.id}`]: true }));
                                     }}
-                                    className="border border-gray-300 rounded px-2 py-1 text-sm w-24"
+                                    className="border border-line-strong rounded px-2 py-1 text-sm w-24"
                                   />
-                                  <span className="text-gray-500 text-sm">€</span>
+                                  <span className="text-ink-soft text-sm">€</span>
                                 </div>
                               </td>
                               <td className="px-6 py-2 text-sm font-medium whitespace-nowrap">
@@ -456,7 +456,7 @@ export default function PricingConfigPage() {
                                 <button
                                   onClick={() => saveVariant(variant.id)}
                                   disabled={(!dirty[`varprice-${variant.id}`] && !dirty[`varcost-${variant.id}`]) || saving === `var-${variant.id}`}
-                                  className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-300 text-xs font-medium"
+                                  className="bg-blue-600 text-paper px-3 py-1 rounded hover:bg-blue-700 disabled:bg-muted-foreground text-xs font-medium"
                                 >
                                   {saving === `var-${variant.id}` ? '...' : 'Desar'}
                                 </button>

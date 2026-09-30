@@ -31,7 +31,7 @@ export default function EditWrapper({
       {children}
       <button
         onClick={handleEditClick}
-        className={`absolute top-4 right-4 z-[11000] p-2 bg-blue-600 text-white rounded-lg shadow-lg transition-opacity hover:bg-blue-700 pointer-events-auto ${isAdmin ? 'opacity-100' : editMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+        className={`absolute top-4 right-4 z-[11000] p-2 bg-blue-600 text-paper rounded-lg shadow-lg transition-opacity hover:bg-blue-700 pointer-events-auto ${isAdmin ? 'opacity-100' : editMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
         title={`Editar ${section}`}
       >
         <Edit3 className="w-5 h-5" />

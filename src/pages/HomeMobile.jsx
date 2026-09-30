@@ -59,7 +59,6 @@ const HERO_OVERLAY_SIZE = {
   'austen/unsociable-and-taciturn': 2.4,
   'austen/i-admire-and-love-you': 12.16,
   'austen/you-have-bewitched-me': 2.4,
-  'austen/you-must-allow-me': 12.16,
   'austen/lfmd/blue-solid': 19,
   'austen/lfmd/fuchsia-solid': 19,
   'austen/lfmd/red-solid': 19,
@@ -128,7 +127,7 @@ function MobileHero() {
           transform: 'translateY(-50%)',
           zIndex: 2,
           paddingLeft: '12px',
-          color: '#475059',
+          color: 'hsl(var(--grey-ink-2))',
         }}
       >
         <p style={{
@@ -157,7 +156,7 @@ function MobileHero() {
           overflow: 'hidden',
           borderRadius: '12px',
           height: 'min(84vw, 390px)',
-          background: '#FFFFFF',
+          background: 'hsl(var(--grey-paper))',
         }}
       >
         {heroPlan.map((s, i) => (
@@ -170,7 +169,7 @@ function MobileHero() {
               display: 'flex',
               alignItems: 'center',
               overflow: 'hidden',
-              background: '#FFFFFF',
+              background: 'hsl(var(--grey-paper))',
               textDecoration: 'none',
             }}
             className="active:opacity-90 transition-opacity"
@@ -187,8 +186,8 @@ function MobileHero() {
           onClick={handleShuffle}
           aria-label="Barreja samarretes i dibuixos"
           style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'hsl(var(--grey-paper))',
+            border: '1px solid hsl(var(--grey-line))',
             borderRadius: '9999px',
             width: '70px',
             height: '70px',
@@ -201,7 +200,7 @@ function MobileHero() {
           }}
           className="active:scale-95"
         >
-          <Shuffle size={35} color="#475059" strokeWidth={1.5} />
+          <Shuffle size={35} color="hsl(var(--grey-ink-2))" strokeWidth={1.5} />
         </button>
       </div>
     </div>
@@ -287,7 +286,7 @@ export default function HomeMobile() {
                 lineHeight: 0.9,
                 letterSpacing: '0.02em',
                 textTransform: 'uppercase',
-                color: '#0b0d10',
+                color: 'hsl(var(--grey-ink-strong))',
                 margin: 0,
               }}>
                 {col.title}
@@ -347,8 +346,8 @@ export default function HomeMobile() {
                 to={col.href}
                 style={{
                   borderRadius: '9999px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  backgroundColor: 'hsl(var(--grey-paper))',
+                  border: '1px solid hsl(var(--grey-line))',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -358,7 +357,7 @@ export default function HomeMobile() {
                   textDecoration: 'none',
                   transition: 'all 200ms ease',
                 }}
-                className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+                className="hover:shadow-md hover:border-muted-2 active:scale-95 group"
                 title="Veure tota la col·lecció"
               >
                 <span style={{
@@ -367,10 +366,10 @@ export default function HomeMobile() {
                   fontSize: '11px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  color: '#475059',
+                  color: 'hsl(var(--grey-ink-2))',
                   lineHeight: 1,
                 }}
-                  className="group-hover:text-neutral-900"
+                  className="group-hover:text-ink-strong"
                 >
                   <span style={{ display: 'inline-block', transform: 'translateY(2px)' }}>SI EN VOLS SABER</span>{' '}
                   <span style={{ display: 'inline-block', fontSize: '20px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle' }}>+</span>

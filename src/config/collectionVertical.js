@@ -263,13 +263,13 @@ export const TDP_MIDES_INTERIOR = {
 export const HERO_TDP_GAP_TABLET_PX = '338px';
 export const HERO_TDP_GAP_LANDSCAPE_PX = '-240px';
 
-// 14 colors canonics (ordre extret de FullWideSlideHeader.jsx).
+// 14 colors canonics (mockupPaths.SHIRT_COLORS).
 // Repetits ciclicament fins a omplir les 16 cel·les del 4x4.
 const TDP_GRID_COLORS = [
-  ['white',        'light-blue',     'royal',         'purple'],
-  ['navy',         'daisy',          'gold',          'light-pink'],
-  ['red',          'kiwi',           'irish-green',   'military-green'],
-  ['forest-green', 'black',          'white',         'light-blue'],
+  ['white',          'light-blue',     'royal',         'navy'],
+  ['irish-green',    'military-green', 'daisy',         'gold'],
+  ['red',            'dark-chocolate', 'ice-grey',      'rs-sport-grey'],
+  ['charcoal',       'black',          'white',         'light-blue'],
 ];
 
 /**
@@ -286,10 +286,10 @@ const TDP_GRID_COLORS_FLAT = TDP_GRID_COLORS.flat();
  * en endavant quedaven sense color i no es pintaven: 16 fitxes en comptes de 28.
  */
 const CANON_COLORS = [
-  'white', 'light-blue', 'royal', 'purple',
-  'navy', 'daisy', 'gold', 'light-pink',
-  'red', 'kiwi', 'irish-green', 'military-green',
-  'forest-green', 'black',
+  'white', 'light-blue', 'royal', 'navy',
+  'irish-green', 'military-green', 'daisy', 'gold',
+  'red', 'dark-chocolate', 'ice-grey', 'rs-sport-grey',
+  'charcoal', 'black',
 ];
 
 /** Productes de Cube (s'assignen a les cel·les ciclicament). */

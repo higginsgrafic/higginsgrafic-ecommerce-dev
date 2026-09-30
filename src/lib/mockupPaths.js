@@ -23,15 +23,15 @@ export const SHIRT_COLORS = [
   'light-blue',
   'royal',
   'navy',
-  'purple',
-  'light-pink',
+  'irish-green',
+  'military-green',
   'daisy',
   'gold',
   'red',
-  'kiwi',
-  'irish-green',
-  'military-green',
-  'forest-green',
+  'dark-chocolate',
+  'ice-grey',
+  'rs-sport-grey',
+  'charcoal',
   'black',
 ];
 
@@ -39,6 +39,37 @@ export const INK_BLACK = 'b';
 export const INK_WHITE = 'w';
 export const INK_MULTI = 'multi';
 export const INKS = [INK_BLACK, INK_WHITE, INK_MULTI];
+
+/**
+ * LA REGLA DE LA INVERSIÓ (29/09/2026, dictada per l'amo)
+ *
+ * La tinta de línia (`b`/`w`) no pot coincidir amb el to de la samarreta: si hi
+ * coincidiria, es força el NEGATIU (l'altra tinta). La tinta `multi` (COLOR) no
+ * s'inverteix mai.
+ *
+ *  - Samarretes CLARES → sobre BLANC (tinta blanca) surt tinta NEGRA.
+ *      white, ice-grey, rs-sport-grey
+ *  - Samarretes FOSQUES → sobre NEGRE (tinta negra) surt tinta BLANCA.
+ *      black, navy, dark-chocolate, charcoal
+ *
+ * L'amo ho va dictar en dues tongades el 29/09/2026: primer per a `white` i
+ * `black`, després hi va afegir `navy` i `dark-chocolate`, i finalment els
+ * quatre colors nous (charcoal i dark-chocolate foscos; rs-sport-grey i
+ * ice-grey clars). Amb els 14 colors, tots els parells tinta×samarreta tenen
+ * contrast.
+ *
+ * Està centralitzada aquí perquè hi havia la regla copiada a `cartImage.js`,
+ * `drawingPaths.js`, `pdpMockup.js` i `CheckoutContent.jsx`.
+ */
+export const INK_INVERTS_ON_LIGHT = ['white', 'ice-grey', 'rs-sport-grey'];
+export const INK_INVERTS_ON_DARK = ['black', 'navy', 'dark-chocolate', 'charcoal'];
+
+/** Aplica la regla de la inversió. `ink` ha de ser 'b' o 'w'. */
+export function invertLineInk(ink, shirtColor) {
+  if (ink === INK_WHITE && INK_INVERTS_ON_LIGHT.includes(shirtColor)) return INK_BLACK;
+  if (ink === INK_BLACK && INK_INVERTS_ON_DARK.includes(shirtColor)) return INK_WHITE;
+  return ink;
+}
 
 const PUBLIC_BASE = '/placeholders/apparel/mockups';
 

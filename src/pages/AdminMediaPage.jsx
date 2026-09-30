@@ -213,31 +213,31 @@ export default function AdminMediaPage() {
   };
 
   return (
-    <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
+    <div className="h-screen bg-paper-soft overflow-hidden flex flex-col">
       <div className="flex-1 overflow-y-auto max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestor de Media</h1>
-          <p className="text-gray-600">Pugeu, gestioneu i organitzeu els fitxers del lloc</p>
+          <h1 className="text-3xl font-bold text-ink-strong mb-2">Gestor de Media</h1>
+          <p className="text-ink-2">Pugeu, gestioneu i organitzeu els fitxers del lloc</p>
         </div>
 
         {/* Navegació de carpetes */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="bg-paper rounded-lg shadow p-4 mb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 text-sm">
               <button
                 onClick={navigateToRoot}
-                className={`p-2 hover:bg-gray-100 rounded ${!currentFolder ? 'bg-gray-100' : ''}`}
+                className={`p-2 hover:bg-paper-soft rounded ${!currentFolder ? 'bg-paper-soft' : ''}`}
                 title="Arrel"
               >
                 <Home className="w-4 h-4" />
               </button>
               {currentFolder && (
                 <>
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                  <ChevronRight className="w-4 h-4 text-muted-2" />
                   {currentFolder.split('/').map((folder, idx, arr) => (
                     <React.Fragment key={idx}>
-                      <span className="text-gray-700 font-medium">{folder}</span>
-                      {idx < arr.length - 1 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                      <span className="text-ink-2 font-medium">{folder}</span>
+                      {idx < arr.length - 1 && <ChevronRight className="w-4 h-4 text-muted-2" />}
                     </React.Fragment>
                   ))}
                 </>
@@ -245,7 +245,7 @@ export default function AdminMediaPage() {
             </div>
             <button
               onClick={() => setShowNewFolder(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-paper rounded-lg hover:bg-blue-700 transition-colors"
             >
               <FolderPlus className="w-4 h-4" />
               Nova carpeta
@@ -253,19 +253,19 @@ export default function AdminMediaPage() {
           </div>
 
           {showNewFolder && (
-            <div className="flex gap-2 p-4 bg-gray-50 rounded-lg">
+            <div className="flex gap-2 p-4 bg-paper-soft rounded-lg">
               <input
                 type="text"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
                 placeholder="Nom de la carpeta"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onKeyPress={(e) => e.key === 'Enter' && handleCreateFolder()}
                 autoFocus
               />
               <button
                 onClick={handleCreateFolder}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-green-600 text-paper rounded-lg hover:bg-green-700 transition-colors"
               >
                 Crear
               </button>
@@ -274,7 +274,7 @@ export default function AdminMediaPage() {
                   setShowNewFolder(false);
                   setNewFolderName('');
                 }}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                className="px-4 py-2 bg-muted-foreground text-ink-2 rounded-lg hover:bg-muted-2 transition-colors"
               >
                 Cancel·lar
               </button>
@@ -286,7 +286,7 @@ export default function AdminMediaPage() {
           className={`border-2 border-dashed rounded-lg p-12 mb-8 transition-all ${
             dragActive
               ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-300 bg-white hover:border-gray-400'
+              : 'border-line-strong bg-paper hover:border-muted-2'
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -294,13 +294,13 @@ export default function AdminMediaPage() {
           onDrop={handleDrop}
         >
           <div className="text-center">
-            <Upload className={`mx-auto h-12 w-12 ${dragActive ? 'text-blue-500' : 'text-gray-400'}`} />
+            <Upload className={`mx-auto h-12 w-12 ${dragActive ? 'text-blue-500' : 'text-muted-2'}`} />
             <div className="mt-4">
               <label htmlFor="file-upload" className="cursor-pointer">
                 <span className="text-blue-600 hover:text-blue-700 font-medium">
                   Feu clic per seleccionar
                 </span>
-                <span className="text-gray-600"> o arrossegueu fitxers aquí</span>
+                <span className="text-ink-2"> o arrossegueu fitxers aquí</span>
               </label>
               <input
                 ref={fileInputRef}
@@ -312,7 +312,7 @@ export default function AdminMediaPage() {
                 onChange={handleFileSelect}
               />
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-ink-soft mt-2">
               Imatges, vídeos, àudio i PDFs fins a 50MB
             </p>
             {currentFolder && (
@@ -334,18 +334,18 @@ export default function AdminMediaPage() {
 
         {loading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ink-strong"></div>
           </div>
         ) : files.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-            <Folder className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Carpeta buida</h3>
-            <p className="text-gray-600">Comenceu pujant fitxers o creant subcarpetes</p>
+          <div className="text-center py-12 bg-paper rounded-lg border border-line">
+            <Folder className="mx-auto h-12 w-12 text-muted-2 mb-4" />
+            <h3 className="text-lg font-medium text-ink-strong mb-2">Carpeta buida</h3>
+            <p className="text-ink-2">Comenceu pujant fitxers o creant subcarpetes</p>
           </div>
         ) : (
           <>
             <div className="flex justify-between items-center mb-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-ink-2">
                 {files.length} {files.length === 1 ? 'element' : 'elements'}
               </p>
             </div>
@@ -354,16 +354,16 @@ export default function AdminMediaPage() {
               {files.map((file) => (
                 <div
                   key={file.name}
-                  className="group relative bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all"
+                  className="group relative bg-paper rounded-lg border border-line overflow-hidden hover:shadow-lg transition-all"
                 >
-                  <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
+                  <div className="aspect-square bg-paper-soft flex items-center justify-center relative">
                     {file.isFolder ? (
                       <button
                         onClick={() => navigateToFolder(file.name)}
-                        className="w-full h-full flex flex-col items-center justify-center hover:bg-gray-200 transition-colors"
+                        className="w-full h-full flex flex-col items-center justify-center hover:bg-paper-tint transition-colors"
                       >
                         <Folder className="w-16 h-16 text-blue-500 mb-2" />
-                        <span className="text-sm font-medium text-gray-700 px-2 text-center">{file.name}</span>
+                        <span className="text-sm font-medium text-ink-2 px-2 text-center">{file.name}</span>
                       </button>
                     ) : isImage(file.name) ? (
                       <img
@@ -378,41 +378,41 @@ export default function AdminMediaPage() {
                           className="w-full h-full object-cover"
                           muted
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center pointer-events-none">
-                          <Video className="w-12 h-12 text-white" />
+                        <div className="absolute inset-0 bg-ink-pure bg-opacity-30 flex items-center justify-center pointer-events-none">
+                          <Video className="w-12 h-12 text-paper" />
                         </div>
                       </>
                     ) : isAudio(file.name) ? (
                       <div className="flex flex-col items-center justify-center w-full p-4">
                         <Music className="w-12 h-12 text-blue-500 mb-3" />
-                        <p className="text-xs text-gray-600 text-center truncate w-full">{file.name}</p>
+                        <p className="text-xs text-ink-2 text-center truncate w-full">{file.name}</p>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center">
-                        <FileText className="w-12 h-12 text-gray-400 mb-2" />
-                        <p className="text-xs text-gray-600 text-center px-2">{file.name.split('.').pop().toUpperCase()}</p>
+                        <FileText className="w-12 h-12 text-muted-2 mb-2" />
+                        <p className="text-xs text-ink-2 text-center px-2">{file.name.split('.').pop().toUpperCase()}</p>
                       </div>
                     )}
                   </div>
 
                   {!file.isFolder && (
                     <>
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="absolute inset-0 bg-ink-pure bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleCopyUrl(file.url)}
-                            className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                            className="p-2 bg-paper rounded-full hover:bg-paper-soft transition-colors"
                             title="Copieu l'URL"
                           >
                             {copiedUrl === file.url ? (
                               <Check className="w-5 h-5 text-green-600" />
                             ) : (
-                              <Copy className="w-5 h-5 text-gray-700" />
+                              <Copy className="w-5 h-5 text-ink-2" />
                             )}
                           </button>
                           <button
                             onClick={() => handleDelete(file.path)}
-                            className="p-2 bg-white rounded-full hover:bg-red-100 transition-colors"
+                            className="p-2 bg-paper rounded-full hover:bg-red-100 transition-colors"
                             title="Esborrar"
                           >
                             <Trash2 className="w-5 h-5 text-red-600" />
@@ -420,8 +420,8 @@ export default function AdminMediaPage() {
                         </div>
                       </div>
 
-                      <div className="p-2 border-t border-gray-200">
-                        <p className="text-xs text-gray-600 truncate" title={file.name}>
+                      <div className="p-2 border-t border-line">
+                        <p className="text-xs text-ink-2 truncate" title={file.name}>
                           {file.name}
                         </p>
                       </div>

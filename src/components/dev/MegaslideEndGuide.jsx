@@ -132,9 +132,13 @@ export default function MegaslideEndGuide() {
   }, [activat]);
 
   // Permet encendre'l i apagar-lo sense recarregar (útil mentre es prova).
+  //
+  // AMB `e.code` TAMBE (02/10/2026): a un Mac, Opcio+M dona `µ` i el `e.key`
+  // d'aquest atall no hi encaixava mai.
   useEffect(() => {
     const onKey = (e) => {
-      if (e.altKey && (e.key === 'm' || e.key === 'M')) {
+      if (e.altKey && (e.code === 'KeyM' || e.key === 'm' || e.key === 'M')) {
+        e.preventDefault();
         setActivat((prev) => {
           const next = !prev;
           try { window.localStorage.setItem(CLAU, next ? '1' : '0'); } catch { /* ignore */ }

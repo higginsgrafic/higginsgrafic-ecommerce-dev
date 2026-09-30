@@ -24,8 +24,37 @@ import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
  * que son les mateixes que fa servir `position: fixed`.
  */
 const COLOR_CARRIL = 'rgba(37, 99, 235, 0.85)';
+// LES SEGONES GUIES: EL CARRIL DE LA PAGINA (02/10/2026). En Marc: «Necessito
+// unes segones guies per al segon carril». El de la pagina es
+// `min(939.2px, 100vw - 80px)` centrat (el del header, la hero i la taula de la
+// p1); el del megaslide es el de les guies blaves. Van amb el mateix commutador.
+const COLOR_CARRIL_PAGINA = 'rgba(22, 163, 74, 0.85)';
+const AMPLE_CARRIL_PAGINA = 'min(939.2px, calc(100vw - 80px))';
 
-export default function CarrilGuidesOverlay({ enabled }) {
+export default function CarrilGuidesOverlay({ enabled, onToggle }) {
+  // EL COMMUTADOR, TAMBE AMB EL TECLAT (02/10/2026). La barra de botons nome s
+  // surt a les rutes d'edicio, pero aquestes guies es poden encendre a qualsevol
+  // pagina (`?carril=1`): si s'encenen en una pagina sense barra, no hi ha cap
+  // boto per apagar-les. Ho ha vist l'amo («les guies de carril no se'n van»).
+  // Amb Alt+C s'encenen i s'apaguen des de qualsevol lloc; el boto de la barra
+  // (on hi es) fa el mateix.
+  //
+  // AMB `e.code`, NO AMB `e.key` (02/10/2026). A un Mac, Opcio+C no dona la
+  // lletra `c`: dona `ç`. El commutador mirava `e.key`, o sigui que a un Mac no
+  // s'encenia mai (i, com que no arribava al `preventDefault`, a mes s'escrivia
+  // la `ç`). `e.code` es la tecla FISICA i val igual a tot arreu.
+  useEffect(() => {
+    if (!onToggle) return undefined;
+    const onKey = (e) => {
+      if (e.altKey && (e.code === 'KeyC' || e.key === 'c' || e.key === 'C')) {
+        e.preventDefault();
+        onToggle();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onToggle]);
+
   // LA GUIA DE LA DRETA DE LES FLETXES (24/09/2026, ho va demanar l'amo).
   //
   // El bloc de fletxes del carrusel es l'ultima cosa que hi ha abans de la
@@ -108,6 +137,28 @@ export default function CarrilGuidesOverlay({ enabled }) {
           height: '100vh',
           width: 0,
           borderLeft: `1px solid ${COLOR_CARRIL}`,
+        }}
+      />
+      <div
+        data-guia-carril-pagina="esq"
+        style={{
+          position: 'fixed',
+          left: `calc((100vw - ${AMPLE_CARRIL_PAGINA}) / 2)`,
+          top: 0,
+          height: '100vh',
+          width: 0,
+          borderLeft: `1px solid ${COLOR_CARRIL_PAGINA}`,
+        }}
+      />
+      <div
+        data-guia-carril-pagina="dret"
+        style={{
+          position: 'fixed',
+          left: `calc((100vw + ${AMPLE_CARRIL_PAGINA}) / 2)`,
+          top: 0,
+          height: '100vh',
+          width: 0,
+          borderLeft: `1px solid ${COLOR_CARRIL_PAGINA}`,
         }}
       />
       {xFletxes !== null ? (

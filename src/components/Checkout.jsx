@@ -144,7 +144,7 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-[920px] bg-white rounded-[29px] shadow-2xl overflow-hidden flex flex-col"
+              className="w-full max-w-[920px] bg-paper rounded-[29px] shadow-2xl overflow-hidden flex flex-col"
               style={{
                 ...(isSectionEnabled('checkout') ? getDebugStyle('checkout', 'main') : {}),
                 maxHeight: modalMaxHeight ? `${modalMaxHeight}px` : '100%',
@@ -154,9 +154,9 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
               <div className="p-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Lock className="h-5 w-5 text-green-600" />
-                  <h2 className="text-2xl font-bold transition-opacity" style={{ color: "#141414" }}>Caixa Segura</h2>
+                  <h2 className="text-2xl font-bold transition-opacity" style={{ color: "hsl(var(--grey-ink-strong))" }}>Caixa Segura</h2>
                 </div>
-                <div className="flex items-center gap-2 border-l border-gray-200 pl-4">
+                <div className="flex items-center gap-2 border-l border-line pl-4">
                   <Button variant="secondary" size="sm" type="button" onClick={fillMockPayment}>
                     Omple dades
                   </Button>
@@ -170,10 +170,10 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
                 <div className="h-full min-h-0 overflow-y-auto">
                   <div className="w-full flex justify-center px-0">
                     <div className="grid grid-cols-1 md:grid-cols-[520px_360px]">
-                      <div className="pt-6 pb-0 pr-6 pl-0 flex items-end" style={{ color: "#141414", minHeight: 48 }}>
+                      <div className="pt-6 pb-0 pr-6 pl-0 flex items-end" style={{ color: "hsl(var(--grey-ink-strong))", minHeight: 48 }}>
                         <h3 className="font-semibold">T’enviarem la factura a</h3>
                       </div>
-                      <div className="pt-6 pb-0 pl-6 pr-0 flex items-end" style={{ color: "#141414", minHeight: 48 }}>
+                      <div className="pt-6 pb-0 pl-6 pr-0 flex items-end" style={{ color: "hsl(var(--grey-ink-strong))", minHeight: 48 }}>
                         <h3 className="font-semibold flex items-center gap-2">
                           <CreditCard className="h-5 w-5" /> Informació de Pagament
                         </h3>
@@ -187,7 +187,7 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                          className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none"
                         />
                       </div>
                       <div className="py-6 pl-6 pr-0">
@@ -199,38 +199,38 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
                           onChange={handleChange}
                           required
                           maxLength="16"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                          className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none"
                         />
                       </div>
 
-                      <div className="py-6 pr-6 pl-0" style={{ color: "#141414" }}>
+                      <div className="py-6 pr-6 pl-0" style={{ color: "hsl(var(--grey-ink-strong))" }}>
                         <h3 className="font-semibold">Dades d'enviament</h3>
                       </div>
                       <div className="pl-6 pr-0 pb-6 pt-0">
                         <div className="grid grid-cols-2 gap-4">
-                          <input type="text" name="expiryDate" placeholder="MM/AA *" value={formData.expiryDate} onChange={handleChange} required maxLength="5" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none" />
-                          <input type="text" name="cvv" placeholder="CVV *" value={formData.cvv} onChange={handleChange} required maxLength="3" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none" />
+                          <input type="text" name="expiryDate" placeholder="MM/AA *" value={formData.expiryDate} onChange={handleChange} required maxLength="5" className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none" />
+                          <input type="text" name="cvv" placeholder="CVV *" value={formData.cvv} onChange={handleChange} required maxLength="3" className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none" />
                         </div>
                       </div>
 
                       <div className="pl-0 pr-6 pb-6 pt-0">
                         <div className="grid grid-cols-2 gap-4">
-                          <input type="text" name="firstName" placeholder="Nom *" value={formData.firstName} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none" />
-                          <input type="text" name="lastName" placeholder="Cognoms *" value={formData.lastName} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none" />
+                          <input type="text" name="firstName" placeholder="Nom *" value={formData.firstName} onChange={handleChange} required className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none" />
+                          <input type="text" name="lastName" placeholder="Cognoms *" value={formData.lastName} onChange={handleChange} required className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none" />
                         </div>
                       </div>
                       <div className="pl-6 pr-0 pb-6 pt-0">
                         <div className="space-y-2">
-                          <div className="flex justify-between text-sm"><span className="transition-opacity" style={{ color: "#141414", opacity: 0.7 }}>Subtotal</span><span className="font-medium">{formatPrice(totalPrice)}</span></div>
+                          <div className="flex justify-between text-sm"><span className="transition-opacity" style={{ color: "hsl(var(--grey-ink-strong))", opacity: 0.7 }}>Subtotal</span><span className="font-medium">{formatPrice(totalPrice)}</span></div>
                           <div className="flex justify-between text-sm">
-                            <span className="transition-opacity" style={{ color: "#141414", opacity: 0.7 }}>Enviament</span>
+                            <span className="transition-opacity" style={{ color: "hsl(var(--grey-ink-strong))", opacity: 0.7 }}>Enviament</span>
                             <span className="flex items-baseline gap-2">
                               <span
                                 className="transition-opacity"
                                 style={{
                                   position: 'relative',
                                   display: 'inline-block',
-                                  color: '#141414',
+                                  color: 'hsl(var(--grey-ink-strong))',
                                   opacity: 0.5,
                                   lineHeight: 1,
                                 }}
@@ -259,7 +259,7 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
                       </div>
 
                       <div className="pl-0 pr-6 pb-6 pt-0">
-                        <input type="text" name="address" placeholder="Adreça *" value={formData.address} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none" />
+                        <input type="text" name="address" placeholder="Adreça *" value={formData.address} onChange={handleChange} required className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none" />
                       </div>
                       <div className="pl-6 pr-0 pb-6 pt-0 flex items-center">
                         <div className="flex justify-between text-lg font-bold w-full">
@@ -270,15 +270,15 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
 
                       <div className="pl-0 pr-6 pb-6 pt-0">
                         <div className="grid grid-cols-2 gap-4">
-                          <input type="text" name="city" placeholder="Ciutat *" value={formData.city} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none" />
-                          <input type="text" name="postalCode" placeholder="Codi postal *" value={formData.postalCode} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none" />
+                          <input type="text" name="city" placeholder="Ciutat *" value={formData.city} onChange={handleChange} required className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none" />
+                          <input type="text" name="postalCode" placeholder="Codi postal *" value={formData.postalCode} onChange={handleChange} required className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none" />
                         </div>
                       </div>
                       <div className="pl-6 pr-0 pb-6 pt-0">
-                        <Button type="submit" disabled={isProcessing} className="w-full bg-gray-900 hover:bg-gray-800 text-white py-6 text-lg">
+                        <Button type="submit" disabled={isProcessing} className="w-full bg-ink-strong hover:bg-ink text-paper py-6 text-lg">
                           {isProcessing ? (
                             <span className="flex items-center gap-2">
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-line"></div>
                               Processant...
                             </span>
                           ) : (
@@ -288,11 +288,11 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
                       </div>
 
                       <div className="pl-0 pr-6 pb-6 pt-0 flex items-end">
-                        <input type="text" name="country" placeholder="País *" value={formData.country} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none" />
+                        <input type="text" name="country" placeholder="País *" value={formData.country} onChange={handleChange} required className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent outline-none" />
                       </div>
                       <div className="py-6 pl-6 pr-0 flex items-end">
-                        <p className="text-xs relative" style={{ color: "#141414", opacity: 0.6 }}>
-                          <span aria-hidden="true" style={{ position: 'absolute', left: 0, transform: 'translateX(-10px)', color: '#6b7280', fontWeight: 700 }}>*</span>
+                        <p className="text-xs relative" style={{ color: "hsl(var(--grey-ink-strong))", opacity: 0.6 }}>
+                          <span aria-hidden="true" style={{ position: 'absolute', left: 0, transform: 'translateX(-10px)', color: 'hsl(var(--grey-muted-2))', fontWeight: 700 }}>*</span>
                           Els camps amb asterisc són obligatoris.
                         </p>
                       </div>

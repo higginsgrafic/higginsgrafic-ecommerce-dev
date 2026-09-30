@@ -51,6 +51,10 @@ export default function DebugLayer({
 
   const megaStripeState = useMegaStripeDebugState({ beltEnabledFromUrl, locationPathname: location.pathname });
   const { layoutInspectorEnabled, setLayoutInspectorEnabled, guidesEnabled, setGuidesEnabled, copiedDesign, setCopiedDesign, belt2GuidesEnabled, setBelt2GuidesEnabled, carrilGuidesEnabled, setCarrilGuidesEnabled, megaAccordionLocked, setMegaAccordionLocked } = useDebugToggles({ locationSearch: location.search });
+  // Els dos commutadors de les guies, clavats (per al teclat): el setter del
+  // hook ja es estable, i aquests en son la versio «volta-ho».
+  const canviaCarrilGuides = useCallback(() => setCarrilGuidesEnabled((v) => !v), [setCarrilGuidesEnabled]);
+  const canviaBelt2Guides = useCallback(() => setBelt2GuidesEnabled((v) => !v), [setBelt2GuidesEnabled]);
   const { debugsEnabled: debugOverlaysEnabled, rulersEnabled: rulersOverlayEnabled, pdpControlsEnabled, pautaEnabled, setPautaEnabled, tableEnabled, setTableEnabled, pautaOpacity, setPautaOpacity, tableOpacity, setTableOpacity } = useDebugOverlays();
   const { snapshot: stripeOverlayDebugSnapshot, debugOn: stripeOverlayDebugOn } = useStripeOverlayDebug(location.search);
   const { exportCopyStatus, setExportCopyStatus, exportTab, setExportTab, exportModalOpen, setExportModalOpen, exportModalTitle, setExportModalTitle, exportModalText, setExportModalText } = useExportModal();
@@ -175,6 +179,11 @@ export default function DebugLayer({
           setGuidesEnabled={setGuidesEnabled}
           belt2GuidesEnabled={belt2GuidesEnabled}
           setBelt2GuidesEnabled={setBelt2GuidesEnabled}
+          // LES DUES DEL CARRIL (01/10/2026). No s'havien passat mai: la barra
+          // les demanava i li arribaven `undefined`, aixi que el boto «Carril»
+          // petava amb «setCarrilGuidesEnabled is not a function» i no feia res.
+          carrilGuidesEnabled={carrilGuidesEnabled}
+          setCarrilGuidesEnabled={setCarrilGuidesEnabled}
           megaAccordionLocked={megaAccordionLocked}
           setMegaAccordionLocked={setMegaAccordionLocked}
         />
@@ -187,9 +196,26 @@ export default function DebugLayer({
         />
       )}
 
-      {import.meta.env.DEV && <P.CarrilGuidesOverlay enabled={carrilGuidesEnabled} />}
+      {/* LES DUES GUIES (carril i Belt 2), AMB EL SEU COMMUTADOR DE TECLAT
+          (02/10/2026). Aquestes dues surten a TOTES les rutes de desenvolupament
+          (no nome s a les d'edicio, com la barra), o sigui que es podien encendre
+          en una pagina on no hi havia cap boto per apagar-les: «les guies de
+          carril no se'n van». Amb el commutador tambe es treu el parametre de
+          l'adreca (vegeu `useDebugToggles`), i per aixo passa pel setter del
+          hook i no per un `setState` cru. */}
+      {import.meta.env.DEV && (
+        <P.CarrilGuidesOverlay
+          enabled={carrilGuidesEnabled}
+          onToggle={canviaCarrilGuides}
+        />
+      )}
 
-      {import.meta.env.DEV && <P.BeltReferenceOverlay enabled={belt2GuidesEnabled} />}
+      {import.meta.env.DEV && (
+        <P.BeltReferenceOverlay
+          enabled={belt2GuidesEnabled}
+          onToggle={canviaBelt2Guides}
+        />
+      )}
 
       {import.meta.env.DEV && (pautaEnabled || tableEnabled) && (location.pathname !== '/checkout' || tableEnabled) && (
         <P.Pauta4ColsOverlay

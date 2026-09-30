@@ -115,26 +115,26 @@ export default function ResetPasswordPage() {
         onClick={handleClose}
       >
         <div
-          className="relative bg-white rounded-lg shadow-2xl p-8 w-full max-w-md mx-4"
+          className="relative bg-paper rounded-lg shadow-2xl p-8 w-full max-w-md mx-4"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             type="button"
             onClick={handleClose}
-            className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-700 transition-colors"
+            className="absolute top-4 right-4 text-muted-2 hover:text-ink-2 transition-colors"
             aria-label="Tancar"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex items-center justify-center mb-6">
-            <KeyRound className="w-8 h-8 text-neutral-700" />
+            <KeyRound className="w-8 h-8 text-ink-2" />
           </div>
 
-            <h1 className="text-2xl font-bold text-center text-neutral-900 mb-2">
+            <h1 className="text-2xl font-bold text-center text-ink-strong mb-2">
               Nova contrasenya
             </h1>
-            <p className="text-center text-neutral-500 text-sm mb-6">
+            <p className="text-center text-ink-soft text-sm mb-6">
               Introdueix la teva nova contrasenya per recuperar l'accés al compte
             </p>
 
@@ -154,24 +154,24 @@ export default function ResetPasswordPage() {
             {!success && sessionReady && (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-ink-2 mb-1">
                     Nova contrasenya
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-2" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-20 py-2.5 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+                      className="w-full pl-10 pr-20 py-2.5 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-ink-strong focus:border-transparent"
                       placeholder="Mínim 6 caràcters"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
                       <button
                         type="button"
                         onClick={generatePassword}
-                        className="p-1 text-neutral-400 hover:text-neutral-700 transition-colors rounded"
+                        className="p-1 text-muted-2 hover:text-ink-2 transition-colors rounded"
                         title="Contrasenya al·leatòria"
                         aria-label="Contrasenya al·leatòria"
                       >
@@ -180,7 +180,7 @@ export default function ResetPasswordPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="p-1 text-neutral-400 hover:text-neutral-700 transition-colors rounded"
+                        className="p-1 text-muted-2 hover:text-ink-2 transition-colors rounded"
                         title={showPassword ? 'Amaga la contrasenya' : 'Mostra la contrasenya'}
                         aria-label={showPassword ? 'Amaga la contrasenya' : 'Mostra la contrasenya'}
                       >
@@ -191,17 +191,17 @@ export default function ResetPasswordPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-ink-2 mb-1">
                     Confirmar contrasenya
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-2" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+                      className="w-full pl-10 pr-10 py-2.5 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-ink-strong focus:border-transparent"
                       placeholder="Repeteix la contrasenya"
                     />
                   </div>
@@ -210,7 +210,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-2.5 bg-neutral-900 text-white rounded-lg font-medium hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-2.5 bg-ink-strong text-paper rounded-lg font-medium hover:bg-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Actualitzant...' : 'Actualitza la contrasenya'}
                 </button>
@@ -218,8 +218,8 @@ export default function ResetPasswordPage() {
             )}
 
             {error && (
-              <p className="text-center text-sm text-neutral-500 mt-6">
-                <Link to="/login" className="text-neutral-900 font-medium hover:underline">
+              <p className="text-center text-sm text-ink-soft mt-6">
+                <Link to="/login" className="text-ink-strong font-medium hover:underline">
                   Torna a l'inici de sessió
                 </Link>
               </p>

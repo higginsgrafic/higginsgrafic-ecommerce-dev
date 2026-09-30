@@ -280,17 +280,17 @@ function MegaStripeHud({
                 >
                     {hudActiveTab === 'cistell' && !cistellExpanded && (
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.98)', display: 'flex', flexDirection: 'column', zIndex: 10, pointerEvents: 'auto', overflow: 'auto', padding: '20px 24px' }}>
-                        <div style={{ fontFamily: 'Roboto, sans-serif', color: '#000', maxWidth: 480 }}>
+                        <div style={{ fontFamily: 'Roboto, sans-serif', color: 'hsl(var(--grey-ink-pure))', maxWidth: 480 }}>
                           {/* Selector de layout */}
                           <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-                            <button onClick={() => setCistellLayout(1)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 1 ? 700 : 400, background: cistellLayout === 1 ? '#000' : '#f0f0f0', color: cistellLayout === 1 ? '#fff' : '#666', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 1</button>
-                            <button onClick={() => setCistellLayout(2)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 2 ? 700 : 400, background: cistellLayout === 2 ? '#000' : '#f0f0f0', color: cistellLayout === 2 ? '#fff' : '#666', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 2</button>
-                            <button onClick={() => setCistellLayout(3)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 3 ? 700 : 400, background: cistellLayout === 3 ? '#000' : '#f0f0f0', color: cistellLayout === 3 ? '#fff' : '#666', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 3</button>
-                            <button onClick={() => setCistellLayout(4)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 4 ? 700 : 400, background: cistellLayout === 4 ? '#000' : '#f0f0f0', color: cistellLayout === 4 ? '#fff' : '#666', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Imatge</button>
+                            <button onClick={() => setCistellLayout(1)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 1 ? 700 : 400, background: cistellLayout === 1 ? 'hsl(var(--grey-ink-pure))' : 'hsl(var(--grey-paper-tint))', color: cistellLayout === 1 ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-soft))', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 1</button>
+                            <button onClick={() => setCistellLayout(2)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 2 ? 700 : 400, background: cistellLayout === 2 ? 'hsl(var(--grey-ink-pure))' : 'hsl(var(--grey-paper-tint))', color: cistellLayout === 2 ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-soft))', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 2</button>
+                            <button onClick={() => setCistellLayout(3)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 3 ? 700 : 400, background: cistellLayout === 3 ? 'hsl(var(--grey-ink-pure))' : 'hsl(var(--grey-paper-tint))', color: cistellLayout === 3 ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-soft))', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Layout 3</button>
+                            <button onClick={() => setCistellLayout(4)} style={{ padding: '4px 10px', fontSize: 10, fontFamily: 'Roboto, sans-serif', fontWeight: cistellLayout === 4 ? 700 : 400, background: cistellLayout === 4 ? 'hsl(var(--grey-ink-pure))' : 'hsl(var(--grey-paper-tint))', color: cistellLayout === 4 ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-soft))', border: 'none', borderRadius: 2, cursor: 'pointer' }}>Imatge</button>
                           </div>
                           
                           {/* Header compacte */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 20, borderBottom: '2px solid #000', paddingBottom: 8 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 20, borderBottom: '2px solid hsl(var(--grey-ink-pure))', paddingBottom: 8 }}>
                             <h2 style={{ fontFamily: 'Oswald, sans-serif', fontSize: 18, fontWeight: 700, letterSpacing: '0.03em', textTransform: 'uppercase', margin: 0, lineHeight: 1.2 }}>CISTELL (2)</h2>
                             <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>34,90€</div>
                           </div>
@@ -305,7 +305,7 @@ function MegaStripeHud({
                     )}
                     {hudActiveTab === 'cistell' && cistellExpanded && (
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.96)', display: 'flex', flexDirection: 'column', zIndex: 10, pointerEvents: 'auto', overflow: 'auto', padding: 16 }}>
-                        <div style={{ fontFamily: 'ui-sans-serif, system-ui, sans-serif', color: '#000' }}>
+                        <div style={{ fontFamily: 'ui-sans-serif, system-ui, sans-serif', color: 'hsl(var(--grey-ink-pure))' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                             <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '0.02em', textTransform: 'uppercase', margin: 0 }}>LA MEVA COMANDA 🛒</h2>
                             <button onClick={() => setCistellExpanded(false)} style={{ background: 'rgba(0,0,0,0.1)', border: 'none', padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', borderRadius: 4 }}>← Tornar</button>
@@ -334,7 +334,7 @@ function MegaStripeHud({
                           </div>
 
                           {/* Total */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, paddingBottom: 16, borderTop: '2px solid #000', marginBottom: 20 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, paddingBottom: 16, borderTop: '2px solid hsl(var(--grey-ink-pure))', marginBottom: 20 }}>
                             <div style={{ fontSize: 18, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOT PLEGAT</div>
                             <div style={{ fontSize: 28, fontWeight: 900 }}>34,90€</div>
                           </div>
@@ -371,7 +371,7 @@ function MegaStripeHud({
                             <div style={{ fontWeight: 600, marginTop: 8 }}>On vols que les facturem?</div>
 
                             {/* Botó Pagament */}
-                            <button style={{ width: '100%', background: '#000', color: '#fff', border: 'none', padding: '14px', fontSize: 16, fontWeight: 700, cursor: 'pointer', borderRadius: 4, marginTop: 16 }}>Pagament</button>
+                            <button style={{ width: '100%', background: 'hsl(var(--grey-ink-pure))', color: 'hsl(var(--grey-paper))', border: 'none', padding: '14px', fontSize: 16, fontWeight: 700, cursor: 'pointer', borderRadius: 4, marginTop: 16 }}>Pagament</button>
 
                             {/* Footer */}
                             <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.6)', textAlign: 'center', lineHeight: 1.6, marginTop: 16 }}>
@@ -385,14 +385,14 @@ function MegaStripeHud({
                     )}
                     {hudActiveTab === 'pàgines' && (
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.98)', display: 'flex', flexDirection: 'column', zIndex: 10, pointerEvents: 'auto', overflow: 'auto', padding: '20px 24px' }}>
-                        <div style={{ fontFamily: 'Roboto, sans-serif', color: '#000', maxWidth: 480 }}>
+                        <div style={{ fontFamily: 'Roboto, sans-serif', color: 'hsl(var(--grey-ink-pure))', maxWidth: 480 }}>
                           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Components</div>
                           <div style={{ height: '1px', backgroundColor: 'rgba(0,0,0,0.12)', marginBottom: 16 }} />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             <button
                               type="button"
                               onClick={() => navigate('/checkout')}
-                              style={{ textAlign: 'left', background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.10)', borderRadius: 6, padding: '10px 14px', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                              style={{ textAlign: 'left', background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.10)', borderRadius: 6, padding: '10px 14px', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: 'hsl(var(--grey-ink-pure))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                             >
                               <span>Llista Checkout</span>
                               <span style={{ fontSize: 12, fontWeight: 400, color: 'rgba(0,0,0,0.45)' }}>/checkout</span>

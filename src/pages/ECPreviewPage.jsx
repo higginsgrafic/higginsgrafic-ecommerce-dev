@@ -238,7 +238,7 @@ function ECPreviewPage() {
           backgroundType: data.background_type,
           videoUrl: data.video_url,
           imageUrl: data.image_url,
-          backgroundColor: data.background_color || '#000000',
+          backgroundColor: data.background_color || 'hsl(var(--grey-ink-pure))',
           gradientStops: data.gradient_stops || null,
           gradientAngle: data.gradient_angle ?? 180,
           title: data.title ?? '',
@@ -247,7 +247,7 @@ function ECPreviewPage() {
           buttonText: data.button_text ?? '',
           buttonLink: data.button_link ?? '/',
           showButton: data.show_button ?? false,
-          textColor: data.text_color || '#ffffff',
+          textColor: data.text_color || 'hsl(var(--grey-paper))',
           redirectUrl: data.redirect_url ?? '',
           autoRedirect: data.auto_redirect ?? false,
           globalRedirect: data.global_redirect ?? false
@@ -284,8 +284,8 @@ function ECPreviewPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-black">
-        <div className="text-white text-xl">Carregant...</div>
+      <div className="w-full h-screen flex items-center justify-center bg-ink-pure">
+        <div className="text-paper text-xl">Carregant...</div>
       </div>
     );
   }
@@ -294,7 +294,7 @@ function ECPreviewPage() {
   const title = config?.title ?? '';
   const subtitle = config?.subtitle ?? '';
   const description = config?.description ?? '';
-  const textColor = config?.textColor || '#ffffff';
+  const textColor = config?.textColor || 'hsl(var(--grey-paper))';
   const showButton = config?.showButton ?? false;
   const buttonText = config?.buttonText ?? '';
   const buttonLink = config?.buttonLink ?? '/';
@@ -313,7 +313,7 @@ function ECPreviewPage() {
   const showDevNote = isDev && !isAdmin;
 
   const getBackgroundStyle = () => {
-    if (!config) return { backgroundColor: '#000000' };
+    if (!config) return { backgroundColor: 'hsl(var(--grey-ink-pure))' };
 
     if (config.gradientStops && config.gradientStops.length > 0) {
       const sortedStops = [...config.gradientStops].sort((a, b) => a.position - b.position);
@@ -321,7 +321,7 @@ function ECPreviewPage() {
       return { background: `linear-gradient(${config.gradientAngle}deg, ${gradient})` };
     }
 
-    return { backgroundColor: config.backgroundColor || '#000000' };
+    return { backgroundColor: config.backgroundColor || 'hsl(var(--grey-ink-pure))' };
   };
 
   return (
@@ -371,7 +371,7 @@ function ECPreviewPage() {
         {showDevNote && (
           <div className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none">
             <div
-              className="pointer-events-auto w-[34rem] max-w-[90vw] min-h-[18rem] rounded-2xl border border-white/20 bg-red-600/70 backdrop-blur-md px-8 py-16 text-white flex flex-col justify-center"
+              className="pointer-events-auto w-[34rem] max-w-[90vw] min-h-[18rem] rounded-2xl border border-line/20 bg-red-600/70 backdrop-blur-md px-8 py-16 text-paper flex flex-col justify-center"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mx-auto inline-flex flex-col items-start">
@@ -461,7 +461,7 @@ function ECPreviewPage() {
                   <Link
                     to={buttonLink}
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-block px-8 py-4 bg-white/20 backdrop-blur-sm rounded-lg font-medium transition-all hover:bg-white/30 hover:scale-105"
+                    className="inline-block px-8 py-4 bg-paper/20 backdrop-blur-sm rounded-lg font-medium transition-all hover:bg-paper/30 hover:scale-105"
                     style={{ color: textColor }}
                   >
                     {buttonText}
@@ -475,8 +475,8 @@ function ECPreviewPage() {
       </div>
 
       {isRedirecting && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="text-white text-xl animate-pulse">Redirigint a Etsy…</div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-pure">
+          <div className="text-paper text-xl animate-pulse">Redirigint a Etsy…</div>
         </div>
       )}
     </>);

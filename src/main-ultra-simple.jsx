@@ -28,7 +28,7 @@ function UltraSimpleApp() {
           }} style={{
             padding: '12px 24px',
             background: 'white',
-            color: '#333',
+            color: 'hsl(var(--grey-ink))',
             border: 'none',
             borderRadius: '8px',
             fontSize: '16px',

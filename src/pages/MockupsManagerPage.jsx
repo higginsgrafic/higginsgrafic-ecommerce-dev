@@ -591,56 +591,56 @@ export default function MockupsManagerPage() {
 
   if (loading && mockups.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-paper-soft flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregant mockups...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ink-strong mx-auto"></div>
+          <p className="mt-4 text-ink-2">Carregant mockups...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-paper-soft py-8">
       <div className="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Gestió de Mockups</h1>
-            <p className="mt-2 text-gray-600">Gestiona les imatges de previsualització dels productes</p>
+            <h1 className="text-3xl font-bold text-ink-strong">Gestió de Mockups</h1>
+            <p className="mt-2 text-ink-2">Gestiona les imatges de previsualització dels productes</p>
           </div>
           <div className="flex gap-2">
             <Link
               to="/admin"
-              className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-ink-2 bg-paper border border-line-strong rounded-lg hover:bg-paper-soft"
             >
               ← Tornar
             </Link>
             <button
               onClick={exportToCSV}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
+              className="flex items-center gap-2 px-4 py-2 bg-ink-2 text-paper rounded-lg hover:bg-ink"
             >
               <Download className="w-4 h-4" />
               Exportar CSV
             </button>
             <button
               onClick={() => setShowAddForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-paper rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-4 h-4" />
               Afegir Mockup
             </button>
             <button
               onClick={() => setShowGridView((v) => !v)}
-              className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-ink-2 bg-paper border border-line-strong rounded-lg hover:bg-paper-soft"
             >
               {showGridView ? 'Amagar grid' : 'Veure grid'}
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="bg-paper rounded-lg shadow p-4 mb-6">
           <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-ink-2">
               Registres: {diagnostics.totalRows} (actius: {diagnostics.activeRows}, inactius: {diagnostics.inactiveRows}) · Keys úniques: {diagnostics.uniqueKeys} · Combinacions úniques: {diagnostics.uniqueSemantic} · Duplicats (mateix key): {diagnostics.duplicateKeyGroups.length} · Duplicats (mateixa combinació): {diagnostics.duplicateSemanticGroups.length}
             </div>
             <button
@@ -654,13 +654,13 @@ export default function MockupsManagerPage() {
           {showDiagnostics && (
             <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="border rounded-lg p-3">
-                <div className="text-sm font-semibold text-gray-900 mb-2">Resum</div>
-                <div className="text-xs text-gray-700">
+                <div className="text-sm font-semibold text-ink-strong mb-2">Resum</div>
+                <div className="text-xs text-ink-2">
                   mockups: {diagnostics.bySource.mockups} · media: {diagnostics.bySource.media} · other: {diagnostics.bySource.other} · empty: {diagnostics.bySource.empty}
                 </div>
 
-                <div className="mt-3 text-xs text-gray-700">
-                  <div className="font-semibold text-gray-900 mb-1">Top col·leccions (per nombre de registres)</div>
+                <div className="mt-3 text-xs text-ink-2">
+                  <div className="font-semibold text-ink-strong mb-1">Top col·leccions (per nombre de registres)</div>
                   <div className="space-y-1">
                     {diagnostics.collectionsTop.map(([c, n]) => (
                       <div key={c} className="font-mono break-all">{n} · {c || '(buit)'}</div>
@@ -670,15 +670,15 @@ export default function MockupsManagerPage() {
               </div>
 
               <div className="border rounded-lg p-3">
-                <div className="text-sm font-semibold text-gray-900 mb-2">Duplicats per key normalitzat</div>
+                <div className="text-sm font-semibold text-ink-strong mb-2">Duplicats per key normalitzat</div>
                 {diagnostics.duplicateKeyGroups.length === 0 ? (
-                  <div className="text-sm text-gray-500">Cap</div>
+                  <div className="text-sm text-ink-soft">Cap</div>
                 ) : (
                   <div className="space-y-3">
                     {diagnostics.duplicateKeyGroups.slice(0, 20).map(([key, items]) => (
                       <div key={key} className="text-xs">
-                        <div className="font-mono break-all text-gray-800">{items.length}x · {key}</div>
-                        <div className="text-gray-600 mt-1">
+                        <div className="font-mono break-all text-ink">{items.length}x · {key}</div>
+                        <div className="text-ink-2 mt-1">
                           {items.map((m) => `${m.id}:${m.collection}/${m.design_name}/${m.product_type}/${m.base_color}/${m.drawing_color}`).join(' · ')}
                         </div>
                       </div>
@@ -688,15 +688,15 @@ export default function MockupsManagerPage() {
               </div>
 
               <div className="border rounded-lg p-3 lg:col-span-2">
-                <div className="text-sm font-semibold text-gray-900 mb-2">Duplicats per combinació (collection+design+type+colors)</div>
+                <div className="text-sm font-semibold text-ink-strong mb-2">Duplicats per combinació (collection+design+type+colors)</div>
                 {diagnostics.duplicateSemanticGroups.length === 0 ? (
-                  <div className="text-sm text-gray-500">Cap</div>
+                  <div className="text-sm text-ink-soft">Cap</div>
                 ) : (
                   <div className="space-y-3">
                     {diagnostics.duplicateSemanticGroups.slice(0, 20).map(([key, items]) => (
                       <div key={key} className="text-xs">
-                        <div className="font-mono break-all text-gray-800">{items.length}x · {key}</div>
-                        <div className="text-gray-600 mt-1">
+                        <div className="font-mono break-all text-ink">{items.length}x · {key}</div>
+                        <div className="text-ink-2 mt-1">
                           {items.map((m) => `${m.id}:${m.file_path || ''}`).join(' · ')}
                         </div>
                       </div>
@@ -708,19 +708,19 @@ export default function MockupsManagerPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-paper rounded-lg shadow p-6 mb-6">
           <div className="flex items-center gap-2 mb-4">
-            <Filter className="w-5 h-5 text-gray-500" />
+            <Filter className="w-5 h-5 text-ink-soft" />
             <h2 className="text-lg font-semibold">Filtres</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Col·lecció</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Col·lecció</label>
               <select
                 value={filters.collection}
                 onChange={e => setFilters({ ...filters, collection: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Totes</option>
                 {collections.map(c => (
@@ -730,11 +730,11 @@ export default function MockupsManagerPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Disseny</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Disseny</label>
               <select
                 value={filters.design_name}
                 onChange={e => setFilters({ ...filters, design_name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={!filters.collection}
               >
                 <option value="">Tots</option>
@@ -745,47 +745,47 @@ export default function MockupsManagerPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Color base</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Color base</label>
               <input
                 type="text"
                 value={filters.base_color}
                 onChange={e => setFilters({ ...filters, base_color: e.target.value })}
                 placeholder="white, black..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Color dibuix</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Color dibuix</label>
               <input
                 type="text"
                 value={filters.drawing_color}
                 onChange={e => setFilters({ ...filters, drawing_color: e.target.value })}
                 placeholder="black, white..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tipus producte</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Tipus producte</label>
               <input
                 type="text"
                 value={filters.product_type}
                 onChange={e => setFilters({ ...filters, product_type: e.target.value })}
                 placeholder="tshirt, mug..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estat</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Estat</label>
               <select
                 value={filters.is_active === undefined ? '' : filters.is_active.toString()}
                 onChange={e => setFilters({
                   ...filters,
                   is_active: e.target.value === '' ? undefined : e.target.value === 'true'
                 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Tots</option>
                 <option value="true">Actius</option>
@@ -795,7 +795,7 @@ export default function MockupsManagerPage() {
           </div>
 
           <div className="mt-4 flex justify-between items-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-ink-2">
               {filteredCount} / {totalCount} mockup{totalCount !== 1 ? 's' : ''}
             </p>
             <button
@@ -815,93 +815,93 @@ export default function MockupsManagerPage() {
         </div>
 
         {showAddForm && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-paper rounded-lg shadow p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Afegir Mockup</h2>
             <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Col·lecció *</label>
+                <label className="block text-sm font-medium text-ink-2 mb-1">Col·lecció *</label>
                 <input
                   type="text"
                   required
                   value={editForm.collection || ''}
                   onChange={e => setEditForm({ ...editForm, collection: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nom disseny *</label>
+                <label className="block text-sm font-medium text-ink-2 mb-1">Nom disseny *</label>
                 <input
                   type="text"
                   required
                   value={editForm.design_name || ''}
                   onChange={e => setEditForm({ ...editForm, design_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Color dibuix *</label>
+                <label className="block text-sm font-medium text-ink-2 mb-1">Color dibuix *</label>
                 <input
                   type="text"
                   required
                   value={editForm.drawing_color || ''}
                   onChange={e => setEditForm({ ...editForm, drawing_color: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Color base *</label>
+                <label className="block text-sm font-medium text-ink-2 mb-1">Color base *</label>
                 <input
                   type="text"
                   required
                   value={editForm.base_color || ''}
                   onChange={e => setEditForm({ ...editForm, base_color: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tipus producte *</label>
+                <label className="block text-sm font-medium text-ink-2 mb-1">Tipus producte *</label>
                 <input
                   type="text"
                   required
                   value={editForm.product_type || 'tshirt'}
                   onChange={e => setEditForm({ ...editForm, product_type: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ruta fitxer *</label>
+                <label className="block text-sm font-medium text-ink-2 mb-1">Ruta fitxer *</label>
                 <input
                   type="text"
                   required
                   value={editForm.file_path || ''}
                   onChange={e => setEditForm({ ...editForm, file_path: e.target.value })}
                   placeholder="/mockups/..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subcategoria</label>
+                <label className="block text-sm font-medium text-ink-2 mb-1">Subcategoria</label>
                 <input
                   type="text"
                   value={editForm.subcategory || ''}
                   onChange={e => setEditForm({ ...editForm, subcategory: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sub-subcategoria</label>
+                <label className="block text-sm font-medium text-ink-2 mb-1">Sub-subcategoria</label>
                 <input
                   type="text"
                   value={editForm.sub_subcategory || ''}
                   onChange={e => setEditForm({ ...editForm, sub_subcategory: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line-strong rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -909,13 +909,13 @@ export default function MockupsManagerPage() {
                 <button
                   type="button"
                   onClick={() => { setShowAddForm(false); setEditForm({}); }}
-                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 text-ink-2 bg-paper border border-line-strong rounded-lg hover:bg-paper-soft"
                 >
                   Cancel·lar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-blue-600 text-paper rounded-lg hover:bg-blue-700"
                 >
                   Afegir
                 </button>
@@ -924,38 +924,38 @@ export default function MockupsManagerPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-paper rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-line">
+              <thead className="bg-paper-soft">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">
                     Previsualització
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">
                     Col·lecció
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">
                     Disseny
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">
                     Colors
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">
                     Tipus
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">
                     Ordre
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">
                     Estat
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-ink-soft uppercase tracking-wider">
                     Accions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-paper divide-y divide-line">
                 {mockups.map(mockup => (
                   <tr key={mockup.id} className={!mockup.is_active ? 'opacity-50' : ''}>
                     {editingId === mockup.id ? (
@@ -1021,7 +1021,7 @@ export default function MockupsManagerPage() {
                           />
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${mockup.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${mockup.is_active ? 'bg-green-100 text-green-800' : 'bg-paper-soft text-ink'}`}>
                             {mockup.is_active ? 'Actiu' : 'Inactiu'}
                           </span>
                         </td>
@@ -1034,7 +1034,7 @@ export default function MockupsManagerPage() {
                           </button>
                           <button
                             onClick={cancelEdit}
-                            className="text-gray-600 hover:text-gray-900"
+                            className="text-ink-2 hover:text-ink-strong"
                           >
                             Cancel·lar
                           </button>
@@ -1055,26 +1055,26 @@ export default function MockupsManagerPage() {
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{mockup.collection}</div>
+                          <div className="text-sm font-medium text-ink-strong">{mockup.collection}</div>
                           {mockup.subcategory && (
-                            <div className="text-xs text-gray-500">{mockup.subcategory}</div>
+                            <div className="text-xs text-ink-soft">{mockup.subcategory}</div>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{mockup.design_name}</div>
+                          <div className="text-sm text-ink-strong">{mockup.design_name}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">🎨 {mockup.drawing_color}</div>
-                          <div className="text-sm text-gray-500">📦 {mockup.base_color}</div>
+                          <div className="text-sm text-ink-strong">🎨 {mockup.drawing_color}</div>
+                          <div className="text-sm text-ink-soft">📦 {mockup.base_color}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">{mockup.product_type}</span>
+                          <span className="text-sm text-ink-strong">{mockup.product_type}</span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-ink-soft">
                           {mockup.display_order}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${mockup.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${mockup.is_active ? 'bg-green-100 text-green-800' : 'bg-paper-soft text-ink'}`}>
                             {mockup.is_active ? 'Actiu' : 'Inactiu'}
                           </span>
                         </td>
@@ -1109,26 +1109,26 @@ export default function MockupsManagerPage() {
 
           {mockups.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500">No s'han trobat mockups amb aquests filtres</p>
+              <p className="text-ink-soft">No s'han trobat mockups amb aquests filtres</p>
             </div>
           )}
         </div>
 
         {showGridView && (
-          <div className="mt-6 bg-white rounded-lg shadow p-4">
+          <div className="mt-6 bg-paper rounded-lg shadow p-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-              <div className="text-sm text-gray-700">
+              <div className="text-sm text-ink-2">
                 Vista per col·lecció → disseny, dividida per color de dibuix (white vs black)
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-ink-2">
                   total: {gridData.total} · mockups: {gridData.mockupsCount} · media: {gridData.mediaCount} · mostrats: {gridData.shown}
                 </div>
                 <select
                   value={gridSource}
                   onChange={(e) => setGridSource(e.target.value)}
-                  className="px-2 py-1 border border-gray-300 rounded text-sm"
+                  className="px-2 py-1 border border-line-strong rounded text-sm"
                 >
                   <option value="auto">Auto</option>
                   <option value="mockups">/mockups</option>
@@ -1139,7 +1139,7 @@ export default function MockupsManagerPage() {
             </div>
 
             {gridData.shown === 0 ? (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-ink-2">
                 No hi ha registres per aquesta font: <span className="font-mono">{gridData.effectiveSource}</span>.
                 Prova a canviar el selector (Auto / /mockups / media / Tots).
               </div>
@@ -1147,21 +1147,21 @@ export default function MockupsManagerPage() {
               <div className="space-y-8">
                 {gridData.collections.map((c) => (
                   <div key={c.collection}>
-                    <div className="text-lg font-semibold text-gray-900 mb-3">{c.collection}</div>
+                    <div className="text-lg font-semibold text-ink-strong mb-3">{c.collection}</div>
 
                     <div className="space-y-6">
                       {c.designs.map((d) => (
                         <div key={`${c.collection}-${d.design}`} className="border rounded-lg p-3">
                           <div className="flex justify-between items-center mb-3">
-                            <div className="text-sm font-semibold text-gray-900">{d.design}</div>
-                            <div className="text-xs text-gray-600">
+                            <div className="text-sm font-semibold text-ink-strong">{d.design}</div>
+                            <div className="text-xs text-ink-2">
                               white: {d.white.length} · black: {d.black.length}{d.other.length ? ` · other: ${d.other.length}` : ''}
                             </div>
                           </div>
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div>
-                              <div className="text-xs font-medium text-gray-700 mb-2">Dibuix blanc</div>
+                              <div className="text-xs font-medium text-ink-2 mb-2">Dibuix blanc</div>
                               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                                 {d.white.map((m) => (
                                   <a
@@ -1188,7 +1188,7 @@ export default function MockupsManagerPage() {
                             </div>
 
                             <div>
-                              <div className="text-xs font-medium text-gray-700 mb-2">Dibuix negre</div>
+                              <div className="text-xs font-medium text-ink-2 mb-2">Dibuix negre</div>
                               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                                 {d.black.map((m) => (
                                   <a
@@ -1217,7 +1217,7 @@ export default function MockupsManagerPage() {
 
                           {d.other.length > 0 && (
                             <div className="mt-4">
-                              <div className="text-xs font-medium text-gray-700 mb-2">Altres colors de dibuix</div>
+                              <div className="text-xs font-medium text-ink-2 mb-2">Altres colors de dibuix</div>
                               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                                 {d.other.map((m) => (
                                   <a
@@ -1255,10 +1255,10 @@ export default function MockupsManagerPage() {
 
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-900 mb-2">Com importar mockups:</h3>
-          <code className="block bg-white p-3 rounded text-sm mb-2">
+          <code className="block bg-paper p-3 rounded text-sm mb-2">
             node scripts/import-mockups.js --csv mockups.csv
           </code>
-          <code className="block bg-white p-3 rounded text-sm">
+          <code className="block bg-paper p-3 rounded text-sm">
             node scripts/import-mockups.js --scan ./public/mockups
           </code>
         </div>

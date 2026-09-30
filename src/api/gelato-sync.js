@@ -244,10 +244,10 @@ function transformStoreProductForSupabase(storeProduct) {
 
 function mapColorToHex(colorName) {
   const colorMap = {
-    'blanco': '#FFFFFF',
-    'white': '#FFFFFF',
-    'negro': '#181818',
-    'black': '#181818',
+    'blanco': 'hsl(var(--grey-paper))',
+    'white': 'hsl(var(--grey-paper))',
+    'negro': 'hsl(var(--grey-ink-strong))',
+    'black': 'hsl(var(--grey-ink-strong))',
     'armada': '#1E3A8A',
     'navy': '#1E3A8A',
     'azul': '#2563EB',
@@ -258,12 +258,12 @@ function mapColorToHex(colorName) {
     'red': '#DC2626',
     'amarillo': '#FCD34D',
     'yellow': '#FCD34D',
-    'gris': '#6B7280',
-    'gray': '#6B7280'
+    'gris': 'hsl(var(--grey-ink-soft))',
+    'gray': 'hsl(var(--grey-ink-soft))'
   };
 
   const color = colorName.toLowerCase();
-  return colorMap[color] || '#FFFFFF';
+  return colorMap[color] || 'hsl(var(--grey-paper))';
 }
 
 export async function syncMockProductsToSupabase() {
@@ -302,7 +302,7 @@ export async function syncMockProductsToSupabase() {
           product_variants: mockProduct.sizes?.map(size => ({
             size: size,
             color: 'Default',
-            color_hex: '#FFFFFF',
+            color_hex: 'hsl(var(--grey-paper))',
             price: mockProduct.price,
             stock: 999,
             is_available: true

@@ -74,7 +74,7 @@ export function MobileCercadorSheet() {
       <div
         style={{
           position: 'fixed', left: 0, right: 0, bottom: '0px', top: 0, zIndex: 45,
-          background: '#fff',
+          background: 'hsl(var(--grey-paper))',
           transform: `translateY(${translateY}px)`,
           transition: sheet.isDragging ? 'none' : 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1)',
           display: 'flex', flexDirection: 'column',
@@ -107,8 +107,8 @@ export function MobileCercadorSheet() {
 
           {/* Info sota el carrusel */}
           <div style={{ padding: '8px 16px 12px', textAlign: 'center' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{drawing}</div>
-            <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--grey-ink-strong))' }}>{drawing}</div>
+            <div style={{ fontSize: 11, color: 'hsl(var(--grey-muted-2))', marginTop: 2 }}>
               {COLLECTIONS[collection]?.label} · {VARIANT_LABELS[variant] || variant} · {color}
             </div>
           </div>
@@ -120,7 +120,7 @@ export function MobileCercadorSheet() {
         {...sheet.handlers}
         style={{
           position: 'fixed', left: 0, right: 0, bottom: `${NAV_HEIGHT}px`, zIndex: 120, height: HANDLE_HEIGHT,
-          background: '#fff', borderTop: '1px solid #e5e7eb',
+          background: 'hsl(var(--grey-paper))', borderTop: '1px solid hsl(var(--grey-line))',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'grab', touchAction: 'none',
           boxShadow: '0 -2px 10px rgba(0,0,0,0.08)',
@@ -128,14 +128,14 @@ export function MobileCercadorSheet() {
           userSelect: 'none',
         }}
       >
-        <div style={{ width: 60, height: 5, borderRadius: 3, background: '#1a1a1a' }} />
+        <div style={{ width: 60, height: 5, borderRadius: 3, background: 'hsl(var(--grey-ink-strong))' }} />
       </div>
 
       {/* Barra del sheet — tapa la BottomTabBar quan és obert */}
       <div style={{
         position: 'fixed', left: 0, right: 0, bottom: '0px', height: NAV_HEIGHT, zIndex: 115,
         display: 'flex', alignItems: 'center', justifyContent: 'space-around',
-        background: '#fff', borderTop: '1px solid #e5e7eb',
+        background: 'hsl(var(--grey-paper))', borderTop: '1px solid hsl(var(--grey-line))',
         transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
         transition: 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1), bottom 240ms cubic-bezier(0.32, 0.72, 0, 1)',
       }}>
@@ -153,7 +153,7 @@ function SheetBtn({ icon, label, onClick }) {
     <button onClick={onClick} style={{
       flex: 1, height: '100%', border: 'none', background: 'transparent',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      gap: 2, cursor: 'pointer', color: '#1a1a1a', fontSize: 10, fontWeight: 600,
+      gap: 2, cursor: 'pointer', color: 'hsl(var(--grey-ink-strong))', fontSize: 10, fontWeight: 600,
     }}>
       <span style={{ fontSize: 20, lineHeight: 1 }}>{icon}</span>
       <span>{label}</span>

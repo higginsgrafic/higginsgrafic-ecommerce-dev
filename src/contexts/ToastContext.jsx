@@ -55,9 +55,9 @@ const Toast = ({ toast, onClose }) => {
   };
 
   const colors = {
-    success: 'bg-green-600 text-white border-green-700',
-    info: 'bg-blue-600 text-white border-blue-700',
-    error: 'bg-red-600 text-white border-red-700'
+    success: 'bg-green-600 text-paper border-green-700',
+    info: 'bg-blue-600 text-paper border-blue-700',
+    error: 'bg-red-600 text-paper border-red-700'
   };
 
   return (
@@ -69,17 +69,17 @@ const Toast = ({ toast, onClose }) => {
       className={`pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-lg border shadow-xl ${colors[toast.type]}`}
       style={{ maxWidth: '520px', minWidth: '320px', maxHeight: '70vh' }}
     >
-      <div className="flex-shrink-0 text-white">
+      <div className="flex-shrink-0 text-paper">
         {icons[toast.type]}
       </div>
 
-      <p className="text-sm font-roboto font-medium flex-1 leading-snug text-white whitespace-pre-wrap break-words overflow-auto" style={{ maxHeight: '65vh' }}>
+      <p className="text-sm font-roboto font-medium flex-1 leading-snug text-paper whitespace-pre-wrap break-words overflow-auto" style={{ maxHeight: '65vh' }}>
         {toast.message}
       </p>
 
       <button
         onClick={onClose}
-        className="flex-shrink-0 text-white hover:opacity-80 transition-opacity"
+        className="flex-shrink-0 text-paper hover:opacity-80 transition-opacity"
         aria-label="Tancar notificació"
       >
         <X className="h-4 w-4" />

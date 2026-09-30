@@ -31,7 +31,7 @@ const COUNTRIES = [
   'Països Baixos', 'Polònia', 'Portugal', 'Regne Unit', 'Rep. Txeca', 'Romania', 'Singapur',
   'Suècia', 'Suïssa', 'Xipre',
 ];
-const inputClass = 'w-full border border-gray-200 bg-white px-3 py-2 text-sm focus:border-gray-900 focus:outline-none';
+const inputClass = 'w-full border border-line bg-paper px-3 py-2 text-sm focus:border-ink-strong focus:outline-none';
 const emptyLine = () => ({ name: '', description: '', quantity: 1, product_price: 0 });
 const addressLabels = { floor: 'Pis', door: 'Porta', staircase: 'Escala', block: 'Bloc', other: 'Altres' };
 
@@ -69,7 +69,7 @@ const emptyDraft = {
 function Field({ label, children, className = '' }) {
   return (
     <label className={`flex flex-col gap-1 ${className}`}>
-      <span className="font-oswald text-[10px] uppercase tracking-[0.15em] text-gray-400">{label}</span>
+      <span className="font-oswald text-[10px] uppercase tracking-[0.15em] text-muted-2">{label}</span>
       {children}
     </label>
   );
@@ -84,17 +84,17 @@ function InvoicePreview({ draft, onClose, isTest = false }) {
 
   return (
     <div
-      className="fixed inset-0 z-[40000] overflow-y-auto bg-black/60 p-4"
+      className="fixed inset-0 z-[40000] overflow-y-auto bg-ink-pure/60 p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Previsualització de la factura"
       onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
     >
       <div className="mx-auto mb-4 flex max-w-[210mm] items-center justify-between gap-3">
-        <div className="font-oswald text-xs uppercase tracking-[0.16em] text-white/80">
+        <div className="font-oswald text-xs uppercase tracking-[0.16em] text-paper/80">
           {title} · {linies.length} {linies.length === 1 ? 'línia' : 'línies'}
         </div>
-        <button type="button" onClick={onClose} className="inline-flex items-center gap-2 bg-white px-4 py-2 text-xs uppercase tracking-wider text-gray-700 shadow hover:text-black">
+        <button type="button" onClick={onClose} className="inline-flex items-center gap-2 bg-paper px-4 py-2 text-xs uppercase tracking-wider text-ink-2 shadow hover:text-ink-pure">
           <X className="h-4 w-4" /> Tancar
         </button>
       </div>
@@ -283,7 +283,7 @@ export default function InvoiceEditor({ mode = 'live' }) {
     else setMessage('No s’ha pogut eliminar l’esborrany.');
   };
 
-  if (status === 'loading') return <div className="p-8 text-sm text-gray-500">Carregant l’esborrany…</div>;
+  if (status === 'loading') return <div className="p-8 text-sm text-ink-soft">Carregant l’esborrany…</div>;
 
   if (status === 'mode-equivocat') {
     // Pot ser un esborrany (que porta el seu id) o una factura que es volia
@@ -307,7 +307,7 @@ export default function InvoiceEditor({ mode = 'live' }) {
           </p>
           <Link
             to={desti}
-            className="mt-4 inline-flex items-center gap-2 bg-amber-600 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-amber-700"
+            className="mt-4 inline-flex items-center gap-2 bg-amber-600 px-4 py-2 text-xs uppercase tracking-wider text-paper hover:bg-amber-700"
           >
             Obrir-ho a la pantalla que toca
           </Link>
@@ -330,7 +330,7 @@ export default function InvoiceEditor({ mode = 'live' }) {
 
       <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <Link to={esProva ? '/admin/factures/proves' : '/admin/factures'} className="mb-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.12em] text-gray-500 hover:text-black">
+          <Link to={esProva ? '/admin/factures/proves' : '/admin/factures'} className="mb-3 inline-flex items-center gap-2 text-xs uppercase tracking-[0.12em] text-ink-soft hover:text-ink-pure">
             <ArrowLeft className="h-3.5 w-3.5" /> {esProva ? 'Tornar a les proves' : 'Tornar a factures'}
           </Link>
           <h1 className="font-oswald text-2xl uppercase tracking-[0.04em]">
@@ -338,7 +338,7 @@ export default function InvoiceEditor({ mode = 'live' }) {
               ? (draft.document_kind === 'rectification' ? 'Prova de rectificativa' : 'Prova de factura')
               : (draft.document_kind === 'rectification' ? 'Factura rectificativa' : 'Factura manual')}
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-ink-soft">
             {esProva
               ? 'Això és una prova: no tindrà número fiscal, no sortirà mai al compte de cap client i es podrà esborrar.'
               : 'Esborrany editable. El número s’assignarà només quan s’emeti.'}
@@ -350,29 +350,29 @@ export default function InvoiceEditor({ mode = 'live' }) {
               <Trash2 className="h-4 w-4" /> Eliminar
             </button>
           )}
-          <button type="button" onClick={() => setPreviewOpen(true)} className="inline-flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 text-xs uppercase tracking-wider hover:border-black">
+          <button type="button" onClick={() => setPreviewOpen(true)} className="inline-flex items-center gap-2 border border-line-strong bg-paper px-4 py-2 text-xs uppercase tracking-wider hover:border-ink-pure">
             <Eye className="h-4 w-4" /> Previsualitzar
           </button>
-          <button type="button" onClick={save} disabled={status === 'saving' || status === 'issuing'} className="inline-flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 text-xs uppercase tracking-wider hover:border-black disabled:opacity-50">
+          <button type="button" onClick={save} disabled={status === 'saving' || status === 'issuing'} className="inline-flex items-center gap-2 border border-line-strong bg-paper px-4 py-2 text-xs uppercase tracking-wider hover:border-ink-pure disabled:opacity-50">
             <Save className="h-4 w-4" /> Desar
           </button>
           <button
             type="button"
             onClick={issue}
             disabled={status === 'saving' || status === 'issuing'}
-            className={`inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider text-white disabled:opacity-50 ${esProva ? 'bg-amber-600 hover:bg-amber-700' : 'bg-gray-900 hover:bg-black'}`}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider text-paper disabled:opacity-50 ${esProva ? 'bg-amber-600 hover:bg-amber-700' : 'bg-ink-strong hover:bg-ink-pure'}`}
           >
             <Send className="h-4 w-4" /> {esProva ? 'Emetre la prova' : 'Emetre'}
           </button>
         </div>
       </div>
 
-      {message && <div className={`mb-5 border px-4 py-3 text-sm ${status === 'error' ? 'border-red-200 bg-red-50 text-red-700' : 'border-gray-200 bg-white text-gray-600'}`}>{message}</div>}
+      {message && <div className={`mb-5 border px-4 py-3 text-sm ${status === 'error' ? 'border-red-200 bg-red-50 text-red-700' : 'border-line bg-paper text-ink-2'}`}>{message}</div>}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
-          <section className="border border-gray-200 bg-white p-5">
-            <h2 className="mb-4 font-oswald text-xs uppercase tracking-[0.16em] text-gray-500">Document</h2>
+          <section className="border border-line bg-paper p-5">
+            <h2 className="mb-4 font-oswald text-xs uppercase tracking-[0.16em] text-ink-soft">Document</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Tipus">
                 <select value={draft.invoice_type} onChange={(event) => setField('invoice_type', event.target.value)} className={inputClass}>
@@ -391,8 +391,8 @@ export default function InvoiceEditor({ mode = 'live' }) {
             </div>
           </section>
 
-          <section className="border border-gray-200 bg-white p-5">
-            <h2 className="mb-4 font-oswald text-xs uppercase tracking-[0.16em] text-gray-500">Client</h2>
+          <section className="border border-line bg-paper p-5">
+            <h2 className="mb-4 font-oswald text-xs uppercase tracking-[0.16em] text-ink-soft">Client</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Nom i cognoms"><input value={draft.customer_name || ''} onChange={(event) => setField('customer_name', event.target.value)} className={inputClass} /></Field>
               <Field label="Correu"><input type="email" value={draft.customer_email || ''} onChange={(event) => setField('customer_email', event.target.value)} className={inputClass} /></Field>
@@ -411,8 +411,8 @@ export default function InvoiceEditor({ mode = 'live' }) {
                 <Field label="Ciutat"><input value={draft.customer_city || ''} onChange={(event) => setField('customer_city', event.target.value)} className={inputClass} /></Field>
                 <Field label="País">
                   <div className="relative">
-                    <ChevronDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-300" />
-                    <select value={draft.customer_country || ''} onChange={(event) => setField('customer_country', event.target.value)} className={`${inputClass} appearance-none pl-9 text-gray-400`}>
+                    <ChevronDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <select value={draft.customer_country || ''} onChange={(event) => setField('customer_country', event.target.value)} className={`${inputClass} appearance-none pl-9 text-muted-2`}>
                       <option value="">Selecciona un país</option>
                       {draft.customer_country && !COUNTRIES.includes(draft.customer_country) && <option value={draft.customer_country}>{draft.customer_country}</option>}
                       {COUNTRIES.map((country) => <option key={country} value={country}>{country}</option>)}
@@ -423,23 +423,23 @@ export default function InvoiceEditor({ mode = 'live' }) {
             </div>
           </section>
 
-          <section className="border border-gray-200 bg-white p-5">
+          <section className="border border-line bg-paper p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-oswald text-xs uppercase tracking-[0.16em] text-gray-500">Línies</h2>
-              <button type="button" onClick={() => setDraft((current) => ({ ...current, items: [...current.items, emptyLine()] }))} className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-gray-600 hover:text-black">
+              <h2 className="font-oswald text-xs uppercase tracking-[0.16em] text-ink-soft">Línies</h2>
+              <button type="button" onClick={() => setDraft((current) => ({ ...current, items: [...current.items, emptyLine()] }))} className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-ink-2 hover:text-ink-pure">
                 <Plus className="h-4 w-4" /> Afegir línia
               </button>
             </div>
             <div className="space-y-3">
               {draft.items.map((line, index) => (
-                <div key={index} className="grid gap-3 border-b border-gray-100 pb-3 sm:grid-cols-[1fr_90px_130px_36px]">
+                <div key={index} className="grid gap-3 border-b border-line pb-3 sm:grid-cols-[1fr_90px_130px_36px]">
                   <div className="space-y-2">
                     <input value={line.name || ''} onChange={(event) => setLine(index, 'name', event.target.value)} placeholder="Concepte" className={inputClass} />
                     <input value={line.description || ''} onChange={(event) => setLine(index, 'description', event.target.value)} placeholder="Descripció opcional" className={inputClass} />
                   </div>
                   <Field label="Quantitat"><input type="number" min="1" value={line.quantity} onChange={(event) => setLine(index, 'quantity', event.target.value)} className={inputClass} /></Field>
                   <Field label="Preu unitari amb IVA"><input type="number" step="0.01" value={line.product_price} onChange={(event) => setLine(index, 'product_price', event.target.value)} className={inputClass} /></Field>
-                  <button type="button" onClick={() => removeLine(index)} disabled={draft.items.length === 1} aria-label="Eliminar línia" className="mt-5 h-9 text-gray-400 hover:text-red-600 disabled:opacity-20"><Trash2 className="mx-auto h-4 w-4" /></button>
+                  <button type="button" onClick={() => removeLine(index)} disabled={draft.items.length === 1} aria-label="Eliminar línia" className="mt-5 h-9 text-muted-2 hover:text-red-600 disabled:opacity-20"><Trash2 className="mx-auto h-4 w-4" /></button>
                 </div>
               ))}
             </div>
@@ -449,20 +449,20 @@ export default function InvoiceEditor({ mode = 'live' }) {
           </section>
         </div>
 
-        <aside className="h-fit border border-gray-900 bg-white p-5 lg:sticky lg:top-6">
+        <aside className="h-fit border border-ink-strong bg-paper p-5 lg:sticky lg:top-6">
           <h2 className="font-oswald text-sm uppercase tracking-[0.16em]">Resum</h2>
           <div className="mt-5 space-y-3 text-sm tabular-nums">
-            <div className="flex justify-between"><span className="text-gray-500">Productes</span><span>{eur(totals.products)}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Transport</span><span>{eur(totals.shipping)}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Base imposable</span><span>{eur(totals.base)}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">IVA 21%</span><span>{eur(totals.iva)}</span></div>
-            <div className="flex justify-between border-t-2 border-gray-900 pt-3 font-oswald text-lg"><span>Total</span><span>{eur(totals.total)}</span></div>
+            <div className="flex justify-between"><span className="text-ink-soft">Productes</span><span>{eur(totals.products)}</span></div>
+            <div className="flex justify-between"><span className="text-ink-soft">Transport</span><span>{eur(totals.shipping)}</span></div>
+            <div className="flex justify-between"><span className="text-ink-soft">Base imposable</span><span>{eur(totals.base)}</span></div>
+            <div className="flex justify-between"><span className="text-ink-soft">IVA 21%</span><span>{eur(totals.iva)}</span></div>
+            <div className="flex justify-between border-t-2 border-ink-strong pt-3 font-oswald text-lg"><span>Total</span><span>{eur(totals.total)}</span></div>
           </div>
-          <div className={`mt-5 p-3 text-xs leading-relaxed ${esProva ? 'bg-amber-50 text-amber-800' : 'bg-gray-50 text-gray-500'}`}>
+          <div className={`mt-5 p-3 text-xs leading-relaxed ${esProva ? 'bg-amber-50 text-amber-800' : 'bg-paper-soft text-ink-soft'}`}>
             {esProva ? (
               <>Número previst: <strong className="text-amber-900">PROVA-AAAA-000000</strong>. No toca la sèrie FO/FS/FR. Desar no consumeix res.</>
             ) : (
-              <>Sèrie prevista: <strong className="text-gray-900">{draft.document_kind === 'rectification' ? 'FR' : draft.invoice_type === 'full' ? 'FO' : 'FS'}</strong>. Desar no consumeix cap número.</>
+              <>Sèrie prevista: <strong className="text-ink-strong">{draft.document_kind === 'rectification' ? 'FR' : draft.invoice_type === 'full' ? 'FO' : 'FS'}</strong>. Desar no consumeix cap número.</>
             )}
           </div>
         </aside>

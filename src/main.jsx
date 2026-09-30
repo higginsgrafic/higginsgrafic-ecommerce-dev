@@ -37,7 +37,7 @@ function showFatalOverlay(title, details) {
       el.style.borderRadius = '12px';
       el.style.padding = '16px';
       el.style.fontFamily = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
-      el.style.color = '#111827';
+      el.style.color = 'hsl(var(--grey-ink-strong))';
       el.style.whiteSpace = 'pre-wrap';
       el.style.overflow = 'auto';
       document.body.appendChild(el);

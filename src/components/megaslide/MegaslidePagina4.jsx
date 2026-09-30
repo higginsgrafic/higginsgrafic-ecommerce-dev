@@ -6,7 +6,7 @@ import { MoreHorizontal, Loader2, Truck, AlertCircle, X, Package, LogOut, Chevro
 import { MOCK_CLIENT } from '@/lib/mockOrderStore';
 
 const STATUS_COLOR = {
-  'PENDENT': '#9CA3AF',
+  'PENDENT': 'hsl(var(--grey-muted-2))',
   'PREPARACIÓ': '#7C3AED',
   'REPARTIMENT': '#D97706',
   'ATURADA': '#EAB308',
@@ -27,8 +27,8 @@ const LEGEND = ['PENDENT', 'PREPARACIÓ', 'REPARTIMENT', 'ATURADA', 'CANCEL·LAD
 
 const COL_TEMPLATE = '2.2fr 1fr 1.3fr 1.3fr 0.9fr';
 
-const TEXT = { fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '9pt', color: '#475059' };
-const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#2F3540' };
+const TEXT = { fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '9pt', color: 'hsl(var(--grey-ink-2))' };
+const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'hsl(var(--grey-ink))' };
 
 const PHONE_PREFIXES = [
   '+34', '+39', '+33', '+49', '+353', '+44', '+46', '+45',
@@ -324,7 +324,7 @@ export default function MegaslidePagina4({
   const enviatsMessages = mockMessages.filter(m => m.type === 'enviats');
 
   return (
-    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: isPortraitTablet ? '269px' : '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 #ffffff, inset -8px 0 0 #ffffff' : undefined }}>
+    <div style={{ width: '25%', flexShrink: 0, display: 'block', height: isPortraitTablet ? '269px' : '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible', boxShadow: isPortraitTablet ? 'inset 8px 0 0 hsl(var(--grey-paper)), inset -8px 0 0 hsl(var(--grey-paper))' : undefined }}>
       <div ref={viewportRef4} data-mega-page-viewport="4" style={{
         width: '100%',
         height: isPortraitTablet ? '269px' : '100%',
@@ -473,7 +473,7 @@ export default function MegaslidePagina4({
                         {displayOrders.map((o, idx) => {
                           const status = o.status || o.raw?.status || 'PENDENT';
                           const Icon = STATUS_ICON[status] || MoreHorizontal;
-                          const color = STATUS_COLOR[status] || '#9CA3AF';
+                          const color = STATUS_COLOR[status] || 'hsl(var(--grey-muted-2))';
                           return (
                             <tr key={o.num || idx} style={{ height: `${ROW_HEIGHT}px` }}>
                               <td style={{ ...TEXT, fontSize: '10pt', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '4px 2px', textAlign: 'center', border: 'none', maxWidth: 0 }}>{o.num}</td>
@@ -510,7 +510,7 @@ export default function MegaslidePagina4({
                     return (
                       <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <Icon size={11} color={color} strokeWidth={2} />
-                        <span style={{ ...HEAD, fontSize: '6pt', color: '#475059' }}>{label}</span>
+                        <span style={{ ...HEAD, fontSize: '6pt', color: 'hsl(var(--grey-ink-2))' }}>{label}</span>
                       </div>
                     );
                   })}
@@ -540,7 +540,7 @@ export default function MegaslidePagina4({
                   {/* Tab selector — estil selector de color pàgina 2 */}
                   <div style={{
                     display: 'flex',
-                    backgroundColor: '#f3f4f6',
+                    backgroundColor: 'hsl(var(--grey-paper-soft))',
                     padding: '2px',
                     borderRadius: '4px',
                     border: 'none',
@@ -564,8 +564,8 @@ export default function MegaslidePagina4({
                             letterSpacing: '0em',
                             lineHeight: 1,
                             textTransform: 'capitalize',
-                            color: isActive ? '#111827' : '#9ca3af',
-                            backgroundColor: isActive ? '#ffffff' : 'transparent',
+                            color: isActive ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-muted-2))',
+                            backgroundColor: isActive ? 'hsl(var(--grey-paper))' : 'transparent',
                             border: 'none',
                             borderRadius: '3px',
                             cursor: 'pointer',
@@ -607,13 +607,13 @@ export default function MegaslidePagina4({
                       >
                         <div style={{ transform: idx % 2 === 0 ? 'scaleX(-1)' : 'none', position: 'relative', padding: '0 10px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
-                            <span style={{ ...TEXT, fontSize: '10pt', color: '#111827', fontFamily: 'Oswald, sans-serif', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{msg.subject}</span>
-                            <span style={{ ...TEXT, fontSize: '10pt', color: '#6b7280' }}>
+                            <span style={{ ...TEXT, fontSize: '10pt', color: 'hsl(var(--grey-ink-strong))', fontFamily: 'Oswald, sans-serif', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{msg.subject}</span>
+                            <span style={{ ...TEXT, fontSize: '10pt', color: 'hsl(var(--grey-muted-2))' }}>
                               {msg.date}
                             </span>
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                            <div style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '10pt', color: '#4b5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                            <div style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '10pt', color: 'hsl(var(--grey-ink-2))', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                               {msg.preview}
                             </div>
                             {msg.status === 'Pendent' ? (
@@ -668,11 +668,11 @@ export default function MegaslidePagina4({
                     }}
                   >
                     {messagesSlideOpen ? (
-                      <ChevronDown size={16} color="#475059" strokeWidth={2} />
+                      <ChevronDown size={16} color="hsl(var(--grey-ink-2))" strokeWidth={2} />
                     ) : (
-                      <ChevronUp size={16} color="#475059" strokeWidth={2} />
+                      <ChevronUp size={16} color="hsl(var(--grey-ink-2))" strokeWidth={2} />
                     )}
-                    <PenLine size={14} color="#475059" strokeWidth={2} />
+                    <PenLine size={14} color="hsl(var(--grey-ink-2))" strokeWidth={2} />
                     <div style={{ width: '16px' }} />
                   </button>
 
@@ -744,8 +744,8 @@ export default function MegaslidePagina4({
                         style={{
                           ...HEAD,
                           fontSize: '7pt',
-                          color: '#475059',
-                          backgroundColor: '#FFFFFF',
+                          color: 'hsl(var(--grey-ink-2))',
+                          backgroundColor: 'hsl(var(--grey-paper))',
                           border: 'none',
                           borderRadius: '2px',
                           cursor: 'pointer',
@@ -758,8 +758,8 @@ export default function MegaslidePagina4({
                         style={{
                           ...HEAD,
                           fontSize: '7pt',
-                          color: '#475059',
-                          backgroundColor: '#FFFFFF',
+                          color: 'hsl(var(--grey-ink-2))',
+                          backgroundColor: 'hsl(var(--grey-paper))',
                           border: 'none',
                           borderRadius: '2px',
                           cursor: 'pointer',
@@ -773,8 +773,8 @@ export default function MegaslidePagina4({
                         style={{
                           ...HEAD,
                           fontSize: '7pt',
-                          color: '#FFFFFF',
-                          backgroundColor: '#2F3540',
+                          color: 'hsl(var(--grey-paper))',
+                          backgroundColor: 'hsl(var(--grey-ink))',
                           border: 'none',
                           borderRadius: '2px',
                           cursor: 'pointer',
@@ -831,7 +831,7 @@ export default function MegaslidePagina4({
                           <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="Pis" defaultValue="" style={{ fontSize: '10pt' }} /></td>
                         </tr>
                         <tr>
-                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><select defaultValue="+34" style={{ fontSize: '10pt', border: 'none', background: 'transparent', outline: 'none', fontFamily: 'Roboto, sans-serif', fontWeight: 300, color: '#9CA3AF', cursor: 'pointer' }}>{PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}</select><TransparentInput placeholder="Mòbil" defaultValue="" style={{ fontSize: '10pt', flex: 1 }} /></div></td>
+                          <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><select defaultValue="+34" style={{ fontSize: '10pt', border: 'none', background: 'transparent', outline: 'none', fontFamily: 'Roboto, sans-serif', fontWeight: 300, color: 'hsl(var(--grey-muted))', cursor: 'pointer' }}>{PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}</select><TransparentInput placeholder="Mòbil" defaultValue="" style={{ fontSize: '10pt', flex: 1 }} /></div></td>
                           <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput placeholder="CP" defaultValue="" onBlur={handleCpBlur} style={{ fontSize: '10pt' }} /></td>
                         </tr>
                         <tr>
@@ -850,8 +850,8 @@ export default function MegaslidePagina4({
                         <tr>
                           <td style={{ border: 'none' }} />
                           <td style={{ padding: '2px 4px', border: 'none' }}>
-                            <button onClick={() => navigate('/shipping')} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Roboto, sans-serif', fontSize: '9pt', fontWeight: 300, color: '#475059', padding: 0 }}>
-                              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '14px', height: '14px', borderRadius: '50%', border: '1px solid #9CA3AF', fontSize: '8pt', fontWeight: 400, color: '#9CA3AF', lineHeight: 1 }}>i</span>
+                            <button onClick={() => navigate('/shipping')} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Roboto, sans-serif', fontSize: '9pt', fontWeight: 300, color: 'hsl(var(--grey-ink-2))', padding: 0 }}>
+                              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '14px', height: '14px', borderRadius: '50%', border: '1px solid hsl(var(--grey-muted-2))', fontSize: '8pt', fontWeight: 400, color: 'hsl(var(--grey-muted))', lineHeight: 1 }}>i</span>
                               Enviaments i Temps
                             </button>
                           </td>
@@ -885,7 +885,7 @@ export default function MegaslidePagina4({
                         <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={floorRef} placeholder="Pis" defaultValue={defaultAddress.floor_door || ''} style={{ fontSize: '10pt' }} /></td>
                       </tr>
                       <tr>
-                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><select value={phonePrefixState} onChange={e => setPhonePrefixState(e.target.value)} style={{ fontSize: '10pt', border: 'none', background: 'transparent', outline: 'none', fontFamily: 'Roboto, sans-serif', fontWeight: 300, color: '#9CA3AF', cursor: 'pointer' }}>{PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}</select><TransparentInput ref={phoneRef} placeholder="Mòbil" defaultValue={phoneNumber} error={missingFields.includes('phone')} style={{ fontSize: '10pt', flex: 1 }} /></div></td>
+                        <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><div style={{ display: 'flex', gap: '4px' }}><select value={phonePrefixState} onChange={e => setPhonePrefixState(e.target.value)} style={{ fontSize: '10pt', border: 'none', background: 'transparent', outline: 'none', fontFamily: 'Roboto, sans-serif', fontWeight: 300, color: 'hsl(var(--grey-muted))', cursor: 'pointer' }}>{PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}</select><TransparentInput ref={phoneRef} placeholder="Mòbil" defaultValue={phoneNumber} error={missingFields.includes('phone')} style={{ fontSize: '10pt', flex: 1 }} /></div></td>
                         <td style={{ padding: '2px 4px 2.5px', border: 'none' }}><TransparentInput ref={cpRef} placeholder="CP" defaultValue={defaultAddress.postal_code || ''} onBlur={handleCpBlur} error={missingFields.includes('postal_code')} style={{ fontSize: '10pt' }} /></td>
                       </tr>
                       <tr>
@@ -904,8 +904,8 @@ export default function MegaslidePagina4({
                       <tr>
                         <td style={{ border: 'none' }} />
                         <td style={{ padding: '2px 4px', border: 'none' }}>
-                          <button onClick={() => navigate('/shipping')} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Roboto, sans-serif', fontSize: '9pt', fontWeight: 300, color: '#475059', padding: 0 }}>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '14px', height: '14px', borderRadius: '50%', border: '1px solid #9CA3AF', fontSize: '8pt', fontWeight: 400, color: '#9CA3AF', lineHeight: 1 }}>i</span>
+                          <button onClick={() => navigate('/shipping')} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Roboto, sans-serif', fontSize: '9pt', fontWeight: 300, color: 'hsl(var(--grey-ink-2))', padding: 0 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '14px', height: '14px', borderRadius: '50%', border: '1px solid hsl(var(--grey-muted-2))', fontSize: '8pt', fontWeight: 400, color: 'hsl(var(--grey-muted))', lineHeight: 1 }}>i</span>
                             Enviaments i Temps
                           </button>
                         </td>
@@ -923,7 +923,7 @@ export default function MegaslidePagina4({
                     style={{
                       ...HEAD,
                       fontSize: '7pt',
-                      color: '#475059',
+                      color: 'hsl(var(--grey-ink-2))',
                       backgroundColor: 'rgba(244,246,248,0.7)',
                       border: 'none',
                       borderRadius: '2px',
@@ -936,7 +936,7 @@ export default function MegaslidePagina4({
                       gap: '4px',
                     }}
                   >
-                    <LogOut size={10} color="#475059" strokeWidth={2} />
+                    <LogOut size={10} color="hsl(var(--grey-ink-2))" strokeWidth={2} />
                     Tanca sessió
                   </button>
                   <button
@@ -945,8 +945,8 @@ export default function MegaslidePagina4({
                     style={{
                       ...HEAD,
                       fontSize: '7pt',
-                      color: '#FFFFFF',
-                      backgroundColor: '#2F3540',
+                      color: 'hsl(var(--grey-paper))',
+                      backgroundColor: 'hsl(var(--grey-ink))',
                       border: 'none',
                       borderRadius: '2px',
                       cursor: 'pointer',

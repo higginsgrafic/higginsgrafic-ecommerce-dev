@@ -59,10 +59,10 @@ function AdminBanner({ rulerInset = 0 }) {
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
-          className="h-8 w-8 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+          className="h-8 w-8 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-line focus-visible:ring-offset-2"
           aria-label="Anar enrere"
         >
-          <ChevronLeft className="h-5 w-5 text-white" />
+          <ChevronLeft className="h-5 w-5 text-paper" />
           <span className="sr-only">Enrere</span>
         </Button>
 
@@ -80,10 +80,10 @@ function AdminBanner({ rulerInset = 0 }) {
           variant="ghost"
           size="icon"
           onClick={() => navigate(1)}
-          className="h-8 w-8 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+          className="h-8 w-8 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-line focus-visible:ring-offset-2"
           aria-label="Anar endavant"
         >
-          <ChevronRight className="h-5 w-5 text-white" />
+          <ChevronRight className="h-5 w-5 text-paper" />
           <span className="sr-only">Endavant</span>
         </Button>
       </div>
@@ -92,14 +92,14 @@ function AdminBanner({ rulerInset = 0 }) {
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
         {isAdmin && (
           <div className="flex h-[30px] items-center gap-2 rounded-md px-2 hover:bg-red-700 transition-all">
-            <span className="text-xs font-semibold text-white">EC bypass</span>
+            <span className="text-xs font-semibold text-paper">EC bypass</span>
             <button
               type="button"
               role="switch"
               aria-checked={bypassUnderConstruction}
               onClick={toggleBypassUnderConstruction}
-              className={`relative inline-flex h-4 w-8 items-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600 ${
-                bypassUnderConstruction ? 'bg-white/90 border-white/70' : 'bg-white/20 border-white/40'
+              className={`relative inline-flex h-4 w-8 items-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line focus-visible:ring-offset-2 focus-visible:ring-offset-red-600 ${
+                bypassUnderConstruction ? 'bg-paper/90 border-line/70' : 'bg-paper/20 border-line/40'
               }`}
               title={bypassUnderConstruction ? 'EC bypass activat (feu clic per desactivar)' : 'EC bypass desactivat (feu clic per activar)'}
               aria-label={bypassUnderConstruction ? 'Desactiveu l\'EC bypass' : 'Activeu l\'EC bypass'}
@@ -114,7 +114,7 @@ function AdminBanner({ rulerInset = 0 }) {
         )}
         <Link
           to="/admin"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:bg-red-700 transition-all px-3 py-1.5 rounded group"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-paper hover:bg-red-700 transition-all px-3 py-1.5 rounded group"
         >
           <LayoutDashboard className="w-4 h-4 group-hover:scale-110 transition-transform" />
           <span>Administració</span>
@@ -124,13 +124,13 @@ function AdminBanner({ rulerInset = 0 }) {
             variant="ghost"
             size="icon"
             onClick={copyRouteToClipboard}
-            className="h-7 w-7 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+            className="h-7 w-7 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-line focus-visible:ring-offset-2"
             aria-label="Copieu l'URL"
             title="Copieu l'URL"
           >
-            <Copy className="h-4 w-4 text-white" />
+            <Copy className="h-4 w-4 text-paper" />
           </Button>
-          <span className="text-xs text-white/70 font-mono">
+          <span className="text-xs text-paper/70 font-mono">
             {location.pathname}
           </span>
         </div>
@@ -143,7 +143,7 @@ function AdminBanner({ rulerInset = 0 }) {
             variant="ghost"
             size="sm"
             onClick={handleLogout}
-            className="h-8 text-white hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 gap-1.5"
+            className="h-8 text-paper hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-line focus-visible:ring-offset-2 gap-1.5"
             title="Tanqueu la sessió"
           >
             <LogOut className="w-4 h-4" />
@@ -154,7 +154,7 @@ function AdminBanner({ rulerInset = 0 }) {
             variant="ghost"
             size="sm"
             onClick={() => navigate('/admin-login')}
-            className="h-8 text-white hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 gap-1.5"
+            className="h-8 text-paper hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-line focus-visible:ring-offset-2 gap-1.5"
             title="Entreu com a administrador"
           >
             <Lock className="w-4 h-4" />

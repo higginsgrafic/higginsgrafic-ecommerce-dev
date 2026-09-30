@@ -1,5 +1,5 @@
 .hero {
-  background: #fff;
+  background: hsl(var(--grey-paper));
   height: 520px;
 }
 
@@ -21,7 +21,7 @@
   position: relative;
   border-radius: 9px;
   overflow: hidden;
-  background: #f0f0f0;
+  background: hsl(var(--grey-paper-tint));
   border: 1px solid rgba(0, 0, 0, 0.08);
   height: 100%;
 }
@@ -79,7 +79,7 @@
     rgba(0, 0, 0, 0.35) 35%,
     rgba(0, 0, 0, 0) 70%
   );
-  color: #fff;
+  color: hsl(var(--grey-paper));
   pointer-events: none;
 }
 
@@ -111,7 +111,7 @@
   appearance: none;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  color: hsl(var(--grey-paper));
   padding: 0.7rem 1rem;
   border-radius: 999px;
   font: inherit;
@@ -124,8 +124,8 @@
 }
 
 .primary {
-  background: #fff;
-  color: #000;
+  background: hsl(var(--grey-paper));
+  color: hsl(var(--grey-ink-pure));
   border-color: rgba(255, 255, 255, 0.4);
 }
 
@@ -158,7 +158,7 @@
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(0, 0, 0, 0.35);
-  color: #fff;
+  color: hsl(var(--grey-paper));
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -211,7 +211,7 @@
 }
 
 .dot[aria-current='true'] {
-  background: radial-gradient(circle, #fff 25%, rgba(255, 255, 255, 0.45) 25%);
+  background: radial-gradient(circle, hsl(var(--grey-paper)) 25%, rgba(255, 255, 255, 0.45) 25%);
   background-clip: content-box;
 }
 

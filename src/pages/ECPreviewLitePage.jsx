@@ -29,7 +29,7 @@ export default function ECPreviewLitePage() {
     String(import.meta.env.VITE_EC_PREVIEW_LITE_VIDEO_URL || '').trim() ||
     (backgroundType === 'video' ? defaultVideoUrl : '');
   const imageUrl = (params.get('image') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_IMAGE_URL || '').trim();
-  const backgroundColor = (params.get('bgColor') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_BG_COLOR || '#000000');
+  const backgroundColor = (params.get('bgColor') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_BG_COLOR || 'hsl(var(--grey-ink-pure))');
   const posterUrl = (params.get('poster') || '').trim() || imageUrl || '';
 
   const title = (params.get('title') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_TITLE || '');
@@ -43,7 +43,7 @@ export default function ECPreviewLitePage() {
   const buttonLink = (params.get('buttonLink') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_BUTTON_LINK || redirectUrl || '/');
 
   const redirectMode = (params.get('redirectMode') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_REDIRECT_MODE || 'onEnd');
-  const textColor = (params.get('textColor') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_TEXT_COLOR || '#ffffff');
+  const textColor = (params.get('textColor') || '').trim() || String(import.meta.env.VITE_EC_PREVIEW_LITE_TEXT_COLOR || 'hsl(var(--grey-paper))');
 
   const effectiveBackgroundType = useMemo(() => {
     if (backgroundType === 'video' && !videoUrl) return 'color';
@@ -231,7 +231,7 @@ export default function ECPreviewLitePage() {
 
       <div className="relative w-full h-screen overflow-hidden cursor-pointer" onClick={handleScreenClick} style={{ backgroundColor }}>
         {debug && (
-          <div className="absolute top-2 left-2 z-20 max-w-[90vw] rounded bg-black/60 px-2 py-1 text-[11px] text-white">
+          <div className="absolute top-2 left-2 z-20 max-w-[90vw] rounded bg-ink-pure/60 px-2 py-1 text-[11px] text-paper">
             <div>bg: {String(backgroundType)} / effective: {String(effectiveBackgroundType)}</div>
             <div>redirectMode: {String(redirectMode)}</div>
             <div>videoUrl: {String(videoUrl)}</div>
@@ -300,7 +300,7 @@ export default function ECPreviewLitePage() {
                   <Link
                     to={buttonLink}
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-block px-8 py-4 bg-white/20 backdrop-blur-sm rounded-lg font-medium transition-all hover:bg-white/30 hover:scale-105"
+                    className="inline-block px-8 py-4 bg-paper/20 backdrop-blur-sm rounded-lg font-medium transition-all hover:bg-paper/30 hover:scale-105"
                     style={{ color: textColor }}
                   >
                     {buttonText}

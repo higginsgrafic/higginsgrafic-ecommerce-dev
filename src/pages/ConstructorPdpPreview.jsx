@@ -12,13 +12,16 @@ import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 import StoryPosterLink from '@/components/StoryPosterLink';
 import { Flag } from './ShippingPage';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const PDP_PRESET_VERSION = 'pdp-layout-2026-06-06-1953';
 
 const PDP_TITLE_SETTINGS = {
-  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
+  // LA MATEIXA MIDA QUE EL TITOL `ESPECIFICACIONS` D'AQUESTA MATEIXA PANTALLA
+  // (30/09/2026): alla tambe son 20pt.
+  x: 0, y: 0, fontFamily: 'Oswald', fontSize: 20, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.003, lineHeight: 1, textAlign: 'left', verticalAlign: 'bottom',
-  color: '#475059', textTransform: 'uppercase',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'uppercase',
 };
 const PDP_COLLECTION_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 8, fontWeight: 400, selectedFontWeight: 700,
@@ -28,32 +31,32 @@ const PDP_COLLECTION_SETTINGS = {
 const PDP_DESCRIPTION_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Roboto', fontSize: 16, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.03, lineHeight: 1.65, textAlign: 'left', verticalAlign: 'top',
-  color: '#111827', textTransform: 'none',
+  color: 'hsl(var(--grey-ink-strong))', textTransform: 'none',
 };
 const PDP_PRICE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 200, selectedFontWeight: 700,
   letterSpacing: 0, lineHeight: 1, textAlign: 'left', verticalAlign: 'center',
-  color: '#475059', textTransform: 'none',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'none',
 };
 const PDP_CTA_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 12, fontWeight: 300, selectedFontWeight: 400,
   letterSpacing: 0.04, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
-  color: '#475059', textTransform: 'uppercase',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'uppercase',
 };
 const PDP_SIZE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 12, fontWeight: 300, selectedFontWeight: 400,
   letterSpacing: 0, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
-  color: '#475059', textTransform: 'none',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'none',
 };
 const PDP_SPECS_HEADING_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.04, lineHeight: 1, textAlign: 'right', verticalAlign: 'bottom',
-  color: '#475059', textTransform: 'uppercase',
+  color: 'hsl(var(--grey-ink-2))', textTransform: 'uppercase',
 };
 const PDP_SPEC_LABEL_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 8, fontWeight: 700, selectedFontWeight: 700,
   letterSpacing: 0.2, lineHeight: 1.2, textAlign: 'right', verticalAlign: 'bottom',
-  color: '#111827', textTransform: 'uppercase',
+  color: 'hsl(var(--grey-ink-strong))', textTransform: 'uppercase',
 };
 const PDP_SPEC_VALUE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Roboto', fontSize: 16, fontWeight: 300, selectedFontWeight: 700,
@@ -72,14 +75,15 @@ const PDP_SPEC_VALUE_SETTINGS = {
 // =============================================================================
 
 const TDP_IMAGE = (color) =>
-  `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.webp`;
+  tshirtSrc(color);
 
 const PRODUCT_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
-// 14 colors oficials Gildan 64000 en l'ordre de la stripe (MegaStripe).
+// 14 colors oficials Gildan 64000 en l'ordre canònic (mockupPaths.SHIRT_COLORS).
 const OFFICIAL_COLORS = [
-  'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink', 'daisy',
-  'gold', 'red', 'kiwi', 'irish-green', 'military-green', 'forest-green', 'black',
+  'white', 'light-blue', 'royal', 'navy', 'irish-green', 'military-green',
+  'daisy', 'gold', 'red', 'dark-chocolate', 'ice-grey', 'rs-sport-grey',
+  'charcoal', 'black',
 ];
 const THUMB_COUNT = OFFICIAL_COLORS.length;
 
@@ -101,16 +105,16 @@ function colorToProductName(color) {
     'light-blue': 'Light Blue',
     'royal': 'Royal',
     'navy': 'Navy',
-    'purple': 'Purple',
-    'light-pink': 'Light Pink',
     'daisy': 'Daisy',
     'gold': 'Gold',
     'red': 'Red',
-    'kiwi': 'Kiwi',
     'irish-green': 'Irish Green',
     'military-green': 'Military Green',
-    'forest-green': 'Forest Green',
     'black': 'Black',
+    'rs-sport-grey': 'RS Sport Grey',
+    'ice-grey': 'Ice Grey',
+    'charcoal': 'Charcoal',
+    'dark-chocolate': 'Dark Chocolate',
   };
   return map[color] || color;
 }
@@ -288,10 +292,10 @@ function ConstructorPdpPreview() {
           <div
             style={{
               display: 'flex',
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'hsl(var(--grey-paper-soft))',
               padding: '2px',
               borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-              border: '1px solid #e5e7eb',
+              border: '1px solid hsl(var(--grey-line))',
               width: '100%',
               height: '100%',
               boxSizing: 'border-box',
@@ -312,8 +316,8 @@ function ConstructorPdpPreview() {
                     letterSpacing: `${sizeButtonTextSettings.letterSpacing}em`,
                     lineHeight: sizeButtonTextSettings.lineHeight,
                     textTransform: sizeButtonTextSettings.textTransform,
-                    color: isSelected ? '#111827' : '#9ca3af',
-                    backgroundColor: isSelected ? '#ffffff' : 'transparent',
+                    color: isSelected ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-muted-2))',
+                    backgroundColor: isSelected ? 'hsl(var(--grey-paper))' : 'transparent',
                     border: 'none',
                     borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
                     cursor: 'pointer',
@@ -372,7 +376,7 @@ function ConstructorPdpPreview() {
               // ignore
             }
           }}
-          className="bg-muted text-[#475059] transition-all duration-200 hover:bg-white hover:text-[#111827] hover:shadow-sm active:scale-95"
+          className="bg-muted text-[hsl(var(--grey-ink-2))] transition-all duration-200 hover:bg-paper hover:text-[hsl(var(--grey-ink-strong))] hover:shadow-sm active:scale-95"
           style={{
             gridColumn: '4 / 5',
             gridRow: '19 / 20',
@@ -380,7 +384,7 @@ function ConstructorPdpPreview() {
             height: '100%',
             minWidth: 0,
             minHeight: 0,
-            border: '1px solid #e5e7eb',
+            border: '1px solid hsl(var(--grey-line))',
             borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
             padding: 0,
             cursor: 'pointer',
@@ -467,7 +471,7 @@ function ConstructorPdpPreview() {
                   gridRow: '1 / 2',
                   minHeight: 0,
                   border: 'none',
-                  background: '#fbfcfd',
+                  background: 'hsl(var(--grey-paper))',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -511,7 +515,7 @@ function ConstructorPdpPreview() {
                     gridRow: `${vIdx * 2 + 2} / ${vIdx * 2 + 4}`,
                     minHeight: 0,
                     border: 'none',
-                    background: '#fbfcfd',
+                    background: 'hsl(var(--grey-paper))',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -528,7 +532,7 @@ function ConstructorPdpPreview() {
                         top: 0,
                         bottom: 0,
                         width: '3px',
-                        background: '#0b0d10',
+                        background: 'hsl(var(--grey-ink-strong))',
                       }}
                     />
                   )}
@@ -557,7 +561,7 @@ function ConstructorPdpPreview() {
               gridRow: `1 / ${THUMB_COUNT + 1}`,
               minWidth: 0,
               minHeight: 0,
-              background: '#fbfcfd',
+              background: 'hsl(var(--grey-paper))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -665,7 +669,7 @@ function ConstructorPdpPreview() {
             lineHeight: 1,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            color: '#475059',
+            color: 'hsl(var(--grey-ink-2))',
             textAlign: 'right',
           }}
         >
@@ -700,7 +704,7 @@ function ConstructorPdpPreview() {
                 fontWeight: 700,
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
-                color: '#111827',
+                color: 'hsl(var(--grey-ink-strong))',
                 lineHeight: 1.2,
               }}
             >
@@ -725,10 +729,10 @@ function ConstructorPdpPreview() {
           <div
             style={{
               display: 'flex',
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'hsl(var(--grey-paper-soft))',
               padding: '2px',
               borderRadius: 'clamp(2.81px, 0.8vw, 5.06px)',
-              border: '1px solid #e5e7eb',
+              border: '1px solid hsl(var(--grey-line))',
               width: '100%',
               height: '100%',
               boxSizing: 'border-box',
@@ -749,8 +753,8 @@ function ConstructorPdpPreview() {
                     letterSpacing: `${finishButtonTextSettings.letterSpacing}em`,
                     lineHeight: finishButtonTextSettings.lineHeight,
                     textTransform: finishButtonTextSettings.textTransform,
-                    color: isActive ? '#111827' : '#9ca3af',
-                    backgroundColor: isActive ? '#ffffff' : 'transparent',
+                    color: isActive ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-muted-2))',
+                    backgroundColor: isActive ? 'hsl(var(--grey-paper))' : 'transparent',
                     border: 'none',
                     borderRadius: 'clamp(2.11px, 0.6vw, 3.8px)',
                     cursor: 'pointer',

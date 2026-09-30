@@ -140,7 +140,7 @@ function FastViewBlocksGrid({ preset, onLogout }) {
   const renderRegion = (regionId) => {
     if (regionId === 'identity') {
       return (
-        <div className="border border-border rounded-lg p-4 bg-white">
+        <div className="border border-border rounded-lg p-4 bg-paper">
           <div className="text-sm text-muted-foreground">Usuari</div>
           <div className="mt-1 text-base font-semibold text-foreground">Sessió</div>
         </div>
@@ -149,7 +149,7 @@ function FastViewBlocksGrid({ preset, onLogout }) {
 
     if (regionId === 'primaryActions') {
       return (
-        <div className="border border-border rounded-lg p-4 bg-white">
+        <div className="border border-border rounded-lg p-4 bg-paper">
           <div className="text-sm text-muted-foreground">Accions</div>
           <div className="mt-1 text-sm text-foreground">(MVP) Encara no connectat</div>
         </div>
@@ -158,7 +158,7 @@ function FastViewBlocksGrid({ preset, onLogout }) {
 
     if (regionId === 'ordersSummary') {
       return (
-        <div className="border border-border rounded-lg p-4 bg-white">
+        <div className="border border-border rounded-lg p-4 bg-paper">
           <div className="text-sm text-muted-foreground">Comandes</div>
           <div className="mt-1 text-sm text-foreground">(MVP) Encara no connectat</div>
         </div>
@@ -167,7 +167,7 @@ function FastViewBlocksGrid({ preset, onLogout }) {
 
     if (regionId === 'recentlyViewed') {
       return (
-        <div className="border border-border rounded-lg p-4 bg-white">
+        <div className="border border-border rounded-lg p-4 bg-paper">
           <div className="text-sm text-muted-foreground">Darreres vistes</div>
           <div className="mt-1 text-sm text-foreground">(MVP) Encara no connectat</div>
         </div>
@@ -176,7 +176,7 @@ function FastViewBlocksGrid({ preset, onLogout }) {
 
     if (regionId === 'helpAndSession') {
       return (
-        <div className="border border-border rounded-lg p-4 bg-white flex flex-col gap-3 justify-between h-full min-h-0">
+        <div className="border border-border rounded-lg p-4 bg-paper flex flex-col gap-3 justify-between h-full min-h-0">
           <div>
             <div className="text-sm text-muted-foreground">Ajuda</div>
             <div className="mt-1 text-sm text-foreground">(MVP) Encara no connectat</div>
@@ -206,7 +206,7 @@ function FastViewBlocksGrid({ preset, onLogout }) {
 
   return (
     <>
-      <div className="p-4 sm:p-6 border-b bg-white">
+      <div className="p-4 sm:p-6 border-b bg-paper">
         <h2 className="text-xl sm:text-2xl font-oswald font-bold uppercase text-foreground">Compte</h2>
         <p className="mt-1 text-sm text-muted-foreground">Vista ràpida</p>
       </div>
@@ -313,7 +313,7 @@ function CartBlocksGrid({
   const renderRegion = (regionId) => {
     if (regionId === 'cartHeader') {
       return (
-        <div className="p-4 sm:p-6 border-b bg-white">
+        <div className="p-4 sm:p-6 border-b bg-paper">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl sm:text-2xl font-oswald font-bold uppercase text-foreground">El teu cistell</h2>
           </div>
@@ -329,7 +329,7 @@ function CartBlocksGrid({
 
     if (regionId === 'cartSummary') {
       return (
-        <div className="p-4 sm:p-6 bg-white border-b">
+        <div className="p-4 sm:p-6 bg-paper border-b">
           <div className="text-sm text-muted-foreground">Subtotal</div>
           <div className="mt-1 text-base font-semibold text-foreground">{Number.isFinite(totalPrice) ? formatPrice(totalPrice) : ''}</div>
         </div>
@@ -338,7 +338,7 @@ function CartBlocksGrid({
 
     if (regionId === 'cartActions') {
       return (
-        <div className="border-b bg-white p-4 sm:p-6 flex items-center gap-2">
+        <div className="border-b bg-paper p-4 sm:p-6 flex items-center gap-2">
           {toolsAvailable ? (
             <ToolsBar
               preset={preset}
@@ -530,10 +530,10 @@ function SimpleConfirmModal({
 
   const modal = (
     <div className="fixed inset-0 z-[25000] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">{title}</h2>
-        {body ? <p className="text-gray-600 mb-6">{body}</p> : null}
+      <div className="absolute inset-0 bg-ink-pure/50 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative bg-paper rounded-lg shadow-2xl max-w-md w-full mx-4 p-6">
+        <h2 className="text-lg font-semibold text-ink-strong mb-2">{title}</h2>
+        {body ? <p className="text-ink-2 mb-6">{body}</p> : null}
         <div className="flex gap-3 justify-end">
           <Button variant={cancelVariant || 'secondary'} onClick={onCancel}>
             {cancelLabel}
@@ -584,7 +584,7 @@ function CartContent({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="p-4 sm:p-6 border-b bg-white">
+      <div className="p-4 sm:p-6 border-b bg-paper">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl sm:text-2xl font-oswald font-bold uppercase text-foreground">El teu cistell</h2>
         </div>
@@ -596,7 +596,7 @@ function CartContent({
         </div>
       </div>
 
-      <div className="border-b bg-white p-4 sm:p-6 flex items-center gap-2">
+      <div className="border-b bg-paper p-4 sm:p-6 flex items-center gap-2">
         {toolsAvailable ? (
           <ToolsBar
             preset={preset}
@@ -715,7 +715,7 @@ function FastViewContent({ preset, onLogout }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="p-4 sm:p-6 border-b bg-white">
+      <div className="p-4 sm:p-6 border-b bg-paper">
         <h2 className="text-xl sm:text-2xl font-oswald font-bold uppercase text-foreground">Compte</h2>
         <p className="mt-1 text-sm text-muted-foreground">Vista ràpida</p>
       </div>
@@ -962,8 +962,8 @@ export default function SlideShell({
             data-shell-variant={shellVariant}
             className={
               isFullWide
-                ? 'fixed left-0 right-0 w-full bg-white z-[20001] border-b border-border shadow-2xl flex flex-col'
-                : 'fixed inset-y-0 right-0 w-full sm:w-[450px] bg-white z-[20001] shadow-2xl flex flex-col h-full'
+                ? 'fixed left-0 right-0 w-full bg-paper z-[20001] border-b border-border shadow-2xl flex flex-col'
+                : 'fixed inset-y-0 right-0 w-full sm:w-[450px] bg-paper z-[20001] shadow-2xl flex flex-col h-full'
             }
             style={isFullWide ? { top: fullWideTop, maxHeight: fullWideMaxHeight } : undefined}
             initial={isFullWide ? { y: -8, opacity: 0 } : { x: '100%', opacity: 0 }}
@@ -973,7 +973,7 @@ export default function SlideShell({
             role="dialog"
             aria-modal="true"
           >
-            <div className="border-b bg-white">
+            <div className="border-b bg-paper">
               <div className={`mx-auto ${isFullWide ? 'max-w-[1400px] px-4 sm:px-6 lg:px-10' : 'px-2'} py-2`}>
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
@@ -1235,7 +1235,7 @@ export default function SlideShell({
                                 <div className="mt-3 text-2xl font-black tracking-tight text-foreground">Confirmació (demo)</div>
 
                                 <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                                  <div className="rounded-lg border border-border bg-white p-4 sm:col-span-2">
+                                  <div className="rounded-lg border border-border bg-paper p-4 sm:col-span-2">
                                     <div className="text-sm text-muted-foreground">Enviament a</div>
                                     <div className="mt-1 text-sm font-semibold text-foreground">
                                       {checkoutDetails.firstName} {checkoutDetails.lastName}
@@ -1248,7 +1248,7 @@ export default function SlideShell({
                                     <div className="mt-1 text-sm font-semibold text-foreground">{checkoutDetails.email}</div>
                                   </div>
 
-                                  <div className="rounded-lg border border-border bg-white p-4">
+                                  <div className="rounded-lg border border-border bg-paper p-4">
                                     <div className="text-sm text-muted-foreground">Total</div>
                                     <div className="mt-1 text-lg font-black text-foreground">
                                       {Number.isFinite(totalPrice) ? formatPrice(totalPrice) : ''}
@@ -1274,7 +1274,7 @@ export default function SlideShell({
                                 <div className="text-xs font-semibold tracking-[0.18em] text-muted-foreground">CONFIRMACIÓ</div>
                                 <div className="mt-3 text-2xl font-black tracking-tight text-foreground">Comanda confirmada</div>
 
-                                <div className="mt-4 rounded-lg border border-border bg-white p-4">
+                                <div className="mt-4 rounded-lg border border-border bg-paper p-4">
                                   <div className="text-sm text-muted-foreground">Número de comanda</div>
                                   <div className="mt-1 font-mono text-sm font-semibold text-foreground">{checkoutOrderId || '—'}</div>
                                   <div className="mt-3 text-sm text-foreground/80">Redirigint a la pàgina de confirmació…</div>

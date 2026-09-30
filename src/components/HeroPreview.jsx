@@ -85,7 +85,7 @@ const HeroPreview = ({ slides = [], autoplayInterval = 8000, className = '' }) =
   }
 
   return (
-    <section className={`relative h-[70vh] min-h-[500px] overflow-hidden text-center text-white bg-black ${className}`}>
+    <section className={`relative h-[70vh] min-h-[500px] overflow-hidden text-center text-paper bg-ink-pure ${className}`}>
       <motion.div
         className="absolute inset-0 z-30 cursor-pointer active:cursor-grabbing"
         drag="x"
@@ -121,7 +121,7 @@ const HeroPreview = ({ slides = [], autoplayInterval = 8000, className = '' }) =
             />
           </div>
           <div
-            className="absolute inset-0 bg-black"
+            className="absolute inset-0 bg-ink-pure"
             style={{ opacity: slides[currentSlide].bg_opacity ?? slides[currentSlide].bgOpacity ?? 0.5 }}
           />
         </motion.div>
@@ -138,7 +138,7 @@ const HeroPreview = ({ slides = [], autoplayInterval = 8000, className = '' }) =
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <motion.h1
-              className={`${getTypographyClasses(typography.hero.title)} mb-3 lg:mb-4 drop-shadow-lg text-white uppercase`}
+              className={`${getTypographyClasses(typography.hero.title)} mb-3 lg:mb-4 drop-shadow-lg text-paper uppercase`}
               style={{ fontSize: titleFontSize }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -147,7 +147,7 @@ const HeroPreview = ({ slides = [], autoplayInterval = 8000, className = '' }) =
               {slides[currentSlide].title}
             </motion.h1>
             <motion.p
-              className={`${getTypographyClasses(typography.hero.subtitle)} max-w-4xl mx-auto drop-shadow-md text-gray-100 px-2`}
+              className={`${getTypographyClasses(typography.hero.subtitle)} max-w-4xl mx-auto drop-shadow-md text-paper px-2`}
               style={{ fontSize: subtitleFontSize }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -166,7 +166,7 @@ const HeroPreview = ({ slides = [], autoplayInterval = 8000, className = '' }) =
               key={index}
               onClick={(e) => { e.stopPropagation(); setCurrentSlide(index); }}
               className={`w-2 h-2 rounded-full transition-all duration-300 p-2 box-content ${
-                index === currentSlide ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/80'
+                index === currentSlide ? 'bg-paper w-8' : 'bg-paper/50 hover:bg-paper/80'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

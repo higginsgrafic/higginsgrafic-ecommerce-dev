@@ -87,31 +87,60 @@ html.scrollbar-compensate .offers-header-cart-open {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9.02%;
+    /* LA RAMPA DE GRISOS DE LA CASA (30/09/2026).
+       =
+       Un sol to —el de `#F9FAFB`, matís 210—, saturació 10 % a tot arreu, i
+       dotze passos de llum. D'aqui surt TOTA la colorimetria de la interficie:
+       papers, vores, textos i estats. L'amo ho va dictar aixi: «El que vull es
+       que tot s'unifiqui al voltant d'un gris fred: #F9FAFB.»
+       =
+       Els noms diuen la FUNCIO, i cada pas es el seguent mes fosc:
+         paper      el blanc de fons            ink-2       la tinta de la casa
+         paper-soft fons suau                   ink         la tinta fosca
+         paper-tint el clar de fons             ink-strong  el quasi negre
+         line       les vores                   ink-pure    el negre pur
+       =
+       Per afegir un pas nou, canvia NOME'S la llum: el to i la saturacio son
+       comuns i no s'han de tocar. */
+    --grey-paper: 210 10% 100%;
+    --grey-paper-soft: 210 10% 97%;
+    --grey-paper-tint: 210 10% 94%;
+    --grey-line: 210 10% 92%;
+    --grey-line-strong: 210 10% 84%;
+    --grey-muted: 210 10% 74%;
+    --grey-muted-2: 210 10% 60%;
+    --grey-ink-soft: 210 10% 45%;
+    --grey-ink-2: 210 10% 33%;
+    --grey-ink: 210 10% 16%;
+    --grey-ink-strong: 210 10% 8%;
+    --grey-ink-pure: 210 10% 2%;
 
-    --white-strong: var(--background);
-    --white-soft: var(--background);
+    /* Els tokens de sempre, apuntant a la rampa. */
+    --background: var(--grey-paper);
+    --foreground: var(--grey-ink-2);
 
-    --muted: 210 20% 98%;
-    --muted-foreground: 0 0% 69.8%;
+    --white-strong: var(--grey-paper);
+    --white-soft: var(--grey-paper);
 
-    --popover: 0 0% 100%;
+    --muted: var(--grey-paper-soft);
+    --muted-foreground: var(--grey-muted);
+
+    --popover: var(--grey-paper);
     --popover-foreground: 0 100% 50%;
 
-    --border: 0 0% 91%;
-    --input: 0 0% 91%;
+    --border: var(--grey-line);
+    --input: var(--grey-line);
 
-    --card: 0 0% 100%;
+    --card: var(--grey-paper);
     --card-foreground: 0 100% 50%;
 
     --primary: 0 100% 50%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 0 0% 96%;
+    --secondary: var(--grey-paper-soft);
     --secondary-foreground: 0 100% 50%;
 
-    --accent: 0 0% 96%;
+    --accent: var(--grey-paper-soft);
     --accent-foreground: 0 100% 50%;
 
     --destructive: 0 100% 50%;
@@ -119,6 +148,18 @@ html.scrollbar-compensate .offers-header-cart-open {
 
     --ring: 0 100% 50%;
 
+    /* ELS TONS SUAUS, EN ORDRE (30/09/2026).
+       =
+       La conversio va de clar a fosc, i aquesta es la llista que fa servir el
+       projecte per saber per on va:
+         paper · paper-soft · paper-tint   -> superficies
+         line · line-strong                -> vores
+         muted · muted-2                   -> text apagat
+         ink-soft · ink-2 · ink            -> text
+         ink-strong · ink-pure             -> negres
+       =
+       I el MODE NIT: com que cada token diu la FUNCIO i no el color, el mode nit
+       es nome's girar la rampa. Cap pantalla no s'ha de tocar. */
     --radius: 0.5rem;
     /* El belt es una PROPORCIO de la finestra: 1350 sobre 1920 = 70,3125%.
        Abans era `min(1350px, 100vw - 32px)`, amb un sostre fix, i per aixo les
@@ -135,7 +176,28 @@ html.scrollbar-compensate .offers-header-cart-open {
     --page-band-footer-height: 620px;
   }
 
-
+  /* EL MODE NIT (30/09/2026): nome's la rampa girada.
+     =
+     Els tons suaus passen a ser foscos i la tinta passa a ser clara, mantenint
+     el MATEIX to (matis 210) i la MATEIXA saturacio. Els noms no canvien, o
+     sigui que cap pantalla no s'ha de tocar quan s'activi.
+     =
+     Es activa posant la classe `dark` a l'arrel (`document.documentElement`),
+     que es el que llegira el commutador del mode nit. */
+  .dark {
+    --grey-paper: 210 10% 5%;
+    --grey-paper-soft: 210 10% 8%;
+    --grey-paper-tint: 210 10% 11%;
+    --grey-line: 210 10% 16%;
+    --grey-line-strong: 210 10% 26%;
+    --grey-muted: 210 10% 45%;
+    --grey-muted-2: 210 10% 58%;
+    --grey-ink-soft: 210 10% 72%;
+    --grey-ink-2: 210 10% 88%;
+    --grey-ink: 210 10% 94%;
+    --grey-ink-strong: 210 10% 97%;
+    --grey-ink-pure: 210 10% 100%;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {

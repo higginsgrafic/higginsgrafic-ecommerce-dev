@@ -72,7 +72,7 @@ export default function BottomTabBar() {
 
   return (
     <nav
-      className="fixed left-0 right-0 z-50 bg-white border-t border-gray-200 safe-area-bottom"
+      className="fixed left-0 right-0 z-50 bg-paper border-t border-line safe-area-bottom"
       style={{ bottom: '0px' }}
     >
       <div className="flex items-center justify-around h-16 max-w-md mx-auto">
@@ -87,7 +87,7 @@ export default function BottomTabBar() {
                 key="cerca"
                 type="button"
                 onClick={handleCerca}
-                className="flex items-center justify-center flex-1 h-full text-gray-500 active:text-red-600 transition-colors"
+                className="flex items-center justify-center flex-1 h-full text-ink-soft active:text-red-600 transition-colors"
               >
                 <div className="relative">
                   <Icon size={28} strokeWidth={2} />
@@ -103,7 +103,7 @@ export default function BottomTabBar() {
                 type="button"
                 aria-label="Cistell"
                 onClick={handleCart}
-                className="flex items-center justify-center flex-1 h-full text-gray-500 active:text-red-600 transition-colors"
+                className="flex items-center justify-center flex-1 h-full text-ink-soft active:text-red-600 transition-colors"
               >
                 {cartIcon}
               </button>
@@ -117,7 +117,7 @@ export default function BottomTabBar() {
               end={to === '/'}
               className={({ isActive }) =>
                 `flex items-center justify-center flex-1 h-full transition-colors ${
-                  isActive ? 'text-red-600' : 'text-gray-500'
+                  isActive ? 'text-red-600' : 'text-ink-soft'
                 }`
               }
             >

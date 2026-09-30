@@ -27,8 +27,8 @@ function OrdersTab({ orders }) {
   if (!orders || orders.length === 0) {
     return (
       <div style={{ padding: '40px', textAlign: 'center' }}>
-        <Package className="w-12 h-12 mx-auto text-neutral-300 mb-4" />
-        <p style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14pt', color: '#666' }}>
+        <Package className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+        <p style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14pt', color: 'hsl(var(--grey-ink-soft))' }}>
           Encara no tens cap comanda
         </p>
       </div>
@@ -39,7 +39,7 @@ function OrdersTab({ orders }) {
     <div style={{ padding: '40px' }}>
       <h3 style={titleStyle}>Les teves comandes</h3>
       {orders.map((order) => (
-        <div key={order.id} style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '16px', marginBottom: '16px' }}>
+        <div key={order.id} style={{ backgroundColor: 'white', border: '1px solid hsl(var(--grey-line-strong))', padding: '16px', marginBottom: '16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '20px', alignItems: 'center' }}>
             <div>
               <div style={{ ...labelStyle, marginBottom: '4px' }}>Número</div>
@@ -59,7 +59,7 @@ function OrdersTab({ orders }) {
                 fontFamily: 'Roboto Condensed, sans-serif',
                 fontSize: '12pt',
                 fontWeight: 300,
-                backgroundColor: STATUS_COLORS[order.status] || '#e9ecef',
+                backgroundColor: STATUS_COLORS[order.status] || 'hsl(var(--grey-paper-tint))',
                 padding: '4px 8px',
                 display: 'inline-block',
               }}>
@@ -77,7 +77,7 @@ function OrdersTab({ orders }) {
               fontFamily: 'Roboto Condensed, sans-serif',
               fontSize: '12pt',
               fontWeight: 400,
-              backgroundColor: '#000',
+              backgroundColor: 'hsl(var(--grey-ink-pure))',
               color: 'white',
               border: 'none',
               cursor: 'pointer',
@@ -129,7 +129,7 @@ function AccountTab({ profile, addresses, onUpdateProfile }) {
             <label style={labelStyle}>Empresa</label>
             <input type="text" value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} placeholder="Opcional" style={inputStyle} />
           </div>
-          <button type="submit" disabled={saving} style={{ padding: '8px 16px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 400, backgroundColor: '#000', color: 'white', border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+          <button type="submit" disabled={saving} style={{ padding: '8px 16px', fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 400, backgroundColor: 'hsl(var(--grey-ink-pure))', color: 'white', border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
             {saving ? 'Desant...' : 'Desar canvis'}
           </button>
           {saved && (
@@ -142,7 +142,7 @@ function AccountTab({ profile, addresses, onUpdateProfile }) {
         <h3 style={titleStyle}>Adreces</h3>
         {addresses && addresses.length > 0 ? (
           addresses.map((addr) => (
-            <div key={addr.id} style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '12px', marginBottom: '12px' }}>
+            <div key={addr.id} style={{ backgroundColor: 'white', border: '1px solid hsl(var(--grey-line-strong))', padding: '12px', marginBottom: '12px' }}>
               <div style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', fontWeight: 300 }}>
                 {/* `recipient_name` no existeix a la taula `addresses`: sortia
                     sempre buit. Els camps reals són street, street_number,
@@ -159,7 +159,7 @@ function AccountTab({ profile, addresses, onUpdateProfile }) {
             </div>
           ))
         ) : (
-          <p style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', color: '#666' }}>No tens adreces guardades</p>
+          <p style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', color: 'hsl(var(--grey-ink-soft))' }}>No tens adreces guardades</p>
         )}
       </div>
     </div>
@@ -184,8 +184,8 @@ export function UserProfileTabs({ onTabChange }) {
   if (loading) {
     return (
       <div style={{ padding: '40px', textAlign: 'center' }}>
-        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto" />
-        <p style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', color: '#666', marginTop: '12px' }}>Carregant dades…</p>
+        <div className="w-8 h-8 border-2 border-ink-pure border-t-transparent rounded-full animate-spin mx-auto" />
+        <p style={{ fontFamily: 'Roboto Condensed, sans-serif', fontSize: '12pt', color: 'hsl(var(--grey-ink-soft))', marginTop: '12px' }}>Carregant dades…</p>
       </div>
     );
   }
@@ -196,7 +196,7 @@ export function UserProfileTabs({ onTabChange }) {
         display: 'flex',
         alignItems: 'center',
         gap: '0',
-        borderBottom: '2px solid #e5e7eb',
+        borderBottom: '2px solid hsl(var(--grey-line))',
         paddingBottom: '0',
         padding: '0',
       }}>
@@ -218,7 +218,7 @@ export function UserProfileTabs({ onTabChange }) {
               border: 'none',
               borderBottom: activeTabId === tab.id ? '3px solid #1E62B8' : '3px solid transparent',
               backgroundColor: 'transparent',
-              color: activeTabId === tab.id ? '#1E62B8' : '#666',
+              color: activeTabId === tab.id ? '#1E62B8' : 'hsl(var(--grey-ink-soft))',
               cursor: 'pointer',
               transition: 'all 0.2s',
               marginBottom: '-2px',
@@ -230,7 +230,7 @@ export function UserProfileTabs({ onTabChange }) {
         ))}
       </div>
 
-      <div style={{ backgroundColor: 'white', borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ backgroundColor: 'white', borderBottom: '1px solid hsl(var(--grey-line))' }}>
         {activeTabId === '1' && <OrdersTab orders={orders} />}
         {activeTabId === '2' && <AccountTab profile={profile} addresses={addresses} onUpdateProfile={updateProfile} />}
       </div>

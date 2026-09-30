@@ -204,14 +204,14 @@ export default function EmailPreviewPage() {
   const filtered = activeTab === 'tots' ? rendered : rendered.filter((r) => r.category === activeTab);
 
   return (
-    <div style={{ margin: 0, padding: '32px 16px', background: '#EAEBEF', fontFamily: "'Roboto', sans-serif", minHeight: '100vh' }}>
+    <div style={{ margin: 0, padding: '32px 16px', background: 'hsl(var(--grey-paper-tint))', fontFamily: "'Roboto', sans-serif", minHeight: '100vh' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
           <div>
-            <h1 style={{ fontSize: '24px', color: '#141414', margin: 0, fontWeight: 700 }}>
+            <h1 style={{ fontSize: '24px', color: 'hsl(var(--grey-ink-strong))', margin: 0, fontWeight: 700 }}>
               Plantilles de correu ({rendered.length})
             </h1>
-            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#666' }}>
+            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'hsl(var(--grey-ink-soft))' }}>
               Compara les plantilles HTML amb les imatges de fons originals
             </p>
           </div>
@@ -219,7 +219,7 @@ export default function EmailPreviewPage() {
           {/* Controls Bar */}
           <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
             {/* View Mode Selector */}
-            <div style={{ display: 'flex', background: '#FFFFFF', padding: '3px', borderRadius: '8px', border: '1px solid #D1D5DB' }}>
+            <div style={{ display: 'flex', background: 'hsl(var(--grey-paper))', padding: '3px', borderRadius: '8px', border: '1px solid hsl(var(--grey-line-strong))' }}>
               {[
                 { id: 'overlay', label: 'Fons superposat' },
                 { id: 'side-by-side', label: 'Costat a costat' },
@@ -233,8 +233,8 @@ export default function EmailPreviewPage() {
                     padding: '6px 12px',
                     borderRadius: '6px',
                     border: 'none',
-                    background: viewMode === mode.id ? '#141414' : 'transparent',
-                    color: viewMode === mode.id ? '#FFFFFF' : '#4B5563',
+                    background: viewMode === mode.id ? 'hsl(var(--grey-ink-strong))' : 'transparent',
+                    color: viewMode === mode.id ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-2))',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -247,8 +247,8 @@ export default function EmailPreviewPage() {
 
             {/* Opacity slider for overlay mode */}
             {viewMode === 'overlay' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFFFFF', padding: '6px 12px', borderRadius: '8px', border: '1px solid #D1D5DB' }}>
-                <span style={{ fontSize: '12px', color: '#4B5563', fontWeight: 500 }}>Fons:</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'hsl(var(--grey-paper))', padding: '6px 12px', borderRadius: '8px', border: '1px solid hsl(var(--grey-line-strong))' }}>
+                <span style={{ fontSize: '12px', color: 'hsl(var(--grey-ink-2))', fontWeight: 500 }}>Fons:</span>
                 <input
                   type="range"
                   min="0"
@@ -258,7 +258,7 @@ export default function EmailPreviewPage() {
                   onChange={(e) => setBgOpacity(parseFloat(e.target.value))}
                   style={{ width: '80px', cursor: 'pointer' }}
                 />
-                <span style={{ fontSize: '12px', color: '#141414', fontWeight: 600, width: '36px' }}>
+                <span style={{ fontSize: '12px', color: 'hsl(var(--grey-ink-strong))', fontWeight: 600, width: '36px' }}>
                   {Math.round(bgOpacity * 100)}%
                 </span>
               </div>
@@ -274,9 +274,9 @@ export default function EmailPreviewPage() {
                 padding: '6px 12px',
                 borderRadius: '8px',
                 border: '1px solid',
-                borderColor: redText ? '#DC2626' : '#D1D5DB',
-                backgroundColor: redText ? '#FEE2E2' : '#FFFFFF',
-                color: redText ? '#DC2626' : '#4B5563',
+                borderColor: redText ? '#DC2626' : 'hsl(var(--grey-muted))',
+                backgroundColor: redText ? '#FEE2E2' : 'hsl(var(--grey-paper))',
+                color: redText ? '#DC2626' : 'hsl(var(--grey-ink-2))',
                 fontSize: '12px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -288,7 +288,7 @@ export default function EmailPreviewPage() {
                   width: '8px',
                   height: '8px',
                   borderRadius: '50%',
-                  backgroundColor: redText ? '#DC2626' : '#9CA3AF',
+                  backgroundColor: redText ? '#DC2626' : 'hsl(var(--grey-muted-2))',
                 }}
               />
               Text vermell
@@ -304,9 +304,9 @@ export default function EmailPreviewPage() {
                 padding: '6px 12px',
                 borderRadius: '8px',
                 border: '1px solid',
-                borderColor: showGrid ? '#2563EB' : '#D1D5DB',
-                backgroundColor: showGrid ? '#DBEAFE' : '#FFFFFF',
-                color: showGrid ? '#1D4ED8' : '#4B5563',
+                borderColor: showGrid ? '#2563EB' : 'hsl(var(--grey-muted))',
+                backgroundColor: showGrid ? '#DBEAFE' : 'hsl(var(--grey-paper))',
+                color: showGrid ? '#1D4ED8' : 'hsl(var(--grey-ink-2))',
                 fontSize: '12px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -325,8 +325,8 @@ export default function EmailPreviewPage() {
             </button>
 
             {/* Item count switcher */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#FFFFFF', padding: '4px 8px', borderRadius: '8px', border: '1px solid #D1D5DB' }}>
-              <span style={{ fontSize: '12px', color: '#666' }}>Articles:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'hsl(var(--grey-paper))', padding: '4px 8px', borderRadius: '8px', border: '1px solid hsl(var(--grey-line-strong))' }}>
+              <span style={{ fontSize: '12px', color: 'hsl(var(--grey-ink-soft))' }}>Articles:</span>
               {[1, 2, 4, 8].map((n) => (
                 <button
                   key={n}
@@ -335,8 +335,8 @@ export default function EmailPreviewPage() {
                     padding: '4px 8px',
                     borderRadius: '4px',
                     border: 'none',
-                    background: itemCount === n ? '#141414' : 'transparent',
-                    color: itemCount === n ? '#FFF' : '#141414',
+                    background: itemCount === n ? 'hsl(var(--grey-ink-strong))' : 'transparent',
+                    color: itemCount === n ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-strong))',
                     fontWeight: 600,
                     cursor: 'pointer',
                     fontSize: '11px',
@@ -359,9 +359,9 @@ export default function EmailPreviewPage() {
                 padding: '6px 14px',
                 borderRadius: '20px',
                 border: '1px solid',
-                borderColor: activeTab === cat ? '#141414' : '#D1D5DB',
-                backgroundColor: activeTab === cat ? '#141414' : '#FFFFFF',
-                color: activeTab === cat ? '#FFFFFF' : '#4B5563',
+                borderColor: activeTab === cat ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-muted))',
+                backgroundColor: activeTab === cat ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-paper))',
+                color: activeTab === cat ? 'hsl(var(--grey-paper))' : 'hsl(var(--grey-ink-2))',
                 fontSize: '13px',
                 fontWeight: 500,
                 cursor: 'pointer',
@@ -374,7 +374,7 @@ export default function EmailPreviewPage() {
         </div>
       </div>
 
-      {rendered.length === 0 && <p style={{ textAlign: 'center', color: '#888' }}>Renderitzant plantilles...</p>}
+      {rendered.length === 0 && <p style={{ textAlign: 'center', color: 'hsl(var(--grey-muted-2))' }}>Renderitzant plantilles...</p>}
 
       {/* Global style override when redText is enabled */}
       {redText && (
@@ -396,7 +396,7 @@ export default function EmailPreviewPage() {
         const renderGrid = showGrid;
         return (
           <section key={name} style={{ marginBottom: '56px' }}>
-            <h2 style={{ fontSize: '16px', color: '#141414', marginBottom: '14px', textAlign: 'center', fontWeight: 600 }}>
+            <h2 style={{ fontSize: '16px', color: 'hsl(var(--grey-ink-strong))', marginBottom: '14px', textAlign: 'center', fontWeight: 600 }}>
               {name}
             </h2>
 
@@ -405,7 +405,7 @@ export default function EmailPreviewPage() {
               <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
                 {/* HTML Column */}
                 <div>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#666', textAlign: 'center', marginBottom: '6px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'hsl(var(--grey-ink-soft))', textAlign: 'center', marginBottom: '6px' }}>
                     Versió HTML
                   </div>
                   <div
@@ -414,7 +414,7 @@ export default function EmailPreviewPage() {
                       position: 'relative',
                       width: '520px',
                       maxWidth: '100%',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: 'hsl(var(--grey-paper))',
                       boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                       borderRadius: '12px',
                       overflow: 'hidden',
@@ -427,7 +427,7 @@ export default function EmailPreviewPage() {
 
                 {/* Original Mockup Column */}
                 <div>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#666', textAlign: 'center', marginBottom: '6px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'hsl(var(--grey-ink-soft))', textAlign: 'center', marginBottom: '6px' }}>
                     Imatge Original
                   </div>
                   <div
@@ -435,7 +435,7 @@ export default function EmailPreviewPage() {
                       position: 'relative',
                       width: '520px',
                       maxWidth: '100%',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: 'hsl(var(--grey-paper))',
                       boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                       borderRadius: '12px',
                       overflow: 'hidden',
@@ -449,7 +449,7 @@ export default function EmailPreviewPage() {
                         style={{ width: '100%', height: 'auto', display: 'block' }}
                       />
                     ) : (
-                      <div style={{ padding: '40px', textAlign: 'center', color: '#888', fontSize: '13px' }}>
+                      <div style={{ padding: '40px', textAlign: 'center', color: 'hsl(var(--grey-muted-2))', fontSize: '13px' }}>
                         Sense imatge de referència
                       </div>
                     )}
@@ -463,7 +463,7 @@ export default function EmailPreviewPage() {
                   width: '520px',
                   maxWidth: '100%',
                   margin: '0 auto',
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: 'hsl(var(--grey-paper))',
                   boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                   borderRadius: '12px',
                   overflow: 'hidden',
@@ -477,7 +477,7 @@ export default function EmailPreviewPage() {
                     style={{ width: '100%', height: 'auto', display: 'block' }}
                   />
                 ) : (
-                  <div style={{ padding: '40px', textAlign: 'center', color: '#888', fontSize: '13px' }}>
+                  <div style={{ padding: '40px', textAlign: 'center', color: 'hsl(var(--grey-muted-2))', fontSize: '13px' }}>
                     Sense imatge de referència
                   </div>
                 )}
@@ -490,7 +490,7 @@ export default function EmailPreviewPage() {
                   width: '520px',
                   maxWidth: '100%',
                   margin: '0 auto',
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: 'hsl(var(--grey-paper))',
                   boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                   borderRadius: '12px',
                   overflow: 'hidden',

@@ -13,6 +13,7 @@ import {
   MARGE_EXTRA_ESCRIPTORI_PX,
   PADDING_DALT_PANELL_ESCRIPTORI_PX,
   PADDING_VERTICAL_PANELL_ESCRIPTORI_PX,
+  PADDING_VERTICAL_PANELL_ESTRETA_PX,
   PADDING_VERTICAL_PANELL_PX,
 } from '../megaslide/geometriaMegaslide.js';
 import { alturaTaulaVertical, CapaTaulaVertical, TaulaVerticalP1 } from '../megaslide/TaulaVertical.jsx';
@@ -32,6 +33,18 @@ const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'))
 // samarretes i el final del megaslide és 30,0 (a les dues pàgines, que des del
 // 28/09/2026 tenen les franges exactament a la mateixa alçada).
 const P1_STRIPE_BOTTOM_GAP = 29.5;
+
+/**
+ * L'ESTONA INVISIBLE DEL PANELL, en mil·lisegons: el temps que el megaslide
+ * està muntat, amb el seu lloc ja reservat, però encara amb opacitat 0, perquè
+ * no es vegi com es va muntant la composició de la pàgina 2.
+ *
+ * És la durada que porta l'animació `mega-panel-desplega` com a retràs, i la
+ * publica qui l'ha de saber: la capçalera —que és qui pinta l'espai reservat—
+ * i el cadenat —que no s'ha de veure fins que el panell comença a aparèixer.
+ * Si es canvia, es canvia aquí i prou.
+ */
+export const MEGA_PANEL_DELAY_MS = 500;
 
 // Marge extra de la pestanya del megaslide a l'escriptori: les graelles de la
 // banda estreta s'han menjat el coixí que quedava sota les samarretes i cal
@@ -166,9 +179,15 @@ export default function MegaMenuPanel({
   // va lligada a la graella de la 1 pel bucle `alignTopRowToPage1`), aixi que el
   // retall es fa aqui i mou les dues. Els numeros i el perque son a
   // `PADDING_DALT_PANELL_ESCRIPTORI_PX` (geometriaMegaslide.js).
+  // A LA COMPOSICIO ESTRETA (1024-1366 APAISAT) EL PANELL S'ESCURÇA 16 px
+  // (02/10/2026). En Marc: «Escurça els megaslide que hagis d'escurçar. De fet,
+  // per aixo ho faig, perque la hero hi capiga be»: amb els 15 px d'aire de dalt
+  // i els de baix, el bloc de la p2 queda amb 15 a cada banda. Les vistes
+  // verticals i el mobil no s'hi toquen.
+  const esEstretaAqui = w >= 1024 && w <= 1366 && w >= h;
   const paddingVerticalPanellPx = esEscriptoriAqui
     ? PADDING_VERTICAL_PANELL_ESCRIPTORI_PX
-    : PADDING_VERTICAL_PANELL_PX;
+    : (esEstretaAqui ? PADDING_VERTICAL_PANELL_ESTRETA_PX : PADDING_VERTICAL_PANELL_PX);
   // Marge extra de la pestanya a l'escriptori (vegeu MARGE_EXTRA_DESKTOP_PX).
   // S'aplica tant a la mesura com a la reserva, perquè el panell no faci cap
   // salt entre l'estat inicial i el calibrat.
@@ -377,12 +396,12 @@ export default function MegaMenuPanel({
         className="relative z-[10000] block border-b border-border"
         style={{
           overflow: 'visible',
-          backgroundColor: '#ffffff',
+          backgroundColor: 'hsl(var(--grey-paper))',
           // El megaslide apareixia de cop i es veia com s'anava muntant el
           // contingut. Amb aquesta animacio es desplega suaument (baixa i es
           // fon alhora), i l'ull ja no percep que les imatges arriben.
           //
-          // MIG SEGON INVISIBLE ABANS DE DESPLEGAR-SE (26/09/2026), i aixo es el
+          // ESTONA INVISIBLE ABANS DE DESPLEGAR-SE (26/09/2026), i aixo es el
           // que fa que nome's es vegi UN estat: la composicio de la pagina 2
           // acaba de quadrar-se DESPRES del primer pintat (l'alineacio amb la
           // pagina 1 corre despres dels efectes de la filera, la mida de la
@@ -393,7 +412,14 @@ export default function MegaMenuPanel({
           // (opacitat 0, 26 px mes amunt) durant l'espera, i els repasos que
           // queden es fan amb el panell invisible. Els clics no s'hi perden:
           // l'opacitat no treu els events, nome's la visibilitat.
-          animation: 'mega-panel-desplega 340ms cubic-bezier(0.22, 1, 0.36, 1) 500ms backwards',
+          //
+          // L'ESTONA, PUBLICADA (01/10/2026). Durant l'espera el panell ja
+          // ocupa el seu lloc, i allo que hi hagues darrere es veia tallat per
+          // l'espai en blanc de la capcalera, amb el cadenat ja a punt: la
+          // sensacio era que el megaslide «primer feia un espai buit i despres
+          // apareixia». Qui ho hagi de saber (la capcalera, que es qui pinta
+          // aquell espai, i el cadenat) ho llegeix d'aqui, i no ho endevina.
+          animation: `mega-panel-desplega 340ms cubic-bezier(0.22, 1, 0.36, 1) ${MEGA_PANEL_DELAY_MS}ms backwards`,
           ...(megaFullScreen ? {
             minHeight: '100vh',
           } : {})
@@ -487,7 +513,6 @@ export default function MegaMenuPanel({
                     WebkitOverflowScrolling: isPortraitTablet ? 'touch' : undefined,
                     scrollbarWidth: isPortraitTablet ? 'none' : undefined,
                     touchAction: isPortraitTablet ? 'pan-x' : undefined,
-                    pointerEvents: isPortraitTablet ? 'auto' : undefined,
                   }}>
                   <div style={{
                     flex: isPortraitTablet ? '0 0 0px' : '1 1 auto',

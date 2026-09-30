@@ -86,7 +86,7 @@ const OrderConfirmationLayout = ({
           fontSize: '25.34px',
           fontWeight: 500,
           textTransform: 'uppercase',
-          color: '#141414',
+          color: 'hsl(var(--grey-ink-strong))',
           margin: 0,
         }}>
           La comanda
@@ -118,7 +118,7 @@ const OrderConfirmationLayout = ({
               justifyContent: 'space-between',
               fontFamily: 'Roboto, sans-serif',
               fontSize: '16.1px',
-              color: '#141414',
+              color: 'hsl(var(--grey-ink-strong))',
             }}>
               <div style={{ padding: '0 20px', fontWeight: 300, textTransform: 'uppercase', textAlign: 'left', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', overflow: 'hidden', }}>
                 {item.name || 'Producte'}
@@ -151,7 +151,7 @@ const OrderConfirmationLayout = ({
         justifyContent: 'space-between',
         fontFamily: 'Roboto, sans-serif',
         fontSize: '16.1px',
-        color: '#141414',
+        color: 'hsl(var(--grey-ink-strong))',
         overflow: 'hidden',
         pointerEvents: 'auto',
       }}>
@@ -195,8 +195,8 @@ const OrderConfirmationLayout = ({
             alignItems: 'center',
             justifyContent: 'center',
             padding: '10px 28px',
-            backgroundColor: '#141414',
-            color: '#FFFFFF',
+            backgroundColor: 'hsl(var(--grey-ink-strong))',
+            color: 'hsl(var(--grey-paper))',
             textDecoration: 'none',
             borderRadius: '4px',
             fontFamily: 'Oswald, sans-serif',
@@ -243,7 +243,7 @@ const OrderConfirmationLayout = ({
               fontSize: '23.03px',
               fontWeight: 700,
               lineHeight: 1,
-              color: '#141414',
+              color: 'hsl(var(--grey-ink-strong))',
               marginBottom: '8px',
               pointerEvents: 'auto',
             }}
@@ -260,7 +260,7 @@ const OrderConfirmationLayout = ({
               fontFamily: 'Roboto, sans-serif',
               fontSize: '34.51px',
               fontWeight: 400,
-              color: '#141414',
+              color: 'hsl(var(--grey-ink-strong))',
               opacity: 0.85,
               marginBottom: '4px',
               marginTop: '12px',
@@ -280,7 +280,7 @@ const OrderConfirmationLayout = ({
                 fontFamily: 'Oswald, sans-serif',
                 fontSize: '57.54px',
                 fontWeight: 400,
-                color: '#141414',
+                color: 'hsl(var(--grey-ink-strong))',
                 marginBottom: '0px',
                 pointerEvents: 'auto',
               }}
@@ -296,7 +296,7 @@ const OrderConfirmationLayout = ({
                 fontFamily: 'Roboto, sans-serif',
                 fontSize: '16.1px',
                 fontWeight: 400,
-                color: '#141414',
+                color: 'hsl(var(--grey-ink-strong))',
                 opacity: 0.7,
                 marginTop: '-2px',
                 pointerEvents: 'auto',

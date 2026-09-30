@@ -194,7 +194,7 @@ const OrderTrackingPage = () => {
         description="Segueix l'estat de la teva comanda en temps real"
       />
 
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-paper-soft py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="mb-6">
             <Breadcrumbs items={[{ label: 'Seguiment de Comanda' }]} />
@@ -204,17 +204,17 @@ const OrderTrackingPage = () => {
             <h1 className="font-oswald text-4xl md:text-5xl font-bold uppercase mb-3">
               Seguiment de Comanda
             </h1>
-            <p className="font-roboto text-lg text-gray-600">
+            <p className="font-roboto text-lg text-ink-2">
               Introdueix el teu número de comanda per veure l'estat
             </p>
           </div>
 
           {/* Formulari de cerca */}
           {!order && (
-            <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
+            <div className="bg-paper rounded-lg shadow-md p-6 md:p-8 mb-8">
               <form onSubmit={handleTrackOrder} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 font-roboto">
+                  <label className="block text-sm font-medium text-ink-2 mb-2 font-roboto">
                     Número de Comanda
                   </label>
                   <input
@@ -222,12 +222,12 @@ const OrderTrackingPage = () => {
                     value={orderId}
                     onChange={(e) => setOrderId(e.target.value)}
                     placeholder="ex: ORD-1234567890"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent font-roboto"
+                    className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent font-roboto"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 font-roboto">
+                  <label className="block text-sm font-medium text-ink-2 mb-2 font-roboto">
                     Email de la Comanda
                   </label>
                   <input
@@ -235,7 +235,7 @@ const OrderTrackingPage = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="exemple@email.com"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent font-roboto"
+                    className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ink-strong focus:border-transparent font-roboto"
                   />
                 </div>
 
@@ -248,7 +248,7 @@ const OrderTrackingPage = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 font-roboto font-medium"
+                  className="w-full py-3 bg-ink-strong text-paper rounded-lg hover:bg-ink transition-colors disabled:opacity-50 font-roboto font-medium"
                 >
                   {loading ? 'Buscant...' : 'Seguir Comanda'}
                 </button>
@@ -266,19 +266,19 @@ const OrderTrackingPage = () => {
                   setOrderId('');
                   setEmail('');
                 }}
-                className="text-sm text-gray-600 hover:text-gray-900 font-roboto flex items-center gap-2"
+                className="text-sm text-ink-2 hover:text-ink-strong font-roboto flex items-center gap-2"
               >
                 ← Buscar altra comanda
               </button>
 
               {/* Info de la comanda */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-paper rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h2 className="font-oswald text-2xl font-bold uppercase">
                       Comanda {order.id}
                     </h2>
-                    <p className="text-sm text-gray-600 font-roboto mt-1">
+                    <p className="text-sm text-ink-2 font-roboto mt-1">
                       Data: {new Date(order.createdAt || Date.now()).toLocaleDateString('ca-ES', {
                         year: 'numeric',
                         month: 'long',
@@ -287,7 +287,7 @@ const OrderTrackingPage = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-gray-600 font-roboto">Total</div>
+                    <div className="text-sm text-ink-2 font-roboto">Total</div>
                     <div className="font-oswald text-2xl font-bold">
                       {formatPrice(order.totalPrice ?? 0)}
                     </div>
@@ -311,7 +311,7 @@ const OrderTrackingPage = () => {
                 <div className="mb-8">
                   <div className="relative">
                     {/* Línia de fons */}
-                    <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200"></div>
+                    <div className="absolute top-5 left-0 right-0 h-1 bg-paper-tint"></div>
                     {/* Línia de progrés */}
                     <div
                       className="absolute top-5 left-0 h-1 bg-green-600 transition-all duration-500"
@@ -333,8 +333,8 @@ const OrderTrackingPage = () => {
                             <div
                               className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
                                 isCompleted
-                                  ? 'bg-green-600 text-white'
-                                  : 'bg-gray-200 text-gray-500'
+                                  ? 'bg-green-600 text-paper'
+                                  : 'bg-paper-tint text-ink-soft'
                               } ${isCurrent ? 'ring-4 ring-green-200' : ''}`}
                             >
                               {stage.icon}
@@ -343,7 +343,7 @@ const OrderTrackingPage = () => {
                             <div className="mt-2 text-center">
                               <div
                                 className={`text-xs font-medium font-roboto ${
-                                  isCompleted ? 'text-gray-900' : 'text-gray-500'
+                                  isCompleted ? 'text-ink-strong' : 'text-ink-soft'
                                 }`}
                               >
                                 {stage.label}
@@ -368,19 +368,19 @@ const OrderTrackingPage = () => {
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">📍</span>
                       <div className="flex-1">
-                        <h3 className="font-roboto font-semibold text-gray-900 mb-2">
+                        <h3 className="font-roboto font-semibold text-ink-strong mb-2">
                           Informació de Seguiment
                         </h3>
                         <div className="space-y-2 text-sm">
                           {order.tracking.carrier && (
                             <div className="flex gap-2">
-                              <span className="text-gray-600">Transportista:</span>
+                              <span className="text-ink-2">Transportista:</span>
                               <span className="font-medium">{order.tracking.carrier}</span>
                             </div>
                           )}
                           {order.tracking.trackingNumber && (
                             <div className="flex gap-2">
-                              <span className="text-gray-600">Número de seguiment:</span>
+                              <span className="text-ink-2">Número de seguiment:</span>
                               <span className="font-mono font-medium">{order.tracking.trackingNumber}</span>
                             </div>
                           )}
@@ -399,7 +399,7 @@ const OrderTrackingPage = () => {
                           )}
                           {order.estimatedDelivery && (
                             <div className="flex gap-2 pt-2 border-t border-blue-200">
-                              <span className="text-gray-600">Entrega estimada:</span>
+                              <span className="text-ink-2">Entrega estimada:</span>
                               <span className="font-medium">
                                 {new Date(order.estimatedDelivery).toLocaleDateString('ca-ES', {
                                   year: 'numeric',
@@ -417,12 +417,12 @@ const OrderTrackingPage = () => {
 
                 {/* Productes */}
                 <div className="mt-6">
-                  <h3 className="font-roboto font-semibold text-gray-900 mb-3">
+                  <h3 className="font-roboto font-semibold text-ink-strong mb-3">
                     Productes ({order.items?.length || 0})
                   </h3>
                   <div className="space-y-3">
                     {order.items?.map((item, index) => (
-                      <div key={index} className="flex gap-4 p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex gap-4 p-3 bg-paper-soft rounded-lg">
                         {item.image && (
                           <img
                             src={item.image}
@@ -432,7 +432,7 @@ const OrderTrackingPage = () => {
                         )}
                         <div className="flex-1">
                           <div className="font-roboto font-medium">{item.name}</div>
-                          <div className="text-sm text-gray-600 font-roboto">
+                          <div className="text-sm text-ink-2 font-roboto">
                             Talla: {item.size} • Quantitat: {item.quantity}
                           </div>
                         </div>
@@ -447,10 +447,10 @@ const OrderTrackingPage = () => {
                 {/* Adreça d'enviament */}
                 {order.shippingAddress && (
                   <div className="mt-6 pt-6 border-t">
-                    <h3 className="font-roboto font-semibold text-gray-900 mb-3">
+                    <h3 className="font-roboto font-semibold text-ink-strong mb-3">
                       Adreça d'Enviament
                     </h3>
-                    <div className="text-sm text-gray-700 font-roboto">
+                    <div className="text-sm text-ink-2 font-roboto">
                       <div>{order.shippingAddress.firstName} {order.shippingAddress.lastName}</div>
                       <div>{order.shippingAddress.street}</div>
                       <div>{order.shippingAddress.postalCode} {order.shippingAddress.city}</div>
@@ -461,16 +461,16 @@ const OrderTrackingPage = () => {
               </div>
 
               {/* Ajuda */}
-              <div className="bg-gray-100 rounded-lg p-6">
-                <h3 className="font-roboto font-semibold text-gray-900 mb-2">
+              <div className="bg-paper-soft rounded-lg p-6">
+                <h3 className="font-roboto font-semibold text-ink-strong mb-2">
                   Necessites ajuda?
                 </h3>
-                <p className="text-sm text-gray-700 font-roboto mb-3">
+                <p className="text-sm text-ink-2 font-roboto mb-3">
                   Si tens alguna pregunta sobre la teva comanda, contacta amb nosaltres.
                 </p>
                 <a
                   href="/contact"
-                  className="inline-block px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors text-sm font-roboto font-medium"
+                  className="inline-block px-4 py-2 bg-ink-strong text-paper rounded hover:bg-ink transition-colors text-sm font-roboto font-medium"
                 >
                   Contactar amb Suport
                 </a>

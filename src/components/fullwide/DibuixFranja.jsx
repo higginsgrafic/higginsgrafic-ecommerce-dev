@@ -10,8 +10,9 @@ import {
   STRIPE_DRAWING_ESCALA_VERTICAL,
   STRIPE_DRAWING_DX_VERTICAL,
   FILTRE_DIBUIX_DESACTIVAT,
+  FILTRE_DIBUIX_DESACTIVAT_AUSTEN,
+  FILTRE_DIBUIX_DESACTIVAT_CUBE,
   FILTRE_DIBUIX_DESACTIVAT_LFMD,
-  FILTRE_DIBUIX_DESACTIVAT_COLOR,
 } from '../../config/stripeCalibrationsVertical';
 import {
   DIBUIXOS_FRANJA_DX,
@@ -389,12 +390,17 @@ export function DibuixFranja({
     ? (cal.dx + (STRIPE_DRAWING_DX_VERTICAL[canonicalKey(picked)] ?? STRIPE_DRAWING_DX_VERTICAL[picked] ?? 0)) * factorCalibratgeVertical
     : cal.dx;
   const transform = `translate(calc(${dxDibuix}px * ${fA} + ${desplacamentGap}% + var(--hgStripeDrawingExtraDx, 0px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDxFilaDalt, 0px)' : ''}), calc(${dyDibuix}px + var(--hgStripeDrawingExtraDy, -5px)${idx < 7 ? ' + var(--hgStripeDrawingExtraDyFilaDalt, 0px)' : ''})) scale(calc(${escalaDibuix} * var(--hgStripeDrawingExtraScale, 1)))`;
-  // Els dibuixos que nome's existeixen en color no porten la variant negra: a
-  // aquests se'ls ha de treure el color a part. I els de LOOKING FOR MY DARCY,
-  // que son d'aquests, porten un filtre propi (l'amo els vol un 5 % MES CLARS que
-  // el vel, no un 10 % mes foscos).
+  // Els dibuixos que nome's existeixen en color (CUBE i LOOKING FOR MY DARCY)
+  // no porten la variant negra: se'ls ha de treure el color a part, amb el
+  // MATEIX filtre tots dos (29/09/2026: «LFMD tambe ha de tenir el mateix color
+  // que Cube»). Abans LFMD portava un filtre propi que el pintava de blanc i, a
+  // la samarreta atenuada, no s'hi veia.
   const esDibuixAmbVariantNegra = typeof picked === 'string' && /-b-stripe\.webp$/i.test(picked);
-  const esDibuixDeLfmd = typeof picked === 'string' && picked.toLowerCase().includes('/looking_for_my_darcy/');
+  // Els quatre dibuixos d'austen (Pemberley, Keep Calm, Quotes i Crosswords)
+  // van una mica mes alts que la resta (vegeu el seu filtre).
+  const esDibuixDAusten = typeof picked === 'string' && /\/images_stripe\/austen\//i.test(picked);
+  // LFMD va mes apagat que la resta de nome's-color (cube).
+  const esDibuixDeLfmd = typeof picked === 'string' && /\/looking_for_my_darcy\//i.test(picked);
   const filter = drawingOverlayDebug
     ? 'drop-shadow(0 0 2px rgba(0,0,0,0.65))'
     : active === 'austen'
@@ -404,13 +410,12 @@ export function DibuixFranja({
       ? 'drop-shadow(0 0 2px rgba(0,0,0,0.75))'
       // EL DIBUIX D'UNA SAMARRETA ATENUADA, EN GRIS DE DESACTIVAT (28/09/2026,
       // ho ha demanat l'amo: «els facis tots d'un color gris desactivat»).
-      // Els dibuixos de casa son imatges en escala de grisos: nome's se'ls
-      // rebaixa l'opacitat (vegeu `FILTRE_DIBUIX_DESACTIVAT`), que els deixa el
-      // detall intacte. Els de LOOKING FOR MY DARCY en porten un de propi.
       : desactivat
-        ? (esDibuixDeLfmd
-          ? FILTRE_DIBUIX_DESACTIVAT_LFMD
-          : (esDibuixAmbVariantNegra ? FILTRE_DIBUIX_DESACTIVAT : FILTRE_DIBUIX_DESACTIVAT_COLOR))
+        ? (esDibuixDAusten
+          ? FILTRE_DIBUIX_DESACTIVAT_AUSTEN
+          : esDibuixDeLfmd
+            ? FILTRE_DIBUIX_DESACTIVAT_LFMD
+            : (esDibuixAmbVariantNegra ? FILTRE_DIBUIX_DESACTIVAT : FILTRE_DIBUIX_DESACTIVAT_CUBE))
         : 'none';
 
   return (

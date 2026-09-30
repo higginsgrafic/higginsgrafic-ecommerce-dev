@@ -25,7 +25,7 @@ export const CistellLayout1 = ({ onExpand }) => (
 
     {/* Camp descompte */}
     <div style={{ marginBottom: 18, borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(0,0,0,0.15)', borderRadius: 3, padding: '8px 12px', background: '#fff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(0,0,0,0.15)', borderRadius: 3, padding: '8px 12px', background: 'hsl(var(--grey-paper))' }}>
         <input type="text" placeholder="Codi descompte" style={{ flex: 1, border: 'none', outline: 'none', fontSize: 12, fontFamily: 'Roboto, sans-serif', background: 'transparent' }} />
         <button style={{ background: 'none', border: 'none', fontSize: 16, cursor: 'pointer', color: 'rgba(0,0,0,0.5)', padding: 0 }}>→</button>
       </div>
@@ -41,14 +41,14 @@ export const CistellLayout1 = ({ onExpand }) => (
         <div style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'rgba(0,0,0,0.65)' }}>IVA (21%)</div>
         <div style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'rgba(0,0,0,0.65)' }}>3,33€</div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, borderTop: '2px solid #000' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, borderTop: '2px solid hsl(var(--grey-ink-pure))' }}>
         <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.02em' }}>TOTAL</div>
         <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700 }}>34,90€</div>
       </div>
     </div>
 
     {/* Botó CTA */}
-    <button onClick={onExpand} style={{ width: '100%', background: '#000', color: '#fff', border: 'none', padding: '14px', fontSize: 14, fontFamily: 'Oswald, sans-serif', fontWeight: 700, cursor: 'pointer', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = '#1a1a1a'} onMouseOut={(e) => e.target.style.background = '#000'}>FINALITZA LA COMPRA</button>
+    <button onClick={onExpand} style={{ width: '100%', background: 'hsl(var(--grey-ink-pure))', color: 'hsl(var(--grey-paper))', border: 'none', padding: '14px', fontSize: 14, fontFamily: 'Oswald, sans-serif', fontWeight: 700, cursor: 'pointer', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'hsl(var(--grey-ink-strong))'} onMouseOut={(e) => e.target.style.background = 'hsl(var(--grey-ink-pure))'}>FINALITZA LA COMPRA</button>
   </>
 );
 
@@ -71,7 +71,7 @@ export const CistellLayout2 = ({ onExpand }) => (
 
     {/* Camp descompte */}
     <div style={{ marginBottom: 18, paddingBottom: 18, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(0,0,0,0.15)', borderRadius: 3, padding: '8px 12px', background: '#fff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(0,0,0,0.15)', borderRadius: 3, padding: '8px 12px', background: 'hsl(var(--grey-paper))' }}>
         <input type="text" placeholder="Codi descompte" style={{ flex: 1, border: 'none', outline: 'none', fontSize: 12, fontFamily: 'Roboto, sans-serif', background: 'transparent' }} />
         <button style={{ background: 'none', border: 'none', fontSize: 16, cursor: 'pointer', color: 'rgba(0,0,0,0.5)', padding: 0 }}>→</button>
       </div>
@@ -84,13 +84,13 @@ export const CistellLayout2 = ({ onExpand }) => (
         <div style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, fontWeight: 500, textAlign: 'right' }}>31,57€</div>
         <div style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'rgba(0,0,0,0.65)' }}>IVA (21%)</div>
         <div style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'rgba(0,0,0,0.65)', textAlign: 'right' }}>3,33€</div>
-        <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.02em', paddingTop: 10, borderTop: '2px solid #000' }}>TOTAL</div>
-        <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700, textAlign: 'right', paddingTop: 10, borderTop: '2px solid #000' }}>34,90€</div>
+        <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.02em', paddingTop: 10, borderTop: '2px solid hsl(var(--grey-ink-pure))' }}>TOTAL</div>
+        <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700, textAlign: 'right', paddingTop: 10, borderTop: '2px solid hsl(var(--grey-ink-pure))' }}>34,90€</div>
       </div>
     </div>
 
     {/* Botó CTA */}
-    <button onClick={onExpand} style={{ width: '100%', background: '#000', color: '#fff', border: 'none', padding: '14px', fontSize: 14, fontFamily: 'Oswald, sans-serif', fontWeight: 700, cursor: 'pointer', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = '#1a1a1a'} onMouseOut={(e) => e.target.style.background = '#000'}>FINALITZA LA COMPRA</button>
+    <button onClick={onExpand} style={{ width: '100%', background: 'hsl(var(--grey-ink-pure))', color: 'hsl(var(--grey-paper))', border: 'none', padding: '14px', fontSize: 14, fontFamily: 'Oswald, sans-serif', fontWeight: 700, cursor: 'pointer', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'hsl(var(--grey-ink-strong))'} onMouseOut={(e) => e.target.style.background = 'hsl(var(--grey-ink-pure))'}>FINALITZA LA COMPRA</button>
   </>
 );
 
@@ -102,8 +102,8 @@ export const CistellLayout4 = ({ onExpand }) => (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Producte 1: WORMHOLE */}
         <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 16, paddingBottom: 16, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
-          <div style={{ width: 80, height: 80, background: '#f5f5f5', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #000' }}></div>
+          <div style={{ width: 80, height: 80, background: 'hsl(var(--grey-paper-soft))', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid hsl(var(--grey-ink-pure))' }}></div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -116,8 +116,8 @@ export const CistellLayout4 = ({ onExpand }) => (
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <button style={{ width: 24, height: 24, border: '1px solid #000', background: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                <button style={{ width: 24, height: 24, border: '1px solid #000', background: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                <button style={{ width: 24, height: 24, border: '1px solid hsl(var(--grey-ink-pure))', background: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                <button style={{ width: 24, height: 24, border: '1px solid hsl(var(--grey-ink-pure))', background: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
               </div>
               <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700 }}>19,95€</div>
             </div>
@@ -126,8 +126,8 @@ export const CistellLayout4 = ({ onExpand }) => (
 
         {/* Producte 2: MASCHINENMENSCH */}
         <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 16, paddingBottom: 16, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
-          <div style={{ width: 80, height: 80, background: '#f5f5f5', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #000' }}></div>
+          <div style={{ width: 80, height: 80, background: 'hsl(var(--grey-paper-soft))', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid hsl(var(--grey-ink-pure))' }}></div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -140,8 +140,8 @@ export const CistellLayout4 = ({ onExpand }) => (
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <button style={{ width: 24, height: 24, border: '1px solid #000', background: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                <button style={{ width: 24, height: 24, border: '1px solid #000', background: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                <button style={{ width: 24, height: 24, border: '1px solid hsl(var(--grey-ink-pure))', background: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                <button style={{ width: 24, height: 24, border: '1px solid hsl(var(--grey-ink-pure))', background: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
               </div>
               <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700 }}>14,95€</div>
             </div>
@@ -151,20 +151,20 @@ export const CistellLayout4 = ({ onExpand }) => (
 
       {/* Camp descompte */}
       <div style={{ marginBottom: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(0,0,0,0.2)', borderRadius: 2, padding: '10px 12px', background: '#fff' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(0,0,0,0.2)', borderRadius: 2, padding: '10px 12px', background: 'hsl(var(--grey-paper))' }}>
           <input type="text" placeholder="Targeta regal o codi descompte" style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, fontFamily: 'Roboto, sans-serif', background: 'transparent' }} />
-          <button style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#000', padding: 0 }}>→</button>
+          <button style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'hsl(var(--grey-ink-pure))', padding: 0 }}>→</button>
         </div>
       </div>
 
       {/* Total */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTop: '2px solid #000' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTop: '2px solid hsl(var(--grey-ink-pure))' }}>
         <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.02em' }}>TOT PLEGAT FA</div>
         <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 28, fontWeight: 700 }}>34,90€</div>
       </div>
 
       {/* Botó CTA */}
-      <button onClick={onExpand} style={{ width: '100%', background: '#000', color: '#fff', border: 'none', padding: '16px', fontSize: 16, fontFamily: 'Oswald, sans-serif', fontWeight: 400, cursor: 'pointer', borderRadius: 2, textTransform: 'capitalize', letterSpacing: '0.02em', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = '#1a1a1a'} onMouseOut={(e) => e.target.style.background = '#000'}>Comanda</button>
+      <button onClick={onExpand} style={{ width: '100%', background: 'hsl(var(--grey-ink-pure))', color: 'hsl(var(--grey-paper))', border: 'none', padding: '16px', fontSize: 16, fontFamily: 'Oswald, sans-serif', fontWeight: 400, cursor: 'pointer', borderRadius: 2, textTransform: 'capitalize', letterSpacing: '0.02em', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'hsl(var(--grey-ink-strong))'} onMouseOut={(e) => e.target.style.background = 'hsl(var(--grey-ink-pure))'}>Comanda</button>
     </div>
   </>
 );
@@ -193,7 +193,7 @@ export const CistellLayout3 = ({ onExpand }) => (
 
     {/* Camp descompte */}
     <div style={{ marginBottom: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(0,0,0,0.15)', borderRadius: 3, padding: '8px 12px', background: '#fff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(0,0,0,0.15)', borderRadius: 3, padding: '8px 12px', background: 'hsl(var(--grey-paper))' }}>
         <input type="text" placeholder="Codi descompte" style={{ flex: 1, border: 'none', outline: 'none', fontSize: 12, fontFamily: 'Roboto, sans-serif', background: 'transparent' }} />
         <button style={{ background: 'none', border: 'none', fontSize: 16, cursor: 'pointer', color: 'rgba(0,0,0,0.5)', padding: 0 }}>→</button>
       </div>
@@ -209,13 +209,13 @@ export const CistellLayout3 = ({ onExpand }) => (
         <div style={{ fontFamily: 'Roboto, sans-serif', color: 'rgba(0,0,0,0.65)' }}>IVA (21%)</div>
         <div style={{ fontFamily: 'Roboto, sans-serif', color: 'rgba(0,0,0,0.65)' }}>3,33€</div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '2px solid #000' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '2px solid hsl(var(--grey-ink-pure))' }}>
         <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.02em' }}>TOTAL</div>
         <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: 16, fontWeight: 700 }}>34,90€</div>
       </div>
     </div>
 
     {/* Botó CTA */}
-    <button onClick={onExpand} style={{ width: '100%', background: '#000', color: '#fff', border: 'none', padding: '14px', fontSize: 14, fontFamily: 'Oswald, sans-serif', fontWeight: 700, cursor: 'pointer', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = '#1a1a1a'} onMouseOut={(e) => e.target.style.background = '#000'}>FINALITZA LA COMPRA</button>
+    <button onClick={onExpand} style={{ width: '100%', background: 'hsl(var(--grey-ink-pure))', color: 'hsl(var(--grey-paper))', border: 'none', padding: '14px', fontSize: 14, fontFamily: 'Oswald, sans-serif', fontWeight: 700, cursor: 'pointer', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'hsl(var(--grey-ink-strong))'} onMouseOut={(e) => e.target.style.background = 'hsl(var(--grey-ink-pure))'}>FINALITZA LA COMPRA</button>
   </>
 );

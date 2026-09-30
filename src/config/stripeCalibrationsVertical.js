@@ -52,18 +52,22 @@ export const STRIPE_DRAWING_DY_VERTICAL = {
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp': 29.51,
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp': 29.57,
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp': 29.57,
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/body-and-soul-b-stripe.webp': 27.87,
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/half-agony-half-hope-b-stripe.webp': 28.4,
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp': 27.87,
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/half-agony-half-hope-b-stripe.webp': 26.02,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/i-prefer-to-be-b-stripe.webp': 27.87,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/it-is-a-truth-b-stripe.webp': 29.54,
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/unsociable-and-taciturn-b-stripe.webp': 27.87,
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-must-allow-me-b-stripe.webp': 29.98,
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/body-and-soul-w-stripe.webp': 28.03,
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/half-agony-half-hope-w-stripe.webp': 28.75,
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/unsociable-and-taciturn-b-stripe.webp': 25.49,
+  // AQUESTA NO HI ERA (29/09/2026): les seves tres frases son les que l'amo vol
+  // mes amunt, i sense entrada al mapa es quedava amb el valor generic.
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp': 25.49,
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/i-admire-and-love-you-b-stripe.webp': 29.98,
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-have-bewitched-me-w-stripe.webp': 28.03,
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/half-agony-half-hope-w-stripe.webp': 26.37,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/i-prefer-to-be-w-stripe.webp': 28.03,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/it-is-a-truth-w-stripe.webp': 29.61,
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/unsociable-and-taciturn-w-stripe.webp': 28.03,
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-must-allow-me-w-stripe.webp': 30.04,
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/unsociable-and-taciturn-w-stripe.webp': 25.65,
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-have-bewitched-me-w-stripe.webp': 25.65,
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/i-admire-and-love-you-w-stripe.webp': 30.04,
   '/custom_logos/drawings/images_stripe/cube/afrodita-c-stripe.webp': 28.06,
   '/custom_logos/drawings/images_stripe/cube/cube-3-p0-stripe.webp': 28.9,
   '/custom_logos/drawings/images_stripe/cube/cyber-cube-stripe.webp': 28.17,
@@ -238,23 +242,25 @@ export const STRIPE_DRAWING_DX_VERTICAL = {
   // Els dibuixos de Quotes: porten un dx de 3,25-3,75 al calibratge compartit
   // (la resta de dibuixos van a 0,5-1,25) i a la vertical es veien tots desplacats
   // a la dreta. Aqui se'ls hi porta el dx al nivell de la resta (0,5).
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/body-and-soul-b-stripe.webp': -3.25,
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/half-agony-half-hope-b-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/i-prefer-to-be-b-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/it-is-a-truth-b-stripe.webp': -3.98,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/unsociable-and-taciturn-b-stripe.webp': -3.25,
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-must-allow-me-b-stripe.webp': -3.48,
-  '/custom_logos/drawings/images_stripe/austen/quotes/color/body-and-soul-multi-light-stripe.webp': -3.25,
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp': -3.25,
+  '/custom_logos/drawings/images_stripe/austen/quotes/black/i-admire-and-love-you-b-stripe.webp': -3.48,
+  '/custom_logos/drawings/images_stripe/austen/quotes/color/you-have-bewitched-me-multi-light-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/color/half-agony-half-hope-multi-light-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/color/i-prefer-to-be-multi-light-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/color/it-is-a-truth-multi-light-stripe.webp': -3.98,
-  '/custom_logos/drawings/images_stripe/austen/quotes/color/you-must-allow-me-multi-light-stripe.webp': -3.48,
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/body-and-soul-w-stripe.webp': -3.25,
+  '/custom_logos/drawings/images_stripe/austen/quotes/color/i-admire-and-love-you-multi-light-stripe.webp': -3.48,
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-have-bewitched-me-w-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/half-agony-half-hope-w-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/i-prefer-to-be-w-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/it-is-a-truth-w-stripe.webp': -3.98,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/unsociable-and-taciturn-w-stripe.webp': -3.25,
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-must-allow-me-w-stripe.webp': -3.48,
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-have-bewitched-me-w-stripe.webp': -3.25,
+  '/custom_logos/drawings/images_stripe/austen/quotes/white/i-admire-and-love-you-w-stripe.webp': -3.48,
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp': -2,
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp': -2,
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp': -2,
@@ -286,52 +292,46 @@ export const VEL_SAMARRETA_BUIDA_ALFA = 0.85;
 export const VEL_SAMARRETA_BUIDA_ALFA_BLANCA = 0.6;
 
 /**
- * ELS DIBUIXOS DE LES SAMARRETES ATENUADES, UN 10 % MES FOSCOS QUE EL VEL
- * (28/09/2026).
+ * ELS DIBUIXOS DE LES SAMARRETES ATENUADES: FOSCOS I AMB EL SEU DETALL
+ * (29/09/2026).
  *
- * Ho ha demanat l'amo: «Fes els dibuixos del mateix color que el vel, pero un 10%
- * mes fosc».
+ * L'amo ho ha dictat en tres passos: «Fes els dibuixos del mateix color que el
+ * vel, pero un 10 % mes fosc» (28/09), «Han de ser tots foscos» (29/09) i,
+ * quan es van aplanar, «Ara semblen una taca, no s'enten res del dibuix».
  *
- * SURT EXACTE, I PER QUe: el dibuix va PER DAMUNT del vel, o sigui que el que te
- * al darrere es el color del vel (la samarreta esblanqueida). Pintar-hi el dibuix
- * nome's amb un 10 % de negre el deixa a `0,9 x color del vel`, que es
- * literalment «el mateix color, un 10 % mes fosc»: les parts d'ink del dibuix
- * (que son negre) hi cauen just, i els tons intermedis es queden a un 10 % d'allo
- * que son, que es el que fa que el dibuix segueixi tenint el seu detall.
+ * PER TANT: la foscor la fa l'OPACITAT, no un `brightness(0)`. El dibuix es
+ * deixa TAL COM ES (es una imatge en escala de grisos, amb el seu detall) i se
+ * li baixa l'opacitat: sobre el vel d'una samarreta negra -que el blanc al 60 %
+ * deixa a ~#999- un 0,18 de negre el deixa a ~#7D, es a dir el «mateix color
+ * que el vel, un 10 % mes fosc» que demanava l'amo.
  *
- * I val per a qualsevol samarreta, perque qui mana es el vel: sobre samarreta
- * blanca el vel queda blanc i el dibuix surt a #E5E5E5; sobre negra el vel queda
- * #999999 i el dibuix a #8A8A8A.
- *
- * (Els dos intents d'abans no valien: `brightness(0)` aplanava el dibuix, i
- * invertir-lo no funciona perque les variants negres son IMATGES EN ESCALA DE
- * GRISOS i invertir-les capgira els tons. Ho va veure l'amo: «El negre es en
- * escala de grisos. No funcionara».)
+ * (`brightness(0)` el deixava pla i nome's en quedava la silueta: el detall es
+ * perdia. I `invert()` el pintava clar, que es el contrari del que es vol.)
  */
-export const FILTRE_DIBUIX_DESACTIVAT = 'opacity(0.1)';
+export const FILTRE_DIBUIX_DESACTIVAT = 'opacity(0.18)';
 
 /**
- * ELS DIBUIXOS DE LOOKING FOR MY DARCY, UN 5 % MES CLARS QUE EL VEL (28/09/2026).
+ * I PEMBERLEY, KEEP CALM, QUOTES I CROSSWORDS, UNA MIQUETA MES (29/09/2026).
  *
- * Ho ha demanat l'amo, NOME'S per a LFMD: «LFMD, en lloc d'un 10% mes fosc,
- * hauria de ser un 5% mes clar» i, mes tard, «fes els dibuixos un 20% mes clars»
- * (confirmat que nome's son els de LFMD).
- *
- * Son els dibuixos que nome's existeixen en color i que, per tant, no poden
- * entrar al calcul del 10 % de negre dels altres (vegeu
- * `srcDibuixVelatEnNegre`). Com que han de quedar MES CLARS que el vel i no mes
- * foscos, se'ls pinta de BLANC: `brightness(0)` els deixa plans (l'alfa es
- * conserva, o sigui que la forma no es toca) i `invert(1)` els posa blancs, i amb
- * un 20 % d'opacitat el resultat es `color del vel + 20 % cap al blanc`.
+ * L'amo els va assenyalar un a un: «Pemberley, Keep Calm i Quotes, que es vegin
+ * una mica mes» i, tot seguit, «I crosswords». Son els quatre dibuixos
+ * d'austen, i aquest es el seu grau.
  */
-export const FILTRE_DIBUIX_DESACTIVAT_LFMD = 'brightness(0) invert(1) opacity(0.2)';
+export const FILTRE_DIBUIX_DESACTIVAT_AUSTEN = 'opacity(0.28)';
 
 /**
- * El filtre dels altres dibuixos que nome's existeixen en color (els de CUBE, que
- * tambe van sense variant negra): se'ls treu el color i se'ls rebaixa igual que
- * als altres, que allo ja estava demanat i NO es toca.
+ * ELS DIBUIXOS NOME'S-COLOR: CUBE TAL COM ES, LFMD ATENUAT (29/09/2026).
+ *
+ * Tots dos son dibuixos pintats (no tinta de linia) i per tant no entren al
+ * calcul del gris dels altres. Pero l'amo els vol DIFERENTS:
+ *
+ *  - CUBE: «Torna-li el color a Cube». Es queda amb el seu color i nome's se li
+ *    baixa una mica l'opacitat, com als de tinta de linia.
+ *  - LFMD: «atenua LFMD». Se li treu el color de sota amb el `grayscale` i es
+ *    queda mes apagat que cube.
  */
-export const FILTRE_DIBUIX_DESACTIVAT_COLOR = 'grayscale(1) opacity(0.1)';
+export const FILTRE_DIBUIX_DESACTIVAT_CUBE = 'opacity(0.18)';
+export const FILTRE_DIBUIX_DESACTIVAT_LFMD = 'grayscale(1) opacity(0.18)';
 
 /**
  * CAP DIBUIX PORTA MIRALL, MAI, si no es demana de forma expressa.

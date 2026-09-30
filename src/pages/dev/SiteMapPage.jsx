@@ -267,7 +267,7 @@ function NodeCard({ node, pos, dim, onHover, hovered }) {
         width: pos.w,
         height: pos.h,
         background: '#ffffff',
-        border: `1px solid ${isHover ? '#0f172a' : '#e2e8f0'}`,
+        border: `1px solid ${isHover ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-line))'}`,
         borderLeft: `3px solid ${tagColor}`,
         borderRadius: 4,
         display: 'flex',
@@ -303,7 +303,7 @@ function MosaicView({ data, layout, hovered, onHover, related }) {
             width: gb.outerW,
             height: gb.outerH,
             background: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid hsl(var(--grey-line))',
             borderRadius: 10,
             boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
           }}
@@ -762,7 +762,7 @@ function ColumnsView({ data, layout, hovered, onHover, related }) {
             width: COLS_COL_W + 16,
             height: layout.height - COLS_PAD * 2 + 8,
             background: idx % 2 === 0 ? '#ffffff' : '#f8fafc',
-            border: '1px solid #e2e8f0',
+            border: '1px solid hsl(var(--grey-line))',
             borderRadius: 10,
             boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
           }}
@@ -1533,7 +1533,7 @@ function SiteMapPage() {
         <div
           style={{
             display: 'inline-flex',
-            border: '1px solid #cbd5e1',
+            border: '1px solid hsl(var(--grey-line-strong))',
             borderRadius: 6,
             overflow: 'hidden',
             background: '#fff',
@@ -1594,7 +1594,7 @@ function SiteMapPage() {
               setTy(20);
             }
           }}
-          style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #cbd5e1', borderRadius: 6, background: '#fff', cursor: 'pointer', flexShrink: 0 }}
+          style={{ fontSize: 11, padding: '4px 10px', border: '1px solid hsl(var(--grey-line-strong))', borderRadius: 6, background: '#fff', cursor: 'pointer', flexShrink: 0 }}
         >
           Reset
         </button>

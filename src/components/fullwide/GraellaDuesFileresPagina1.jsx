@@ -116,7 +116,7 @@ export default function GraellaDuesFileresPagina1({
         boxSizing: 'border-box',
         // FORA LA RATLLA DE L'ESQUERRA (28/09/2026). En Marc: «Treu la línia de
         // davant de la graella a la p1». Era la vora esquerra del contenidor
-        // (1 px, `#D1D5DB`), posada el mateix dia amb «A la part esquerra de la
+        // (1 px, `hsl(var(--grey-muted))`), posada el mateix dia amb «A la part esquerra de la
         // graella, hi pots posar una línia?».
         //
         // EL COIXI DE 10 px S'HI QUEDA, i es el que fa que NOMES marxi la ratlla:

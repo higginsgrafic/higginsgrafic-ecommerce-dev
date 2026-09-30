@@ -490,7 +490,7 @@ function CollectionVerticalPage({ slug }) {
                 fontSize: 'clamp(2.5rem, 8.5vw, 125px)',
                 letterSpacing: '0.02em',
                 lineHeight: 0.9,
-                color: '#0b0d10',
+                color: 'hsl(var(--grey-ink-strong))',
                 textTransform: 'uppercase',
                 display: 'inline-flex',
                 alignItems: 'center',

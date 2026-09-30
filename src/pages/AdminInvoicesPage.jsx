@@ -29,14 +29,14 @@ const fmtDate = (iso) => {
 function Camp({ etiqueta, children }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="font-oswald text-[10px] tracking-[0.16em] uppercase text-gray-400">{etiqueta}</span>
+      <span className="font-oswald text-[10px] tracking-[0.16em] uppercase text-muted-2">{etiqueta}</span>
       {children}
     </label>
   );
 }
 
 const inputClass =
-  'border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-900 transition-colors';
+  'border border-line px-3 py-2 text-sm bg-paper focus:outline-none focus:border-ink-strong transition-colors';
 
 function tipusFactura(factura) {
   if (factura.document_kind === 'rectification') return 'Rectificativa';
@@ -196,7 +196,7 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
           <h1 className="font-oswald text-2xl tracking-[0.04em] uppercase mb-1">
             {esProva ? 'Factures de prova' : 'Factures'}
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-ink-soft">
             {esProva
               ? 'Proves del circuit sencer. No compten enlloc i no es poden confondre amb una factura de debò.'
               : 'Crea, emet, consulta i rectifica les factures de la botiga.'}
@@ -205,31 +205,31 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
         <div className="flex gap-2">
           {!esProva && (
             <>
-              <button type="button" onClick={exportCsv} disabled={!dades.invoices.length} className="inline-flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 text-xs uppercase tracking-wider hover:border-black disabled:opacity-40">
+              <button type="button" onClick={exportCsv} disabled={!dades.invoices.length} className="inline-flex items-center gap-2 border border-line-strong bg-paper px-4 py-2 text-xs uppercase tracking-wider hover:border-ink-pure disabled:opacity-40">
                 <Download className="h-4 w-4" /> Exportar CSV
               </button>
               <Link to="/admin/factures/proves" className="inline-flex items-center gap-2 border border-amber-500 bg-amber-50 px-4 py-2 text-xs uppercase tracking-wider text-amber-800 hover:bg-amber-100">
                 <FlaskConical className="h-4 w-4" /> Proves
               </Link>
-              <Link to="/admin/factures/nova" className="inline-flex items-center gap-2 bg-gray-900 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-black">
+              <Link to="/admin/factures/nova" className="inline-flex items-center gap-2 bg-ink-strong px-4 py-2 text-xs uppercase tracking-wider text-paper hover:bg-ink-pure">
                 <FilePlus2 className="h-4 w-4" /> Nova factura
               </Link>
             </>
           )}
           {esProva && (
             <>
-              <Link to="/admin/factures/proves/eines" className="inline-flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 text-xs uppercase tracking-wider hover:border-black">
+              <Link to="/admin/factures/proves/eines" className="inline-flex items-center gap-2 border border-line-strong bg-paper px-4 py-2 text-xs uppercase tracking-wider hover:border-ink-pure">
                 <Wrench className="h-4 w-4" /> Eines de prova
               </Link>
               <button
                 type="button"
                 onClick={generarProva}
                 disabled={generant}
-                className="inline-flex items-center gap-2 border border-amber-600 bg-white px-4 py-2 text-xs uppercase tracking-wider text-amber-700 hover:bg-amber-50 disabled:opacity-50"
+                className="inline-flex items-center gap-2 border border-amber-600 bg-paper px-4 py-2 text-xs uppercase tracking-wider text-amber-700 hover:bg-amber-50 disabled:opacity-50"
               >
                 <FlaskConical className="h-4 w-4" /> {generant ? 'Generant…' : 'Generar una prova'}
               </button>
-              <Link to="/admin/factures/proves/nova" className="inline-flex items-center gap-2 bg-amber-600 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-amber-700">
+              <Link to="/admin/factures/proves/nova" className="inline-flex items-center gap-2 bg-amber-600 px-4 py-2 text-xs uppercase tracking-wider text-paper hover:bg-amber-700">
                 <FilePlus2 className="h-4 w-4" /> Nova prova a mà
               </Link>
             </>
@@ -237,15 +237,15 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
         </div>
       </div>
 
-      {missatge && <div className="mb-4 border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">{missatge}</div>}
+      {missatge && <div className="mb-4 border border-line bg-paper px-4 py-3 text-sm text-ink-2">{missatge}</div>}
 
-      <div className="mb-6 flex border-b border-gray-200">
-        <button type="button" onClick={() => setVista('issued')} className={`px-4 py-3 font-oswald text-xs uppercase tracking-[0.14em] ${vista === 'issued' ? 'border-b-2 border-gray-900 text-gray-900' : 'text-gray-400'}`}>Emeses ({dades.invoices.length})</button>
-        <button type="button" onClick={() => setVista('drafts')} className={`px-4 py-3 font-oswald text-xs uppercase tracking-[0.14em] ${vista === 'drafts' ? 'border-b-2 border-gray-900 text-gray-900' : 'text-gray-400'}`}>Esborranys ({drafts.length})</button>
+      <div className="mb-6 flex border-b border-line">
+        <button type="button" onClick={() => setVista('issued')} className={`px-4 py-3 font-oswald text-xs uppercase tracking-[0.14em] ${vista === 'issued' ? 'border-b-2 border-ink-strong text-ink-strong' : 'text-muted-2'}`}>Emeses ({dades.invoices.length})</button>
+        <button type="button" onClick={() => setVista('drafts')} className={`px-4 py-3 font-oswald text-xs uppercase tracking-[0.14em] ${vista === 'drafts' ? 'border-b-2 border-ink-strong text-ink-strong' : 'text-muted-2'}`}>Esborranys ({drafts.length})</button>
       </div>
 
       {vista === 'issued' && (
-        <form onSubmit={(event) => { event.preventDefault(); setCercaAplicada(cerca.trim()); }} className="flex flex-wrap items-end gap-3 mb-6 pb-6 border-b border-gray-200">
+        <form onSubmit={(event) => { event.preventDefault(); setCercaAplicada(cerca.trim()); }} className="flex flex-wrap items-end gap-3 mb-6 pb-6 border-b border-line">
           <Camp etiqueta="Any">
             <select value={anyFiltre} onChange={(event) => setAnyFiltre(event.target.value)} className={inputClass}>
               <option value="">Tots</option>
@@ -263,14 +263,14 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
           <Camp etiqueta="Cerca">
             <input type="search" value={cerca} onChange={(event) => setCerca(event.target.value)} placeholder="Número, client, NIF o comanda" className={`${inputClass} w-72`} />
           </Camp>
-          <button type="submit" className="px-5 py-2 bg-gray-900 text-white font-oswald tracking-[0.12em] uppercase text-xs hover:bg-black">Cercar</button>
+          <button type="submit" className="px-5 py-2 bg-ink-strong text-paper font-oswald tracking-[0.12em] uppercase text-xs hover:bg-ink-pure">Cercar</button>
           {(anyFiltre || tipusFiltre || cercaAplicada) && (
-            <button type="button" onClick={() => { setAnyFiltre(''); setTipusFiltre(''); setCerca(''); setCercaAplicada(''); }} className="px-3 py-2 text-xs uppercase tracking-[0.12em] text-gray-500 hover:text-gray-900">Treure filtres</button>
+            <button type="button" onClick={() => { setAnyFiltre(''); setTipusFiltre(''); setCerca(''); setCercaAplicada(''); }} className="px-3 py-2 text-xs uppercase tracking-[0.12em] text-ink-soft hover:text-ink-strong">Treure filtres</button>
           )}
         </form>
       )}
 
-      {estat === 'carregant' && <div className="text-gray-400 text-sm">Carregant…</div>}
+      {estat === 'carregant' && <div className="text-muted-2 text-sm">Carregant…</div>}
       {estat === 'error' && <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">No s’han pogut carregar les factures. Comprova que la migració de gestió estigui executada.</div>}
 
       {estat === 'ok' && vista === 'issued' && (
@@ -280,44 +280,44 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
               per tant a la pantalla de proves no s'hi mostren. */}
           {!esProva && dades.totals.perTrimestre.length > 0 && (
             <section className="mb-8">
-              <h2 className="font-oswald text-[11px] tracking-[0.18em] uppercase text-gray-400 mb-3">Totals per trimestre</h2>
+              <h2 className="font-oswald text-[11px] tracking-[0.18em] uppercase text-muted-2 mb-3">Totals per trimestre</h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm border-collapse">
-                  <thead><tr className="border-b border-gray-900">
-                    {['Període', 'Factures', 'Base', 'IVA', 'Total'].map((header, index) => <th key={header} className={`${index ? 'text-right' : 'text-left'} py-2 font-oswald font-normal text-[10px] uppercase tracking-[0.14em] text-gray-400`}>{header}</th>)}
+                  <thead><tr className="border-b border-ink-strong">
+                    {['Període', 'Factures', 'Base', 'IVA', 'Total'].map((header, index) => <th key={header} className={`${index ? 'text-right' : 'text-left'} py-2 font-oswald font-normal text-[10px] uppercase tracking-[0.14em] text-muted-2`}>{header}</th>)}
                   </tr></thead>
                   <tbody>
-                    {dades.totals.perTrimestre.map((period) => <tr key={period.period} className="border-b border-gray-100"><td className="py-2 font-oswald">{period.period}</td><td className="py-2 text-right">{period.count}</td><td className="py-2 text-right">{eur(period.base)}</td><td className="py-2 text-right">{eur(period.iva)}</td><td className="py-2 text-right font-oswald">{eur(period.total)}</td></tr>)}
-                    <tr className="border-t-2 border-gray-900"><td className="py-2 font-oswald uppercase">Total mostrat</td><td className="py-2 text-right">{totalGeneral.count}</td><td className="py-2 text-right">{eur(totalGeneral.base)}</td><td className="py-2 text-right">{eur(totalGeneral.iva)}</td><td className="py-2 text-right font-oswald">{eur(totalGeneral.total)}</td></tr>
+                    {dades.totals.perTrimestre.map((period) => <tr key={period.period} className="border-b border-line"><td className="py-2 font-oswald">{period.period}</td><td className="py-2 text-right">{period.count}</td><td className="py-2 text-right">{eur(period.base)}</td><td className="py-2 text-right">{eur(period.iva)}</td><td className="py-2 text-right font-oswald">{eur(period.total)}</td></tr>)}
+                    <tr className="border-t-2 border-ink-strong"><td className="py-2 font-oswald uppercase">Total mostrat</td><td className="py-2 text-right">{totalGeneral.count}</td><td className="py-2 text-right">{eur(totalGeneral.base)}</td><td className="py-2 text-right">{eur(totalGeneral.iva)}</td><td className="py-2 text-right font-oswald">{eur(totalGeneral.total)}</td></tr>
                   </tbody>
                 </table>
               </div>
             </section>
           )}
           {/* Factures */}
-          <section className="overflow-x-auto border border-gray-200 bg-white">
+          <section className="overflow-x-auto border border-line bg-paper">
             <table className="w-full text-sm border-collapse">
-              <thead><tr className="border-b border-gray-900">
-                {['Número', 'Data', 'Client', 'NIF', 'Tipus', 'Total', 'Accions'].map((header, index) => <th key={header} className={`${index === 5 ? 'text-right' : 'text-left'} px-3 py-3 font-oswald font-normal text-[10px] uppercase tracking-[0.14em] text-gray-400`}>{header}</th>)}
+              <thead><tr className="border-b border-ink-strong">
+                {['Número', 'Data', 'Client', 'NIF', 'Tipus', 'Total', 'Accions'].map((header, index) => <th key={header} className={`${index === 5 ? 'text-right' : 'text-left'} px-3 py-3 font-oswald font-normal text-[10px] uppercase tracking-[0.14em] text-muted-2`}>{header}</th>)}
               </tr></thead>
               <tbody>
                 {dades.invoices.map((invoice) => (
-                  <tr key={invoice.id || invoice.number} className="border-b border-gray-100 hover:bg-gray-50">
+                  <tr key={invoice.id || invoice.number} className="border-b border-line hover:bg-paper-soft">
                     <td className="px-3 py-3 font-oswald">
                       {invoice.number}
                       {invoice.is_test === true && <span className="ml-2 border border-amber-400 bg-amber-50 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-amber-700">Prova</span>}
-                    </td><td className="px-3 py-3 text-gray-500">{fmtDate(invoice.issued_at)}</td>
-                    <td className="px-3 py-3"><div>{invoice.customer_name || '—'}</div>{invoice.customer_company && <div className="text-[11px] text-gray-400">{invoice.customer_company}</div>}</td>
-                    <td className="px-3 py-3 text-gray-500">{invoice.customer_tax_id || '—'}</td><td className="px-3 py-3 text-xs uppercase tracking-wider text-gray-500">{tipusFactura(invoice)}</td>
+                    </td><td className="px-3 py-3 text-ink-soft">{fmtDate(invoice.issued_at)}</td>
+                    <td className="px-3 py-3"><div>{invoice.customer_name || '—'}</div>{invoice.customer_company && <div className="text-[11px] text-muted-2">{invoice.customer_company}</div>}</td>
+                    <td className="px-3 py-3 text-ink-soft">{invoice.customer_tax_id || '—'}</td><td className="px-3 py-3 text-xs uppercase tracking-wider text-ink-soft">{tipusFactura(invoice)}</td>
                     <td className="px-3 py-3 text-right tabular-nums">{eur(invoice.total)}</td>
                     <td className="px-3 py-3"><div className="flex justify-end gap-2">
-                      {invoice.access_token && <Link to={`/factura/${invoice.access_token}`} className="inline-flex items-center gap-1 border border-gray-200 px-2 py-1 text-[10px] uppercase tracking-wider hover:border-black"><Eye className="h-3.5 w-3.5" /> Veure</Link>}
-                      {invoice.customer_email && <button type="button" onClick={() => resend(invoice)} className="inline-flex items-center gap-1 border border-gray-200 px-2 py-1 text-[10px] uppercase tracking-wider hover:border-black"><Mail className="h-3.5 w-3.5" /> Reenviar</button>}
-                      {invoice.is_test !== true && <Link to={`/admin/factures/nova?rectifies=${encodeURIComponent(invoice.id)}`} className="inline-flex items-center gap-1 border border-gray-200 px-2 py-1 text-[10px] uppercase tracking-wider hover:border-black"><RotateCcw className="h-3.5 w-3.5" /> Rectificar</Link>}
+                      {invoice.access_token && <Link to={`/factura/${invoice.access_token}`} className="inline-flex items-center gap-1 border border-line px-2 py-1 text-[10px] uppercase tracking-wider hover:border-ink-pure"><Eye className="h-3.5 w-3.5" /> Veure</Link>}
+                      {invoice.customer_email && <button type="button" onClick={() => resend(invoice)} className="inline-flex items-center gap-1 border border-line px-2 py-1 text-[10px] uppercase tracking-wider hover:border-ink-pure"><Mail className="h-3.5 w-3.5" /> Reenviar</button>}
+                      {invoice.is_test !== true && <Link to={`/admin/factures/nova?rectifies=${encodeURIComponent(invoice.id)}`} className="inline-flex items-center gap-1 border border-line px-2 py-1 text-[10px] uppercase tracking-wider hover:border-ink-pure"><RotateCcw className="h-3.5 w-3.5" /> Rectificar</Link>}
                     </div></td>
                   </tr>
                 ))}
-                {!dades.invoices.length && <tr><td colSpan="7" className="py-10 text-center text-gray-400">No hi ha cap factura amb aquests filtres.</td></tr>}
+                {!dades.invoices.length && <tr><td colSpan="7" className="py-10 text-center text-muted-2">No hi ha cap factura amb aquests filtres.</td></tr>}
               </tbody>
             </table>
           </section>
@@ -325,17 +325,17 @@ export default function AdminInvoicesPage({ mode = 'live' }) {
       )}
 
       {estat === 'ok' && vista === 'drafts' && (
-        <section className="overflow-x-auto border border-gray-200 bg-white">
+        <section className="overflow-x-auto border border-line bg-paper">
           <table className="w-full text-sm border-collapse">
-            <thead><tr className="border-b border-gray-900">
-              {['Actualitzat', 'Client', 'Document', 'Comanda', 'Total', ''].map((header) => <th key={header} className="px-3 py-3 text-left font-oswald font-normal text-[10px] uppercase tracking-[0.14em] text-gray-400">{header}</th>)}
+            <thead><tr className="border-b border-ink-strong">
+              {['Actualitzat', 'Client', 'Document', 'Comanda', 'Total', ''].map((header) => <th key={header} className="px-3 py-3 text-left font-oswald font-normal text-[10px] uppercase tracking-[0.14em] text-muted-2">{header}</th>)}
             </tr></thead>
             <tbody>
-              {drafts.map((draft) => <tr key={draft.id} className="border-b border-gray-100"><td className="px-3 py-3 text-gray-500">{fmtDate(draft.updated_at)}</td><td className="px-3 py-3">
+              {drafts.map((draft) => <tr key={draft.id} className="border-b border-line"><td className="px-3 py-3 text-ink-soft">{fmtDate(draft.updated_at)}</td><td className="px-3 py-3">
                   {draft.customer_name || 'Sense nom'}
                   {draft.is_test === true && <span className="ml-2 border border-amber-400 bg-amber-50 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-amber-700">Prova</span>}
-                </td><td className="px-3 py-3 text-xs uppercase tracking-wider text-gray-500">{tipusFactura(draft)}</td><td className="px-3 py-3 text-gray-500">{draft.order_number || '—'}</td><td className="px-3 py-3 tabular-nums">{eur(draft.total)}</td><td className="px-3 py-3 text-right"><Link to={draft.is_test === true ? `/admin/factures/proves/esborrany/${draft.id}` : `/admin/factures/esborrany/${draft.id}`} className="inline-flex items-center gap-1 border border-gray-200 px-3 py-1.5 text-[10px] uppercase tracking-wider hover:border-black"><Pencil className="h-3.5 w-3.5" /> Editar</Link></td></tr>)}
-              {!drafts.length && <tr><td colSpan="6" className="py-10 text-center text-gray-400">No hi ha cap esborrany pendent.</td></tr>}
+                </td><td className="px-3 py-3 text-xs uppercase tracking-wider text-ink-soft">{tipusFactura(draft)}</td><td className="px-3 py-3 text-ink-soft">{draft.order_number || '—'}</td><td className="px-3 py-3 tabular-nums">{eur(draft.total)}</td><td className="px-3 py-3 text-right"><Link to={draft.is_test === true ? `/admin/factures/proves/esborrany/${draft.id}` : `/admin/factures/esborrany/${draft.id}`} className="inline-flex items-center gap-1 border border-line px-3 py-1.5 text-[10px] uppercase tracking-wider hover:border-ink-pure"><Pencil className="h-3.5 w-3.5" /> Editar</Link></td></tr>)}
+              {!drafts.length && <tr><td colSpan="6" className="py-10 text-center text-muted-2">No hi ha cap esborrany pendent.</td></tr>}
             </tbody>
           </table>
         </section>

@@ -97,7 +97,7 @@ const TramFinal = forwardRef(function TramFinal(
             lineHeight: 1.1,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            color: '#111827',
+            color: 'hsl(var(--grey-ink-strong))',
             transform: `translateX(${posterTextOffsetX})`,
           }}
         >

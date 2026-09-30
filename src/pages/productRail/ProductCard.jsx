@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const DEFAULT_TILE_STYLE = {
   width: '450px',
   height: '450px',
-  backgroundColor: '#f5f5f5',
+  backgroundColor: 'hsl(var(--grey-paper-soft))',
   position: 'relative',
   transform: 'scale(0.8822222222)',
   transformOrigin: 'bottom left',

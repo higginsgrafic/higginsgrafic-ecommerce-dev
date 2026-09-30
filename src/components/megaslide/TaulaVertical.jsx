@@ -62,7 +62,7 @@ const CELA = {
   fontFamily: 'Oswald, Roboto Condensed, sans-serif',
   fontSize: '13px',
   letterSpacing: '0.06em',
-  color: '#1A1A1A',
+  color: 'hsl(var(--grey-ink-strong))',
 };
 
 /**

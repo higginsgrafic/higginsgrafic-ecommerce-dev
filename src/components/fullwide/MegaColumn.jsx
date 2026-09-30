@@ -1278,7 +1278,7 @@ function MegaColumn({
                         || it.toLowerCase().endsWith('keep-calm-b.webp')
                         || it.toLowerCase().endsWith('keep-calm-b-grid.webp')
                       )
-                        ? 'bg-white'
+                        ? 'bg-paper'
                         : collectionId === 'austen'
                           && typeof it === 'string'
                           && it.toLowerCase().includes('/austen/pemberley_house/')
@@ -1299,7 +1299,7 @@ function MegaColumn({
                           className={compactLandscape || useContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
                         />
                       ) : (
-                        <div className="h-full w-full bg-black/5" />
+                        <div className="h-full w-full bg-ink-pure/5" />
                       );
                     })()}
                   </div>

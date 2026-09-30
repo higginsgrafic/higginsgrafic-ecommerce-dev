@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, User, LogIn, Lock, Unlock, Search, LayoutDashboard } from 'lucide-react';
+import { ChevronDown, User, LogIn, Search, LayoutDashboard } from 'lucide-react';
 import { useProductContext } from '@/contexts/ProductContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,7 +28,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 import RegisterOverlay from './fullwide/RegisterOverlay.jsx';
 import usePersistentState from '@/hooks/usePersistentState';
 import { CONTROL_TILE_BN, CONTROL_TILE_ARROWS } from './fullwide/MegaColumn.jsx';
-import MegaMenuPanel from './fullwide/MegaMenuPanel.jsx';
+import MegaMenuPanel, { MEGA_PANEL_DELAY_MS } from './fullwide/MegaMenuPanel.jsx';
 import { CERCADOR_COLORS } from './fullwide/CercadorTopBar.jsx';
 import useMegaPublicIdleReset from '@/hooks/useMegaPublicIdleReset';
 import { findPdpUrl } from '@/config/pdpRoutes.js';
@@ -82,6 +82,15 @@ function FullWideSlideHeader({
   // Les dues tauletes son el mateix disseny a part (vegeu el punt 10 del
   // testimoni): el carril de 1350 no s'hi aplica.
   const esTauleta = isPortraitTablet || isLandscapeTablet;
+  // EL CARRIL DEL HEADER, AMPLIAT A 1024 (02/10/2026). En Marc: «A la 1024
+  // haurem de fer com a la vertical, doncs. Un doble header» i, un cop el carril
+  // va ser el del segon header (939,2 px), «Torna a posar els enllaços de la p1
+  // al header principal, que ara sí que hi caben»: els enllacos tornen a la fila
+  // de dalt, pero el carril ample s'hi queda, que es el que els hi dona el lloc.
+  const esCarrilHeaderAmpliat = isPortraitTablet
+    || (isLandscapeTablet && typeof window !== 'undefined' && window.innerWidth <= 1024);
+  // El segon header es nome's de la tauleta vertical, com abans.
+  const esDobleHeader = isPortraitTablet;
   // LA CAPÇALERA DE DUES FILES ES NOMES DE LA TAULETA VERTICAL: el logo i les
   // icones (61 px) i el menu de colleccions a sota (62). L'apaisada porta la
   // d'una fila de 80 px, com l'escriptori.
@@ -354,8 +363,8 @@ function FullWideSlideHeader({
         const slug = s.split('/austen/quotes/')[1].replace(/-b-grid\.webp$/, '').replace(/\.webp$/, '');
         const map = {
           'it-is-a-truth': 'quotes-it-is-a-truth',
-          'you-must-allow-me': 'quotes-i-admire-and-love-you',
-          'body-and-soul': 'quotes-you-have-bewitched-me',
+          'i-admire-and-love-you': 'quotes-i-admire-and-love-you',
+          'you-have-bewitched-me': 'quotes-you-have-bewitched-me',
           'unsociable-and-taciturn': 'quotes-unsociable-and-taciturn',
           'half-agony-half-hope': 'quotes-half-agony-half-hope',
         };
@@ -389,12 +398,26 @@ function FullWideSlideHeader({
   const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
   const [megaLocked, setMegaLocked] = useState(false);
   const [lockBtnTop, setLockBtnTop] = useState(null);
+  // EL PANELL JA APAREIX (01/10/2026).
+  //
+  // El megaslide es munta invisible durant `MEGA_PANEL_DELAY_MS` (perque no es
+  // vegi com es munta la composicio), pero el seu lloc ja esta reservat. Com
+  // que l'espai reservat el pinta aquesta capcalera i el cadenat ja hi era a
+  // punt, allo que es veia era: un espai blanc i el cadenat, i DESPRES
+  // l'aparicio. Amb aquest estat, fins que el panell no comenca a apareixer la
+  // capcalera no pinta aquell espai (es veu el que hi ha darrere, que es la
+  // composicio de la pagina) i el cadenat no es munta.
+  const [panellComenca, setPanellComenca] = useState(false);
   // Contenidor del cadenat: la seva posicio s'hi escriu directament a cada
   // fotograma, sense passar per l'estat de React (que feia saltets).
   const lockWrapRef = useRef(null);
   // El cadenat no queda encavalcat al separador: en surt de sota i queda
   // 8 px per sota de la linia del megaslide.
   const CADE_BAIXADA_PX = 8;
+  // L'amplada del cadenat (l'icona de la casa, `/custom_logos/icons/cadenat.svg`,
+  // que fa 96 x 101): es el que es descompta de `left` perque la SEVA vora dreta
+  // caigui a la vora dreta del carril.
+  const CADENAT_AMPLADA_PX = 48;
   const { user } = useAuth();
   // LES CLAUS DE LA URL VAN AMB GUIO I LES DE L'ESTAT AMB GUIO BAIX (25/09/2026):
   // `the-human-inside` a la URL, `the_human_inside` a l'estat. Sense normalitzar,
@@ -913,8 +936,8 @@ function FullWideSlideHeader({
       if (!Array.isArray(items) || items.length === 0) return items;
       const wantOrder = [
         'it-is-a-truth',
-        'you-must-allow-me',
-        'body-and-soul',
+        'i-admire-and-love-you',
+        'you-have-bewitched-me',
         'unsociable-and-taciturn',
         'half-agony-half-hope',
       ];
@@ -2655,6 +2678,77 @@ function FullWideSlideHeader({
     return out;
   }, [defaultNav, navItems]);
 
+  // ELS ENLLACOS DEL NAV, ADAPTATS (02/10/2026). En Marc: «Els enllaços de la p1
+  // que hi ha al header, no hi caben a tot arreu. Queden tallats. S'han
+  // d'adaptar les mides de text». La nav porta `overflow: hidden` a la banda
+  // estreta: quan els cinc noms no hi caben, l'ultim queda tallat. Aqui es
+  // mesura quant en falta i s'abaixa la mida de la lletra i la separacio, mai
+  // per sota del terra.
+  //
+  // NOME'S BAIXA: si ja hi cap, no es toca. Amb el reset automatic el bucle
+  // oscil·lava (la mesura veia la lletra ja petita, hi cabia, tornava a la mida
+  // gran i tornava a desbordar).
+  const navRef = useRef(null);
+  const [navFontPx, setNavFontPx] = useState(null);
+  const [navGapPx, setNavGapPx] = useState(null);
+  useLayoutEffect(() => {
+    // En canviar de colleccio o de banda, es torna a començar de zero.
+    setNavFontPx(null);
+    setNavGapPx(null);
+  }, [resolvedNav, esTauleta]);
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return undefined;
+    let frame = 0;
+    const mesura = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const ample = nav.clientWidth;
+        const natural = nav.scrollWidth;
+        const primer = nav.firstElementChild;
+        if (!ample || !natural || !primer) return;
+        // LA MIDA DE LA DESKTOP ES EL PRIMER OBJECTIU (02/10/2026). En Marc: «Mira
+        // de posar a totes les vistes que puguis, la mateixa mida que la desktop».
+        // O sigui que NOME'S es toca la lletra si, esgotada la separacio, encara no
+        // hi cap: primer s'encongeixen els 16 px entre enllacos (fins a zero) i la
+        // lletra es queda als 12 px de la desktop sempre que pot.
+        if (natural <= ample + 1) return;
+        // LES FLETXES NO S'ESCALEN (`h-3 w-3`, 12 px cadascuna).
+        const n = nav.children.length;
+        const fletxes = n * 12;
+        const gapActual = Number.parseFloat(getComputedStyle(nav).columnGap) || 0;
+        const gaps = Math.max(0, n - 1) * gapActual;
+        const text = Math.max(0, natural - fletxes - gaps);
+        const minim = text + fletxes;
+        if (minim <= ample + 1) {
+          // Amb la lletra de la desktop i la separacio justa, ja hi cap.
+          const gapJust = n > 1 ? Math.max(0, (ample - minim) / (n - 1)) : 0;
+          setNavGapPx((prev) => (prev === gapJust ? prev : gapJust));
+          return;
+        }
+        // Ni amb la separacio a zero: ara si, s'abaixa la lletra.
+        const actual = Number.parseFloat(getComputedStyle(primer).fontSize) || 12;
+        const k = (natural - fletxes) > 0
+          ? Math.max(0.2, (ample - fletxes) / (natural - fletxes))
+          : (ample / natural);
+        // El 0,97 es el coixi dels arrodoniments i del `letter-spacing`.
+        const mida = Math.max(6.5, Math.round(actual * k * 0.97 * 10) / 10);
+        if (mida < actual) setNavFontPx((prev) => (prev === mida ? prev : mida));
+        setNavGapPx((prev) => (prev === 0 ? prev : 0));
+      });
+    };
+    mesura();
+    const t1 = window.setTimeout(mesura, 500);
+    const t2 = window.setTimeout(mesura, 1400);
+    window.addEventListener('resize', mesura);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', mesura);
+    };
+  }, [resolvedNav, esTauleta, navFontPx, navGapPx]);
+
 
   // LA LLISTA DELS DIBUIXOS DE THE HUMAN INSIDE SURT DEL REGISTRE (25/09/2026).
   //
@@ -2721,8 +2815,8 @@ function FullWideSlideHeader({
             CONTROL_TILE_BN,
             '/custom_logos/drawings/images_grid/austen/pemberley_house/pemberley-house-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/keep_calm/keep-calm-b-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/quotes/you-must-allow-me-b-grid.webp',
-            '/custom_logos/drawings/images_grid/austen/quotes/body-and-soul-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/i-admire-and-love-you-b-grid.webp',
+            '/custom_logos/drawings/images_grid/austen/quotes/you-have-bewitched-me-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/quotes/half-agony-half-hope-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
             '/custom_logos/drawings/images_grid/austen/quotes/it-is-a-truth-b-grid.webp',
@@ -2991,6 +3085,20 @@ function FullWideSlideHeader({
   // les imatges a la memoria (o quan el topall de 400 ms ha passat).
   const potMuntarElPanell = Boolean(active) && oberturaAPunt;
 
+  // QUAN EL PANELL COMENCA A APAREIXER. L'animacio del panell porta l'estona
+  // invisible com a retràs (`MEGA_PANEL_DELAY_MS`), i per tant l'aparicio
+  // comenca exactament quan s'acaba. El rellotge es posa en muntar-se el
+  // panell i s'esborra en desmuntar-se: mentre el panell no es vegi, ni
+  // l'espai reservat es pinta de blanc ni el cadenat es munta.
+  useEffect(() => {
+    if (!potMuntarElPanell) {
+      setPanellComenca(false);
+      return undefined;
+    }
+    const id = window.setTimeout(() => setPanellComenca(true), MEGA_PANEL_DELAY_MS);
+    return () => window.clearTimeout(id);
+  }, [potMuntarElPanell]);
+
   useEffect(() => {
     if (!active) return;
     if (stripeOverlayOverrideActive) return;
@@ -3168,7 +3276,7 @@ function FullWideSlideHeader({
   return (
     <header
       ref={headerRef}
-      className={`${contained ? 'relative' : 'fixed'} z-[10000] ${isLandscapeTablet && active ? 'bg-transparent' : 'bg-background'}`}
+      className={`${contained ? 'relative' : 'fixed'} z-[10000] ${(isLandscapeTablet && active) || (potMuntarElPanell && !panellComenca) ? 'bg-transparent' : 'bg-background'}`}
       onMouseLeave={(e) => {
         if (isManualLockEnabled()) return;
         if (megaAccordionLocked) return;
@@ -3203,7 +3311,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           data-admin-icona="1"
           aria-label="Administració"
           title="Administració"
-          className="absolute inline-flex items-center justify-center rounded text-foreground transition-colors hover:bg-black/5 hover:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute inline-flex items-center justify-center rounded text-foreground transition-colors hover:bg-ink-pure/5 hover:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           style={{ left: 0, top: 0, width: '28px', height: 'var(--capcalera-fila, 52px)', zIndex: 10002 }}
         >
           <LayoutDashboard className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />
@@ -3213,13 +3321,13 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       {/* La linia de sota la capcalera: a la vertical ve del nav que hi ha a
           sota, pero a l'escriptori i a l'apaisada el nav va dins la barra i el
           border-b era transparent, aixi que no es veia. Li posem el mateix
-          color que fa servir la vertical (#E6E8EC). */}
+          color que fa servir la vertical (hsl(var(--grey-paper))). */}
       {/* A la vertical el megaslide viu DINS d'aquest header i, com que va
           despres al DOM, es pintava per damunt de la barra i es menjava els
           clics de la lupa. La barra va un punt per sobre. */}
       <div
         className={`${isPortraitTablet ? '' : 'border-b'} relative bg-background`}
-        style={{ zIndex: isPortraitTablet ? 10001 : undefined, ...(isPortraitTablet ? {} : { borderBottomColor: '#E6E8EC' }) }}
+        style={{ zIndex: isPortraitTablet ? 10001 : undefined, ...(isPortraitTablet ? {} : { borderBottomColor: 'hsl(var(--grey-line))' }) }}
       >
         <div
           data-capcalera-fila="1"
@@ -3254,8 +3362,19 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // la barra) el carril queda a 40..728 i es veu centrat de debò. Si
             // la barra es una de sobreposició, `100vw` i `100%` coincideixen i
             // no es mou res.
-            width: isPortraitTablet ? 'min(939.2px, calc(100vw - 80px))' : 'var(--hg-mega-w, 70.3vw)',
-            marginLeft: isPortraitTablet
+            // A 1024 EL PRIMER HEADER FA EL MATEIX CARRIL QUE EL SEGON
+            // (02/10/2026). En Marc: «No es podria fer més ample la distància
+            // entre el logo i la icona d'usuari, a la vista 1024?». Fins ara
+            // agafava el carril del megaslide (605 px a 1024) i el segon header en
+            // fa 939,2: el logo i la icona quedaven molt mes junts que els
+            // enllacos de sota. Amb el mateix carril, tot alinea.
+            width: esCarrilHeaderAmpliat ? 'min(939.2px, calc(100vw - 80px))' : 'var(--hg-mega-w, 70.3vw)',
+            // CENTRAT A LA FINESTRA TAMBE A 1024 (02/10/2026). En Marc: «El
+            // header, centra el header». Amb el carril del segon header (939,2)
+            // la fila ha d'anar centrada com alla; el `--hg-mega-x` es la x del
+            // carril del MEGASLIDE (605 px a 1024) i deixava el header 160 px a
+            // la dreta.
+            marginLeft: esCarrilHeaderAmpliat
               ? 'calc((100vw - min(939.2px, 100vw - 80px)) / 2 - var(--rulerInset, 0px))'
               : 'calc(var(--hg-mega-x, 0px) - var(--rulerInset, 0px))',
             // SENSE COIXÍ: EL LOGO A LA VORA ESQUERRA DEL CARRIL I LES ICONES A
@@ -3336,14 +3455,14 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             />
           </Link>
 
-          <nav className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap ${esTauleta ? 'overflow-hidden' : ''} ${isPortraitTablet ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: isLandscapeTablet ? '1rem' : '0.25rem', minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : {
+          <nav ref={navRef} className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap ${esTauleta ? 'overflow-hidden' : ''} ${esDobleHeader ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: navGapPx != null ? `${navGapPx}px` : (isLandscapeTablet ? '1rem' : '0.25rem'), minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : {
               // El -5% és un ajust òptic del nav (el desplaça cap a l'esquerra).
               // Dins el carril, a la banda estreta (768-1366) el nav no té marge
               // per a aquest desplaçament: el seu contingut ja hi va just i el
               // -5% el posava sota el logo (la «F» de FIRST CONTACT quedava
               // tallada a 1280).
               transform: esBandaEstreta ? 'none' : 'translateX(-5%)',
-              columnGap: carrilPx(16),
+              ...(navGapPx != null ? { gap: `${navGapPx}px`, columnGap: `${navGapPx}px` } : { columnGap: carrilPx(16) }),
             }}>
             {resolvedNav.map((item) => {
               // L'indicador d'obert (fletxa rotada + color) només s'ha
@@ -3362,9 +3481,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                   // menu es pot llegir. A 1440 l'escala val 0,75 i el text
                   // quedava a 8,25 px.
                   style={
-                    (isPortraitTablet || isLandscapeTablet)
-                      ? { letterSpacing: '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px', whiteSpace: 'nowrap' }
-                      : { whiteSpace: 'nowrap', fontSize: `max(12px, ${carrilPx(11)})` }
+                    {
+                      ...((isPortraitTablet || isLandscapeTablet)
+                        ? { letterSpacing: '0.04em', fontSize: isPortraitTablet ? '11.5px' : '12px' }
+                        : { fontSize: `max(12px, ${carrilPx(11)})` }),
+                      whiteSpace: 'nowrap',
+                      // L'AJUST, SI ELS NOMS NO HI CABEN (vegeu `navFontPx`). Va
+                      // DESPRES de la mida de sempre, que si no la sobreescriu.
+                      ...(navFontPx != null ? { fontSize: `${navFontPx}px` } : null),
+                    }
                   }
                   aria-expanded={open ? 'true' : 'false'}
                   onClick={() => {
@@ -3531,19 +3656,19 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       </div>
 
       {/* Segon header NOMES de la tauleta VERTICAL — enllaços de colleccions */}
-      {isPortraitTablet && (
+      {esDobleHeader && (
         <div
           className="bg-background flex items-center"
           style={{
             position: 'relative',
             zIndex: 10001,
-            // Aquest segon header només surt a la tauleta vertical: es queda
-            // amb el marc del lloc (vegeu el primer).
+            // Aquest segon header surt a la tauleta vertical i a 1024 (vegeu
+            // `esDobleHeader`): es queda amb el marc del lloc (vegeu el primer).
             // El MATEIX carril que el primer header i que la taula vertical
             // (vegeu el comentari de la fila de dalt): el nav s'hi centra.
             width: 'min(939.2px, calc(100vw - 80px))',
             marginLeft: 'calc((100vw - min(939.2px, 100vw - 80px)) / 2 - var(--rulerInset, 0px))',
-            borderTop: '1px solid #E6E8EC',
+            borderTop: '1px solid hsl(var(--grey-line))',
             // Els 62 px que queden dels 114, amb el contingut centrat.
             height: '62px',
           }}
@@ -3553,14 +3678,19 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
               `marginTop: 10px` i `translateY(4px)`, que eren per a l'alçada
               antiga de la fila (43 px); ara la fila fa 62 px i el contingut
               s'hi centra, aixi que aquests 14 px el descol·locaven. */}
-          <nav className="flex items-center justify-center gap-6 px-10 py-2 flex-nowrap overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {/* ELS ENLLACOS, CENTRATS AL VIEWPORT I UNA MIQUETA MES PETITS
+              (02/10/2026). En Marc: «Centra el text dels enllaços i fes-los una
+              mica més petits, que encaixin amb el carril» i tot seguit «Centra'ls
+              al viewport»: el conjunt va centrat dins el carril (que es el mateix
+              del primer header), no repartit de vora a vora. */}
+          <nav className="flex items-center justify-center gap-6 flex-nowrap" style={{ width: '100%' }}>
             {resolvedNav.map((item) => {
               const open = active === item.id && megaPage === 1;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  className={`inline-flex items-center gap-1 text-xs font-semibold tracking-[0.18em] uppercase whitespace-nowrap ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`inline-flex items-center gap-1 text-[11px] font-semibold tracking-[0.16em] uppercase whitespace-nowrap ${open ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                   aria-expanded={open ? 'true' : 'false'}
                   onClick={() => {
                     if (clicColleccioRepetit(item.id)) return;
@@ -3601,36 +3731,95 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
       {/* El cadenat no es munta fins que no hi ha la primera mesura: així no
           apareix a la posició de reserva (a dalt de tot). I a la pàgina del
-          cistell (3) no hi surt: allà no cal bloquejar el megaslide. */}
-      {canUseDom && active && megaPage !== 3 && lockBtnTop != null && ReactDOM.createPortal(
+          cistell (3) no hi surt: allà no cal bloquejar el megaslide.
+          TAMPOC FINS QUE EL PANELL APAREIX (01/10/2026): el cadenat surt de
+          sota el panell, i mentre el panell és invisible es veia sol, abans
+          que el megaslide. */}
+      {canUseDom && active && panellComenca && megaPage !== 3 && lockBtnTop != null && ReactDOM.createPortal(
         <div
           ref={lockWrapRef}
           style={{
             position: 'fixed',
-            left: '50%',
+            // EL CADENAT, A LA VORA DRETA DEL CARRIL (02/10/2026, ho ha demanat
+            // l'amo: «Alinea'l a la dreta del carril»). Abans anava al mig de la
+            // finestra (`left: 50%`); el carril esta centrat, o sigui que la
+            // seva vora dreta es `50% + mig carril`. L'animacio de sortida
+            // (`mega-cadenat-surt`) porta el `translate(-50%)` que el centra
+            // sobre aquesta `left`, i per aixo se li descompta la meitat de la
+            // seva amplada: el que queda a la vora del carril es la SEVA vora
+            // dreta.
+            left: `calc(50% + var(--hg-mega-w, 0px) / 2 - ${CADENAT_AMPLADA_PX / 2}px)`,
             // El cadenat surt de sota el panell (vegeu mega-cadenat-surt) i
             // queda just a sota del separador.
             top: `${lockBtnTop + CADE_BAIXADA_PX}px`,
             // La sortida dura el mateix que l'ultim tram del panell i comença de
             // seguida, aixi el cadenat i la pestanya hi arriben alhora.
             animation: 'mega-cadenat-surt 250ms cubic-bezier(0.22, 1, 0.36, 1) 0ms both',
-            // Per sota del panell (z-[10000]) perque el cadenat en surti de sota.
-            zIndex: 9999,
+            // PER SOBRE DEL PANELL (02/10/2026). Abans anava a 9999, per sota del
+            // panell (z-[10000]), i a 1024 amb la pagina 1 el cadenat quedava
+            // TAPAT per la franja de samarretes de la p1 (que surt del panell,
+            // que te `overflow: visible`): es veia pero no es podia clicar. Amb
+            // 10002 queda per damunt del panell i del segon header (10001).
+            zIndex: 10002,
             pointerEvents: 'none',
           }}
         >
           <button
             onClick={() => setMegaLocked((v) => !v)}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-colors hover:bg-muted"
+            className="flex items-center justify-center"
             style={{
-              transition: 'background-color 150ms',
+              position: 'relative',
+              padding: 0,
+              border: 0,
+              background: 'transparent',
               cursor: 'pointer',
               pointerEvents: 'auto',
             }}
             title={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
             aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           >
-            {megaLocked ? <Lock size={22} /> : <Unlock size={22} />}
+            {/* LA PLACA: el dibuix de la casa, sense el cadenat (el porta el
+                component, injectat, des del 02/10/2026). */}
+            <img
+              src="/custom_logos/icons/cadenat.svg"
+              alt=""
+              aria-hidden="true"
+              draggable={false}
+              style={{ width: CADENAT_AMPLADA_PX, height: 'auto', display: 'block' }}
+            />
+            {/* EL CADENAT, INJECTAT (02/10/2026, ho va demanar l'amo: «Trec el
+                cadenat de l'svg i l'hi poses tu injectat»). Es un SVG en línia i
+                no una imatge per dues coses: el color surt dels tokens de la
+                casa (abans el cadenat era negre fix dins del fitxer) i els dos
+                estats tenen dibuix propi — la tanca tancada quan el megaslide
+                esta bloquejat i la tanca oberta quan no ho esta, com feien les
+                dues icones de `lucide` que hi havia abans. */}
+            <svg
+              viewBox="0 0 24 30"
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                width: CADENAT_AMPLADA_PX * 0.36,
+                height: 'auto',
+                transform: 'translate(-50%, -50%)',
+                color: 'hsl(var(--grey-ink))',
+                pointerEvents: 'none',
+              }}
+            >
+              <g fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                {megaLocked ? (
+                  /* Tancat: la tanca torna a baixar fins al cos. */
+                  <path d="M8 13V8.5a4 4 0 0 1 8 0V13" />
+                ) : (
+                  /* Obert: la tanca s'obre cap a la dreta (l'anca dreta no
+                     arriba al cos). */
+                  <path d="M8 13V8.5a4 4 0 0 1 8 0" />
+                )}
+                <rect x="3.4" y="13" width="17.2" height="13.4" rx="3.4" />
+              </g>
+            </svg>
           </button>
         </div>,
         document.body

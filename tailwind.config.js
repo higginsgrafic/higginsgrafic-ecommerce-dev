@@ -50,6 +50,27 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        /* LA RAMPA DE GRISOS DE LA CASA (30/09/2026).
+           Els noms diuen la funcio, i tots surten dels tokens de `index.css`:
+           un sol to (matis 210) i la saturacio comuna. Aixi `bg-paper`,
+           `text-ink`, `border-line`... son l'unic vocabulari de color de la
+           interficie, i canviar la rampa es canviar els tokens. */
+        paper: {
+          DEFAULT: "hsl(var(--grey-paper))",
+          soft: "hsl(var(--grey-paper-soft))",
+          tint: "hsl(var(--grey-paper-tint))",
+        },
+        line: {
+          DEFAULT: "hsl(var(--grey-line))",
+          strong: "hsl(var(--grey-line-strong))",
+        },
+        ink: {
+          DEFAULT: "hsl(var(--grey-ink))",
+          2: "hsl(var(--grey-ink-2))",
+          soft: "hsl(var(--grey-ink-soft))",
+          strong: "hsl(var(--grey-ink-strong))",
+          pure: "hsl(var(--grey-ink-pure))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

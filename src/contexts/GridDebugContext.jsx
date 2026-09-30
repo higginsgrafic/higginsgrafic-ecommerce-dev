@@ -72,7 +72,7 @@ export function GridDebugProvider({ children }) {
       layout: 'border-2 border-orange-500'
     };
 
-    return colors[section] || 'border-2 border-gray-500';
+    return colors[section] || 'border-2 border-ink-soft';
   };
 
   const getDebugStyle = (section, subSection = null) => {

@@ -16,10 +16,10 @@ export default function ProtectedRoute({ children }) {
 
   if (!authReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-paper">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-neutral-500">Verificant accés…</p>
+          <div className="w-8 h-8 border-2 border-ink-pure border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-ink-soft">Verificant accés…</p>
         </div>
       </div>
     );

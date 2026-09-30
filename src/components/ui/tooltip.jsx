@@ -18,11 +18,11 @@ const TooltipContent = React.forwardRef(({ className, sideOffset = 4, ...props }
       style={{
         zIndex: 99999,
         borderRadius: '6px',
-        backgroundColor: '#141414',
+        backgroundColor: 'hsl(var(--grey-ink-strong))',
         padding: '4px 10px',
         fontSize: '12px',
         fontFamily: 'Roboto, sans-serif',
-        color: '#ffffff',
+        color: 'hsl(var(--grey-paper))',
         boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         whiteSpace: 'nowrap',
       }}

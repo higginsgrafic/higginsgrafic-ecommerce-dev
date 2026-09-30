@@ -109,9 +109,27 @@ const loadInitialState = () => {
   }
 };
 
-export default function BeltReferenceOverlay({ enabled }) {
+export default function BeltReferenceOverlay({ enabled, onToggle }) {
   const location = useLocation();
   const [state, setState] = useState(loadInitialState);
+  // EL COMMUTADOR, TAMBE AMB EL TECLAT (02/10/2026): el mateix cas que les
+  // guies del carril — la barra de botons nome s surt a les rutes d'edicio i
+  // aquestes guies es poden encendre a qualsevol pagina amb `?belt2=1`. Amb
+  // Alt+B s'encenen i s'apaguen des de qualsevol lloc.
+  //
+  // I amb `e.code` (no `e.key`), com a les del carril: a un Mac, Opcio+B dona
+  // `∫` en comptes de `b`.
+  useEffect(() => {
+    if (!onToggle) return undefined;
+    const onKey = (e) => {
+      if (e.altKey && (e.code === 'KeyB' || e.key === 'b' || e.key === 'B')) {
+        e.preventDefault();
+        onToggle();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onToggle]);
   // Persistència: X, sprite i Y de referència visual (yCarouselTop,
   // yFinalizeBottom). Les Y es persisteixen perquè la guia visual del
   // mega-slide ha de ser visible a TOTES les rutes com a referència. Les

@@ -71,38 +71,37 @@ export default function RuletaDemoPage() {
   const selectedColorOrder = useMemo(
     () => [
       'white',
-      'light-pink',
-      'kiwi',
       'light-blue',
+      'royal',
+      'navy',
       'daisy',
       'gold',
-      'irish-green',
-      'royal',
       'red',
-      'purple',
+      'irish-green',
       'military-green',
-      'forest-green',
-      'navy',
       'black',
+      'rs-sport-grey',
+      'ice-grey',
+      'charcoal',
+      'dark-chocolate',
     ],
     []
   );
 
+  // Els botons `selector-color-*` NOMES existeixen per als 10 colors comuns; els
+  // 4 nous (i l'antiga paleta) no tenen imatge. El qui els pinta ja preveu el
+  // cas `src` buit, o sigui que la ruleta no es trenca.
   const colorButtonSrcBySlug = useMemo(
     () => ({
       white: '/placeholders/t-shirt_buttons/selector-color-white.webp',
-      'light-pink': '/placeholders/t-shirt_buttons/selector-color-light-pink.webp',
       'light-blue': '/placeholders/t-shirt_buttons/selector-color-light-blue.webp',
       daisy: '/placeholders/t-shirt_buttons/selector-color-daisy.webp',
       gold: '/placeholders/t-shirt_buttons/selector-color-gold.webp',
       red: '/placeholders/t-shirt_buttons/selector-color-red.webp',
-      purple: '/placeholders/t-shirt_buttons/selector-color-purple.webp',
       royal: '/placeholders/t-shirt_buttons/selector-color-blue-royal.webp',
       navy: '/placeholders/t-shirt_buttons/selector-color-blue-navy.webp',
       'military-green': '/placeholders/t-shirt_buttons/selector-color-military-green.webp',
-      'forest-green': '/placeholders/t-shirt_buttons/selector-color-forest-green.webp',
       'irish-green': '/placeholders/t-shirt_buttons/selector-color-irish-green.webp',
-      kiwi: '/placeholders/t-shirt_buttons/selector-color-kiwi.webp',
       black: '/placeholders/t-shirt_buttons/selector-color-black.webp',
     }),
     []
@@ -333,9 +332,9 @@ export default function RuletaDemoPage() {
   const SliderRow = ({ label, value, min, max, step, onChange, digits = 2 }) => {
     return (
       <div className="grid gap-1">
-        <div className="flex items-center justify-between text-[11px] font-semibold text-white/60">
+        <div className="flex items-center justify-between text-[11px] font-semibold text-paper/60">
           <span>{label}</span>
-          <span className="font-mono text-white/70">{format(value, digits)}</span>
+          <span className="font-mono text-paper/70">{format(value, digits)}</span>
         </div>
         <input
           type="range"
@@ -376,10 +375,10 @@ export default function RuletaDemoPage() {
 
     return (
       <label className="grid gap-1">
-        <div className="text-[11px] font-semibold text-white/60">{label}</div>
+        <div className="text-[11px] font-semibold text-paper/60">{label}</div>
         <input
           ref={inputRef}
-          className="h-8 rounded-md border border-white/15 bg-black/20 px-2 font-mono text-[12px] text-white/85"
+          className="h-8 rounded-md border border-line/15 bg-ink-pure/20 px-2 font-mono text-[12px] text-paper/85"
           inputMode="numeric"
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -402,12 +401,12 @@ export default function RuletaDemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0b0b] text-white">
+    <div className="min-h-screen bg-[hsl(var(--grey-ink-pure))] text-paper">
       <SEO title="Ruleta (demo)" description="Demo ruleta circular (WIP)" />
       <div className="min-h-screen w-full grid" style={{ gridTemplateColumns: '1fr 360px' }}>
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="relative" style={{ width: `${frame.width}px`, height: `${frame.height}px`, transform: scale !== 1 ? `scale(${scale})` : undefined, transformOrigin: 'center' }}>
-            <div className="absolute inset-0" style={{ background: '#ffffff', borderRadius: '18px', boxShadow: '0 30px 90px rgba(0,0,0,0.55)' }} />
+            <div className="absolute inset-0" style={{ background: 'hsl(var(--grey-paper))', borderRadius: '18px', boxShadow: '0 30px 90px rgba(0,0,0,0.55)' }} />
 
             <div className="absolute inset-0 overflow-hidden" style={{ borderRadius: '18px' }}>
               <img
@@ -526,13 +525,13 @@ export default function RuletaDemoPage() {
           </div>
         </div>
 
-        <aside className="min-h-screen border-l border-white/10 bg-[#101010] px-4 py-4 overflow-y-auto">
+        <aside className="min-h-screen border-l border-line/10 bg-[hsl(var(--grey-ink-strong))] px-4 py-4 overflow-y-auto">
           <div className="flex items-center justify-between">
-            <div className="text-[11px] font-semibold tracking-[0.22em] text-white/55">TOOLS</div>
+            <div className="text-[11px] font-semibold tracking-[0.22em] text-paper/55">TOOLS</div>
             <button
               type="button"
               onClick={resetAll}
-              className="h-8 rounded-md border border-white/15 bg-white/5 px-3 text-[12px] font-semibold text-white/80 hover:bg-white/10"
+              className="h-8 rounded-md border border-line/15 bg-paper/5 px-3 text-[12px] font-semibold text-paper/80 hover:bg-paper/10"
             >
               Reset
             </button>
@@ -542,7 +541,7 @@ export default function RuletaDemoPage() {
             <button
               type="button"
               onClick={() => setFinalPngVersion(Date.now())}
-              className="h-8 w-full rounded-md border border-white/15 bg-white/5 px-3 text-[12px] font-semibold text-white/80 hover:bg-white/10"
+              className="h-8 w-full rounded-md border border-line/15 bg-paper/5 px-3 text-[12px] font-semibold text-paper/80 hover:bg-paper/10"
             >
               Reload final.webp
             </button>
@@ -550,18 +549,18 @@ export default function RuletaDemoPage() {
 
           <div className="mt-4 grid gap-6">
             <section className="grid gap-3">
-              <div className="text-[11px] font-semibold text-white/50">Orientation</div>
+              <div className="text-[11px] font-semibold text-paper/50">Orientation</div>
               <div className="flex gap-2">
                 <button
                   type="button"
-                  className={`h-9 flex-1 rounded-md border text-[12px] font-semibold ${orientation === 'portrait' ? 'border-white/20 bg-white/10 text-white' : 'border-white/10 bg-black/10 text-white/70'}`}
+                  className={`h-9 flex-1 rounded-md border text-[12px] font-semibold ${orientation === 'portrait' ? 'border-line/20 bg-paper/10 text-paper' : 'border-line/10 bg-ink-pure/10 text-paper/70'}`}
                   onClick={() => setOrientation('portrait')}
                 >
                   Portrait
                 </button>
                 <button
                   type="button"
-                  className={`h-9 flex-1 rounded-md border text-[12px] font-semibold ${orientation === 'landscape' ? 'border-white/20 bg-white/10 text-white' : 'border-white/10 bg-black/10 text-white/70'}`}
+                  className={`h-9 flex-1 rounded-md border text-[12px] font-semibold ${orientation === 'landscape' ? 'border-line/20 bg-paper/10 text-paper' : 'border-line/10 bg-ink-pure/10 text-paper/70'}`}
                   onClick={() => setOrientation('landscape')}
                 >
                   Landscape
@@ -571,17 +570,17 @@ export default function RuletaDemoPage() {
             </section>
 
             <section className="grid gap-3">
-              <div className="text-[11px] font-semibold text-white/50">VIEW</div>
+              <div className="text-[11px] font-semibold text-paper/50">VIEW</div>
               <SliderRow label="left" value={viewLeft} min={0} max={1} step={0.01} onChange={setViewLeft} digits={2} />
               <SliderRow label="top" value={viewTop} min={0} max={1} step={0.01} onChange={setViewTop} digits={2} />
             </section>
 
             <section className="grid gap-3">
-              <div className="text-[11px] font-semibold text-white/50">WHEEL</div>
+              <div className="text-[11px] font-semibold text-paper/50">WHEEL</div>
               <SliderRow label="radius" value={wheelRadius} min={120} max={520} step={1} onChange={setWheelRadius} digits={0} />
               <SliderRow label="angle" value={wheelAngle} min={-3.14} max={3.14} step={0.01} onChange={setWheelAngle} digits={2} />
               <div className="flex items-center justify-between gap-2">
-                <label className="flex items-center gap-2 text-[11px] font-semibold text-white/60">
+                <label className="flex items-center gap-2 text-[11px] font-semibold text-paper/60">
                   <input
                     type="checkbox"
                     checked={wheelAutoSpin}
@@ -589,7 +588,7 @@ export default function RuletaDemoPage() {
                   />
                   Auto spin
                 </label>
-                <span className="font-mono text-[11px] text-white/70">{format(wheelSpinSpeed, 2)} rad/s</span>
+                <span className="font-mono text-[11px] text-paper/70">{format(wheelSpinSpeed, 2)} rad/s</span>
               </div>
               <input
                 type="range"
@@ -608,14 +607,14 @@ export default function RuletaDemoPage() {
               <button
                 type="button"
                 onClick={() => setWheelVisible((v) => !v)}
-                className="h-9 rounded-md border border-white/10 bg-black/10 px-3 text-[12px] font-semibold text-white/80 hover:bg-white/10"
+                className="h-9 rounded-md border border-line/10 bg-ink-pure/10 px-3 text-[12px] font-semibold text-paper/80 hover:bg-paper/10"
               >
                 {wheelVisible ? 'Hide roulette' : 'Show roulette'}
               </button>
             </section>
 
             <section className="grid gap-3">
-              <div className="text-[11px] font-semibold text-white/50">HAND</div>
+              <div className="text-[11px] font-semibold text-paper/50">HAND</div>
               <div className="grid grid-cols-2 gap-2">
                 <NumberRow label="x" value={handX} onChange={(v) => setHandX(Math.round(v))} />
                 <NumberRow label="y" value={handY} onChange={(v) => setHandY(Math.round(v))} />
@@ -624,7 +623,7 @@ export default function RuletaDemoPage() {
             </section>
 
             <section className="grid gap-3">
-              <div className="text-[11px] font-semibold text-white/50">THUMB ARC</div>
+              <div className="text-[11px] font-semibold text-paper/50">THUMB ARC</div>
               <SliderRow label="alpha" value={thumbArcAlpha} min={0} max={1} step={0.01} onChange={setThumbArcAlpha} digits={2} />
               <SliderRow label="radius" value={thumbArcRadius} min={120} max={900} step={1} onChange={setThumbArcRadius} digits={0} />
               <div className="grid grid-cols-2 gap-2">

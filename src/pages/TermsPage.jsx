@@ -293,17 +293,17 @@ function TermsPage() {
         />
       ) : (
       <div
-        className="min-h-screen bg-white relative"
+        className="min-h-screen bg-paper relative"
       >
         {/* Top spacer for fixed header */}
         <div className="pt-[129px] lg:pt-[145px] relative" style={{ zIndex: 1 }} />
 
         {/* Title + subtitle — centered, outside columns */}
         <div className="relative text-center" style={{ zIndex: 1 }}>
-          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[#141414] mb-1 whitespace-nowrap">
+          <h1 className="font-roboto text-[30pt] font-normal uppercase text-[hsl(var(--grey-ink-strong))] mb-1 whitespace-nowrap">
             Termes i Condicions
           </h1>
-          <p className="font-roboto text-[10pt] font-normal text-gray-500 mb-24 text-center">
+          <p className="font-roboto text-[10pt] font-normal text-ink-soft mb-24 text-center">
             Darrera actualització, agost 2026
           </p>
         </div>
@@ -326,8 +326,8 @@ function TermsPage() {
         <div className="mx-auto relative" style={{ zIndex: 1, maxWidth: '500px' }}>
           <div className="w-full">
             {/* Intro */}
-            <div className="mb-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
-              <p className="font-roboto text-[8pt] font-bold text-gray-800 leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
+            <div className="mb-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
+              <p className="font-roboto text-[8pt] font-bold text-ink leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
                 Us recomanem que llegiu amb atenció aquestes Condicions Generals abans de fer una comanda, ja que fer servir els nostres serveis equival a l'acceptació, de facto, de totes elles. Dites Condicions Generals estan dissenyades per protegir tant els teus drets com a consumidor com els nostres com a empresa en el compliment de la legislació vigent.
               </p>
             </div>
@@ -335,12 +335,12 @@ function TermsPage() {
             {/* Sections */}
             {sections.map((section, i) => (
               <div key={i} className="mb-7">
-                <h2 className="font-roboto text-[10pt] font-normal text-[#141414] mb-0 flex items-start gap-2">
-                  <span className="text-[#141414]">•</span>
+                <h2 className="font-roboto text-[10pt] font-normal text-[hsl(var(--grey-ink-strong))] mb-0 flex items-start gap-2">
+                  <span className="text-[hsl(var(--grey-ink-strong))]">•</span>
                   <span>{section.bullet}</span>
                 </h2>
                 {section.paragraph && (
-                  <p className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] mb-2 pl-5">
+                  <p className="font-roboto text-[10pt] font-light text-ink-2 leading-[1.5] mb-2 pl-5">
                     {section.paragraph}
                   </p>
                 )}
@@ -351,8 +351,8 @@ function TermsPage() {
                       const boldPart = dashIdx >= 0 ? item.substring(0, dashIdx) : item;
                       const restPart = dashIdx >= 0 ? item.substring(dashIdx) : '';
                       return (
-                        <li key={j} className="font-roboto text-[10pt] font-light text-gray-700 leading-[1.5] flex items-start gap-2">
-                          <span className="text-gray-700 mt-[-1px]">-</span>
+                        <li key={j} className="font-roboto text-[10pt] font-light text-ink-2 leading-[1.5] flex items-start gap-2">
+                          <span className="text-ink-2 mt-[-1px]">-</span>
                           <span><span className="font-normal">{boldPart}</span>{restPart}</span>
                         </li>
                       );
@@ -360,10 +360,10 @@ function TermsPage() {
                   </ul>
                 )}
                 {section.contact && (
-                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px] text-center">
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px] text-center">
                     <div className="inline-block text-left">
                       {section.contact.map((line, j) => (
-                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-gray-700 ${j === 0 ? 'font-normal' : 'font-light'}`}>
+                        <p key={j} className={`font-roboto text-[10pt] leading-[1.5] text-ink-2 ${j === 0 ? 'font-normal' : 'font-light'}`}>
                           {line}
                         </p>
                       ))}
@@ -371,14 +371,14 @@ function TermsPage() {
                   </div>
                 )}
                 {section.note && section.noteBold && (
-                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
-                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-gray-700">
+                  <div className="mt-[66px] mb-[66px] self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
+                    <p className="font-roboto text-[8pt] font-medium leading-[1.25] text-ink-2">
                       {section.note}
                     </p>
                   </div>
                 )}
                 {section.note && !section.noteBold && (
-                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-gray-700">
+                  <p className="font-roboto pl-5 text-[10pt] font-light leading-[1.5] text-ink-2">
                     {section.note}
                   </p>
                 )}
@@ -386,8 +386,8 @@ function TermsPage() {
             ))}
 
             {/* Footer */}
-            <div className="mt-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
-              <p className="font-roboto text-[8pt] font-bold text-gray-700 leading-[1.25]">
+            <div className="mt-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
+              <p className="font-roboto text-[8pt] font-bold text-ink-2 leading-[1.25]">
                 Aquests Termes i Condicions constitueixen un acord legal vinculant entre vós i Higgins GRÀFIC. Si teniu qualsevol dubte sobre aquestes condicions, si us plau, contacteu amb nosaltres abans de fer una comanda. La satisfacció i confiança són la nostra prioritat.
               </p>
             </div>

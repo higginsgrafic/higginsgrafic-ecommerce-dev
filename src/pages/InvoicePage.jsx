@@ -37,13 +37,13 @@ export default function InvoicePage() {
   const linies = useMemo(() => (factura ? liniesDelDocument(factura) : []), [factura]);
 
   if (estat === 'carregant') {
-    return <div className="min-h-screen flex items-center justify-center text-gray-500">Carregant la factura…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-ink-soft">Carregant la factura…</div>;
   }
   if (estat === 'error' || !factura) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 text-center px-6">
         <div className="font-oswald text-2xl tracking-wide">FACTURA NO TROBADA</div>
-        <p className="text-gray-500 max-w-md">
+        <p className="text-ink-soft max-w-md">
           Aquest enllaç no correspon a cap factura. Comprova que l&apos;hagis copiat sencer.
         </p>
       </div>
@@ -56,7 +56,7 @@ export default function InvoicePage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 print:bg-white print:py-0">
+    <div className="min-h-screen bg-paper-soft py-6 print:bg-paper print:py-0">
       <InvoiceSheet
         doc={factura}
         numero={factura.number || '—'}
@@ -71,7 +71,7 @@ export default function InvoicePage() {
         <button
           type="button"
           onClick={() => window.print()}
-          className="w-full py-3 bg-gray-900 text-white font-oswald tracking-[0.12em] uppercase text-sm hover:bg-black transition-colors"
+          className="w-full py-3 bg-ink-strong text-paper font-oswald tracking-[0.12em] uppercase text-sm hover:bg-ink-pure transition-colors"
         >
           Imprimir o desar en PDF
         </button>

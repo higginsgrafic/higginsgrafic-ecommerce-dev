@@ -116,8 +116,8 @@ function PindolaColleccio({ href, alFlux = false }) {
         height: 'auto',
         width: 'auto',
         borderRadius: '9999px',
-        backgroundColor: '#ffffff',
-        border: '1px solid #e5e7eb',
+        backgroundColor: 'hsl(var(--grey-paper))',
+        border: '1px solid hsl(var(--grey-line))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -128,7 +128,7 @@ function PindolaColleccio({ href, alFlux = false }) {
         transition: 'all 200ms ease',
         textDecoration: 'none',
       }}
-      className="hover:shadow-md hover:border-neutral-400 active:scale-95 group"
+      className="hover:shadow-md hover:border-muted-2 active:scale-95 group"
       title="Veure tota la col·lecció"
     >
       <span
@@ -138,10 +138,10 @@ function PindolaColleccio({ href, alFlux = false }) {
           fontSize: '12px',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
-          color: '#475059',
+          color: 'hsl(var(--grey-ink-2))',
           lineHeight: 1,
         }}
-        className="group-hover:text-neutral-900"
+        className="group-hover:text-ink-strong"
       >
         <span style={{ display: 'inline-block', transform: 'translateY(3px)' }}>SI EN VOLS SABER</span>{' '}
         <span style={{ display: 'inline-block', fontSize: '25px', fontWeight: 100, lineHeight: 1, verticalAlign: 'middle', transform: 'translateY(1px)' }}>+</span>

@@ -178,7 +178,7 @@ export default function ColleccioSettingsPage() {
       description: 'Descripció de la nova col·lecció',
       path: '/new-collection',
       icon_url: '',
-      bg_color: 'bg-white',
+      bg_color: 'bg-paper',
       is_active: true,
       display_order: collections.length
     };
@@ -205,8 +205,8 @@ export default function ColleccioSettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Carregant...</div>
+      <div className="min-h-screen bg-paper-soft flex items-center justify-center">
+        <div className="text-ink-2">Carregant...</div>
       </div>
     );
   }
@@ -215,7 +215,7 @@ export default function ColleccioSettingsPage() {
     <>
       <SEO title="Configuració de Col·leccions" description="Gestiona les col·leccions de productes" />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-paper-soft">
         {/* Random disabled warning */}
         <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-2">
           <p className="text-sm text-yellow-800 text-center">
@@ -225,26 +225,26 @@ export default function ColleccioSettingsPage() {
 
         {/* Controls header */}
         {editMode && (
-          <div className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+          <div className="sticky top-0 z-40 bg-paper border-b border-line shadow-sm">
             <div className="max-w-7xl mx-auto px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-xl font-bold text-gray-900">Configuració de Col·leccions</h1>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <h1 className="text-xl font-bold text-ink-strong">Configuració de Col·leccions</h1>
+                  <div className="flex items-center gap-2 text-sm text-ink-2">
                     <span>{activeCollections.length} col·leccions actives</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={addCollection}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-paper text-sm rounded-md hover:bg-blue-700 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Afegir
                   </button>
                   {saving ? (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                    <div className="flex items-center gap-2 text-sm text-ink-2">
+                      <div className="w-4 h-4 border-2 border-line-strong border-t-gray-600 rounded-full animate-spin" />
                       <span>Desant...</span>
                     </div>
                   ) : lastSaved ? (
@@ -255,7 +255,7 @@ export default function ColleccioSettingsPage() {
                   ) : null}
                   <button
                     onClick={() => setEditMode(false)}
-                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-ink-2 hover:text-ink-strong transition-colors"
                     aria-label="Sortir del mode edició"
                   >
                     <X className="w-5 h-5" />
@@ -270,7 +270,7 @@ export default function ColleccioSettingsPage() {
           <div className="fixed top-6 right-6 z-50">
             <button
               onClick={() => setEditMode(true)}
-              className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+              className="p-3 bg-blue-600 text-paper rounded-full hover:bg-blue-700 transition-colors shadow-lg"
               aria-label="Activar mode edició"
             >
               <Edit3 className="w-5 h-5" />
@@ -291,7 +291,7 @@ export default function ColleccioSettingsPage() {
                         'up'
                       )}
                       disabled={index === 0}
-                      className="p-2 bg-white/90 text-gray-700 rounded-full hover:bg-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      className="p-2 bg-paper/90 text-ink-2 rounded-full hover:bg-paper shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       title="Moure amunt"
                     >
                       <ChevronUp className="w-4 h-4" />
@@ -302,7 +302,7 @@ export default function ColleccioSettingsPage() {
                         'down'
                       )}
                       disabled={index === activeCollections.length - 1}
-                      className="p-2 bg-white/90 text-gray-700 rounded-full hover:bg-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      className="p-2 bg-paper/90 text-ink-2 rounded-full hover:bg-paper shadow-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       title="Moure avall"
                     >
                       <ChevronDown className="w-4 h-4" />
@@ -316,14 +316,14 @@ export default function ColleccioSettingsPage() {
                     </button>
                     <button
                       onClick={() => toggleActive(collections.findIndex(c => c.slug === collection.slug))}
-                      className="p-2 bg-white/90 text-gray-700 rounded-full hover:bg-white shadow-md transition-colors"
+                      className="p-2 bg-paper/90 text-ink-2 rounded-full hover:bg-paper shadow-md transition-colors"
                       title="Desactivar"
                     >
                       <EyeOff className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setDeleteConfirmDialog(collections.findIndex(c => c.slug === collection.slug))}
-                      className="p-2 bg-white/90 text-red-600 rounded-full hover:bg-white shadow-md transition-colors"
+                      className="p-2 bg-paper/90 text-red-600 rounded-full hover:bg-paper shadow-md transition-colors"
                       title="Eliminar"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -346,12 +346,12 @@ export default function ColleccioSettingsPage() {
           ) : (
             <div className="min-h-screen flex items-center justify-center">
               <div className="text-center py-12">
-                <p className="text-gray-500 mb-4">
+                <p className="text-ink-soft mb-4">
                   No hi ha col·leccions actives. Afegeix-ne una per començar.
                 </p>
                 <button
                   onClick={addCollection}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mx-auto"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-paper rounded-lg hover:bg-blue-700 transition-colors mx-auto"
                 >
                   <Plus className="w-4 h-4" />
                   Afegir Col·lecció
@@ -369,23 +369,23 @@ export default function ColleccioSettingsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-50"
+                className="fixed inset-0 bg-ink-pure/50 z-50"
                 onClick={() => setEditingId(null)}
               />
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-lg shadow-xl z-50 max-h-[80vh] overflow-y-auto"
+                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-paper rounded-lg shadow-xl z-50 max-h-[80vh] overflow-y-auto"
               >
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-ink-strong">
                       Editar Col·lecció
                     </h3>
                     <button
                       onClick={() => setEditingId(null)}
-                      className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="p-1 text-muted-2 hover:text-ink-2 transition-colors"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -394,81 +394,81 @@ export default function ColleccioSettingsPage() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-ink-2 mb-1">
                           Slug (identificador únic)
                         </label>
                         <input
                           type="text"
                           value={collections[editingId]?.slug || ''}
                           onChange={(e) => updateCollection(editingId, 'slug', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-line-strong rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="first-contact"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-ink-2 mb-1">
                           Nom
                         </label>
                         <input
                           type="text"
                           value={collections[editingId]?.name || ''}
                           onChange={(e) => updateCollection(editingId, 'name', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-line-strong rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="First Contact"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-ink-2 mb-1">
                         Descripció
                       </label>
                       <textarea
                         value={collections[editingId]?.description || ''}
                         onChange={(e) => updateCollection(editingId, 'description', e.target.value)}
                         rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        className="w-full px-3 py-2 border border-line-strong rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                         placeholder="Descripció de la col·lecció"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-ink-2 mb-1">
                           Ruta
                         </label>
                         <input
                           type="text"
                           value={collections[editingId]?.path || ''}
                           onChange={(e) => updateCollection(editingId, 'path', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-line-strong rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="/first-contact"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-ink-2 mb-1">
                           URL Icona
                         </label>
                         <input
                           type="text"
                           value={collections[editingId]?.icon_url || ''}
                           onChange={(e) => updateCollection(editingId, 'icon_url', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-line-strong rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="/logo-collection.svg"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-ink-2 mb-1">
                         Color de Fons (classe Tailwind)
                       </label>
                       <input
                         type="text"
                         value={collections[editingId]?.bg_color || ''}
                         onChange={(e) => updateCollection(editingId, 'bg_color', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="bg-gradient-to-br from-blue-900 via-slate-900 to-gray-900"
+                        className="w-full px-3 py-2 border border-line-strong rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="bg-gradient-to-br from-blue-900 via-ink-strong to-ink-strong"
                       />
                     </div>
 
@@ -478,16 +478,16 @@ export default function ColleccioSettingsPage() {
                           type="checkbox"
                           checked={collections[editingId]?.is_active || false}
                           onChange={(e) => updateCollection(editingId, 'is_active', e.target.checked)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-4 h-4 text-blue-600 border-line-strong rounded focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-700">Activa</span>
+                        <span className="text-sm font-medium text-ink-2">Activa</span>
                       </label>
                     </div>
 
                     <div className="flex gap-3 justify-end pt-4 border-t">
                       <button
                         onClick={() => setEditingId(null)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        className="px-4 py-2 bg-blue-600 text-paper rounded-md hover:bg-blue-700 transition-colors"
                       >
                         Fet
                       </button>
@@ -507,29 +507,29 @@ export default function ColleccioSettingsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-50"
+                className="fixed inset-0 bg-ink-pure/50 z-50"
                 onClick={() => setDeleteConfirmDialog(null)}
               />
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-lg shadow-xl z-50"
+                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-paper rounded-lg shadow-xl z-50"
               >
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-ink-strong">
                       Esborrar col·lecció
                     </h3>
                     <button
                       onClick={() => setDeleteConfirmDialog(null)}
-                      className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="p-1 text-muted-2 hover:text-ink-2 transition-colors"
                     >
                       <X className="w-5 h-5" />
                     </button>
                   </div>
 
-                  <p className="text-sm text-gray-600 mb-6">
+                  <p className="text-sm text-ink-2 mb-6">
                     Estàs segur que vols esborrar la col·lecció "{collections[deleteConfirmDialog]?.name}"?
                     Aquesta acció no es pot desfer.
                   </p>
@@ -537,13 +537,13 @@ export default function ColleccioSettingsPage() {
                   <div className="flex gap-3 justify-end">
                     <button
                       onClick={() => setDeleteConfirmDialog(null)}
-                      className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                      className="px-4 py-2 text-sm text-ink-2 bg-paper border border-line-strong rounded-md hover:bg-paper-soft transition-colors"
                     >
                       Cancel·lar
                     </button>
                     <button
                       onClick={() => deleteCollection(deleteConfirmDialog)}
-                      className="px-4 py-2 text-sm text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                      className="px-4 py-2 text-sm text-paper bg-red-600 rounded-md hover:bg-red-700 transition-colors"
                     >
                       Esborrar
                     </button>

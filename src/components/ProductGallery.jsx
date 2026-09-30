@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ZoomIn, ZoomOut } from 'lucide-react';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const ProductGallery = ({
   images,
@@ -74,6 +75,11 @@ const ProductGallery = ({
     if (v.includes('royal')) return 'Royal';
     if (v.includes('navy') || v.includes('marina')) return 'Navy';
     if (v === 'blau' || v === 'blue' || v === 'azul') return 'Blue';
+    // Els 4 colors nous del 64000 (29/09/2026). El catàleg ja en té peces.
+    if (v.includes('sport grey') || v.includes('sport-grey') || v.includes('rs sport')) return 'RS Sport Grey';
+    if (v.includes('ice grey') || v.includes('ice-grey')) return 'Ice Grey';
+    if (v.includes('charcoal')) return 'Charcoal';
+    if (v.includes('chocolate')) return 'Dark Chocolate';
     return null;
   };
 
@@ -113,15 +119,19 @@ const ProductGallery = ({
   };
 
   const placeholderByCanonicalColor = {
-    Blanc: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp',
-    Negre: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_black_gpr-4-0_front.webp',
-    Vermell: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_red_gpr-4-0_front.webp',
-    Militar: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_military-green_gpr-4-0_front.webp',
-    Forest: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.webp',
-    Royal: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.webp',
-    Navy: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_navy_gpr-4-0_front.webp',
-    Blau: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_royal_gpr-4-0_front.webp',
-    Verd: '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_forest-green_gpr-4-0_front.webp'
+    Blanc: tshirtSrc('white'),
+    Negre: tshirtSrc('black'),
+    Vermell: tshirtSrc('red'),
+    Militar: tshirtSrc('military-green'),
+    Forest: tshirtSrc('dark-chocolate'),
+    Royal: tshirtSrc('royal'),
+    Navy: tshirtSrc('navy'),
+    Blau: tshirtSrc('royal'),
+    Verd: tshirtSrc('irish-green'),
+    'RS Sport Grey': tshirtSrc('rs-sport-grey'),
+    'Ice Grey': tshirtSrc('ice-grey'),
+    Charcoal: tshirtSrc('charcoal'),
+    'Dark Chocolate': tshirtSrc('dark-chocolate')
   };
 
   const fallbackHexByCanonicalColor = {
@@ -133,7 +143,11 @@ const ProductGallery = ({
     Royal: '#0052CC',
     Navy: '#001F3F',
     Blau: '#0052CC',
-    Verd: '#0B3D2E'
+    Verd: '#0B3D2E',
+    'RS Sport Grey': '#8C8E90',
+    'Ice Grey': '#CBC5BE',
+    Charcoal: '#4D5252',
+    'Dark Chocolate': '#332A28'
   };
 
   const resolvePlaceholderForColor = (color) => {

@@ -93,7 +93,7 @@ const UserSidebar = ({ isOpen, onClose }) => {
     <>
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
+        className="fixed inset-0 bg-ink-pure/50 z-50 backdrop-blur-sm"
         style={{
           opacity: isOpen ? 1 : 0,
           transition: 'opacity 500ms cubic-bezier(0.95, 0.05, 0.795, 0.035)'
@@ -102,7 +102,7 @@ const UserSidebar = ({ isOpen, onClose }) => {
 
       <div
         ref={sidebarRef}
-        className="fixed inset-y-0 right-0 w-full sm:w-[450px] bg-white z-50 shadow-2xl flex flex-col h-full"
+        className="fixed inset-y-0 right-0 w-full sm:w-[450px] bg-paper z-50 shadow-2xl flex flex-col h-full"
         style={{
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 500ms cubic-bezier(0.95, 0.05, 0.795, 0.035)',
@@ -112,13 +112,13 @@ const UserSidebar = ({ isOpen, onClose }) => {
         aria-modal="true"
         aria-labelledby="user-sidebar-title"
       >
-        <div className="p-4 sm:p-6 border-b bg-white">
+        <div className="p-4 sm:p-6 border-b bg-paper">
           <div className="flex items-center justify-between">
-            <h2 id="user-sidebar-title" className="text-xl sm:text-2xl font-oswald font-bold uppercase" style={{ color: '#141414' }}>Menú</h2>
+            <h2 id="user-sidebar-title" className="text-xl sm:text-2xl font-oswald font-bold uppercase" style={{ color: 'hsl(var(--grey-ink-strong))' }}>Menú</h2>
             <Tooltip>
             <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" onClick={onClose} aria-label="Tanca el menú">
-              <X className="h-6 w-6" style={{ color: '#141414' }} />
+              <X className="h-6 w-6" style={{ color: 'hsl(var(--grey-ink-strong))' }} />
             </Button>
             </TooltipTrigger>
             <TooltipContent>Tancar</TooltipContent>
@@ -130,20 +130,20 @@ const UserSidebar = ({ isOpen, onClose }) => {
           <nav className="flex flex-col space-y-1">
             <Link
               to="/perfil"
-              className="font-roboto text-[14pt] font-normal transition-all py-3 px-4 w-full text-left hover:bg-gray-50 rounded-md flex items-center gap-3 text-gray-900 group"
+              className="font-roboto text-[14pt] font-normal transition-all py-3 px-4 w-full text-left hover:bg-paper-soft rounded-md flex items-center gap-3 text-ink-strong group"
               onClick={onClose}
             >
-              <User className="h-5 w-5 text-gray-500 group-hover:text-gray-900 transition-colors" />
+              <User className="h-5 w-5 text-ink-soft group-hover:text-ink-strong transition-colors" />
               <span className="group-hover:translate-x-1 transition-transform">Perfil d'usuari</span>
             </Link>
 
-            <div className="h-px bg-gray-200 my-4" />
+            <div className="h-px bg-paper-tint my-4" />
 
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
-                className="font-roboto text-[14pt] font-normal transition-all py-3 px-4 block hover:bg-gray-50 rounded-md text-gray-900 group"
+                className="font-roboto text-[14pt] font-normal transition-all py-3 px-4 block hover:bg-paper-soft rounded-md text-ink-strong group"
                 onClick={onClose}
               >
                 <span className="group-hover:translate-x-1 inline-block transition-transform">{link.name}</span>

@@ -6,16 +6,16 @@ export const AUSTEN_QUOTES_ASSETS = {
     match: ['truth', 'it-is-a-truth'],
   },
   you_must_allow_me: {
-    grid: '/custom_logos/drawings/images_grid/austen/quotes/you-must-allow-me-b-grid.webp',
-    stripe: '/custom_logos/drawings/images_stripe/austen/quotes/black/you-must-allow-me-b-stripe.webp',
-    original: '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/you-must-allow-me-b-stripe.webp',
-    match: ['allow me', 'you-must-allow-me'],
+    grid: '/custom_logos/drawings/images_grid/austen/quotes/i-admire-and-love-you-b-grid.webp',
+    stripe: '/custom_logos/drawings/images_stripe/austen/quotes/black/i-admire-and-love-you-b-stripe.webp',
+    original: '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/i-admire-and-love-you-b-stripe.webp',
+    match: ['allow me', 'i-admire-and-love-you'],
   },
   body_and_soul: {
-    grid: '/custom_logos/drawings/images_grid/austen/quotes/body-and-soul-b-grid.webp',
-    stripe: '/custom_logos/drawings/images_stripe/austen/quotes/black/body-and-soul-b-stripe.webp',
-    original: '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/body-and-soul-b-stripe.webp',
-    match: ['body and soul', 'body-and-soul'],
+    grid: '/custom_logos/drawings/images_grid/austen/quotes/you-have-bewitched-me-b-grid.webp',
+    stripe: '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp',
+    original: '/custom_logos/drawings/images_originals/stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp',
+    match: ['body and soul', 'you-have-bewitched-me'],
   },
   unsociable_and_taciturn: {
     grid: '/custom_logos/drawings/images_grid/austen/quotes/unsociable-and-taciturn-b-grid.webp',
@@ -47,14 +47,14 @@ export function resolveAustenQuoteThumbFromPath(pathLike, kind) {
   const file = pathLike.toString().split('/').pop()?.toLowerCase() || '';
 
   const map = {
-    'you-must-allow-me.webp': 'you_must_allow_me',
-    'you-must-allow-me-b.webp': 'you_must_allow_me',
+    'i-admire-and-love-you.webp': 'you_must_allow_me',
+    'i-admire-and-love-you-b.webp': 'you_must_allow_me',
     'half-agony-half-hope.webp': 'half_agony_half_hope',
     'half-agony-half-hope-b.webp': 'half_agony_half_hope',
     'it-is-a-truth.webp': 'it_is_a_truth',
     'it-is-a-truth-b.webp': 'it_is_a_truth',
-    'body-and-soul.webp': 'body_and_soul',
-    'body-and-soul-b.webp': 'body_and_soul',
+    'you-have-bewitched-me.webp': 'body_and_soul',
+    'you-have-bewitched-me-b.webp': 'body_and_soul',
     'i-presfer-to-be.webp': 'unsociable_and_taciturn',
     'unsociable-and-taciturn-b.webp': 'unsociable_and_taciturn',
   };
@@ -73,14 +73,14 @@ export function resolveAustenQuoteOriginalFromPath(pathLike) {
   const file = pathLike.toString().split('/').pop()?.toLowerCase() || '';
 
   const map = {
-    'you-must-allow-me.webp': 'you_must_allow_me',
-    'you-must-allow-me-b.webp': 'you_must_allow_me',
+    'i-admire-and-love-you.webp': 'you_must_allow_me',
+    'i-admire-and-love-you-b.webp': 'you_must_allow_me',
     'half-agony-half-hope.webp': 'half_agony_half_hope',
     'half-agony-half-hope-b.webp': 'half_agony_half_hope',
     'it-is-a-truth.webp': 'it_is_a_truth',
     'it-is-a-truth-b.webp': 'it_is_a_truth',
-    'body-and-soul.webp': 'body_and_soul',
-    'body-and-soul-b.webp': 'body_and_soul',
+    'you-have-bewitched-me.webp': 'body_and_soul',
+    'you-have-bewitched-me-b.webp': 'body_and_soul',
     'i-presfer-to-be.webp': 'unsociable_and_taciturn',
     'unsociable-and-taciturn-b.webp': 'unsociable_and_taciturn',
   };

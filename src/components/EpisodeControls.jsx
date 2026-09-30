@@ -116,7 +116,7 @@ const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop
 
   return (
     <div className="flex items-center gap-2 ml-3">
-      <div className="font-roboto text-xs flex flex-col gap-0.5 bg-[#F9FAFB] px-3 py-2" style={{ borderRadius: '3px' }}>
+      <div className="font-roboto text-xs flex flex-col gap-0.5 bg-[hsl(var(--grey-paper-soft))] px-3 py-2" style={{ borderRadius: '3px' }}>
         <span className="leading-tight" style={{ fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}>
           {currentEpisode.title}
         </span>

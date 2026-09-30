@@ -319,10 +319,10 @@ export default function ProductDetailPageEnhanced() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-paper flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-gray-900 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 font-roboto">Carregant producte...</p>
+          <Loader2 className="w-12 h-12 text-ink-strong animate-spin mx-auto mb-4" />
+          <p className="text-ink-2 font-roboto">Carregant producte...</p>
         </div>
       </div>
     );
@@ -330,16 +330,16 @@ export default function ProductDetailPageEnhanced() {
 
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-paper flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
           <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
-          <h2 className="font-oswald text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="font-oswald text-2xl font-bold text-ink-strong mb-2">
             {error || 'Producte no trobat'}
           </h2>
           <Button
             onClick={() => navigate('/fulfillment')}
             className="mt-4"
-            style={{ backgroundColor: '#141414', color: '#FFFFFF' }}
+            style={{ backgroundColor: 'hsl(var(--grey-ink-strong))', color: 'hsl(var(--grey-paper))' }}
           >
             Tornar al catàleg
           </Button>
@@ -427,7 +427,7 @@ export default function ProductDetailPageEnhanced() {
         <meta property="og:image" content={product.images[0]} />
       </Helmet>
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-paper">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <nav className="pt-[17px] lg:pt-[25px] pb-4 ml-[5px]">
             <Breadcrumbs
@@ -444,7 +444,7 @@ export default function ProductDetailPageEnhanced() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             <div className="space-y-4">
               <div
-                className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer group relative"
+                className="aspect-square bg-paper-soft rounded-lg overflow-hidden cursor-pointer group relative"
                 onClick={() => openGallery(selectedImageIndex)}
               >
                 <img
@@ -455,12 +455,12 @@ export default function ProductDetailPageEnhanced() {
                     e.target.src = '/placeholder-product.svg';
                   }}
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+                <div className="absolute inset-0 bg-ink-pure/0 group-hover:bg-ink-pure/5 transition-colors" />
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  <span className="px-3 py-1 bg-green-600 text-white rounded-full text-xs font-oswald uppercase">
+                  <span className="px-3 py-1 bg-green-600 text-paper rounded-full text-xs font-oswald uppercase">
                     ★ 4.8 (127 valoracions)
                   </span>
-                  <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-oswald uppercase">
+                  <span className="px-3 py-1 bg-blue-600 text-paper rounded-full text-xs font-oswald uppercase">
                     Print on Demand
                   </span>
                 </div>
@@ -472,10 +472,10 @@ export default function ProductDetailPageEnhanced() {
                     <button
                       key={idx}
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-all ${
+                      className={`aspect-square bg-paper-soft rounded-lg overflow-hidden border-2 transition-all ${
                         idx === selectedImageIndex
-                          ? 'border-gray-900'
-                          : 'border-transparent hover:border-gray-300'
+                          ? 'border-ink-strong'
+                          : 'border-transparent hover:border-line-strong'
                       }`}
                     >
                       <img
@@ -508,7 +508,7 @@ export default function ProductDetailPageEnhanced() {
             <div className="space-y-6">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-block px-3 py-1 bg-gray-100 rounded-full text-xs font-oswald uppercase text-muted-foreground">
+                  <span className="inline-block px-3 py-1 bg-paper-soft rounded-full text-xs font-oswald uppercase text-muted-foreground">
                     {product.collection}
                   </span>
                   <span className="inline-block px-3 py-1 bg-green-100 rounded-full text-xs font-oswald uppercase text-green-600">
@@ -533,7 +533,7 @@ export default function ProductDetailPageEnhanced() {
                     {formatPrice(currentPrice)}
                   </p>
                   {selectedVariant && selectedVariant.price !== product.price && (
-                    <p className="font-roboto text-xl text-gray-400 line-through">
+                    <p className="font-roboto text-xl text-muted-2 line-through">
                       {formatPrice(product.price)}
                     </p>
                   )}
@@ -590,12 +590,12 @@ export default function ProductDetailPageEnhanced() {
                           onClick={() => handleSizeChange(size)}
                           className={`flex-1 min-w-[140px] px-4 py-4 border-2 rounded-lg transition-all ${
                             selectedSize === size
-                              ? 'border-foreground bg-foreground text-white'
-                              : 'border-gray-300 hover:border-foreground'
+                              ? 'border-foreground bg-foreground text-paper'
+                              : 'border-line-strong hover:border-foreground'
                           }`}
                         >
                           <div className="font-oswald font-bold text-lg">{size}</div>
-                          <div className={`text-xs ${selectedSize === size ? 'text-gray-300' : 'text-muted-foreground'}`}>
+                          <div className={`text-xs ${selectedSize === size ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
                             {size === '11oz' ? '325ml' : '444ml'} • {formatPrice(sizePrice)}
                           </div>
                         </button>
@@ -630,18 +630,18 @@ export default function ProductDetailPageEnhanced() {
                         <div
                           className={`w-14 h-14 rounded-lg border-4 transition-all ${
                             selectedColor === variant.color
-                              ? 'border-gray-900 shadow-lg'
-                              : 'border-gray-300 group-hover:border-gray-500'
+                              ? 'border-ink-strong shadow-lg'
+                              : 'border-line-strong group-hover:border-ink-soft'
                           }`}
                           style={{ backgroundColor: variant.colorHex }}
                         />
                         {selectedColor === variant.color && (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <Check className="w-7 h-7 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.6))' }} />
+                            <Check className="w-7 h-7 text-paper drop-shadow-lg" style={{ filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.6))' }} />
                           </div>
                         )}
                         {variant.stock < 10 && variant.stock > 0 && (
-                          <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-oswald">
+                          <div className="absolute -top-2 -right-2 bg-red-600 text-paper text-xs px-2 py-0.5 rounded-full font-oswald">
                             {variant.stock}
                           </div>
                         )}
@@ -652,53 +652,53 @@ export default function ProductDetailPageEnhanced() {
               )}
 
               {selectedVariant && (
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-300 rounded-lg p-5">
+                <div className="bg-gradient-to-r from-paper-soft to-paper-soft border-2 border-line-strong rounded-lg p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-oswald font-bold text-base uppercase text-gray-900">
+                    <h4 className="font-oswald font-bold text-base uppercase text-ink-strong">
                       Resum de la teva selecció
                     </h4>
-                    <Info className="w-5 h-5 text-gray-700" />
+                    <Info className="w-5 h-5 text-ink-2" />
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm font-roboto">
                     <div>
-                      <p className="text-gray-700 mb-1">Talla / Capacitat</p>
-                      <p className="font-semibold text-gray-900">{selectedVariant.size} ({productSpecs.capacity})</p>
+                      <p className="text-ink-2 mb-1">Talla / Capacitat</p>
+                      <p className="font-semibold text-ink-strong">{selectedVariant.size} ({productSpecs.capacity})</p>
                     </div>
                     <div>
-                      <p className="text-gray-700 mb-1">Color</p>
-                      <p className="font-semibold text-gray-900">{selectedVariant.color}</p>
+                      <p className="text-ink-2 mb-1">Color</p>
+                      <p className="font-semibold text-ink-strong">{selectedVariant.color}</p>
                     </div>
                     <div>
-                      <p className="text-gray-700 mb-1">Preu</p>
-                      <p className="font-semibold text-gray-900">{formatPrice(selectedVariant.price)}</p>
+                      <p className="text-ink-2 mb-1">Preu</p>
+                      <p className="font-semibold text-ink-strong">{formatPrice(selectedVariant.price)}</p>
                     </div>
                     <div>
-                      <p className="text-gray-700 mb-1">Disponibilitat</p>
+                      <p className="text-ink-2 mb-1">Disponibilitat</p>
                       <p className="font-semibold text-green-600 flex items-center gap-1">
                         <Check className="w-4 h-4" /> En estoc
                       </p>
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-gray-300">
-                    <p className="text-xs text-gray-700">SKU: <span className="font-mono">{selectedVariant.sku}</span></p>
+                  <div className="mt-3 pt-3 border-t border-line-strong">
+                    <p className="text-xs text-ink-2">SKU: <span className="font-mono">{selectedVariant.sku}</span></p>
                   </div>
                 </div>
               )}
 
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-roboto text-gray-600">Quantitat:</span>
-                  <div className="flex items-center border border-gray-300 rounded-lg">
+                  <span className="text-sm font-roboto text-ink-2">Quantitat:</span>
+                  <div className="flex items-center border border-line-strong rounded-lg">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                      className="px-4 py-2 hover:bg-paper-soft transition-colors"
                     >
                       -
                     </button>
                     <span className="px-4 py-2 font-oswald font-semibold">{quantity}</span>
                     <button
                       onClick={() => setQuantity(Math.min(10, quantity + 1))}
-                      className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                      className="px-4 py-2 hover:bg-paper-soft transition-colors"
                     >
                       +
                     </button>
@@ -710,7 +710,7 @@ export default function ProductDetailPageEnhanced() {
                     onClick={handleAddToCart}
                     disabled={!selectedVariant}
                     className="flex-1 h-14 text-base font-oswald uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ backgroundColor: '#141414', color: '#FFFFFF' }}
+                    style={{ backgroundColor: 'hsl(var(--grey-ink-strong))', color: 'hsl(var(--grey-paper))' }}
                   >
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Afegir al Cistell
@@ -719,7 +719,7 @@ export default function ProductDetailPageEnhanced() {
                     onClick={handleWishlistToggle}
                     variant="outline"
                     className="h-14 px-5 border-2"
-                    style={{ borderColor: '#141414', color: '#141414' }}
+                    style={{ borderColor: 'hsl(var(--grey-ink-strong))', color: 'hsl(var(--grey-ink-strong))' }}
                   >
                     <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
                   </Button>
@@ -727,41 +727,41 @@ export default function ProductDetailPageEnhanced() {
                     onClick={handleShare}
                     variant="outline"
                     className="h-14 px-5 border-2"
-                    style={{ borderColor: '#141414', color: '#141414' }}
+                    style={{ borderColor: 'hsl(var(--grey-ink-strong))', color: 'hsl(var(--grey-ink-strong))' }}
                   >
                     <Share2 className="w-5 h-5" />
                   </Button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
+              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-line">
                 <div className="text-center">
-                  <Truck className="w-10 h-10 mx-auto mb-2" style={{ color: '#141414' }} />
-                  <p className="text-xs font-roboto font-medium mb-1" style={{ color: '#141414' }}>
+                  <Truck className="w-10 h-10 mx-auto mb-2" style={{ color: 'hsl(var(--grey-ink-strong))' }} />
+                  <p className="text-xs font-roboto font-medium mb-1" style={{ color: 'hsl(var(--grey-ink-strong))' }}>
                     Enviament Gratuït
                   </p>
-                  <p className="text-xs text-gray-600">comandes +50€</p>
+                  <p className="text-xs text-ink-2">comandes +50€</p>
                 </div>
                 <div className="text-center">
-                  <Clock className="w-10 h-10 mx-auto mb-2" style={{ color: '#141414' }} />
-                  <p className="text-xs font-roboto font-medium mb-1" style={{ color: '#141414' }}>
+                  <Clock className="w-10 h-10 mx-auto mb-2" style={{ color: 'hsl(var(--grey-ink-strong))' }} />
+                  <p className="text-xs font-roboto font-medium mb-1" style={{ color: 'hsl(var(--grey-ink-strong))' }}>
                     Producció 2-5 dies
                   </p>
-                  <p className="text-xs text-gray-600">print on demand</p>
+                  <p className="text-xs text-ink-2">print on demand</p>
                 </div>
                 <div className="text-center">
-                  <RotateCcw className="w-10 h-10 mx-auto mb-2" style={{ color: '#141414' }} />
-                  <p className="text-xs font-roboto font-medium mb-1" style={{ color: '#141414' }}>
+                  <RotateCcw className="w-10 h-10 mx-auto mb-2" style={{ color: 'hsl(var(--grey-ink-strong))' }} />
+                  <p className="text-xs font-roboto font-medium mb-1" style={{ color: 'hsl(var(--grey-ink-strong))' }}>
                     Devolucions 14 dies
                   </p>
-                  <p className="text-xs text-gray-600">sense preguntes</p>
+                  <p className="text-xs text-ink-2">sense preguntes</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="mt-16 space-y-6">
-            <div className="border-b border-gray-200">
+            <div className="border-b border-line">
               <div className="flex gap-8">
                 {['description', 'specs', 'reviews', 'faq'].map((tab) => (
                   <button
@@ -770,7 +770,7 @@ export default function ProductDetailPageEnhanced() {
                     className={`pb-4 font-oswald font-semibold uppercase tracking-wider transition-colors ${
                       activeTab === tab
                         ? 'border-b-2 border-foreground text-foreground'
-                        : 'text-gray-500 hover:text-foreground'
+                        : 'text-ink-soft hover:text-foreground'
                     }`}
                   >
                     {tab === 'description' && 'Descripció'}
@@ -856,37 +856,37 @@ export default function ProductDetailPageEnhanced() {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <h3 className="font-oswald font-semibold text-lg uppercase mb-4 text-gray-900">Dimensions i capacitat</h3>
+                    <h3 className="font-oswald font-semibold text-lg uppercase mb-4 text-ink-strong">Dimensions i capacitat</h3>
                     {Object.entries({
                       'Capacitat': productSpecs.capacity,
                       'Alçada': productSpecs.height,
                       'Diàmetre': productSpecs.diameter,
                       'Pes': productSpecs.weight
                     }).map(([key, value]) => (
-                      <div key={key} className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="font-roboto text-gray-600">{key}</span>
-                        <span className="font-roboto font-semibold text-gray-900">{value}</span>
+                      <div key={key} className="flex justify-between py-2 border-b border-line">
+                        <span className="font-roboto text-ink-2">{key}</span>
+                        <span className="font-roboto font-semibold text-ink-strong">{value}</span>
                       </div>
                     ))}
                   </div>
 
                   <div className="space-y-3">
-                    <h3 className="font-oswald font-semibold text-lg uppercase mb-4 text-gray-900">Materials i acabats</h3>
+                    <h3 className="font-oswald font-semibold text-lg uppercase mb-4 text-ink-strong">Materials i acabats</h3>
                     {Object.entries({
                       'Material': productSpecs.material,
                       'Acabat': productSpecs.finish,
                       'Zona d\'impressió': productSpecs.printArea,
                       'Durabilitat': productSpecs.durability
                     }).map(([key, value]) => (
-                      <div key={key} className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="font-roboto text-gray-600">{key}</span>
-                        <span className="font-roboto font-semibold text-gray-900 text-right">{value}</span>
+                      <div key={key} className="flex justify-between py-2 border-b border-line">
+                        <span className="font-roboto text-ink-2">{key}</span>
+                        <span className="font-roboto font-semibold text-ink-strong text-right">{value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-6">
+                <div className="mt-8 bg-paper-soft border border-line rounded-lg p-6">
                   <h3 className="font-oswald font-semibold text-lg uppercase mb-4 flex items-center gap-2">
                     <Droplet className="w-5 h-5 text-blue-600" />
                     Instruccions de cura
@@ -928,10 +928,10 @@ export default function ProductDetailPageEnhanced() {
                     <p className="font-oswald font-semibold text-sm text-green-900">RENTAVAIXELLES</p>
                     <p className="text-xs text-green-700">Cicle superior</p>
                   </div>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-center">
-                    <Globe className="w-8 h-8 mx-auto mb-2 text-slate-600" />
-                    <p className="font-oswald font-semibold text-sm text-slate-900">ORIGEN</p>
-                    <p className="text-xs text-slate-700">{productSpecs.origin}</p>
+                  <div className="bg-paper-soft border border-line rounded-lg p-4 text-center">
+                    <Globe className="w-8 h-8 mx-auto mb-2 text-ink-2" />
+                    <p className="font-oswald font-semibold text-sm text-ink-strong">ORIGEN</p>
+                    <p className="text-xs text-ink-2">{productSpecs.origin}</p>
                   </div>
                 </div>
               </div>
@@ -946,15 +946,15 @@ export default function ProductDetailPageEnhanced() {
                       <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
                       <span className="font-oswald text-2xl font-bold">4.8</span>
                     </div>
-                    <span className="text-sm font-roboto text-gray-600">(127 valoracions)</span>
+                    <span className="text-sm font-roboto text-ink-2">(127 valoracions)</span>
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-5 gap-4 mb-8 p-6 bg-gray-50 rounded-lg">
+                <div className="grid md:grid-cols-5 gap-4 mb-8 p-6 bg-paper-soft rounded-lg">
                   {[5, 4, 3, 2, 1].map((stars) => (
                     <div key={stars} className="flex items-center gap-2">
-                      <span className="text-sm font-roboto text-gray-700">{stars}★</span>
-                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <span className="text-sm font-roboto text-ink-2">{stars}★</span>
+                      <div className="flex-1 bg-paper-tint rounded-full h-2">
                         <div
                           className="bg-yellow-400 h-2 rounded-full"
                           style={{
@@ -962,7 +962,7 @@ export default function ProductDetailPageEnhanced() {
                           }}
                         />
                       </div>
-                      <span className="text-xs font-roboto text-gray-600">
+                      <span className="text-xs font-roboto text-ink-2">
                         {stars === 5 ? '95' : stars === 4 ? '25' : stars === 3 ? '4' : stars === 2 ? '2' : '1'}
                       </span>
                     </div>
@@ -971,7 +971,7 @@ export default function ProductDetailPageEnhanced() {
 
                 <div className="space-y-6">
                   {reviews.map((review) => (
-                    <div key={review.id} className="border border-gray-200 rounded-lg p-6">
+                    <div key={review.id} className="border border-line rounded-lg p-6">
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
@@ -990,16 +990,16 @@ export default function ProductDetailPageEnhanced() {
                                   className={`w-4 h-4 ${
                                     star <= review.rating
                                       ? 'fill-yellow-400 text-yellow-400'
-                                      : 'text-gray-300'
+                                      : 'text-muted-foreground'
                                   }`}
                                 />
                               ))}
                             </div>
-                            <span className="text-sm font-roboto text-gray-500">{review.date}</span>
+                            <span className="text-sm font-roboto text-ink-soft">{review.date}</span>
                           </div>
                         </div>
                       </div>
-                      <p className="font-roboto text-base text-gray-700">{review.comment}</p>
+                      <p className="font-roboto text-base text-ink-2">{review.comment}</p>
                     </div>
                   ))}
                 </div>
@@ -1008,7 +1008,7 @@ export default function ProductDetailPageEnhanced() {
                   <Button
                     variant="outline"
                     className="border-2"
-                    style={{ borderColor: '#141414', color: '#141414' }}
+                    style={{ borderColor: 'hsl(var(--grey-ink-strong))', color: 'hsl(var(--grey-ink-strong))' }}
                   >
                     Veure totes les valoracions
                   </Button>
@@ -1023,21 +1023,21 @@ export default function ProductDetailPageEnhanced() {
                   {faqs.map((faq, index) => (
                     <div
                       key={index}
-                      className="border border-gray-200 rounded-lg overflow-hidden"
+                      className="border border-line rounded-lg overflow-hidden"
                     >
                       <button
                         onClick={() => toggleSection(`faq-${index}`)}
-                        className="w-full flex items-center justify-between p-5 bg-white hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center justify-between p-5 bg-paper hover:bg-paper-soft transition-colors"
                       >
                         <span className="font-oswald font-semibold text-left">{faq.question}</span>
                         <ChevronDown
-                          className={`w-5 h-5 text-gray-600 transition-transform flex-shrink-0 ml-4 ${
+                          className={`w-5 h-5 text-ink-2 transition-transform flex-shrink-0 ml-4 ${
                             expandedSection === `faq-${index}` ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
                       {expandedSection === `faq-${index}` && (
-                        <div className="p-5 pt-0 font-roboto text-gray-700">
+                        <div className="p-5 pt-0 font-roboto text-ink-2">
                           {faq.answer}
                         </div>
                       )}
@@ -1070,33 +1070,33 @@ export default function ProductDetailPageEnhanced() {
             )}
           </div>
 
-          <div className="mt-16 pt-12 border-t border-gray-200">
+          <div className="mt-16 pt-12 border-t border-line">
             <div className="grid md:grid-cols-4 gap-8">
               <div className="text-center">
-                <Shield className="w-12 h-12 mx-auto mb-3 text-gray-700" />
+                <Shield className="w-12 h-12 mx-auto mb-3 text-ink-2" />
                 <h3 className="font-oswald font-bold text-sm uppercase mb-2">Compra Segura</h3>
-                <p className="text-sm font-roboto text-gray-600">
+                <p className="text-sm font-roboto text-ink-2">
                   Pagament encriptat i protegit
                 </p>
               </div>
               <div className="text-center">
-                <Truck className="w-12 h-12 mx-auto mb-3 text-gray-700" />
+                <Truck className="w-12 h-12 mx-auto mb-3 text-ink-2" />
                 <h3 className="font-oswald font-bold text-sm uppercase mb-2">Enviament Ràpid</h3>
-                <p className="text-sm font-roboto text-gray-600">
+                <p className="text-sm font-roboto text-ink-2">
                   Gratuït en comandes +50€
                 </p>
               </div>
               <div className="text-center">
-                <RotateCcw className="w-12 h-12 mx-auto mb-3 text-gray-700" />
+                <RotateCcw className="w-12 h-12 mx-auto mb-3 text-ink-2" />
                 <h3 className="font-oswald font-bold text-sm uppercase mb-2">Devolució Fàcil</h3>
-                <p className="text-sm font-roboto text-gray-600">
+                <p className="text-sm font-roboto text-ink-2">
                   14 dies per canviar d'opinió
                 </p>
               </div>
               <div className="text-center">
-                <Leaf className="w-12 h-12 mx-auto mb-3 text-gray-700" />
+                <Leaf className="w-12 h-12 mx-auto mb-3 text-ink-2" />
                 <h3 className="font-oswald font-bold text-sm uppercase mb-2">Sostenible</h3>
-                <p className="text-sm font-roboto text-gray-600">
+                <p className="text-sm font-roboto text-ink-2">
                   Producció responsable
                 </p>
               </div>
@@ -1105,21 +1105,21 @@ export default function ProductDetailPageEnhanced() {
         </div>
 
         {showGalleryModal && (
-          <div className="fixed inset-0 z-[20000] bg-black/95 flex items-center justify-center">
+          <div className="fixed inset-0 z-[20000] bg-ink-pure/95 flex items-center justify-center">
             <button
               onClick={closeGallery}
-              className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-3 rounded-full transition-colors"
+              className="absolute top-4 right-4 bg-paper/10 hover:bg-paper/20 p-3 rounded-full transition-colors"
               aria-label="Tancar galeria"
             >
-              <X className="h-6 w-6 text-white" />
+              <X className="h-6 w-6 text-paper" />
             </button>
 
             <button
               onClick={prevGalleryImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-4 rounded-full transition-colors"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-paper/10 hover:bg-paper/20 p-4 rounded-full transition-colors"
               aria-label="Imatge anterior"
             >
-              <ChevronLeft className="h-8 w-8 text-white" />
+              <ChevronLeft className="h-8 w-8 text-paper" />
             </button>
 
             <div className="max-w-7xl max-h-[90vh] mx-auto px-4">
@@ -1131,26 +1131,26 @@ export default function ProductDetailPageEnhanced() {
                   e.target.src = '/placeholder-product.svg';
                 }}
               />
-              <div className="text-white text-center mt-4 font-oswald">
+              <div className="text-paper text-center mt-4 font-oswald">
                 {selectedImageIndex + 1} / {product.images.length}
               </div>
             </div>
 
             <button
               onClick={nextGalleryImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-4 rounded-full transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-paper/10 hover:bg-paper/20 p-4 rounded-full transition-colors"
               aria-label="Imatge següent"
             >
-              <ChevronRight className="h-8 w-8 text-white" />
+              <ChevronRight className="h-8 w-8 text-paper" />
             </button>
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/50 p-3 rounded-lg max-w-[90vw] overflow-x-auto">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-ink-pure/50 p-3 rounded-lg max-w-[90vw] overflow-x-auto">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
                   className={`w-16 h-16 rounded overflow-hidden transition-all flex-shrink-0 ${
-                    idx === selectedImageIndex ? 'ring-2 ring-white scale-110' : 'opacity-50 hover:opacity-100'
+                    idx === selectedImageIndex ? 'ring-2 ring-line scale-110' : 'opacity-50 hover:opacity-100'
                   }`}
                 >
                   <img

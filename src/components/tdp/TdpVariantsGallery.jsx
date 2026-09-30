@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
+import { tshirtSrc } from '@/utils/placeholders';
 
 const PAUTA_GUTTER_X = '22.5px';
 const PAUTA_GUTTER_Y = '3px';
@@ -10,7 +11,7 @@ const PAUTA_FIRST_ROW_EXTRA_PX = 4;
 const DEFAULT_DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna";
 
 const DEFAULT_IMAGE_SRC =
-  '/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_white_gpr-4-0_front.webp';
+  tshirtSrc('white');
 
 const DEFAULT_VARIANTS = [
   { variant: 'v3', label: 'v3', editableIdPrefix: 'tdp-gallery-v3' },
@@ -61,7 +62,7 @@ function TdpVariantsGallery({
               style={{
                 gridColumn: parentGridColumn,
                 width: '100%',
-                border: '2px dashed #cbd5e1', // GRIS: Columna buida
+                border: '2px dashed hsl(var(--grey-line-strong))', // GRIS: Columna buida
               }}
             />
           );
@@ -113,7 +114,7 @@ function TdpVariantsGallery({
                   fontSize: '11px',
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: '#475059',
+                  color: 'hsl(var(--grey-ink-2))',
                   zIndex: 5,
                 }}
               >

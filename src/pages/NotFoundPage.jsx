@@ -27,18 +27,18 @@ const NotFoundPage = () => {
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-9xl font-bold font-oswald mb-4"
-            style={{ color: '#141414' }}
+            style={{ color: 'hsl(var(--grey-ink-strong))' }}
           >
             {texts.notFound.number}
           </motion.h1>
 
           {/* Title */}
-          <h2 className="text-2xl sm:text-3xl font-bold font-oswald mb-4" style={{ color: '#141414' }}>
+          <h2 className="text-2xl sm:text-3xl font-bold font-oswald mb-4" style={{ color: 'hsl(var(--grey-ink-strong))' }}>
             {texts.notFound.title}
           </h2>
 
           {/* Description */}
-          <p className="text-gray-600 mb-8 font-roboto">
+          <p className="text-ink-2 mb-8 font-roboto">
             {texts.notFound.message}
           </p>
 
@@ -46,14 +46,14 @@ const NotFoundPage = () => {
           <div className="space-y-4">
             <Link
               to="/"
-              className="block w-full bg-gray-900 text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors font-oswald uppercase tracking-wider"
+              className="block w-full bg-ink-strong text-paper px-6 py-3 rounded-md hover:bg-ink transition-colors font-oswald uppercase tracking-wider"
             >
               {texts.notFound.backHome}
             </Link>
 
             <Link
               to="/first-contact"
-              className="block w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors font-oswald uppercase tracking-wider"
+              className="block w-full border border-line-strong text-ink-2 px-6 py-3 rounded-md hover:bg-paper-soft transition-colors font-oswald uppercase tracking-wider"
             >
               {texts.notFound.viewCollections}
             </Link>

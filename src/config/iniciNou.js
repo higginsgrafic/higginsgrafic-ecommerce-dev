@@ -263,7 +263,7 @@ export const HERO_DIBUIX_MIDA = {
   'austen/unsociable-and-taciturn-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
   'austen/i-admire-and-love-you-b-stripe.webp': { escriptori: 12.16, tauleta: 6 },
   'austen/you-have-bewitched-me-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
-  'austen/you-must-allow-me-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
+  'austen/i-admire-and-love-you-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
   'austen/looking_for_my_darcy/color/solid/blue-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
   'austen/looking_for_my_darcy/color/solid/fuchsia-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
   'austen/looking_for_my_darcy/color/solid/red-solid-stripe.webp': { escriptori: 19, tauleta: 19 },

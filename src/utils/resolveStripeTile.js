@@ -107,10 +107,21 @@ export function resolveForItem(it, tileVariant, ctx) {
     if (s.includes('/austen/quotes/')) {
       const file = s.split('/').pop() || '';
       const slug = file.toLowerCase().replace(/-b-grid(?=\.webp$)/i, '').replace(/-grid(?=\.webp$)/i, '').replace(/\.webp$/i, '');
-      const whiteStem = slug === 'unsociable-and-taciturn' ? 'i-prefer-to-be' : slug;
-      if (tileVariant === 'white') return `/custom_logos/drawings/images_stripe/austen/quotes/white/${whiteStem}-w-stripe.webp`;
+      // ELS FITXERS DE LA FRANJA ES DIUEN COM ELS DE LA GRAELLA (30/09/2026).
+      //
+      // Ja no cal cap mapa: `austen/quotes/<slug>-b-grid.webp` te el seu
+      // equivalent exacte a `austen/quotes/black/<slug>-b-stripe.webp` (i el
+      // `-w-` a `white/`). Comprovat fitxer a fitxer:
+      //
+      //   i-admire-and-love-you · you-have-bewitched-me · half-agony-half-hope ·
+      //   unsociable-and-taciturn · it-is-a-truth
+      //
+      // (Abans hi havia hagut un mapa perque els noms estaven desplaçats; l'amo
+      // els ha posat al seu lloc i el mapa sobrava. Un mapa de mes tambe creua
+      // els dibuixos.)
+      if (tileVariant === 'white') return `/custom_logos/drawings/images_stripe/austen/quotes/white/${slug}-w-stripe.webp`;
       if (tileVariant === 'color') return `/custom_logos/drawings/images_stripe/austen/quotes/color/${slug}-multi-light-stripe.webp`;
-      return `/custom_logos/drawings/images_stripe/austen/quotes/black/${whiteStem}-b-stripe.webp`;
+      return `/custom_logos/drawings/images_stripe/austen/quotes/black/${slug}-b-stripe.webp`;
     }
     if (s.includes('/austen/crosswords/')) {
       const file = s.split('/').pop() || '';

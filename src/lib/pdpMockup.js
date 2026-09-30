@@ -14,11 +14,13 @@
  *  - Resta (b + w): 'w' si la samarreta és fosca, 'b' si és clara.
  */
 
-import { getMockupPath, COLLECTIONS, INK_BLACK, INK_WHITE, INK_MULTI } from '@/lib/mockupPaths';
+import { getMockupPath, COLLECTIONS, INK_BLACK, INK_WHITE, INK_MULTI, invertLineInk, INK_INVERTS_ON_LIGHT, INK_INVERTS_ON_DARK } from '@/lib/mockupPaths';
+import { tshirtSrc } from '@/utils/placeholders';
 
 // Colors foscos (replicat de homeDrawings.js).
 const DARK_COLORS = new Set([
-  'royal', 'purple', 'navy', 'red', 'irish-green', 'military-green', 'forest-green', 'black',
+  'royal', 'navy', 'red', 'irish-green', 'military-green', 'black',
+  'charcoal', 'dark-chocolate',
 ]);
 
 // Acabats del selector de la PDP ↔ tinta del catàleg.
@@ -47,16 +49,19 @@ export function defaultFinishFor(collectionSlug) {
 
 /**
  * Acabats que es veuen bé segons el to de la samarreta (tenint en compte el
- * negatiu que es força a blanc/negre). S'usa a les graelles de col·lecció per
- * no mostrar mai negre sobre fosc ni blanc sobre clar (poc contrast).
+ * negatiu que es força als colors clars i foscos). S'usa a les graelles de
+ * col·lecció per no mostrar mai negre sobre fosc ni blanc sobre clar (poc
+ * contrast).
  *  - COLOR (multi): sempre visible.
- *  - samarreta blanca/negra: BLANC i NEGRE acaben en negatiu visible → tots.
- *  - fosca (no negra): BLANC (→ tinta blanca) visible; NEGRE no.
- *  - clara (no blanca): NEGRE (→ tinta negra) visible; BLANC no.
+ *  - samarreta que s'inverteix (white, ice-grey i rs-sport-grey de clares;
+ *    black, navy, dark-chocolate i charcoal de fosques): BLANC i NEGRE acaben
+ *    tots dos en tinta visible → tots.
+ *  - altres fosques: BLANC (→ tinta blanca) visible; NEGRE no.
+ *  - altres clares: NEGRE (→ tinta negra) visible; BLANC no.
  */
 function visibleFinishesFor(collectionSlug, shirtColor) {
   const avail = availableFinishesFor(collectionSlug);
-  if (shirtColor === 'white' || shirtColor === 'black') return avail;
+  if (INK_INVERTS_ON_LIGHT.includes(shirtColor) || INK_INVERTS_ON_DARK.includes(shirtColor)) return avail;
   const isDark = DARK_COLORS.has(shirtColor);
   return avail.filter((f) => {
     if (f === 'COLOR') return true;
@@ -94,9 +99,9 @@ export function collectionGridImageFor(collectionSlug, productRoute, shirtColor,
 // carrusel de les col·leccions "només color" recorre aquest ordre començant pel
 // color de la pròpia targeta i mostra un total de SHIRT_COLOR_CAROUSEL_COUNT.
 const SHIRT_COLOR_ORDER = [
-  'white', 'light-blue', 'royal', 'navy', 'purple', 'light-pink',
-  'daisy', 'gold', 'red', 'kiwi', 'irish-green', 'military-green',
-  'forest-green', 'black',
+  'white', 'light-blue', 'royal', 'navy', 'irish-green', 'military-green',
+  'daisy', 'gold', 'red', 'dark-chocolate', 'ice-grey', 'rs-sport-grey',
+  'charcoal', 'black',
 ];
 const SHIRT_COLOR_CAROUSEL_COUNT = 5;
 
@@ -134,18 +139,21 @@ export function collectionGridHoverVariantsFor(collectionSlug, productRoute, shi
       const img = tdpImageFor(collectionSlug, productRoute, shirtColor, finish);
       if (img && !urls.includes(img)) urls.push(img);
     }
-    // Regla obligatòria per a samarretes blanca/negra: incloure sempre el
-    // negatiu complet (samarreta + tinta oposades), independentment de si la
-    // col·lecció té versió color.
-    //  - Samarreta BLANCA → afegim tinta blanca sobre samarreta negra (w+black).
-    //  - Samarreta NEGRA  → afegim tinta negra sobre samarreta blanca (b+white).
-    if (inks.includes(INK_WHITE) && shirtColor === 'white') {
-      const whiteVersion = tdpImageFor(collectionSlug, productRoute, 'black', 'BLANC');
-      if (whiteVersion && !urls.includes(whiteVersion)) urls.push(whiteVersion);
-    }
-    if (inks.includes(INK_BLACK) && shirtColor === 'black') {
-      const blackVersion = tdpImageFor(collectionSlug, productRoute, 'white', 'NEGRE');
-      if (blackVersion && !urls.includes(blackVersion)) urls.push(blackVersion);
+    // Regla obligatòria per a les samarretes que s'inverteixen (white, ice-grey
+    // i rs-sport-grey de clares; black, navy, dark-chocolate i charcoal de
+    // fosques): incloure sempre el negatiu complet (samarreta + tinta
+    // oposades), independentment de si la col·lecció té versió color.
+    //  - Samarreta CLARA → afegim la fosca amb la seva tinta.
+    //  - Samarreta FOSCA → afegim la blanca amb tinta negra.
+    const PARELLA_INVERSA = [
+      { color: 'white', inks: INK_INVERTS_ON_LIGHT, contrari: 'black', acabat: 'BLANC' },
+      { color: 'black', inks: INK_INVERTS_ON_DARK, contrari: 'white', acabat: 'NEGRE' },
+    ];
+    for (const { color, inks: inversos, contrari, acabat } of PARELLA_INVERSA) {
+      if (!inversos.includes(shirtColor)) continue;
+      if (!inks.includes(acabat === 'BLANC' ? INK_WHITE : INK_BLACK)) continue;
+      const versio = tdpImageFor(collectionSlug, productRoute, contrari, acabat);
+      if (versio && !urls.includes(versio)) urls.push(versio);
     }
   }
   return urls;
@@ -173,7 +181,7 @@ const DESIGN_MAP = {
 const NO_MOCKUP = new Set([]);
 
 const BLANK_SHIRT = (color) =>
-  `/placeholders/apparel/t-shirt/gildan_5000/gildan-5000_t-shirt_crewneck_unisex_heavyWeight_xl_${color}_gpr-4-0_front.webp`;
+  tshirtSrc(color);
 
 /**
  * Resol la tinta efectiva a partir de l'acabat seleccionat i el color de
@@ -194,9 +202,9 @@ function resolveInk(collectionSlug, shirtColor, finish) {
     : defaultFinishFor(collectionSlug);
   let ink = FINISH_TO_INK[effFinish];
 
-  // Excepció blanc/negre (Opció B): força el negatiu només per a tinta de línia.
-  if (ink === INK_WHITE && shirtColor === 'white') ink = INK_BLACK;
-  else if (ink === INK_BLACK && shirtColor === 'black') ink = INK_WHITE;
+  // Excepció blanc/negre/navy/dark-chocolate (Opció B): força el negatiu només
+  // per a tinta de línia.
+  ink = invertLineInk(ink, shirtColor);
 
   if (!inks.includes(ink)) ink = inks[0];
   return ink;
@@ -280,7 +288,7 @@ export function productThumbnailFor(product, shirtColor = 'white') {
   }
 
   const onlyMulti = collection === 'cube';
-  const ink = onlyMulti ? 'multi' : DARK_COLORS.has(shirtColor) ? 'w' : 'b';
+  const ink = onlyMulti ? 'multi' : invertLineInk(DARK_COLORS.has(shirtColor) ? INK_WHITE : INK_BLACK, shirtColor);
 
   for (const route of candidates) {
     if (!route || NO_MOCKUP.has(`${collection}/${route}`)) continue;
