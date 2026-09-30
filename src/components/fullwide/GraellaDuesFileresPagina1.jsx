@@ -94,6 +94,9 @@ export default function GraellaDuesFileresPagina1({
    *  (selector + fletxes): la graella ha de fer exactament la seva alcada. */
   alcadaCarruselPx = null,
   escala = 1,
+  /** La graella, en bloc, centrada al selector (a 1024). Vegeu
+   *  `CercadorDibuixosGraella`. */
+  centraFilesEnBloc = false,
 }) {
   // LA PECA, EL MES GRAN POSSIBLE FINS A LA DE LA PAGINA 2 (45 unitats). Amb
   // poques peces (7 a FIRST CONTACT) el carril en dona per a mes, i la de la
@@ -147,6 +150,7 @@ export default function GraellaDuesFileresPagina1({
         // bloc de la dreta (`mida`), que es qui ha de coincidir amb el selector
         // i les fletxes. El pare la passa feta.
         alcadaCarruselPx={alcadaCarruselPx}
+        centraFilesEnBloc={centraFilesEnBloc}
         midaSelector={midaSelector}
         reservaDreta={0}
         carrusel

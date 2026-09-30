@@ -74,6 +74,13 @@ function HeroInici() {
   // amb `auto 100 %` de l'alcada de la franja, i si l'alcada no canvia, la
   // samarreta tampoc.
   const esHeroSeccioAmpla = esApaissada && ampleFinestra > 1200 && ampleFinestra <= 1366;
+  // I LA DE 1024, A TOT EL SEGON CARRIL (02/10/2026). En Marc: «Eixampla la hero
+  // fins l'amplada del segon carril». A 1024 el carril de la pagina fa 939,2 px
+  // (el del header, el bloc de la p1, la franja i les segones guies) i la hero hi
+  // ha de caure de vora a vora, com a 1440 i a 1920: el seu coixi passa a zero i
+  // la caixa fa el 100 % del carril. Nome's alla: a la resta de la banda estreta
+  // es queda com estava.
+  const esHeroCarrilSencer1024 = esApaissada && ampleFinestra >= 1000 && ampleFinestra <= 1050;
   // A LA VISTA 1024, EL TRACKING DELS NOMS A LA MEITAT (02/10/2026). En Marc: «A
   // la vista 1024 redueix el traking de les colleccions de la hero a la meitat»:
   // allo on els noms hi van justos, el `letterSpacing` passa de 0,18em a 0,09em.
@@ -99,7 +106,7 @@ function HeroInici() {
         //   110 % (petites)  x 0,75 = 82,5 % -> 8,75 %
         //
         // I a la vertical no hi ha aire: la caixa fa el carril.
-        paddingInline: esVertical
+        paddingInline: (esVertical || esHeroCarrilSencer1024)
           ? 0
           : (esHeroCarrilSencer || esHeroCarrilSencer1920 || esHeroSeccioAmpla
             ? '12.5%'

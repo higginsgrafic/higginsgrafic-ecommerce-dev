@@ -9,6 +9,7 @@
 //
 // Tot en coordenades de finestra, que son les que fan servir les guies fixes.
 import { chromium } from '@playwright/test';
+import { FRACCIO_COSSOS_FRANJA, FRACCIO_MARGE_ESQUERRE_FRANJA } from '../src/config/stripeCalibrations.js';
 const w = Number(process.argv[2] || 1024), h = Number(process.argv[3] || 768);
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1 });
@@ -48,6 +49,17 @@ if (c != null && d != null) {
   for (const [k, v] of [['stripeP1', r.stripeP1], ['stripeP2', r.stripeP2], ['blocP1', r.blocP1]]) {
     if (!v) continue;
     console.log(`${k}: esq ${(v.x - c).toFixed(2)}  dreta ${(v.d - d).toFixed(2)}  ample ${(v.w - (d - c)).toFixed(2)}`);
+  }
+  // LES CINTURES (28/... 02/10/2026). En Marc: «Alinea la stripe per les
+  // cintures de les samarretes!». La cintura esquerra cau a `65/2866` de la
+  // imatge i la dreta a `65/2866 + 2740/2866`: amb les cintures al carril, la
+  // IMATGE es mes ampla que el carril (les manigues hi surten).
+  if (r.stripeP1) {
+    const marge = FRACCIO_MARGE_ESQUERRE_FRANJA * r.stripeP1.w;
+    const cinturaEsq = r.stripeP1.x + marge;
+    const cinturaDret = cinturaEsq + FRACCIO_COSSOS_FRANJA * r.stripeP1.w;
+    console.log(`CINTURES p1: esq ${(cinturaEsq - c).toFixed(2)}  dreta ${(cinturaDret - d).toFixed(2)}  `
+      + `(cintura ${cinturaEsq.toFixed(2)}..${cinturaDret.toFixed(2)} contra carril ${c.toFixed(2)}..${d.toFixed(2)})`);
   }
 }
 await ctx.close();

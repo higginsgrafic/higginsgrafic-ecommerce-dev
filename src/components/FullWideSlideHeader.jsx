@@ -122,6 +122,15 @@ function FullWideSlideHeader({
     && !isLandscapeTablet
     && window.innerWidth >= 768 && window.innerWidth <= 1366
     && window.innerWidth >= window.innerHeight;
+  // A 1024 (l'ajust de la pagina 1) EL CARRIL DE LA PAGINA ES EL QUE MANA
+  // (02/10/2026). En Marc: «Alinea el cadenat a la dreta del segon carril». El
+  // segon carril es `min(939.2px, 100vw - 80px)` centrat: el del header, la
+  // hero, el bloc de la p1 i les segones guies verdes. A la resta de mides el
+  // cadenat segueix a la dreta del carril del megaslide, que es la vora del
+  // panell.
+  const esCarrilPagina1024 = typeof window !== 'undefined'
+    && window.innerWidth >= 1000 && window.innerWidth <= 1050
+    && window.innerWidth >= window.innerHeight;
   const location = useLocation();
   const navigate = useNavigate();
   const { products: contextProducts } = useProductContext();
@@ -3748,7 +3757,20 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // sobre aquesta `left`, i per aixo se li descompta la meitat de la
             // seva amplada: el que queda a la vora del carril es la SEVA vora
             // dreta.
-            left: `calc(50% + var(--hg-mega-w, 0px) / 2 - ${CADENAT_AMPLADA_PX / 2}px)`,
+            //
+            // A 1024, LA DRETA DEL SEGON CARRIL (02/10/2026). En Marc: «Alinea
+            // el cadenat a la dreta del segon carril»: alla el carril de la
+            // pagina es `min(939.2px, 100vw - 80px)` (el del header, la hero i
+            // el bloc de la p1), i es alla on acaba la vora del panell.
+            //
+            // AMB `100vw` I NO AMB `50%` (02/10/2026): el carril del megaslide
+            // va centrat a l'amplada de MAQUETACIO (`document.body.clientWidth`,
+            // que reserva la barra) i el de la pagina a la FINESTRA (`100vw`), que
+            // es el que fan servir les segones guies. Amb `50%` el cadenat queia
+            // 7,5 px a l'esquerra de la vora del carril a 1024 (mesurat).
+            left: esCarrilPagina1024
+              ? `calc((100vw + min(939.2px, calc(100vw - 80px))) / 2 - ${CADENAT_AMPLADA_PX / 2}px)`
+              : `calc(50% + var(--hg-mega-w, 0px) / 2 - ${CADENAT_AMPLADA_PX / 2}px)`,
             // El cadenat surt de sota el panell (vegeu mega-cadenat-surt) i
             // queda just a sota del separador.
             top: `${lockBtnTop + CADE_BAIXADA_PX}px`,
@@ -3779,13 +3801,26 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             aria-label={megaLocked ? 'Desbloca el megaslide' : 'Bloca el megaslide'}
           >
             {/* LA PLACA: el dibuix de la casa, sense el cadenat (el porta el
-                component, injectat, des del 02/10/2026). */}
+                component, injectat, des del 02/10/2026).
+
+                I AMB LA SEVA OMBRA (02/10/2026). En Marc: «afegeix-hi l'ombra
+                que s'ha perdut». Quan la placa era un boto de CSS (cercle amb
+                vora i fons) l'ombra la feia `shadow-lg`; ara es aquest dibuix, i
+                l'ombra li ha de resseguir la SILUETA (la placa te forma de U: es
+                oberta per dalt, on va enganxada al panell), o sigui que va amb
+                `drop-shadow` i no amb una ombra de caixa, que hi pintaria el
+                rectangle del fitxer. */}
             <img
               src="/custom_logos/icons/cadenat.svg"
               alt=""
               aria-hidden="true"
               draggable={false}
-              style={{ width: CADENAT_AMPLADA_PX, height: 'auto', display: 'block' }}
+              style={{
+                width: CADENAT_AMPLADA_PX,
+                height: 'auto',
+                display: 'block',
+                filter: 'drop-shadow(0 5px 6px rgba(0, 0, 0, 0.18))',
+              }}
             />
             {/* EL CADENAT, INJECTAT (02/10/2026, ho va demanar l'amo: «Trec el
                 cadenat de l'svg i l'hi poses tu injectat»). Es un SVG en línia i

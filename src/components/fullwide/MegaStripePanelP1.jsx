@@ -17,6 +17,7 @@ import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
   AJUST_FRANJA_ESCRIPTORI_PX,
   PAGINA1_AJUST_FRANJA_PX,
+  PAGINA1_AIRE_SOTA_BLOC_1024_PX,
   PAGINA1_GAP_DRETA_PX,
   PAGINA1_TOP_FILERA_PX,
   pagina1AlcadaFileraPx,
@@ -567,11 +568,19 @@ function MegaStripePanelP1({
         // la p2 al megaslide) i la de la p1 no en te: a 1024-1366 quedava 18 px
         // mes amunt. El desplacament es ABSOLUT (el que ja tenim mes la diferencia
         // que queda) perque el bucle no oscil·li.
+        //
+        // A 1024 MANA EL SELECTOR (02/10/2026). En Marc: «Alinea el top de les
+        // samarretes a 10 px del bottom del selector»: alla la franja no busca la
+        // Y de la p2 sino que cau 10 px sota el bloc (les fletxes i el selector,
+        // que fan la mateixa alcada). A la resta de la composicio estreta es
+        // queda com estava.
         const vp2 = document.querySelector('[data-mega-page-viewport="2"]');
         const f2 = vp2?.querySelector('[data-stripe-visual-content="2"]');
         const f1 = document.querySelector('[data-mega-page-viewport="1"] [data-stripe-visual-content="1"]');
         if (!f2 || !f1) return;
-        const dy = +(f2.getBoundingClientRect().top - f1.getBoundingClientRect().top).toFixed(1);
+        const dy = esAjust1024P1
+          ? +((bloc.getBoundingClientRect().bottom + PAGINA1_AIRE_SOTA_BLOC_1024_PX) - f1.getBoundingClientRect().top).toFixed(1)
+          : +(f2.getBoundingClientRect().top - f1.getBoundingClientRect().top).toFixed(1);
         setAlcadaBlocEstretaP1((prev) => {
           prevAjustRef.current = prev;
           const dyAplicat = prev?.dy ?? 0;
@@ -610,7 +619,15 @@ function MegaStripePanelP1({
   // (L'`escalaBlocDreta`, el `blocDretaPx` i el `columnaDretaPx` es calculen
   // MES AMUNT, abans del bucle d'alineacio: aquell efecte els fa servir i, si
   // fossin aqui, el lint hi veu un us abans de la declaracio.)
-  const alcadaFileraPx = pagina1AlcadaFileraPx(escalaCarril);
+  // L'ALCADA DE LA FINESTRA DEL CARRUSEL DE LA GRAELLA (02/10/2026). A 1024 les
+  // dues fileres es CENTREN al selector (en Marc: «Centra les dues files al
+  // selector») i la finestra del carrusel es la que demanen les MATEIXES fileres
+  // (`alcadaFila * 2`, el valor per defecte): amb l'alcada de disseny (135) la
+  // graella baixava fins a y204 i la franja, que a 1024 cau 10 px sota el bloc,
+  // la tapava; i amb el costat del bloc (96,5) la primera filera hi quedava
+  // tallada per dalt (en Marc: «La primera fila de la graella està tallada per
+  // dalt»).
+  const alcadaFileraPx = esAjust1024P1 ? null : pagina1AlcadaFileraPx(escalaCarril);
   const gapDretaPx = PAGINA1_GAP_DRETA_PX * escalaCarril;
   // EL TOP DE LA FILERA, EN PX (mesurat: posa la filera de dalt de la graella
   // al centre de la cel·la BLANC del selector).
@@ -708,6 +725,32 @@ function MegaStripePanelP1({
     return () => window.removeEventListener('mega-stripe-full-hit-p1', handler);
   }, [onShirtClick, selectedItem, stripeTileItems, active, shirtColor]);
 
+  // LA PASTILLA BLANCA DEL SELECTOR (02/10/2026). Viu a la CAPA DE LA CAIXA per
+  // anar per sota de l'ombra de la maniga, i a 1024 va DINS de la peça del
+  // selector: alla la peça te el seu propi fons (`hsl(var(--grey-paper-soft))`) i
+  // es pinta en una capa de mes amunt (zIndex 6), o sigui que la pastilla de la
+  // capa de la caixa hi quedava a sota i no es veia — en Marc: «La pastilla
+  // blanca del selector s'ha perdut». Dins de la peça queda per damunt del fons,
+  // i l'ombra (que tambe hi va) li passa per sobre, com a la resta de mides.
+  const capaPastillaBlancaP1 = (
+    <div
+      aria-hidden="true"
+      data-pastilla-p1="1"
+      style={{
+        position: 'absolute',
+        // LA PASTILLA VA AMB EL SELECTOR: a la dreta (meitat dreta) a la
+        // composicio estreta, i a sota (meitat de baix) a la resta.
+        ...(esAjust1024P1
+          ? { right: 0, top: 0, bottom: 0, width: `${blocDretaPx}px` }
+          : (esComposicioEstretaP1
+            ? { right: 0, top: 0, bottom: 0, width: '50%' }
+            : { left: 0, right: 0, bottom: 0, height: '50%' })),
+        pointerEvents: 'none',
+      }}
+    >
+      <PastillaBlancaPagina1 topPct={topPastillaP1Pct} />
+    </div>
+  );
   // LA CAPA DIFOSA DE L'OMBRA DE LA MANIGA (02/10/2026). Es el fons negre difós
   // retallat per la silueta de l'ultima casa del full (`mascaraManigaP1`); viu
   // dins d'un embolcall posicionat, que es qui mana on cau. Es la MATEIXA als
@@ -809,12 +852,43 @@ function MegaStripePanelP1({
               style={{
                 position: 'relative',
                 display: 'flex',
-                alignItems: 'flex-start',
+                // LES DUES FILERES DE LA GRAELLA, CENTRADES AL SELECTOR
+                // (02/10/2026). En Marc: «Centra les dues files al selector». A
+                // 1024 la filera fa l'alcada del bloc (el quadrat del selector) i
+                // la graella, que es una mica mes alta (les dues fileres i el seu
+                // buit), hi queda centrada; a la resta es queda com estava.
+                alignItems: esAjust1024P1 ? 'center' : 'flex-start',
                 width: '100%',
+                ...(esAjust1024P1 ? { height: `${blocDretaPx}px` } : null),
                 marginTop: `${topFileraPx}px`,
               }}
             >
-              <div style={{ flex: '1 1 0%', minWidth: 0, marginRight: `${gapDretaPx}px` }}>
+              {/* EL VIEWPORT DE LA GRAELLA, DE LA VORA ESQUERRA DEL CARRIL DE LA
+                  PAGINA FINS AL SELECTOR (02/10/2026). En Marc: «Obre el viewport
+                  de la graella fins a la part esquerra del segon carril i fins al
+                  selector». A 1024 la graella no viu al carril del megaslide
+                  (605): el seu retall arrenca a la vora esquerra del carril de la
+                  pagina i s'acaba on arrenca el selector, i el porta alla el
+                  MATEIX desplacament que el bloc (`dx`). A la resta de mides, com
+                  sempre. */}
+              <div style={{
+                flex: esAjust1024P1 ? '0 0 auto' : '1 1 0%',
+                minWidth: 0,
+                marginRight: esAjust1024P1 ? 0 : `${gapDretaPx}px`,
+                ...(esAjust1024P1 ? {
+                  // L'amplada de la CAIXA de la graella: el retall (el viewport)
+                  // mes el coixi de 10 px que porta a l'esquerra. El viewport va de
+                  // la vora esquerra del carril de la pagina fins a 10 px ABANS del
+                  // selector (en Marc: «Fes-li un marge al cantó del selector, 10
+                  // px»). El coixi de l'esquerra es compensa amb el desplacament.
+                  width: `${ampleCarrilPaginaP1 - blocDretaPx}px`,
+                  // El retall arrenca 10 px endins de la caixa de la graella (el
+                  // coixi de l'esquerra), o sigui que el desplacament va 10 px mes
+                  // enlla d'on va el bloc perque el RETALL caigui a la vora del
+                  // carril.
+                  ...((alcadaBlocEstretaP1) ? { transform: `translateX(${alcadaBlocEstretaP1.dx - 10}px)` } : null),
+                } : null),
+              }}>
                 <GraellaDuesFileresPagina1
                   items={itemsGraella}
                   onStepper={setStepperP1}
@@ -822,6 +896,7 @@ function MegaStripePanelP1({
                   activeSubcollection={austenSubcollection}
                   escala={esAjust1024P1 ? escalaCarril * 0.75 : escalaCarril}
                   alcadaCarruselPx={alcadaFileraPx}
+                  centraFilesEnBloc={esAjust1024P1}
                   midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
                   onSelectGroup={(collection, subcollection, firstStripeItem) => {
                     // EL CLIC TRIa EL DIBUIX I EL MOSTRA (28/09/2026). En Marc:
@@ -867,7 +942,14 @@ function MegaStripePanelP1({
                   flex: '0 0 auto',
                   width: esAjust1024P1 ? 'min(939.2px, calc(100vw - 80px))' : `${blocDretaPx}px`,
                   minWidth: 0,
-                  position: 'relative',
+                  // A 1024 EL BLOC SURT DEL FLUX (02/10/2026). El bloc fa tot el
+                  // carril de la pagina (939,2) i, com a fill flexible, deixava la
+                  // GRAELLA INTERCALADA amb amplada ZERO (el pare fa 605): en Marc:
+                  // «On és la graella intercalada? No l'aveig». Amb el bloc
+                  // absolut, la graella es queda tota la filera (605) i el bloc hi
+                  // passa per damunt, a la vora dreta del carril de la pagina (el
+                  // desplacament `dx` el porta alla, com abans).
+                  ...(esAjust1024P1 ? { position: 'absolute', left: 0, top: 0 } : { position: 'relative' }),
                   // A 1024, el bloc es desplac, a la dreta del carril de la pagina.
                   ...((esAjust1024P1 && alcadaBlocEstretaP1) ? { transform: `translateX(${alcadaBlocEstretaP1.dx}px)` } : null),
                   // EL BLOC, SENSE CAPA PROPRIA, PER SOTA DE LA FRANJA (28/09/2026).
@@ -963,23 +1045,7 @@ function MegaStripePanelP1({
                     Els BOTONS no es toquen: son a la capa de dalt (`zIndex: 6`),
                     que es la que impedeix que la franja se'ls mengi els clics.
                     Purament decorativa (`pointerEvents: none`). */}
-                <div
-                  aria-hidden="true"
-                  data-pastilla-p1="1"
-                  style={{
-                    position: 'absolute',
-                    // LA PASTILLA VA AMB EL SELECTOR: a la dreta (meitat dreta) a
-                    // la composicio estreta, i a sota (meitat de baix) a la resta.
-                    ...(esAjust1024P1
-                      ? { right: 0, top: 0, bottom: 0, width: `${blocDretaPx}px` }
-                      : (esComposicioEstretaP1
-                        ? { right: 0, top: 0, bottom: 0, width: '50%' }
-                        : { left: 0, right: 0, bottom: 0, height: '50%' })),
-                    pointerEvents: 'none',
-                  }}
-                >
-                  <PastillaBlancaPagina1 topPct={topPastillaP1Pct} />
-                </div>
+                {!esAjust1024P1 ? capaPastillaBlancaP1 : null}
                 {!esAjust1024P1 && ombraManigaP1 && mascaraManigaP1 ? (
                   <div
                     data-maniga-ombra-p1="1"
@@ -1055,10 +1121,17 @@ function MegaStripePanelP1({
                   // i cadascun porta la seva caixa (fons, radi i ombra). A la
                   // resta, el quadrat conjunt de sempre.
                   flexDirection: (esAjust1024P1 || esComposicioEstretaP1) ? 'row' : 'column',
-                  justifyContent: esAjust1024P1 ? 'space-between' : 'flex-end',
+                  justifyContent: 'flex-end',
                   alignItems: (esAjust1024P1 || esComposicioEstretaP1) ? 'stretch' : 'flex-end',
                 }}>
-                {/* EL QUADRAT DE DALT: els dos botons de les fletxes. */}
+                {/* A 1024 NO HI HA FLETXES (02/10/2026). En Marc: «Me n'acabo
+                    d'adonar que un dispositiu tàctil no necessita fletxes...
+                    Esborra les fletxes». Aquesta es la composicio de la tauleta
+                    (1024-1366 apaissada), on el carrusel es mou amb el dit: el
+                    quadrat de les fletxes no s'hi munta i el selector queda sol a
+                    la vora dreta del carril de la pagina. A la resta de mides les
+                    fletxes es queden com estaven. */}
+                {!esAjust1024P1 ? (
                 <div style={{
                   position: 'relative',
                   flex: esAjust1024P1 ? '0 0 auto' : '1 1 50%',
@@ -1090,6 +1163,7 @@ function MegaStripePanelP1({
                   onNext={() => stepperP1?.(-1)}
                 />
                 </div>
+                ) : null}
                 {/* EL QUADRAT DE SOTA: els tres botons del selector. */}
                 <div style={{
                   position: 'relative',
@@ -1107,6 +1181,7 @@ function MegaStripePanelP1({
                     }
                     : null),
                 }}>
+                {esAjust1024P1 ? capaPastillaBlancaP1 : null}
                 {/* L'OMBRA DE LA MANIGA, AMB LA PEÇA DEL SELECTOR (02/10/2026).
                     En Marc: «Pero ara hi ha les fletxes i els enllacos del
                     selector dins de la mateixa franja i jo els vull separats» i

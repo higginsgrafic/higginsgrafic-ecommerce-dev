@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 import { factorFranjaCarril, ESCALA_CALIBRADA_FRANJA } from '../utils/franjaCarril';
-import { FRACCIO_COSSOS_FRANJA } from '../config/stripeCalibrations';
+import { FRACCIO_COSSOS_FRANJA, FRACCIO_MARGE_ESQUERRE_FRANJA } from '../config/stripeCalibrations';
 import { carrilDeFinestra } from '../components/megaslide/geometriaMegaslide';
 import { getLayoutViewportWidth } from '../utils/layoutMetrics';
 
@@ -22,9 +22,10 @@ import { getLayoutViewportWidth } from '../utils/layoutMetrics';
  *
  * @param {object} filaRef - ref de la filera (l'inline-block que conte la imatge).
  * @param {boolean} actiu - si la franja s'ha d'ajustar al carril.
- * @param {number} [ampleCarrilPaginaPx=0] - l'amplada de la IMATGE de la franja
- *   quan qui la crida vol el CARRIL DE LA PAGINA i no el del megaslide (a 1024,
- *   la pagina 1: vegeu-ho dins de `mesura`). 0 vol dir «el de sempre».
+ * @param {number} [ampleCarrilPaginaPx=0] - l'amplada que han de fer els COSSOS
+ *   (les cintures) de les catorze samarretes quan qui la crida vol el CARRIL DE
+ *   LA PAGINA i no el del megaslide (a 1024, la pagina 1: vegeu-ho dins de
+ *   `mesura`). 0 vol dir «el de sempre».
  * @returns {number} factor que multiplica el calibratge (1 quan no s'hi aplica).
  */
 /**
@@ -200,18 +201,21 @@ export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaP
       const estil = getComputedStyle(document.documentElement);
       // EL CARRIL DE LA PAGINA, QUAN QUI CRIDA LA SAP (02/10/2026).
       //
-      // En Marc: «Acaba d'alinear la stripe p1 a la mida del segon carril». A
-      // 1024 la stripe de la p1 no ha de fer el carril del MEGASLIDE sino el de
-      // la PAGINA (`min(939.2px, 100vw - 80px)`: el del header, la hero i les
-      // segones guies). Qui ho demana passa l'amplada de la IMATGE que vol; el
-      // factor de la franja es calcula sobre els COSSOS, o sigui que es
-      // multiplica per `FRACCIO_COSSOS_FRANJA` abans de passar-lo per
-      // `factorFranjaCarril`. Sense aquest parametre tot queda com estava (la
-      // pagina 2 tambe fa servir aquest ganxo i ha de seguir al carril del
-      // megaslide).
-      const objectiu = ampleCarrilPaginaPx > 0
-        ? ampleCarrilPaginaPx * FRACCIO_COSSOS_FRANJA
-        : ampladaObjectiu(el);
+      // En Marc: «Acaba d'alinear la stripe p1 a la mida del segon carril» i,
+      // en veure que la imatge hi queia pero les samarretes no, «Alinea la
+      // stripe per les cintures de les samarretes!».
+      //
+      // L'objectiu d'aquest ganxo son els COSSOS (les cintures): el factor de
+      // `factorFranjaCarril` fa que els cossos de les catorze samarretes facin
+      // l'amplada que se li passa. A 1024, doncs, s'hi passa l'amplada del
+      // CARRIL DE LA PAGINA (`min(939.2px, 100vw - 80px)`: el del header, la
+      // hero i les segones guies verdes) i la cintura de la primera i de
+      // l'ultima samarreta cauen a les seves vorades. La IMATGE queda MES AMPLA
+      // que el carril (la part que hi sobra son les manigues, que hi surten com
+      // a la resta de composicions). Sense aquest parametre tot queda com
+      // estava (la pagina 2 tambe fa servir aquest ganxo i ha de seguir fent el
+      // carril del megaslide amb les cintures).
+      const objectiu = ampleCarrilPaginaPx > 0 ? ampleCarrilPaginaPx : ampladaObjectiu(el);
       if (!ampleDibuix || !objectiu) return;
       // L'ESCALA CALIBRADA, LLEGIDA DEL DOM I NO LA NOMINAL.
       //
@@ -228,13 +232,19 @@ export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaP
       const nou = factorFranjaCarril(objectiu, ampleDibuix, escala);
       // El centre de la filera: a mig cami entre la vora esquerra del carril i
       // la dreta de les fletxes, que es on ha de caure el centre del dibuix.
+      //
       // Amb el carril de la pagina mana la FINESTRA: el seu carril va centrat a
       // `100vw` (com el header, la hero i les segones guies) i no a l'amplada de
-      // maquetacio del cos, que reserva la barra i esta 7,5 px a l'esquerra a
-      // 1024. El `left` de la filera es mesura des de la vora esquerra del
-      // carril del megaslide: es descompta.
+      // maquetacio del cos, que reserva la barra i queda uns px a l'esquerra.
+      // I la IMATGE no va centrada al carril: va desplaçada el que hi ha de la
+      // seva vora esquerra a la primera CINTURA (FRACCIO_MARGE_ESQUERRE_FRANJA),
+      // que es la que ha de caure a la vora del carril. El `left` de la filera
+      // es mesura des de la vora esquerra del carril del megaslide: es
+      // descompta.
+      const ampleImatge = ampleCarrilPaginaPx / FRACCIO_COSSOS_FRANJA;
+      const carrilEsq = (window.innerWidth - ampleCarrilPaginaPx) / 2;
       const centre = ampleCarrilPaginaPx > 0
-        ? (window.innerWidth / 2) - xCarrilMegaslide()
+        ? carrilEsq - (FRACCIO_MARGE_ESQUERRE_FRANJA * ampleImatge) + (ampleImatge / 2) - xCarrilMegaslide()
         : objectiu / 2;
       // Sense el marge, cada mesura tornaria a pintar i el ResizeObserver no
       // pararia.

@@ -1075,6 +1075,16 @@ export const PAGINA1_GAP_PECA_PX = 26;
 export const PAGINA1_GAP_DRETA_PX = 10;
 
 /**
+ * L'AIRE ENTRE EL BLOC DE LA DRETA I LA FRANJA, A 1024 (02/10/2026).
+ *
+ * En Marc: «Alinea el top de les samarretes a 10 px del bottom del selector». A
+ * la composicio de 1024 la franja no busca la Y de la pagina 2: cau aquests px
+ * sota el bloc (les fletxes i el selector, que fan la mateixa alcada), i el
+ * bucle d'alineacio de `MegaStripePanelP1` es qui ho porta alla.
+ */
+export const PAGINA1_AIRE_SOTA_BLOC_1024_PX = 10;
+
+/**
  * L'AMPLADA del bloc de la dreta (el selector i, a sota, les fletxes).
  *
  * DES DEL 28/09/2026 es la MIDA DEL SELECTOR DE LA PAGINA 2 (60 de disseny,

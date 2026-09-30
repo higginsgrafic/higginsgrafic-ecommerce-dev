@@ -425,6 +425,13 @@ export function CercadorDibuixosGraella({
    *  calcul de les dues files: es el cas de la pagina 1, on la graella ha de
    *  fer exactament l'alcada del bloc de la dreta (selector + fletxes). */
   alcadaCarruselPx = null,
+  /** LA GRAELLA, EN BLOC, CENTRADA AL SELECTOR (02/10/2026). A 1024 el selector
+   *  es HORITZONTAL (el quadrat BLANC/COLOR/NEGRE va al costat de la graella) i
+   *  els desnivells de les files —que les centren a les seves caselles— no hi
+   *  volen dir res: amb aixo les dues files van a la seva separacio de disseny i
+   *  el BLOC que formen queda centrat a la finestra (i la finestra, al
+   *  selector). En Marc: «Centra la graella, en bloc, en y, amb el selector». */
+  centraFilesEnBloc = false,
   isPortraitTablet = false,
   isLandscapeTablet = false,
   fontBoost = 0,
@@ -839,8 +846,12 @@ export function CercadorDibuixosGraella({
               // 34,1 — o sigui que la fila de dalt no podia quadrar amb el boto
               // BLANC. A la vertical les dues files van a pas de peça, que es el
               // que fa que coincideixin amb BLANC i COLOR del selector.
-              ? alcadaFila - (isPortraitTablet ? 0 : desnivellsLinies.segona) + (senseFletxes ? gapV + DESPLACAMENT_FILES_P1_PX : 0)
-              : -(isPortraitTablet ? 0 : desnivellsLinies.primera) + (senseFletxes ? DESPLACAMENT_FILES_P1_PX : 0)}px`,
+              ? (centraFilesEnBloc
+                ? (alcadaCarrusel - (alcadaFila + dibuixPx)) / 2 + alcadaFila
+                : alcadaFila - (isPortraitTablet ? 0 : desnivellsLinies.segona) + (senseFletxes ? gapV + DESPLACAMENT_FILES_P1_PX : 0))
+              : (centraFilesEnBloc
+                ? (alcadaCarrusel - (alcadaFila + dibuixPx)) / 2
+                : -(isPortraitTablet ? 0 : desnivellsLinies.primera) + (senseFletxes ? DESPLACAMENT_FILES_P1_PX : 0))}px`,
           } : null),
           // Amb `tilesPercent` la tile s'encongeix dins la seva casella
           // (el centre no es mou).
