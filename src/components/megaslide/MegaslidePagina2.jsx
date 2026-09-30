@@ -12,9 +12,11 @@ import {
   desplacamentGrupActiuFranja,
   AIRE_FRANJA_COLLECCIONS_PX,
   esComposicioEstretaMegaslide,
+  pagina1BlocDretaPx,
 } from './geometriaMegaslide.js';
 import { COIX_ENLLAC_COLLECCIONS_PX } from '../fullwide/estilsBlocs.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
+import { SelectorQuadratPagina1, PastillaBlancaPagina1 } from '../fullwide/BlocDretaPagina1.jsx';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
   CercadorColleccionsColumna,
@@ -157,6 +159,38 @@ export default function MegaslidePagina2({
     ample: typeof window !== 'undefined' ? window.innerWidth : 0,
     isLandscapeTablet,
   });
+  // LA PAGINA 2 DE 1024, AL SEGON CARRIL (02/10/2026). En Marc: «Ara hem de fer
+  // la p2 de la 1024» i «La stripe ha de ser de la mida del segon carril, com la
+  // p1»: alla el contenidor de la pagina fa el carril de la pagina
+  // (`min(939.2px, 100vw - 80px)`: el del header, la hero, el bloc de la p1 i les
+  // segones guies) en lloc del carril del megaslide (605), i tot el que hi ha a
+  // dins (el selector, la graella, la tira de colors, els enllacos i la franja de
+  // samarretes) en surt. El contenidor va centrat a la FINESTRA, com la resta
+  // d'aquella composicio: la filera es centra sobre l'amplada de maquetacio del
+  // cos, que reserva la barra, i aixo son uns px de desplacament.
+  const esCarrilPagina1024 = typeof window !== 'undefined'
+    && window.innerWidth >= 1000 && window.innerWidth <= 1050
+    && window.innerWidth >= window.innerHeight;
+  // LA FRANJA DE COLLECCIONS NOME'S QUEDA A 1280-1366 (02/10/2026): a 1024 els
+  // enllacos son la columna de la dreta (vegeu `CercadorTextRow`), o sigui que
+  // tot el que a la composicio estreta es feia «al voltant de la franja» (el seu
+  // baix, el bloc centrat amb ella) ha de seguir el cami de sempre.
+  const esComposicioFranja = esComposicioEstreta && !esCarrilPagina1024;
+  const ampleCarrilPaginaP2 = esCarrilPagina1024 ? Math.min(939.2, window.innerWidth - 80) : 0;
+  // EL SELECTOR B/C/N DE 1024 ES EL DE LA P1 (02/10/2026). En Marc: «Fes el
+  // selector b/c/n del mateix estil que el de la p1»: mateixa peca (el quadrat
+  // amb el fons `paper-soft`, el radi, l'ombra i la pastilla blanca) i mateixa
+  // mida, que a 1024 es `pagina1BlocDretaPx(1) * 0,75` (96,5), com el bloc de la
+  // dreta de la pagina 1.
+  const costatSelectorP1 = pagina1BlocDretaPx(1) * 0.75;
+  const midaSelectorP2 = esCarrilPagina1024 ? costatSelectorP1 : bnSliderSize;
+  // La pastilla, a la casella del variant triat: el mateix ordre que la p1.
+  const ORDRE_BCN = ['white', 'color', 'black'];
+  const variantBcn = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
+  const topPastillaBcnPct = (ORDRE_BCN.indexOf(ORDRE_BCN.includes(variantBcn) ? variantBcn : 'color') * 100) / 3;
+  const desplacCarrilPaginaP2 = esCarrilPagina1024
+    ? (window.innerWidth - (document.body?.clientWidth || window.innerWidth)) / 2
+    : 0;
   const topGraellaColors = 40 - (esBandaEstreta ? 38 : 0);
   const [topVisualAlignmentY, setTopVisualAlignmentY] = useState(0);
   // L'OMBRA DE LA MANIGA (26/09/2026, A3; refeta el 27/09/2026).
@@ -405,7 +439,7 @@ export default function MegaslidePagina2({
       //    dins del bloc (`topBcn - topGraella`) no canvia quan el bloc es mou.
       const offset = (!perGraelles && typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? 10 : 0;
       let objectiuTop = null;
-      if (perGraelles && esComposicioEstreta) {
+      if (perGraelles && esComposicioFranja) {
         const rGraella = page2Graella.getBoundingClientRect();
         const bcnBox = viewportRef.current.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
         const bandaEl = viewportRef.current.querySelector('[data-colleccions-franja="1"]');
@@ -478,11 +512,17 @@ export default function MegaslidePagina2({
       });
 
       const scyDeclarat = centratgeSelectorY({
-        midaSelector: bnSliderSize,
+        midaSelector: midaSelectorP2,
         escala: readRootCssNumber('--hg-escala-mega', 1),
         dibuix: mesuraGraellaP2?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet),
         gapV: mesuraGraellaP2?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet),
-        carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
+        // EL CARRIL, EL DE LA PAGINA A 1024 (02/10/2026): alla el contenidor de
+        // la pagina 2 fa el carril de la pagina (vegeu `esCarrilPagina1024`) i la
+        // fila de colors hi va amb ell. El que es llegeix de l'arrel
+        // (`document.documentElement`) encara es el carril del MEGASLIDE, que
+        // alla es mes estret: el selector quedava centrat amb un bloc de tres
+        // files que no era el que es pinta.
+        carril: esCarrilPagina1024 ? ampleCarrilPaginaP2 : readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
         desplacTop: desplacTopEf,
       });
 
@@ -524,7 +564,7 @@ export default function MegaslidePagina2({
     // s'ha de tornar a calcular. Com que l'avís arriba des d'un efecte de
     // layout del fill (abans que aquest), la passada nova ja mesura el DOM amb
     // la mida bona: el selector neix centrat i no s'ha de corregir després.
-  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, esComposicioEstreta, topGraellaColors, mesuraGraellaP2]);
+  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, esComposicioEstreta, esComposicioFranja, esCarrilPagina1024, ampleCarrilPaginaP2, topGraellaColors, mesuraGraellaP2]);
 
   // (El centratge del selector amb la graella de colors s'ha fusionat amb
   // l'efecte de dalt. Era un segon bucle que reescrivia el valor que el primer
@@ -573,7 +613,7 @@ export default function MegaslidePagina2({
       // sota del selector). Es una mesura ABSOLUTA, o sigui que el bucle no
       // s'alimenta d'ell mateix.
       let delta;
-      if (esComposicioEstreta) {
+      if (esComposicioFranja) {
         const bandaEl = viewport.querySelector('[data-colleccions-franja="1"]');
         if (!bandaEl) return;
         const objectiu = bandaEl.getBoundingClientRect().bottom + AIRE_FRANJA_COLLECCIONS_PX;
@@ -615,7 +655,7 @@ export default function MegaslidePagina2({
       window.removeEventListener('resize', schedule);
       observer?.disconnect();
     };
-  }, [active, isLandscapeTablet, esComposicioEstreta, topVisualAlignmentY, mesuraGraellaP2]);
+  }, [active, isLandscapeTablet, esComposicioEstreta, esComposicioFranja, topVisualAlignmentY, mesuraGraellaP2]);
 
   const variant = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;
 
@@ -1226,9 +1266,20 @@ export default function MegaslidePagina2({
         <div
           style={{
           flex: '0 0 auto',
-          width: isPortraitTablet ? '992px' : 'var(--hg-mega-w, 70.3vw)',
+          width: isPortraitTablet ? '992px' : (esCarrilPagina1024 ? `${ampleCarrilPaginaP2}px` : 'var(--hg-mega-w, 70.3vw)'),
           maxWidth: 'none',
           position: 'relative',
+          // El contenidor es centra sobre l'amplada de maquetacio del cos (que
+          // reserva la barra): per caure a sobre del carril de la pagina, que va
+          // centrat a la finestra, se'l desplaça el que hi ha de l'una a l'altra.
+          left: esCarrilPagina1024 ? `${desplacCarrilPaginaP2}px` : undefined,
+          // I EL CARRIL DEL MEGASLIDE, REDEFINIT AQUI DINS (02/10/2026): tot el
+          // que hi ha a la pagina 2 que es mesura «en carrils» (`carrilLane`: les
+          // columnes, les separacions i el marge de la filera) ha de seguir el
+          // carril de la PAGINA, que a 1024 es mes ample que el del megaslide.
+          // Les peces que van amb `carrilPx` (el selector, els dibuixos, la
+          // franja) tenen la seva propia calibracio i no es toquen.
+          ...(esCarrilPagina1024 ? { '--hg-mega-w': `${ampleCarrilPaginaP2}px` } : null),
           height: '100%',
           paddingLeft: '0px',
           paddingRight: '0px',
@@ -1256,8 +1307,8 @@ export default function MegaslidePagina2({
             // (`ampleCaixaBcnPx`): la seva pastilla ha d'acabar on acaba la de la
             // franja de colleccions amb FIRST CONTACT actiu. El contenidor es
             // queda l'ample de disseny, que sempre es mes ample.
-            width: carrilPx(bnSliderSize),
-            height: carrilPx(bnSliderSize),
+            width: carrilPx(midaSelectorP2),
+            height: carrilPx(midaSelectorP2),
             zIndex: 4,
             display: 'flex',
             alignItems: 'center',
@@ -1270,18 +1321,59 @@ export default function MegaslidePagina2({
             {/* AQUEST EMBOLCALL TAMBE ES PLE (129,4 x 129,4) i taparia el
                 carrusel: no rep clics. Els rep la pastilla, que es qui es veu. */}
             <div style={{ width: '100%', height: '100%', pointerEvents: 'none', transform: `translateY(${topVisualAlignmentY + selectorCentratgeY}px)` }}>
+              {esCarrilPagina1024 ? (
+                /* LA MATEIXA PECA QUE EL SELECTOR DE LA P1 (02/10/2026): el
+                   quadrat amb el fons, el radi i l'ombra, la pastilla blanca a
+                   la casella triada i els tres enllacos de text. */
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'hsl(var(--grey-paper-soft))',
+                  borderRadius: '5.3px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                  overflow: 'hidden',
+                  pointerEvents: 'auto',
+                }}>
+                  <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                    <PastillaBlancaPagina1 topPct={topPastillaBcnPct} />
+                  </div>
+                  <SelectorQuadratPagina1
+                    dinsBloc
+                    omple
+                    format="square"
+                    mostraPastilla={false}
+                    showWhite={stripeVariantVisibility?.white !== false}
+                    showBlack={stripeVariantVisibility?.black !== false}
+                    showMulti={stripeVariantVisibility?.color !== false}
+                    selectedVariant={variantBcn}
+                    onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
+                    onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
+                    onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
+                  />
+                </div>
+              ) : (
               <FirstContactDibuix00Buttons
                 // EL SELECTOR DE LA PAGINA 2 ES RECTANGLE (26/09/2026): el bloc
                 // de BLANC/COLOR/NEGRE es compartit amb la pagina 1, que el vol
                 // quadrat, i per aixo la forma s'hi passa (vegeu
                 // `FirstContactDibuix00Buttons`). Aqui torna a ser el de sempre:
                 // la meitat d'amplada i el doble d'alçada.
-                format="rectangle"
+                //
+                // I A 1024 TORNA A SER QUADRAT (02/10/2026). En Marc: «el selector
+                // b/c/n serà un quadrat com a la p1 (a l'esquerra)»: alla el
+                // selector de la p1 es un quadrat i el de la p2 ha de fer el
+                // mateix, amb les tres caselles apilades.
+                format={esCarrilPagina1024 ? 'square' : 'rectangle'}
                 // LA CAIXA, CLAVADA AMB LA PASTILLA DE LA FRANJA (02/10/2026):
                 // l'amplada surt de la primera casa de la franja (vegeu
                 // `ampleCaixaBcnPx`) i l'alçada es queda la de disseny (el doble
                 // de l'amplada de disseny, que es el que feia l'aspecte 1/2).
-                ampladaPx={ampleCaixaBcnPx != null ? `${ampleCaixaBcnPx}px` : null}
+                // A 1024 el quadrat fa el costat del contenidor
+                // (`carrilPx(bnSliderSize)`).
+                ampladaPx={esCarrilPagina1024
+                  ? carrilPx(bnSliderSize)
+                  : (ampleCaixaBcnPx != null ? `${ampleCaixaBcnPx}px` : null)}
                 alcadaPx={carrilPx(bnSliderSize)}
                 onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
                 onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
@@ -1291,6 +1383,7 @@ export default function MegaslidePagina2({
                 showMulti={stripeVariantVisibility?.color !== false}
                 selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
               />
+              )}
             </div>
           </div>
         ) : null}
@@ -1338,9 +1431,13 @@ export default function MegaslidePagina2({
             // La franja de colleccions no s'hi mou: `franjaPlena` li descompta
             // l'`esquerra` i continua anant de vora a vora del carril.
             esquerra={bnSliderSize
-              ? (esComposicioEstreta && ampleCaixaBcnPx != null
-                ? carrilPx(ampleCaixaBcnPx)
-                : `calc(${carrilPx(bnSliderSize / 2)} + ${carrilPx(10)})`)
+              ? (esCarrilPagina1024
+                // A 1024 el selector es un quadrat del costat del contenidor i la
+                // filera arrenca 10 px mes enlla.
+                ? `calc(${carrilPx(midaSelectorP2)} + ${carrilPx(10)})`
+                : (esComposicioEstreta && ampleCaixaBcnPx != null
+                  ? carrilPx(ampleCaixaBcnPx)
+                  : `calc(${carrilPx(bnSliderSize / 2)} + ${carrilPx(10)})`))
               : undefined}
             desplacamentVertical={40 - topGraellaColors}
             // El desplaçament vertical d'aquesta filera, el que aplica el bucle

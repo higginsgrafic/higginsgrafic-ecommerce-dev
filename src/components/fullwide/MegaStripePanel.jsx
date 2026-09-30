@@ -17,6 +17,7 @@ import {
   esBandaEstretaFranja,
   AJUST_BAIX_BLOC_FRANJA_PX,
   finestraCosVel,
+  GRAELLA_COLUMNA_DRETA_CARRIL_PX,
 } from '../megaslide/geometriaMegaslide.js';
 import {
   areesClicAmpla,
@@ -473,7 +474,22 @@ function MegaStripePanel({
   // surt de l'amplada del carril, no d'un numero calibrat (vegeu l'hook). A la
   // vista vertical no s'hi aplica: alla la franja te el seu propi calibratge.
   const filaFranjaRef = useRef(null);
-  const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril);
+  // LA FRANJA DE LA P2, DE LA VORA ESQUERRA DEL CARRIL FINS A LA COLUMNA DE
+  // COLLECCIONS (02/10/2026). En Marc: «La stripe va de l'esquerra del carril
+  // fins a la columna de col·leccions de la dreta» i abans «de la mida del segon
+  // carril, com la p1»: alla el contenidor de la pagina ja fa el carril de la
+  // pagina (vegeu `MegaslidePagina2`), o sigui que l'objectiu son els seus cossos
+  // —de la vora esquerra del carril a la columna— i el centre es la meitat del
+  // propi objectiu (`centreAlContenidor`). La columna fa la mida de disseny del
+  // carril (`GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350).
+  const esCarrilPagina1024 = typeof window !== 'undefined'
+    && window.innerWidth >= 1000 && window.innerWidth <= 1050
+    && window.innerWidth >= window.innerHeight;
+  const ampleCarrilPaginaP2 = esCarrilPagina1024 ? Math.min(939.2, window.innerWidth - 80) : 0;
+  const ampleCossosP2 = ampleCarrilPaginaP2 > 0
+    ? ampleCarrilPaginaP2 * (1 - GRAELLA_COLUMNA_DRETA_CARRIL_PX / 1350)
+    : 0;
+  const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, ampleCossosP2, esCarrilPagina1024);
   // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
   // la mascara es reparteixen 7 a dalt i 7 a baix (a l'apaisada van en una
   // sola filera).

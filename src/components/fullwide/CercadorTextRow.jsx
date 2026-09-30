@@ -1840,6 +1840,14 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     ample: typeof window !== 'undefined' ? window.innerWidth : 0,
     isLandscapeTablet,
   });
+  // A 1024, ELS ENLLACOS SON UNA COLUMNA (02/10/2026). En Marc: «la tira de
+  // col·leccions s'ha de convertir en una columna (a la dreta)»: alla la
+  // composicio es la de sempre (la columna de la dreta, com a 1440/1920) i la
+  // franja de sota les barres nome's queda per a 1280-1366.
+  const esColumna1024 = typeof window !== 'undefined'
+    && window.innerWidth >= 1000 && window.innerWidth <= 1050
+    && window.innerWidth >= window.innerHeight;
+  const composicioFranja = composicioEstreta && !esColumna1024;
   const [mesures, setMesures] = useState({
     midesGraella: null,
     margesEnllacos: { dalt: 0, baix: 0 },
@@ -2057,7 +2065,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       //    resultat depenia de qui arribés primer (mesurat: la franja de
       //    colleccions queia 57 px sota el selector en una de cada dues
       //    obertures).
-      if (compact && composicioEstreta && pagina) {
+      if (compact && composicioFranja && pagina) {
         const colorsEl = pagina.querySelector('[data-p2-color-grid]');
         const bcnEl = pagina.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
         if (colorsEl && bcnEl) {
@@ -2108,7 +2116,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     //
     // I `composicioEstreta` (02/10/2026): es la bandera que diu si la franja de
     // colleccions ha de caure entre el selector B/C/N i la franja de samarretes.
-  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY, midaSelector, onMides, ajustFranjaY, composicioEstreta]);
+  }, [compact, isPortraitTablet, isLandscapeTablet, alineacioY, midaSelector, onMides, ajustFranjaY, composicioFranja]);
 
 
   if (compact) {
@@ -2187,7 +2195,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // torna a sumar per la dreta (a la composicio ampla, tambe la columna de la
     // dreta, que a la composta ja no hi es).
     const esquerraFila = esquerra || carrilPct(MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX);
-    const franjaPlena = composicioEstreta
+    const franjaPlena = composicioFranja
       ? {
         marginLeft: `calc(-1 * (${esquerraFila}))`,
         width: `calc(100% + (${esquerraFila}))`,
@@ -2204,7 +2212,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // resol el bucle de mesura (bloc 4): el que hi ha aqui es el declarat, que
     // es el que val a la resta de mides i el que es pinta abans de la primera
     // mesura.
-    const margeDaltFranja = composicioEstreta
+    const margeDaltFranja = composicioFranja
       ? `${mesures.margeFranjaColleccions ?? MARGE_FRANJA_COLLECCIONS_PX}px`
       : `${MARGE_FRANJA_COLLECCIONS_FORA_PX}px`;
 
@@ -2274,7 +2282,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // per als enllacos de colleccions, que ara son una franja sota les
           // barres, i el seu lloc el fa servir tota la composicio (el retall dels
           // dibuixos i la tira de colors arriben a la vora dreta del carril).
-          gridTemplateColumns: composicioEstreta
+          gridTemplateColumns: composicioFranja
             ? 'minmax(0, 1fr)'
             : `minmax(0, 1fr) ${carrilLane(GRAELLA_COLUMNA_DRETA_CARRIL_PX)}`,
           // LA FILA 2 ARRIBA AL BAIX DEL SELECTOR (24/09/2026, ho va demanar
@@ -2294,7 +2302,13 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           // demanar l'amo: «Deixa 10 px de gap amb les fletxes»). Es una mida
           // del carril (`GRAELLA_GAP_COLUMNES_PX`): amb `carrilLane` tambe
           // s'encongeix a tauleta. Abans eren 20 px fixos.
-          columnGap: carrilLane(GRAELLA_GAP_COLUMNES_PX),
+          //
+          // I A 1024, 10 px CLAVATS A CADA CANTÓ (02/10/2026). En Marc: «La
+          // graella va des del selector b/c/n fins a la columna de col·leccions.
+          // Deixa-hi 10 px de gap a cada cantó»: el gap de l'esquerra el porta
+          // l'`esquerra` de la filera (l'amplada del selector mes 10) i el de la
+          // dreta es aquest, fix.
+          columnGap: esColumna1024 ? '10px' : carrilLane(GRAELLA_GAP_COLUMNES_PX),
           rowGap: '10px',
           alignItems: 'start',
           pointerEvents: 'auto',
@@ -2338,7 +2352,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             reservaDreta={reservaDreta}
             marginTop={-mesures.desnivellColors}
           />
-          {composicioEstreta ? (
+          {composicioFranja ? (
             /* LA FRANJA DE COLLECCIONS (1024-1366): de la vora esquerra del
                carril a la dreta, sota les barres. Es el mateix component de
                sempre amb la variant `franja` (vegeu
@@ -2366,7 +2380,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
             Amb la capa de 0 px d'alçada (el seu únic fill és absolut), el
             `bottom` de la columna es comptava des d'un zero i la llista no
             arribava mai al bottom de la slide. */}
-        {composicioEstreta ? null : (
+        {composicioFranja ? null : (
           <div style={{ gridColumn: '2', gridRow: '1 / span 2', minWidth: 0, position: 'relative', alignSelf: 'stretch' }}>
             <CercadorColleccionsColumna
               absolut

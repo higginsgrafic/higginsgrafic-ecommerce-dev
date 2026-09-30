@@ -188,7 +188,7 @@ function xCarrilMegaslide() {
   return declarat ? declarat.x : 0;
 }
 
-export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaPx = 0) {
+export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaPx = 0, centreAlContenidor = false) {
   const [estat, setEstat] = useState({ factor: 1, centre: 0 });
 
   useLayoutEffect(() => {
@@ -243,8 +243,20 @@ export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaP
       // descompta.
       const ampleImatge = ampleCarrilPaginaPx / FRACCIO_COSSOS_FRANJA;
       const carrilEsq = (window.innerWidth - ampleCarrilPaginaPx) / 2;
+      // DOS CASOS, I PER QUE (02/10/2026):
+      //
+      //   - LA PAGINA 1 (`centreAlContenidor` fals): la filera viu DINS del carril
+      //     del megaslide (605 a 1024) i la franja ha de caure al carril de la
+      //     pagina, que es mes ample: el `left` es mesura des de la vora esquerra
+      //     del carril del megaslide i s'ha de descomptar (`xCarrilMegaslide`).
+      //   - LA PAGINA 2 (`centreAlContenidor` cert): alla el mateix contenidor de
+      //     la pagina JA fa el carril de la pagina, o sigui que l'embolcall de la
+      //     filera arrenca a la vora del carril i el centre bo es la meitat del
+      //     propi objectiu.
       const centre = ampleCarrilPaginaPx > 0
-        ? carrilEsq - (FRACCIO_MARGE_ESQUERRE_FRANJA * ampleImatge) + (ampleImatge / 2) - xCarrilMegaslide()
+        ? (centreAlContenidor
+          ? objectiu / 2
+          : carrilEsq - (FRACCIO_MARGE_ESQUERRE_FRANJA * ampleImatge) + (ampleImatge / 2) - xCarrilMegaslide())
         : objectiu / 2;
       // Sense el marge, cada mesura tornaria a pintar i el ResizeObserver no
       // pararia.
@@ -277,7 +289,7 @@ export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaP
       if (observadorEstil) observadorEstil.disconnect();
       window.removeEventListener('resize', mesura);
     };
-  }, [filaRef, actiu, ampleCarrilPaginaPx]);
+  }, [filaRef, actiu, ampleCarrilPaginaPx, centreAlContenidor]);
 
   // Quan no s'hi aplica (la vista vertical), no es toca res: es fa aqui i no
   // dins de l'efecte, que no ha de cridar `setState`.
