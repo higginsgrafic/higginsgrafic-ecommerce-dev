@@ -1969,7 +1969,21 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
       }
 
       // Valors efectius de la graella i del carril: els fan servir els blocs 2 i 3.
-      const carrilEf = readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX);
+      //
+      // EL CARRIL ES LLEGEIX D'AQUI MATEIX, NO DE L'ARREL (02/10/2026). A 1024
+      // el contenidor de la pagina 2 redefineix `--hg-mega-w` (fa el carril de la
+      // pagina, que es mes ample que el del megaslide): llegir-lo de
+      // `document.documentElement` donava 605 i amb ells el desnivell de la tira
+      // de colors i els marges de la columna de colleccions queien uns quants px
+      // enlaire (la columna se n'anava 12 px per sobre del sostre del panell, en
+      // Marc: «La columna no està ben col·locada» i «Passa dels 15 px»). A la
+      // resta de mides el valor computat aqui es el mateix que el de l'arrel.
+      const carrilEl = typeof getComputedStyle === 'function'
+        ? Number.parseFloat(getComputedStyle(el).getPropertyValue('--hg-mega-w'))
+        : NaN;
+      const carrilEf = Number.isFinite(carrilEl) && carrilEl > 0
+        ? carrilEl
+        : readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX);
       const escalaEf = readRootCssNumber('--hg-escala-mega', 1);
       const dibuixEf = nou.midesGraella?.dibuix ?? pintat.midesGraella?.dibuix ?? midaDibuix(isPortraitTablet, isLandscapeTablet);
       const gapVEf = nou.midesGraella?.gapV ?? pintat.midesGraella?.gapV ?? gapVertical(isPortraitTablet, isLandscapeTablet);
