@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "source": "mockup-gildan",
+  "selected": [
+    "white",
+    "light-blue",
+    "royal",
+    "navy",
+    "daisy",
+    "gold",
+    "red",
+    "irish-green",
+    "military-green",
+    "black",
+    "rs-sport-grey",
+    "ice-grey",
+    "charcoal",
+    "dark-chocolate"
+  ],
+  "colors": [
+    {
+      "slug": "white",
+      "label": "White",
+      "selected": true
+    },
+    {
+      "slug": "light-blue",
+      "label": "Light Blue",
+      "selected": true
+    },
+    {
+      "slug": "royal",
+      "label": "Royal",
+      "selected": true
+    },
+    {
+      "slug": "navy",
+      "label": "Navy",
+      "selected": true
+    },
+    {
+      "slug": "daisy",
+      "label": "Daisy",
+      "selected": true
+    },
+    {
+      "slug": "gold",
+      "label": "Gold",
+      "selected": true
+    },
+    {
+      "slug": "red",
+      "label": "Red",
+      "selected": true
+    },
+    {
+      "slug": "irish-green",
+      "label": "Irish Green",
+      "selected": true
+    },
+    {
+      "slug": "military-green",
+      "label": "Military Green",
+      "selected": true
+    },
+    {
+      "slug": "black",
+      "label": "Black",
+      "selected": true
+    },
+    {
+      "slug": "rs-sport-grey",
+      "label": "RS Sport Grey",
+      "selected": true
+    },
+    {
+      "slug": "ice-grey",
+      "label": "Ice Grey",
+      "selected": true
+    },
+    {
+      "slug": "charcoal",
+      "label": "Charcoal",
+      "selected": true
+    },
+    {
+      "slug": "dark-chocolate",
+      "label": "Dark Chocolate",
+      "selected": true
+    }
+  ]
+}

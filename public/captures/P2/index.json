@@ -1,0 +1,93 @@
+{
+ "generat": "2026-09-30T12:36:46.096Z",
+ "vistes": [
+  {
+   "nom": "escriptori-1920-1920x1080-p2-vista",
+   "url": "/nova/inici?carril=1&active=first_contact",
+   "ample": 1920,
+   "alt": 1080,
+   "mode": "vista",
+   "pagina": 2,
+   "alcada": 6933,
+   "alcadaCapturada": 1080,
+   "fitxer": "captures/escriptori-1920-1920x1080-p2-vista.png"
+  },
+  {
+   "nom": "portatil-1440-1440x900-p2-vista",
+   "url": "/nova/inici?carril=1&active=first_contact",
+   "ample": 1440,
+   "alt": 900,
+   "mode": "vista",
+   "pagina": 2,
+   "alcada": 5728,
+   "alcadaCapturada": 900,
+   "fitxer": "captures/portatil-1440-1440x900-p2-vista.png"
+  },
+  {
+   "nom": "portatil-1366-1366x768-p2-vista",
+   "url": "/nova/inici?carril=1&active=first_contact",
+   "ample": 1366,
+   "alt": 768,
+   "mode": "vista",
+   "pagina": 2,
+   "alcada": 5962,
+   "alcadaCapturada": 768,
+   "fitxer": "captures/portatil-1366-1366x768-p2-vista.png"
+  },
+  {
+   "nom": "portatil-1280-1280x720-p2-vista",
+   "url": "/nova/inici?carril=1&active=first_contact",
+   "ample": 1280,
+   "alt": 720,
+   "mode": "vista",
+   "pagina": 2,
+   "alcada": 5692,
+   "alcadaCapturada": 720,
+   "fitxer": "captures/portatil-1280-1280x720-p2-vista.png"
+  },
+  {
+   "nom": "ipad-10-11a-1180x820-p2-vista",
+   "url": "/nova/inici?carril=1&active=first_contact",
+   "ample": 1180,
+   "alt": 820,
+   "mode": "vista",
+   "pagina": 2,
+   "alcada": 5535,
+   "alcadaCapturada": 820,
+   "fitxer": "captures/ipad-10-11a-1180x820-p2-vista.png"
+  },
+  {
+   "nom": "galaxy-tab-s9-1200x800-p2-vista",
+   "url": "/nova/inici?carril=1&active=first_contact",
+   "ample": 1200,
+   "alt": 800,
+   "mode": "vista",
+   "pagina": 2,
+   "alcada": 5561,
+   "alcadaCapturada": 800,
+   "fitxer": "captures/galaxy-tab-s9-1200x800-p2-vista.png"
+  },
+  {
+   "nom": "tauleta-apaisada-1024-1024x768-p2-vista",
+   "url": "/nova/inici?carril=1&active=first_contact",
+   "ample": 1024,
+   "alt": 768,
+   "mode": "vista",
+   "pagina": 2,
+   "alcada": 5073,
+   "alcadaCapturada": 768,
+   "fitxer": "captures/tauleta-apaisada-1024-1024x768-p2-vista.png"
+  },
+  {
+   "nom": "tauleta-vertical-768-768x1024-p2-vista",
+   "url": "/nova/inici?carril=1&active=first_contact",
+   "ample": 768,
+   "alt": 1024,
+   "mode": "vista",
+   "pagina": 2,
+   "alcada": 5483,
+   "alcadaCapturada": 1024,
+   "fitxer": "captures/tauleta-vertical-768-768x1024-p2-vista.png"
+  }
+ ]
+}

@@ -232,6 +232,14 @@
     </select>
   </label>
   <button id="guies" title="Ensenyar les dues verticals blaves de les vores del carril a cada finestra">guies del carril</button>
+  <button id="megaslide" title="Obrir (o tancar) el megaslide a TOTES les vistes alhora">megaslide a totes</button>
+  <span class="grup-control" style="display:inline-flex">
+    <button id="pagina-1" title="Megaslide a la PAGINA 1 a totes les vistes">P1</button>
+    <button id="pagina-2" title="Megaslide a la PAGINA 2 (el cercador) a totes les vistes">P2</button>
+  </span>
+  <button id="captura-vista" title="Capturar cada vista activa tal com es veu (la finestra: 1920x1080, 1440x900…)">captura vistes</button>
+  <button id="captura-pagina" title="Capturar cada vista activa sencera (tota la tirada: els 6900 px de la home)">captura pàgines</button>
+  <span class="ajuda" id="captura-estat"></span>
   <button id="global" title="Al mosaic, ensenyar també els formats que no tenen pestanya">Tots al mosaic</button>
   <button id="recarrega" title="Recarregar TOTES les vistes obertes, tambe les de les altres pestanyes">Recarregar tot</button>
   <button id="navegador" title="Mostrar o amagar el dibuix del navegador">Navegador</button>
@@ -348,6 +356,9 @@ function estatInicial() {
     // Les verticals del carril (vegeu `ambGuies`). Ve ences: qui obra l'eina es
     // per mesurar, i el que es mesura es si les peces cauen dins del carril.
     guiesCarril: true,
+    // EL MEGASLIDE A TOTES LES VISTES (01/10/2026): afegeix `?active=` a la URL
+    // de cada finestra, que es com l'app obre el megaslide. Ve apagat.
+    megaslide: false,
     panell: false,
     grupsOberts: [...GRUPS],
   };
@@ -369,6 +380,8 @@ function carrega() {
     e.filtre = 'tots';
     // Camp afegit despres: qui ja tenia estat desat no el porta.
     if (typeof e.guiesCarril !== 'boolean') e.guiesCarril = true;
+    if (typeof e.megaslide !== 'boolean') e.megaslide = false;
+    if (e.paginaMegaslide !== 1 && e.paginaMegaslide !== 2) e.paginaMegaslide = 1;
     // Camp afegit despres (28/09/2026): la ruta de les vistes sense pestanya.
     if (typeof e.rutaGlobal !== 'string' || !e.rutaGlobal) e.rutaGlobal = '/';
     // Estats desats quan el defecte era tenir nomes un grup obert: s'obren tots.
@@ -440,6 +453,21 @@ const ambGuies = (ruta) => {
   p.set('carril', '1');
   return cami + '?' + p.toString() + (ancla ? '#' + ancla : '');
 };
+
+// El megaslide de l'app s'obre amb `?active=<colleccio>` (es el parametre que
+// llegeix `useUrlActiveCollection`), i el boto el posa i el treu a TOTES les
+// finestres alhora.
+const COLLECCIO_MEGASLIDE = 'first_contact';
+const ambMegaslide = (ruta) => {
+  if (!estat.megaslide) return ruta;
+  const [senseAncla, ancla] = String(ruta).split('#');
+  const [cami, consulta] = senseAncla.split('?');
+  const p = new URLSearchParams(consulta || '');
+  p.set('active', COLLECCIO_MEGASLIDE);
+  return cami + '?' + p.toString() + (ancla ? '#' + ancla : '');
+};
+// La URL d'una vista amb TOTS els parametres de l'eina (guies + megaslide).
+const ambParametres = (ruta) => ambMegaslide(ambGuies(ruta));
 
 let desaPendent = null;
 function desa() {
@@ -643,7 +671,7 @@ function muntaMarc(marc, fixa = false) {
   marc.carregat = false;
   // LA RUTA: la de la SEVA pestanya; si el format no en te (les vistes del boto
   // "Tots al mosaic"), la de totes (`estat.rutaGlobal`).
-  marc.iframe.src = ambGuies((tabDe(marc.fmt.id) || {}).ruta || estat.rutaGlobal || '/');
+  marc.iframe.src = ambParametres((tabDe(marc.fmt.id) || {}).ruta || estat.rutaGlobal || '/');
   marc.sensVisita.style.display = 'none';
   actualitzaEtiqueta(marc);
 }
@@ -995,6 +1023,11 @@ function actualitzaBarra() {
   document.getElementById('zoom-1').classList.toggle('actiu', act && !act.ajust && Math.abs((act.zoom || 0) - 1) < 0.001);
   document.getElementById('global').classList.toggle('actiu', !!estat.tots);
   document.getElementById('guies').classList.toggle('actiu', !!estat.guiesCarril);
+  document.getElementById('megaslide').classList.toggle('actiu', !!estat.megaslide);
+  for (const id of ['pagina-1', 'pagina-2']) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('actiu', Number(id.slice(-1)) === (Number(estat.paginaMegaslide) === 2 ? 2 : 1) && !!estat.megaslide);
+  }
   document.getElementById('global').disabled = !principal;
   document.getElementById('sostre').value = String(estat.sostre || 8);
   const vius = [...marcs.values()].filter((m) => m.viu).length;
@@ -1215,7 +1248,7 @@ barraRuta.addEventListener('change', () => {
     if (!aTotes && id !== act.id) continue;
     m.el.classList.remove('carregat');
     m.carregat = false;
-    m.iframe.src = ambGuies((tabDe(id) || {}).ruta || estat.rutaGlobal || '/');
+    m.iframe.src = ambParametres((tabDe(id) || {}).ruta || estat.rutaGlobal || '/');
   }
   actualitzaBarra();
   desa();
@@ -1246,11 +1279,103 @@ document.getElementById('guies').addEventListener('click', () => {
     if (!m.viu) continue;
     m.el.classList.remove('carregat');
     m.carregat = false;
-    m.iframe.src = ambGuies((tabDe(m.fmt.id) || {}).ruta || '/');
+    m.iframe.src = ambParametres((tabDe(m.fmt.id) || {}).ruta || '/');
   }
   pintaTauler();
   desa();
 });
+document.getElementById('megaslide').addEventListener('click', () => {
+  estat.megaslide = !estat.megaslide;
+  document.getElementById('megaslide').classList.toggle('actiu', !!estat.megaslide);
+  // El parametre nome's es llegeix en obrir la pagina: cal reconstruir la URL de
+  // cada vista i tornar-la a carregar (com fa el boto de les guies).
+  for (const m of marcs.values()) {
+    if (!m.viu) continue;
+    m.el.classList.remove('carregat');
+    m.carregat = false;
+    m.iframe.src = ambParametres((tabDe(m.fmt.id) || {}).ruta || estat.rutaGlobal || '/');
+  }
+  pintaTauler();
+  desa();
+});
+
+// P1 / P2: LA PAGINA DEL MEGASLIDE A TOTES LES VISTES (01/10/2026).
+//
+// La pagina del megaslide viu a `sessionStorage` (`HG_MEGA_PAGE`, amb el format
+// de `usePersistentState`: { value, expiresAt }). Es a cada finestra, aixi que
+// s'hi escriu des d'aqui (mateix origen) i es recarrega la vista amb el
+// megaslide obert (`?active=`) perque el llegeixi en muntar-se.
+const posaPagina = (n) => {
+  estat.megaslide = true;
+  estat.paginaMegaslide = n;
+  const botoMega = document.getElementById('megaslide');
+  if (botoMega) botoMega.classList.add('actiu');
+  for (const m of marcs.values()) {
+    if (!m.viu) continue;
+    try {
+      m.iframe.contentWindow.sessionStorage.setItem(
+        'HG_MEGA_PAGE',
+        JSON.stringify({ value: n, expiresAt: Date.now() + 10 * 60 * 1000 })
+      );
+    } catch { /* ignore */ }
+    m.el.classList.remove('carregat');
+    m.carregat = false;
+    m.iframe.src = ambParametres((tabDe(m.fmt.id) || {}).ruta || estat.rutaGlobal || '/');
+  }
+  for (const id of ['pagina-1', 'pagina-2']) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('actiu', id === `pagina-${n}`);
+  }
+  pintaTauler();
+  desa();
+};
+document.getElementById('pagina-1').addEventListener('click', () => posaPagina(1));
+document.getElementById('pagina-2').addEventListener('click', () => posaPagina(2));
+
+// VISTA I PAGINA SON DUES COSES (01/10/2026, ho ha dit l'amo): la VISTA es el
+// que es veu a la finestra (1920x1080, 1440x900…) i la PAGINA es tota la
+// tirada. Son dos botons i cada captura ho diu al nom del fitxer.
+const capturaVistes = async (mode) => {
+  const boto = document.getElementById(mode === 'pagina' ? 'captura-pagina' : 'captura-vista');
+  const estatEl = document.getElementById('captura-estat');
+  // LES VISTES ACTIVES: les que tenen marc viu, amb la seva mida i la seva ruta.
+  // La PAGINA del megaslide viu a sessionStorage i la captura s'obre en un
+  // navegador nou: cal dir-l'hi, si no sempre surt la p1. Es la que s'ha triat
+  // amb els botons P1/P2 (per defecte, 1).
+  const pagina = Number(estat.paginaMegaslide) === 2 ? 2 : 1;
+  const vistes = [...marcs.values()].filter((m) => m.viu).map((m) => ({
+    nom: m.fmt.nom,
+    ample: m.fmt.w,
+    alt: m.fmt.h,
+    mode,
+    pagina,
+    url: ambParametres((tabDe(m.fmt.id) || {}).ruta || estat.rutaGlobal || '/'),
+  }));
+  if (!vistes.length) { if (estatEl) estatEl.textContent = 'cap vista activa'; return; }
+  const t0 = Date.now();
+  boto.disabled = true;
+  if (estatEl) estatEl.textContent = `capturant ${vistes.length} ${mode === 'pagina' ? 'pàgines' : 'vistes'}… (uns 5 s per captura)`;
+  try {
+    const r = await fetch('/__dev/vistes-capture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vistes }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (j.ok) {
+      if (estatEl) estatEl.textContent = `fetes ${j.vistes} ${mode === 'pagina' ? 'pàgines' : 'vistes'} en ${Math.round((j.ms || Date.now() - t0) / 1000)} s -> public/captures/`;
+    } else if (estatEl) {
+      estatEl.textContent = `ha fallat: ${String(j.error || r.status).split('\n').slice(-1)[0].slice(0, 120)}`;
+    }
+  } catch (err) {
+    if (estatEl) estatEl.textContent = `ha fallat: ${String(err.message || err).slice(0, 120)}`;
+  } finally {
+    boto.disabled = false;
+  }
+};
+document.getElementById('captura-vista').addEventListener('click', () => capturaVistes('vista'));
+document.getElementById('captura-pagina').addEventListener('click', () => capturaVistes('pagina'));
+
 document.getElementById('global').addEventListener('click', () => {
   estat.tots = !estat.tots;
   estat.activa = PRINCIPAL;   // es una propietat del mosaic

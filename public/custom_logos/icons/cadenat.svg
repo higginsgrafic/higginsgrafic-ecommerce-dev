@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 96 101" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:affinity="https://www.affinity.studio/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(0.989691,0,0,0.989691,-71.257732,-79.123711)">
+        <path d="M72,133.5l0,-53.552l97,0l0,53.552c0,26.768 -21.732,48.5 -48.5,48.5c-26.768,0 -48.5,-21.732 -48.5,-48.5Z" style="fill:white;"/>
+        <clipPath id="_clip1">
+            <path d="M72,133.5l0,-53.552l97,0l0,53.552c0,26.768 -21.732,48.5 -48.5,48.5c-26.768,0 -48.5,-21.732 -48.5,-48.5Z"/>
+        </clipPath>
+        <g clip-path="url(#_clip1)">
+            <path d="M72,133.5l0,-58.604l97,-0l0,58.604c0,26.768 -21.732,48.5 -48.5,48.5c-26.768,0 -48.5,-21.732 -48.5,-48.5Zm2.021,-0c0,25.653 20.827,46.479 46.479,46.479c25.653,0 46.479,-20.827 46.479,-46.479l0,-58.604l-92.958,0l-0,58.604Z" style="fill:rgb(233,235,237);"/>
+            <g transform="matrix(1.010417,0,0,1.010417,0.260417,-1.895833)">
+                <!-- EL CADENAT JA NO VIU AQUI (02/10/2026). Aquest fitxer es
+                     nome s la PLACA: la caixa blanca amb el seu contorn
+                     interior. El cadenat el pinta el component
+                     (`FullWideSlideHeader`) en línia, perque ha de poder
+                     canviar de color i d'estat (tancat / obert). -->
+            </g>
+        </g>
+    </g>
+</svg>
