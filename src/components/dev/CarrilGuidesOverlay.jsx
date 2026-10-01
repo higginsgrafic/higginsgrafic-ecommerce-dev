@@ -34,7 +34,7 @@ const AMPLE_CARRIL_PAGINA_BASE = 'min(939.2px, calc(100vw - 80px))';
 
 export default function CarrilGuidesOverlay({ enabled, onToggle }) {
   // EL CARRIL DEL MODEL, SI EN TE (03/10/2026). L'iPad Pro 13 apaïssat te el
-  // seu (1000 px, vegeu `layoutModel`): les segones guies l'han d'ensenyar, que
+  // seu (1100 px, vegeu `layoutModel`): les segones guies l'han d'ensenyar, que
   // son les que fa servir l'amo per comprovar que tot hi cau.
   const carrilModel = carrilIPadPro13();
   const ampleCarrilPagina = carrilModel != null ? `${carrilModel}px` : AMPLE_CARRIL_PAGINA_BASE;

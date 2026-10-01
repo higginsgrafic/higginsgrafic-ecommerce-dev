@@ -514,10 +514,17 @@ function MegaStripePanel({
   // `GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350, o sigui que la cintura acaba
   // aquests 5 px a l'esquerra de la columna.
   //
-  // LA CONSTANT ES 4 I NO 5 perque la franja de la tauleta va un 0,2% mes
+  // LA CONSTANT ES 3,6 I NO 5 perque la franja de la tauleta va un 0,2% mes
   // petita (`scale(0.998)` a `MegaslidePagina2`), que en aquest carril fa ~1 px:
-  // amb 5, la cintura en quedava a 6 (mesurat).
-  const AIRE_STRIPE_COLUMNA_PX = 4;
+  // amb 5, la cintura en quedava a 6 (mesurat, amb el carril de 1000).
+  //
+  // AMB EL CARRIL DE 1100 ES 3,6 (03/10/2026). En Marc: «Vull ampliar el carril a
+  // 1100 px»: la diferencia entre el carril i la columna creix mes que la
+  // constant, i amb 4 la cintura en quedava a 5,4 de la columna (mesurat). Amb
+  // 3,6 torna a quedar a 5,0 (cada unitat de la constant mou la cintura 1 px).
+  // Nome s al model: a la resta de la banda apaïssada el carril es el de sempre
+  // (939,2) i la constant hi segueix sent 4.
+  const AIRE_STRIPE_COLUMNA_PX = carrilIPadPro13() != null ? 3.6 : 4;
   const ampleCossosP2 = ampleCarrilPaginaP2 > 0
     ? ampleCarrilPaginaP2 * (1 - GRAELLA_COLUMNA_DRETA_CARRIL_PX / 1350) - AIRE_STRIPE_COLUMNA_PX
     : 0;

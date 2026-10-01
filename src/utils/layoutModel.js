@@ -321,11 +321,15 @@ export function esIPadPro13({ ample, alt } = {}) {
  * opcions, «el carril propi i una mica més ample (1000 px)». El model fa 1376 px
  * d'ample i amb el segon carril compartit (939,2) li sobraven 218 px per banda.
  *
+ * I AMB 1100 (03/10/2026): en Marc: «Vull ampliar el carril a 1100 px». Surt de
+ * la regla del segon carril (`min(1100, ample - 80)`): a 1376 dona 1100 i la
+ * finestra en queda a 138 px per banda.
+ *
  * El carril es propi del model: nome s el fa servir quan la finestra es l'iPad
  * Pro 13 APAÏSSAT (la vertical te el seu tauler de 992 i es una altra feina).
  * Mai no passa de la finestra menys 80 px, que es la regla del segon carril.
  */
-export const CARRIL_IPAD_PRO_13_APAISSADA_PX = 1000;
+export const CARRIL_IPAD_PRO_13_APAISSADA_PX = 1100;
 export function carrilIPadPro13({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);

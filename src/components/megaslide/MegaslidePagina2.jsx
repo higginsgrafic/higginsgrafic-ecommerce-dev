@@ -183,7 +183,7 @@ export default function MegaslidePagina2({
   // tot el que a la composicio estreta es feia «al voltant de la franja» (el seu
   // baix, el bloc centrat amb ella) ha de seguir el cami de sempre.
   const esComposicioFranja = esComposicioEstreta && !esCarrilPagina1024;
-  // El carril de la pagina: el seu, si es l'iPad Pro 13 apaïssat (1000).
+  // El carril de la pagina: el seu, si es l'iPad Pro 13 apaïssat (1100).
   const ampleCarrilPaginaP2 = esCarrilPagina1024
     ? (carrilIPadPro13() ?? Math.min(939.2, window.innerWidth - 80))
     : 0;

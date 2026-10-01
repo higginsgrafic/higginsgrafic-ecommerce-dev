@@ -2558,9 +2558,11 @@ function FullWideSlideHeader({
         // del 1024 és 1000-1050, vegeu `esCarrilPagina1024`).
         // EL CARRIL DE L'iPAD PRO 13 APAÏSSAT ES SEU (03/10/2026). En Marc:
         // «Crea un segon carril per l'iPad Pro 13» i, en triar, «el carril propi
-        // i una mica més ample (1000 px)»: el model fa 1376 i amb el segon
-        // carril compartit li sobraven 218 px per banda. A la resta de la banda
-        // apaïssada el carril de la pagina segueix sent `min(939.2, 100vw - 80)`.
+        // i una mica més ample (1000 px)»; després «Vull ampliar el carril a
+        // 1100 px», que és el valor d'avui (`layoutModel`). El model fa 1376 i
+        // amb el segon carril compartit li sobraven 218 px per banda. A la resta
+        // de la banda apaïssada el carril de la pagina segueix sent
+        // `min(939.2, 100vw - 80)`.
         const carrilModel = carrilIPadPro13();
         const carrilPagina = typeof window !== 'undefined'
           ? (carrilModel ?? Math.min(939.2, Math.max(0, window.innerWidth - 80)))
