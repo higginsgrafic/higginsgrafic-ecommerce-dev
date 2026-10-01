@@ -267,6 +267,36 @@ Verificat a 1376 amb `deviceScaleFactor` 2: **9 enllaços x 5 punts = 45/45 clic
 roda i l'arrossegament (touch sintètic) fan el pas igual que abans, cap error de pàgina, i
 la petjada de les 11 vistes (`scripts/_tmp-ipad13-abans-despres.mjs`) sense cap diferència.
 
+## 3octies. L'estil de la columna de col·leccions, a tot el site (03/10/2026)
+
+En Marc: «Per cert, agafo la teva oferta de fer extensiva la modificació de la columna de
+col·leccions a la resta del site» i, en triar l'abast entre les quatre opcions, «Tota la
+columna amb l'estil del model». Així que el que al model era seu ara val a tot el lloc:
+
+- **Sense contorn i amb el radi del selector**: la vora d'1 px desapareix i el radi passa
+  de 6 a 5,3 (l'amo havia demanat recuperar aquell contorn el 02/10 per al 1920 i el 1440;
+  aquest canvi el retira).
+- **Ombra suau** `0 1px 3px` alfa 0,12 tambe a la caixa (la pastilla ja la portava).
+- **La pastilla toca les vores laterals**: el coixí lateral del contenidor (2 px) passa a 0.
+- **L'ombra de la màniga, a 0,25** (`OMBRA_MANIGA_ALFA_COLUMNA`); el bloc de la dreta de la
+  p1 es queda amb la de sempre (`OMBRA_MANIGA_ALFA`, 0,45).
+
+**L'alçada de la columna no s'ha tocat.** Ho va demanar l'amo al model («Pots fer la
+pastilla més alta sense modificar l'alçada de la columna?») i aquí es va comprovar el
+mateix abans/després, posant els estils vells en línia: la columna fa el mateix a tot
+arreu —251,41 a 1920, 198,16 a 1440, 213,39 a 1366, 213,42 a 1024 i 221,7 a 1376— i el
+que canvia és la pastilla de dins de cada cel·la, que guanya els 2 px de la vora
+(0,22 px per cel·la) i arriba a les vores laterals.
+
+Verificat a 1920/1440/1376/1366/1280/1180/1024: vora 0, radi 5,3, ombra 0,12, coixí
+2/0/0, ombra de màniga 0,25, i la petjada de les 11 vistes sense cap altra peça moguda.
+
+**Queda pendent** (no tocat en aquest canvi): el clic als dos enllaços de baix de la
+columna encara falla a 1024, 1180, 1280 i 1366, perquè l'arranjament de la superfície de
+clic de la franja (`superficiesDeFranja` a `MegaStripePanel`) avui només val per al model.
+És una línia (`esCarrilPagina1024` en comptes de `esCarrilPagina1024 && esIPadPro13()`) i
+no mou cap píxel.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
