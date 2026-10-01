@@ -219,7 +219,11 @@ export default function MegaMenuPanel({
   // doncs, 25; i com que abans ja n'hi havia 5, ara son 26.
   const alcadaGuard = useCallback((p1Bottom) => alcadaPanellMegaslide({
     p1ContentBottom: p1Bottom,
-    gap: P1_STRIPE_BOTTOM_GAP + (modelAqui ? 26 : 0),
+    // L'AIRE DE SOTA EL PANELL ES DE LA VERSIO (04/10/2026). En Marc: «Fem un
+    // canvi al megaslide 1100. L'aire de sota, en lloc de 40 px que en siguin
+    // 20»: cada versio porta el seu (`extraAireSota` a `MEGASLIDE_VERSIONS`), i
+    // la versio de l'iPad Pro 13 es queda amb els 40 de sempre.
+    gap: P1_STRIPE_BOTTOM_GAP + (modelAqui ? modelAqui.extraAireSota : 0),
     paddingVertical: paddingVerticalPanellPx,
   }), [paddingVerticalPanellPx, w, h, modelAqui]);
 

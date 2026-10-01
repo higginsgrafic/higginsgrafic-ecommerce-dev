@@ -333,6 +333,11 @@ export const MEGASLIDE_VERSIONS = {
     // que fa que la cintura acabi a 5 px de la columna. Depen del carril, o
     // sigui que es de cada versio.
     aireStripeColumna: 3.6,
+    // L'AIRE DE SOTA EL PANELL (04/10/2026). En Marc: «Fem un canvi al megaslide
+    // 1100. L'aire de sota, en lloc de 40 px que en siguin 20». Es el que se suma
+    // al `P1_STRIPE_BOTTOM_GAP` de `MegaMenuPanel` per fer la guarda de l'alcada:
+    // amb 26 l'aire de sota fa 40,5 px i amb 6 en fa 20,5 (mesurat).
+    extraAireSota: 6,
   },
   'ipad-pro-13': {
     nom: 'iPad Pro 13',
@@ -344,6 +349,8 @@ export const MEGASLIDE_VERSIONS = {
     // columna (mesurat) i amb 3,7 torna a quedar a 5,0. Cada unitat de la
     // constant mou la cintura 1 px.
     aireStripeColumna: 3.7,
+    // L'aire de sota el panell es queda als 40 px de sempre.
+    extraAireSota: 26,
   },
 };
 
