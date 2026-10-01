@@ -68,24 +68,26 @@ const CADE_BAIXADA = 56;
  */
 const CADENAT_BAIX_PX = 60;
 /**
- * EL FORMAT DELS 8/10 (04/10/2026). En Marc: «T'he dit que ho apliquessis a
- * 1200x720. Enlloc mes»: l'unic format on la hero es reparteix en desens es el
- * 1200x720.
+ * ELS FORMATS DELS 8/10 (04/10/2026).
  *
- * La FINESTRA de 1200x720 dona ~586 px de viewport (el navegador se'n menja
- * ~134, com als altres portatils) i el VIEWPORT exacte en fa 720: tots dos hi
- * entren. En queden fora el Galaxy Tab S9+ (1200x800, viewport 722) i el Model
- * 1200x820 (viewport 742), que a 1200 d'ample no son aquest format.
+ * En Marc: «T'he dit que ho apliquessis a 1200x720. Enlloc mes» i, tot seguit,
+ * «1280x720». Son els DOS PORTATILS de 720 d'alcada (el visor en te un de
+ * 1200x720 i el de 1280x720), i nome s ells porten el repartiment en desens.
+ *
+ * La FINESTRA dona ~586 px de viewport (el navegador se'n menja ~134, com a tots
+ * els portatils) i el VIEWPORT exacte en fa 720: totes dues alcades hi entren.
+ * En queden fora les tauletes de 1200 i 1280 d'ample, que no son aquest format.
  */
+const AMPLADES_8_10 = [1200, 1280];
 const esHeroVuitDecimes = () => {
   if (typeof window === 'undefined') return false;
   const w = window.innerWidth;
   const h = window.innerHeight;
-  if (Math.abs(w - 1200) > 2) return false;
+  if (!AMPLADES_8_10.some((a) => Math.abs(w - a) <= 2)) return false;
   // Les DUES alcades possibles del format: 586 amb la finestra (el navegador
   // se'n menja 134, com a tots els portatils) i 720 amb el viewport exacte. La
-  // resta d'alcades a 1200 d'ample NO son aquest format: el Galaxy Tab S9+ fa
-  // 722 de viewport, el Model 1200x820 en fa 742 i el mateix aparell, 800.
+  // resta d'alcades a aquestes amplades NO son aquest format (el Galaxy Tab S9+
+  // fa 722 de viewport, el Model 1200x820 en fa 742, i a 1280 hi ha el 666).
   return (h >= 570 && h <= 600) || (h >= 706 && h <= 720);
 };
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
