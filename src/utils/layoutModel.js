@@ -305,13 +305,25 @@ export function laneForViewport(vw = getLayoutViewportWidth()) {
  * @returns {boolean}
  */
 export const IPAD_PRO_13_AMPLADES = [1032, 1376];
+// DUES VISTES MES PORTEN EL MATEIX MEGASLIDE (03/10/2026). En Marc: «Aplica el
+// megaslide de l'iPad Pro 13 a 1180x820 i 1200x800». Aquestes DUES es
+// reconeixen per l'amplada I l'alcada, no nome s per l'amplada: la vista de
+// 1180x742 (iPad Air 11 apaïssat) ha de seguir sent la de sempre i nome s la de
+// 820 porta el megaslide del model. La resta de la funcio (marge de 2 px i
+// classe de tauleta) val igual per a les quatre.
+export const MEGASLIDE_MODEL_VISTES = [
+  { ample: 1180, alt: 820 },
+  { ample: 1200, alt: 800 },
+];
 export function esIPadPro13({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
   const es = deviceLayoutFromViewport(w, h);
   const marge = 2;
-  return IPAD_PRO_13_AMPLADES.some((a) => Math.abs(w - a) <= marge)
-    && (es.isPortraitTablet || es.isLandscapeTablet);
+  const perAmplada = IPAD_PRO_13_AMPLADES.some((a) => Math.abs(w - a) <= marge);
+  const perVista = MEGASLIDE_MODEL_VISTES
+    .some((v) => Math.abs(w - v.ample) <= marge && Math.abs(h - v.alt) <= marge);
+  return (perAmplada || perVista) && (es.isPortraitTablet || es.isLandscapeTablet);
 }
 
 /**

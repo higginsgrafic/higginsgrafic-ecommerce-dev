@@ -11,6 +11,8 @@ const BASE = process.env.HG_URL || 'http://127.0.0.1:3003';
 const VISTES = [
   { nom: 'iPad Pro 13 vertical', w: 1032, h: 1304 },
   { nom: 'iPad Pro 13 apaissada', w: 1376, h: 954 },
+  { nom: 'Model 1180x820', w: 1180, h: 820 },
+  { nom: 'Model 1200x800', w: 1200, h: 800 },
   { nom: 'iPad 10.2 apaisada', w: 1024, h: 690 },
   { nom: 'iPad Air 11 apaisada', w: 1180, h: 742 },
   { nom: 'Portatil 1280', w: 1280, h: 666 },
