@@ -76,26 +76,20 @@ const CADENAT_BAIX_PX = 58;
 /**
  * ELS FORMATS DELS 8/10 (04/10/2026).
  *
- * En Marc: «T'he dit que ho apliquessis a 1200x720. Enlloc mes» i, tot seguit,
- * «1280x720». Son els DOS PORTATILS de 720 d'alcada (el visor en te un de
- * 1200x720 i el de 1280x720), i nome s ells porten el repartiment en desens.
+ * En Marc: «Per tal de dimensionar correctament la hero a cada format podríem
+ * dividir l'espai disponible, un cop obert el megaslide, en 6 parts i que les
+ * franges de la samarreta ocupin els 4/6 centrals»; i, en concretar-ho, «prova amb
+ * 8/10». Primer es va acotar als portatils de 720 («T'he dit que ho apliquessis a
+ * 1200x720. Enlloc mes»), pero l'amo ho vol a TOT ARREU on el megaslide hi es:
+ * «A tots els formats horitzontals, vols dir, oi?».
  *
- * La FINESTRA dona ~586 px de viewport (el navegador se'n menja ~134, com a tots
- * els portatils) i el VIEWPORT exacte en fa 720: totes dues alcades hi entren.
- * En queden fora les tauletes de 1200 i 1280 d'ample, que no son aquest format.
+ * O sigui: TOTS els formats HORITZONTALS de 768 en amunt (els mobils de costat
+ * estret no tenen megaslide: `esMobilAqui` es `ample < 768`). Els VERTICALS es
+ * queden com estaven, amb la seva proporcio i els seus aires.
  */
-const AMPLADES_8_10 = [1200, 1280];
-const esHeroVuitDecimes = () => {
-  if (typeof window === 'undefined') return false;
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  if (!AMPLADES_8_10.some((a) => Math.abs(w - a) <= 2)) return false;
-  // Les DUES alcades possibles del format: 586 amb la finestra (el navegador
-  // se'n menja 134, com a tots els portatils) i 720 amb el viewport exacte. La
-  // resta d'alcades a aquestes amplades NO son aquest format (el Galaxy Tab S9+
-  // fa 722 de viewport, el Model 1200x820 en fa 742, i a 1280 hi ha el 666).
-  return (h >= 570 && h <= 600) || (h >= 706 && h <= 720);
-};
+const esHeroVuitDecimes = () => typeof window !== 'undefined'
+  && window.innerWidth >= 768
+  && window.innerWidth >= window.innerHeight;
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
 const FILES_MIN = 8;
 const FILES_MAX = 32;
