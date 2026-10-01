@@ -303,6 +303,16 @@ const FORMATS = [
   // la classe de tauleta. La finestra es `h - ct` (1304 i 954), com a la
   // resta: el navegador tambe se'n menja.
   { id: 'ipad-pro-13-landscape', nom: 'iPad Pro 13 apaïssada', grup: 'Tauleta apaïsada', w: 1376, h: 1032, ct: 78, cb: 0, img: null },
+  // DUES MIDES MES DEL MODEL (03/10/2026). En Marc: «Aplica-ho sobre aquests
+  // formats, també: 1180x780 o 1200x820» i tot seguit «Posa'm els formats a
+  // l'editor iframe». Son les mateixes amplades que l'iPad 10/11a i el Galaxy
+  // Tab S9+ amb una altra alcada de finestra, i tambe porten el megaslide del
+  // model (`MEGASLIDE_MODEL_AMPLADES` a `layoutModel`: mana l'AMPLADA, no la
+  // parella, perque una finestra de 1180x820 dona un viewport de 1180x742 i amb
+  // la parella exacta no s'hi veia mai el canvi). La finestra es `h - ct`, com a
+  // la resta: 1180x702 i 1200x742.
+  { id: 'model-1180-780',    nom: 'Model 1180×780',         grup: 'Tauleta apaïsada', w: 1180, h: 780,  ct: 78,  cb: 0,  img: null },
+  { id: 'model-1200-820',    nom: 'Model 1200×820',         grup: 'Tauleta apaïsada', w: 1200, h: 820,  ct: 78,  cb: 0,  img: null },
   { id: 'ipad-1180',         nom: 'iPad 10/11a',            grup: 'Tauleta apaïsada', w: 1180, h: 820,  ct: 78,  cb: 0,  img: null },
   { id: 'tabs9-plus',        nom: 'Galaxy Tab S9+',         grup: 'Tauleta apaïsada', w: 1200, h: 800,  ct: 78,  cb: 0,  img: null },
   { id: 'tablet-landscape',  nom: 'Tauleta apaïsada 1024',  grup: 'Tauleta apaïsada', w: 1024, h: 768,  ct: 78,  cb: 0,  img: '/browser-frames/tablet-landscape-safari.webp' },
