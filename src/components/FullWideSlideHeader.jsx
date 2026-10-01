@@ -2535,8 +2535,32 @@ function FullWideSlideHeader({
         if (carril) root.style.setProperty('--carril', `${carril}px`);
         else root.style.removeProperty('--carril');
         const beltTauleta = Math.min(992, Math.max(320, vp - 32));
-        const beltFinal = carril
-          ?? (isPortraitTablet ? 992 : (isLandscapeTablet ? beltTauleta : beltWidth));
+        // EL SEGON CARRIL A LA TAUETA APAÏSSADA (02/10/2026). En Marc: «I no se
+        // li pot fer un segon carril a aquest, també?» i, quan se li va dir que
+        // la diferència era la mateixa a 1280, 1366 i 1376, «Tota la banda de
+        // tauleta apaïssada».
+        //
+        // El carril de la pàgina és `min(939.2px, 100vw - 80px)` (el del
+        // header, la hero i les segones guies verdes) i el megaslide hi anava
+        // estret: 759 a 1280, 811 a 1366 i 817 a 1376 (el 3/5 declarat). Ara
+        // també l'agafa, amb la composició que ja tenia escalada al carril nou:
+        // l'escala és la proporció entre els dos carrils, perquè les peces de
+        // disseny (el selector, els dibuixos, les barres) no canviïn de
+        // proporció dins del seu carril.
+        //
+        // A 1024 NO S'HI ENTRA: allà el segon carril ja hi és des de l'01/10 i
+        // la seva composició té els números calibrats amb l'escala 1 (la banda
+        // del 1024 és 1000-1050, vegeu `esCarrilPagina1024`).
+        const carrilPagina = typeof window !== 'undefined'
+          ? Math.min(939.2, Math.max(0, window.innerWidth - 80))
+          : 0;
+        const usaCarrilPagina = isLandscapeTablet
+          && typeof window !== 'undefined'
+          && window.innerWidth > 1050
+          && carrilPagina > 0;
+        const beltFinal = usaCarrilPagina
+          ? Math.round(carrilPagina)
+          : (carril ?? (isPortraitTablet ? 992 : (isLandscapeTablet ? beltTauleta : beltWidth)));
         root.style.setProperty('--hg-mega-w', `${beltFinal}px`);
         // Quan el carril te una amplada propia (tauleta: 992) la seva posicio
         // tambe: CENTRAT a l'espai de maquetacio. Abans aixo ho deia `belt.left`
@@ -2597,7 +2621,15 @@ function FullWideSlideHeader({
         // L'UNICA font de l'escala del megaslide. La fan servir la franja i,
         // mes endavant, les coordenades del panell. La graella de dibuixos ja
         // s'hi adapta sola (mesura l'amplada de la seva columna).
-        root.style.setProperty('--hg-escala-mega', String((isPortraitTablet || isLandscapeTablet) ? 1 : escalaMegaslide(beltWidth)));
+        //
+        // A la tauleta apaïssada amb el segon carril l'escala es la proporcio
+        // entre el carril nou i el declarat (vegeu `usaCarrilPagina`): aixi la
+        // composicio que ja hi havia queda escalada al carril nou, sense
+        // canviar-hi res de lloc.
+        const escalaTauletaApaissada = (usaCarrilPagina && carril)
+          ? +(beltFinal / carril).toFixed(4)
+          : 1;
+        root.style.setProperty('--hg-escala-mega', String((isPortraitTablet || isLandscapeTablet) ? escalaTauletaApaissada : escalaMegaslide(beltWidth)));
       } catch {
         // ignore
       }
