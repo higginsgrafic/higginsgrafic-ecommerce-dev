@@ -319,6 +319,33 @@ tauletes (939,2) no s'ha tocat.
 Verificat: 9 enllaços de la columna × 5 punts = **45/45 clics**, cap error de pàgina i cap
 desbordament horitzontal.
 
+## 3decies. El megaslide del model, tambe a 1180x820 i 1200x800 (03/10/2026)
+
+En Marc: «Aplica el megaslide de l'iPad Pro 13 a 1180x820 i 1200x800». Les dues vistes entren a
+`esIPadPro13` (`layoutModel`) per la seva **mida** (amplada i alçada,
+`MEGASLIDE_MODEL_VISTES`), no només per l'amplada: la vista de **1180x742** (iPad Air 11
+apaïssat) ha de seguir sent la de sempre, i només la de 820 porta el megaslide del model.
+
+Mesurat, i idèntic al model de 1376:
+
+| | 1180x820 | 1200x800 |
+|---|---|---|
+| carril / escala | 1100 px / 1,1712 | 1100 px / 1,1712 |
+| aire per banda | 40 px | 50 px |
+| panell | 53..351 | 53..351 |
+| aire de dalt de la p2 | 20 | 20 |
+| gap selector→franja (p1) | 20 | 20 |
+| sota les franges (p1 / p2) | 40,6 / 40,4 | 40,6 / 40,4 |
+| selector de la p2 | 113 | 113 |
+| cintura→columna | 5,0 | 5,0 |
+| cadenat | 359..409 | 359..409 |
+| icona de la dreta del header | 1139,5 de 1140 | 1149,5 de 1150 |
+
+Verificat a les dues: 9 enllaços × 5 punts = **45/45 clics**, cap error de pàgina i cap
+desbordament horitzontal. I **cap altra vista s'ha mogut**: la petjada de les 11 de sempre és
+exactament la mateixa (les dues noves s'han afegit a
+`scripts/_tmp-ipad13-abans-despres.mjs`, que ara en mesura 13).
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
