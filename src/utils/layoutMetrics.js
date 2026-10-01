@@ -196,6 +196,27 @@ export function carrilPx(px) {
  * selector, els dibuixos).
  */
 /**
+ * ELS LÍMITS DELS TIPUS DE DISPOSITIU, EN UN SOL LLOC (02/10/2026).
+ *
+ * En Marc: «Em pregunto si no es podrien veure els formats tablet que tenim
+ * seleccionats com a tablet, no com a desktop petit». Els formats de tauleta
+ * de la llista (`scripts/mesura-formats.mjs`) arriben a l'iPad Pro 13, que fa
+ * 1032x1304 vertical i 1376x954 apaïssat: amb els límits vells (1024 i 1366)
+ * aquests dos formats queien a escriptori i es veien com un escriptori petit.
+ *
+ * Aquests números els fan servir `deviceLayoutFromViewport` (layoutModel) i
+ * les dues funcions de sota (`esTauletaApaisada`/`esTauletaVertical`), que son
+ * les que consulten les peces del megaslide, el header i el cistell. Han de
+ * ser els MATEIXOS: si divergeixen, la mateixa finestra te dues classes i es
+ * veu com un salt (es el que va passar amb el 116 de la capçalera).
+ */
+export const MIDA_MOVIL = 600;
+export const MIDA_TAULETA_VERTICAL_MAX = 1032;
+export const MIDA_TAULETA_APAISADA_MIN = 768;
+export const MIDA_TAULETA_APAISADA_MAX = 1376;
+export const ALCADA_TAULETA_APAISADA_MAX = 1100;
+
+/**
  * Tauleta apaïsada i tauleta vertical: NOMES amb mides, mai amb el touch.
  *
  * L'amo ho va demanar aixi: la mida ha de ser la mateixa en un aparell tactil i
@@ -207,14 +228,17 @@ export function carrilPx(px) {
 export function esTauletaApaisada({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
-  return w >= 768 && w <= 1366 && h < w && h > 0 && h <= 1100;
+  return w >= MIDA_TAULETA_APAISADA_MIN
+    && w <= MIDA_TAULETA_APAISADA_MAX
+    && h < w && h > 0
+    && h <= ALCADA_TAULETA_APAISADA_MAX;
 }
 
 /** Tauleta vertical: la regla de `useDeviceLayout`, tambe sense touch. */
 export function esTauletaVertical({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
-  return w >= 600 && w <= 1024 && h > w;
+  return w >= MIDA_MOVIL && w <= MIDA_TAULETA_VERTICAL_MAX && h > w;
 }
 
 export function carrilLane(px) {

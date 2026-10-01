@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useShippingCosts } from '@/hooks/useShippingCosts';
 import { drawingStripePath } from '@/lib/drawingPaths';
-import { esTauletaApaisada , readRootCssNumber } from '@/utils/layoutMetrics';
+import { esTauletaApaisada, esTauletaVertical, readRootCssNumber } from '@/utils/layoutMetrics';
 import { tshirtSrc } from '@/utils/placeholders';
 
 function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmpleNatural }) {
@@ -16,17 +16,14 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
   // només apareix quan NO som a /checkout.
   const isOnCheckoutRoute = location?.pathname === '/checkout';
 
+  // Les bandes de tauleta les diu el model (`esTauletaApaisada`/
+  // `esTauletaVertical`, 02/10/2026): amb els números a mà, l'iPad Pro 13
+  // (1032 vertical i 1376 apaïssat) quedava fora i el cistell no el tractava
+  // com a tauleta.
   const [isTablet, setIsTablet] = useState(
-    typeof window !== 'undefined'
-      && window.innerWidth >= 768
-      && window.innerWidth <= 1366
+    esTauletaApaisada() || esTauletaVertical()
   );
-  const [isPortraitTablet, setIsPortraitTablet] = useState(
-    typeof window !== 'undefined'
-      && window.innerWidth >= 768
-      && window.innerWidth <= 1366
-      && window.innerHeight > window.innerWidth
-  );
+  const [isPortraitTablet, setIsPortraitTablet] = useState(esTauletaVertical());
   const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
 
   // Micro-retocs propis de la vertical (ancoratge a l'esquerra, junts i
@@ -258,8 +255,8 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
     const onResize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      const portrait = w >= 768 && w <= 1366 && h > w;
-      setIsTablet(w >= 768 && w <= 1366);
+      const portrait = esTauletaVertical({ ample: w, alt: h });
+      setIsTablet(esTauletaApaisada({ ample: w, alt: h }) || portrait);
       setIsPortraitTablet(portrait);
       setIsLandscapeTablet(esTauletaApaisada({ ample: w, alt: h }));
     };

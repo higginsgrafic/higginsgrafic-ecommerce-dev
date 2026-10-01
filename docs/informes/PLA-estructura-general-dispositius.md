@@ -38,10 +38,16 @@ quatre classes (ni forats ni solapaments):
 
 ```
 mòbil             =  ample < 600   ||   (ample < 768 && alçada < ample)
-tauleta vertical  =  alçada > ample  &&  ample ≤ 1024
-tauleta apaïssada =  alçada < ample  &&  ample ≤ 1366  &&  alçada ≤ 1100
+tauleta vertical  =  alçada > ample  &&  ample ≤ 1032
+tauleta apaïssada =  alçada < ample  &&  ample ≤ 1376  &&  alçada ≤ 1100
 escriptori        =  la resta
 ```
+
+> **Actualitzat el 02/10/2026:** els dos màxims eren 1024 i 1366 i l'iPad Pro 13
+> (1032×1304 vertical i 1376×954 apaïssat) queia a escriptori. Ara són 1032 i 1376 i els
+> dos formats són tauleta; ho va decidir l'amo i ho explica
+> `INFORME-2026-10-02-tablet-ipad-pro-13.md`. Els límits es declaren a
+> `layoutMetrics.js` i `layoutModel` els importa.
 
 La clau és la segona meitat de la primera línia: **un telèfon girat no es reconeix per
 l'amplada, es reconeix perquè és més ample que alt i encara no arriba a 768**. És la
@@ -53,9 +59,9 @@ franja que avui no té classe.
 |---|---|---|
 | **< 600** | mòbil | mòbil |
 | **600–767** | **mòbil** (el telèfon girat) | tauleta vertical |
-| **768–1024** | tauleta apaïssada | tauleta vertical |
-| **1025–1366** | tauleta apaïssada (si alçada ≤ 1100) | escriptori |
-| **≥ 1367** | escriptori | escriptori |
+| **768–1032** | tauleta apaïssada | tauleta vertical |
+| **1033–1376** | tauleta apaïssada (si alçada ≤ 1100) | escriptori |
+| **≥ 1377** | escriptori | escriptori |
 
 Dues notes de la matriu: **l'alçada de 1100** només actua a la banda 1025–1366, i és el
 que separa una tauleta apaïssada d'un monitor; i una finestra **exactament quadrada**
@@ -96,7 +102,7 @@ classe que els toca **avui** i amb la que els toca **amb la matriu**:
 | iPad Air 11 | 820×1108 | tauleta vertical | tauleta vertical |
 | iPad Pro 11 | 834×1122 | tauleta vertical | tauleta vertical |
 | iPad Air 13 | 1024×1294 | tauleta vertical | tauleta vertical |
-| **iPad Pro 13** | **1032×1304** | **escriptori** | **escriptori** |
+| **iPad Pro 13** | **1032×1304** | **tauleta vertical** | **tauleta vertical** |
 | Galaxy Tab S9 apaïssada | 853×455 | tauleta apaïssada | tauleta apaïssada |
 | Galaxy Tab S9+ apaïssada | 934×506 | tauleta apaïssada | tauleta apaïssada |
 | MatePad 12.2 apaïssada | 981×535 | tauleta apaïssada | tauleta apaïssada |
@@ -107,7 +113,7 @@ classe que els toca **avui** i amb la que els toca **amb la matriu**:
 | iPad Air 11 apaïssada | 1180×742 | tauleta apaïssada | tauleta apaïssada |
 | iPad Pro 11 apaïssada | 1194×756 | tauleta apaïssada | tauleta apaïssada |
 | iPad Air 13 apaïssada | 1366×946 | tauleta apaïssada | tauleta apaïssada |
-| iPad Pro 13 apaïssada | 1376×954 | escriptori | escriptori |
+| iPad Pro 13 apaïssada | 1376×954 | **tauleta apaïssada** | **tauleta apaïssada** |
 | Portàtil 1280 | 1280×666 | tauleta apaïssada | tauleta apaïssada |
 | Portàtil 1366 | 1366×634 | tauleta apaïssada | tauleta apaïssada |
 | Portàtil 1440 | 1440×766 | escriptori | escriptori |
@@ -121,6 +127,10 @@ classe que els toca **avui** i amb la que els toca **amb la matriu**:
 cap classe** (el forat de 600–767 en apaïsat), i la matriu els dona la que els toca: són
 telèfons girats.
 
+> **Actualitzat el 02/10/2026:** amb els màxims a 1032 i 1376, els dos iPad Pro 13 passen
+> a tauleta i el recompte queda en 14 mòbils, 9 tauletes verticals, 19 apaïssades i 6
+> escriptoris. Vegeu `INFORME-2026-10-02-tablet-ipad-pro-13.md`.
+
 ### 1.4 I les quatre cel·les que la matriu NO mou (i que són decisions)
 
 La matriu no canvia cap altra classe, i això vol dir que **hereta quatre
@@ -131,7 +141,7 @@ mesurat i és una decisió de l'amo:
 |---|---|---|
 | **1280×666 i 1366×634** (els dos portàtils més comuns) | tauleta apaïssada | Si fossin escriptori, el carril baixaria de 992 a 961/900 i la hero s'encongiria; **l'encaix no millora**: amb el megaslide obert la pàgina ja no hi cap (en falten 136 a 1280 i 87 a 1366) |
 | **Galaxy Tab S9 i S9+** (533 i 584) | mòbil | Si fossin tauleta vertical, tindrien la capçalera de dues files i la taula de caselles; el carril seria de 533 − 80 = **453 px**, i la columna de la taula faria **90 px** (amb els marges de la casella, uns 70) |
-| **iPad Pro 13 vertical** (1032) | escriptori | Si fos tauleta vertical, tindria la taula de caselles; el carril seria de 952 px i la columna de 190. A 1024, que és el cas mesurat, el carril és 939 i la casella 167,8 × 168,4 |
+| ~~**iPad Pro 13 vertical** (1032)~~ | escriptori | **DECIDIT el 02/10/2026: és tauleta vertical.** Mesurat: es pinta com l'iPad Air 13 (mateix carril de 992 i tot al mateix lloc). Vegeu `INFORME-2026-10-02-tablet-ipad-pro-13.md` |
 | **Els sis telèfons girats de 780 a 932** | tauleta apaïssada | Si fossin mòbil, caldria el **full de mòbil**, que avui no existeix; i amb 334–380 px d'alçada el megaslide no hi cap |
 
 ---

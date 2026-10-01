@@ -28,7 +28,7 @@
  */
 
 import { carrilDeclarat, laneForViewport } from '../../utils/layoutModel';
-import { MEGASLIDE_REFERENCIA_PX, escalaMegaslide } from '../../utils/layoutMetrics';
+import { MEGASLIDE_REFERENCIA_PX, escalaMegaslide, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide';
 
 /**
@@ -669,7 +669,7 @@ export function margeBaixFletxesGraella({ dibuix, gapV, carril, midaSelector, es
  */
 export function esBandaEstretaFranja({ ample, alt } = {}) {
   return Number.isFinite(ample) && Number.isFinite(alt)
-    && ample >= 768 && ample <= 1366 && ample >= alt;
+    && ample >= MIDA_TAULETA_APAISADA_MIN && ample <= MIDA_TAULETA_APAISADA_MAX && ample >= alt;
 }
 
 /**
@@ -849,7 +849,7 @@ export function topFranjaPagina2({
  */
 export const AIRE_FRANJA_COLLECCIONS_PX = 5;
 export const COMPOSICIO_ESTRETA_MIN_PX = 1024;
-export const COMPOSICIO_ESTRETA_MAX_PX = 1366;
+export const COMPOSICIO_ESTRETA_MAX_PX = MIDA_TAULETA_APAISADA_MAX;
 
 /**
  * Si la finestra es dins la composicio estreta de la pagina 2 (1024-1366 en

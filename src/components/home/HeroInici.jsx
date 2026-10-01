@@ -5,6 +5,7 @@ import { CERCADOR_COLORS } from '@/data/collections';
 import useIsMobile from '@/hooks/useIsMobile';
 import { deviceLayoutFromViewport } from '@/utils/layoutModel';
 import { HERO_DIBUIX_MIDA, HERO_DIBUIX_MIDA_DEFECTE } from '@/config/iniciNou';
+import { MIDA_TAULETA_APAISADA_MAX, MIDA_TAULETA_VERTICAL_MAX } from '@/utils/layoutMetrics';
 
 /** El color de cada samarreta, de la taula canonica del lloc. */
 const HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.hex]));
@@ -32,15 +33,18 @@ const HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.h
 function HeroInici() {
   const isMobile = useIsMobile();
   // La finestra es de tauleta? Es el que tria entre els dos valors del mapa de
-  // mides del dibuix.
+  // mides del dibuix. La classe la diu el model (02/10/2026): amb la banda a
+  // ma, l'iPad Pro 13 (1032 vertical i 1376 apaïssat) no hi entrava i es veia
+  // com un escriptori petit (en Marc: «Em pregunto si no es podrien veure els
+  // formats tablet que tenim seleccionats com a tablet»).
   const esTauleta = typeof window !== 'undefined'
-    && window.innerWidth >= 768
-    && window.innerWidth <= 1366;
+    && (deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isPortraitTablet
+      || deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isLandscapeTablet);
   // A la tauleta VERTICAL la hero va a tot el carril: alla la pantalla es mes
   // curta i el bloc de sota te mes espai que la propia hero (mesurat: el bloc
   // en fa 403 i la hero 249 al 80 %). Amb el carril sencer en fa 311, que es
   // gairebe la mida que te a 1440 (321).
-  const esVertical = typeof window !== 'undefined'
+  const esVertical = esTauleta
     && deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isPortraitTablet;
   // LA HERO, FINS AL CARRIL A TOTES LES VISTES (02/10/2026).
   //
@@ -63,11 +67,11 @@ function HeroInici() {
   // disseny, o sigui que les franges no creixen: la samarreta de fons es pinta
   // amb `auto 100 %` de l'alcada de la franja, i si l'alcada no canvia, la
   // samarreta tampoc.
-  const esHeroSeccioAmpla = esApaissada && ampleFinestra > 1200 && ampleFinestra <= 1366;
+  const esHeroSeccioAmpla = esApaissada && ampleFinestra > 1200 && ampleFinestra <= MIDA_TAULETA_APAISADA_MAX;
   // A LA VISTA 1024, EL TRACKING DELS NOMS A LA MEITAT (02/10/2026). En Marc: «A
   // la vista 1024 redueix el traking de les colleccions de la hero a la meitat»:
   // allo on els noms hi van justos, el `letterSpacing` passa de 0,18em a 0,09em.
-  const esHeroTrackingMig = ampleFinestra > 0 && ampleFinestra <= 1024;
+  const esHeroTrackingMig = ampleFinestra > 0 && ampleFinestra <= MIDA_TAULETA_VERTICAL_MAX;
   const [plan, setPlan] = useState(() => buildHeroStripePlan());
   const franges = useMemo(() => plan, [plan]);
 

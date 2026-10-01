@@ -1,7 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 import { factorFranjaCarril, ESCALA_CALIBRADA_FRANJA } from '../utils/franjaCarril';
 import { FRACCIO_COSSOS_FRANJA, FRACCIO_MARGE_ESQUERRE_FRANJA } from '../config/stripeCalibrations';
-import { carrilDeFinestra } from '../components/megaslide/geometriaMegaslide';
+import { carrilDeFinestra, COMPOSICIO_ESTRETA_MIN_PX, COMPOSICIO_ESTRETA_MAX_PX } from '../components/megaslide/geometriaMegaslide';
 import { getLayoutViewportWidth } from '../utils/layoutMetrics';
 
 /**
@@ -128,7 +128,7 @@ function ampladaObjectiu(filaEl = null) {
     // vora esquerra (682 px a 1366 en comptes dels 811 del carril), que es el que
     // deixava la franja de la p1 un 16% mes curta que la de la p2.
     const estreta = typeof window !== 'undefined'
-      && window.innerWidth >= 1024 && window.innerWidth <= 1366
+      && window.innerWidth >= COMPOSICIO_ESTRETA_MIN_PX && window.innerWidth <= COMPOSICIO_ESTRETA_MAX_PX
       && window.innerWidth >= window.innerHeight;
     if (estreta) return Number.isFinite(carril) && carril > 0 ? carril : 0;
     const bloc = mateixaPagina.querySelector(selectorBloc);

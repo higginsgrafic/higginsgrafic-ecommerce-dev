@@ -24,6 +24,8 @@
  */
 
 /** Peces del megaslide que els bucles fan servir com a referència. */
+import { MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from './layoutMetrics';
+
 const SELECTORS = {
   panell: '[data-mega-panel-surface="1"]',
   guarda: '[data-stripe-bottom]',
@@ -225,7 +227,7 @@ export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTau
   // El desplaçament de 10 px el porten TANT la banda estreta com les dues
   // tauletes (es el que hi havia abans); el que canvia es que a la tauleta no
   // s'hi ha d'afegir cap marge extra.
-  const bandaEstreta = ample >= 768 && ample <= 1366 && ample >= alt;
+  const bandaEstreta = ample >= MIDA_TAULETA_APAISADA_MIN && ample <= MIDA_TAULETA_APAISADA_MAX && ample >= alt;
   // El contingut baixa 20 px a TOT l'escriptori (banda estreta i desktop
   // ample), que son els 20 px de marge que s'han afegit a la pesta­nya. Les
   // tauletes es queden amb el seu desplacament de sempre.

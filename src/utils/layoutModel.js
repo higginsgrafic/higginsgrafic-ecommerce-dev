@@ -1,4 +1,11 @@
 import { getLayoutViewportWidth } from './layoutMetrics';
+import {
+  MIDA_MOVIL,
+  MIDA_TAULETA_VERTICAL_MAX,
+  MIDA_TAULETA_APAISADA_MIN,
+  MIDA_TAULETA_APAISADA_MAX,
+  ALCADA_TAULETA_APAISADA_MAX,
+} from './layoutMetrics';
 
 /**
  * layoutModel — model ÚNIC de les mides de layout del lloc.
@@ -19,11 +26,10 @@ import { getLayoutViewportWidth } from './layoutMetrics';
  *     pures de l'amplada i l'alçada de la finestra.
  */
 
-const MIDA_MOVIL = 600;
-const MIDA_TAULETA_VERTICAL_MAX = 1024;
-const MIDA_TAULETA_APAISADA_MIN = 768;
-const MIDA_TAULETA_APAISADA_MAX = 1366;
-const ALCADA_TAULETA_APAISADA_MAX = 1100;
+// ELS LÍMITS VIUEN A `layoutMetrics.js` (02/10/2026), amb les dues funcions
+// `esTauletaApaisada`/`esTauletaVertical`: son les mateixes que consulten les
+// peces del megaslide i el header, i la mateixa finestra no pot tenir dues
+// classes. Aqui nome's s'importen (vegeu el comentari d'alla).
 /**
  * L'ALÇADA DE LA CAPÇALERA: EL LOGO MÉS 10 px D'AIRE A DALT I A BAIX (24/09/2026).
  *
@@ -66,13 +72,19 @@ const ALCADA_CAPCALERA_TAULETA_VERTICAL = 114;
  * ha cap forat i cap finestra cau a dues classes alhora.
  *
  *   1. mobil             =  ample < 600  ||  (ample < 768 && alcada < ample)
- *   2. tauleta vertical  =  alcada > ample  &&  ample <= 1024
- *   3. tauleta apaissada =  alcada < ample  &&  ample <= 1366  &&  alcada <= 1100
+ *   2. tauleta vertical  =  alcada > ample  &&  ample <= 1032
+ *   3. tauleta apaissada =  alcada < ample  &&  ample <= 1376  &&  alcada <= 1100
  *   4. escriptori        =  la resta
  *
- * L'alcada de 1100 nomes actua a la banda 1025-1366: es el que separa una
+ * L'alcada de 1100 nomes actua a la banda 1025-1376: es el que separa una
  * tauleta apaissada d'un monitor. I una finestra exactament quadrada (que no
  * es dona) cau a escriptori.
+ *
+ * ELS DOS LÍMITS SON ELS DE LA TAULETA MES GRAN DE LA LLISTA (02/10/2026). En
+ * Marc: «Em pregunto si no es podrien veure els formats tablet que tenim
+ * seleccionats com a tablet, no com a desktop petit». L'iPad Pro 13 fa
+ * 1032x1304 vertical i 1376x954 apaïssat: amb 1024 i 1366 queia a escriptori.
+ * Vegeu `layoutMetrics.js`, que es qui declara els números.
  */
 export function deviceLayoutFromViewport(vw, vh) {
   const ample = Number.isFinite(vw) && vw > 0 ? vw : 0;

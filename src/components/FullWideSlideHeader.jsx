@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
-import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx } from '@/utils/layoutMetrics';
+import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '@/utils/layoutMetrics';
 import { laneForViewport, carrilDeclarat } from '@/utils/layoutModel';
 import { getLayoutViewportWidth } from '@/utils/layoutMetrics';
 import {
@@ -120,7 +120,7 @@ function FullWideSlideHeader({
   // definicio que a MegaslidePagina2.
   const esBandaEstreta = typeof window !== 'undefined'
     && !isLandscapeTablet
-    && window.innerWidth >= 768 && window.innerWidth <= 1366
+    && window.innerWidth >= MIDA_TAULETA_APAISADA_MIN && window.innerWidth <= MIDA_TAULETA_APAISADA_MAX
     && window.innerWidth >= window.innerHeight;
   // A 1024 (l'ajust de la pagina 1) EL CARRIL DE LA PAGINA ES EL QUE MANA
   // (02/10/2026). En Marc: «Alinea el cadenat a la dreta del segon carril». El

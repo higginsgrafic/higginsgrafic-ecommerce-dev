@@ -11,7 +11,7 @@ import {
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
 import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
-import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
+import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 import { caminsSiluetes, precarregaSiluetesSamarreta } from './siluetesSamarreta.js';
@@ -2147,7 +2147,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // (un disseny a part) i la banda estreta tenen les seves excepcions.
     const esTauleta = isPortraitTablet || isLandscapeTablet;
     const esBandaEstreta = typeof window !== 'undefined' && !esTauleta
-      && window.innerWidth >= 768 && window.innerWidth <= 1366
+      && window.innerWidth >= MIDA_TAULETA_APAISADA_MIN && window.innerWidth <= MIDA_TAULETA_APAISADA_MAX
       && window.innerWidth >= window.innerHeight;
     // La graella de dibuixos és de 16 columnes × 4 files (64 dibuixos). Els
     // dibuixos s'aplanen per ordre de col·lecció i es reparteixen en files de

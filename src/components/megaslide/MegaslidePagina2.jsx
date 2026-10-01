@@ -15,7 +15,7 @@ import {
   pagina1BlocDretaPx,
 } from './geometriaMegaslide.js';
 import { COIX_ENLLAC_COLLECCIONS_PX } from '../fullwide/estilsBlocs.js';
-import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX } from '../../utils/layoutMetrics.js';
+import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
 import { SelectorQuadratPagina1, PastillaBlancaPagina1 } from '../fullwide/BlocDretaPagina1.jsx';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
@@ -150,7 +150,7 @@ export default function MegaslidePagina2({
   // entra, se li baixa la filera 38 px i se li desquadra el selector.
   const esBandaEstreta = typeof window !== 'undefined'
     && !isLandscapeTablet
-    && window.innerWidth >= 768 && window.innerWidth <= 1366
+    && window.innerWidth >= MIDA_TAULETA_APAISADA_MIN && window.innerWidth <= MIDA_TAULETA_APAISADA_MAX
     && window.innerWidth >= window.innerHeight;
   // LA COMPOSICIO ESTRETA (1024-1366, 02/10/2026): alla els enllacos de
   // colleccions son una franja sota la tira de colors i el bloc sencer es mou

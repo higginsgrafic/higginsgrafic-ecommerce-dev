@@ -20,6 +20,8 @@
  */
 
 /** El gutter horitzontal de la pauta: el que separa dues columnes. */
+import { MIDA_TAULETA_APAISADA_MAX } from './layoutMetrics';
+
 export const TDP_GUTTER_X = 22.5;
 
 /**
@@ -34,7 +36,7 @@ export const TDP_GUTTER_X = 22.5;
  *          768 -> 2   (la tauleta que controlem, vertical)
  */
 export function tdpColumnes(ampleFinestra) {
-  if (ampleFinestra > 1366) return 4;
+  if (ampleFinestra > MIDA_TAULETA_APAISADA_MAX) return 4;
   if (ampleFinestra >= 1024) return 3;
   return 2;
 }
