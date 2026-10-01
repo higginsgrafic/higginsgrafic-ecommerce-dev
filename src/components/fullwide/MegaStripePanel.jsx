@@ -6,6 +6,7 @@ import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { esTauletaApaisada } from '../../utils/layoutMetrics.js';
+import { carrilIPadPro13 } from '../../utils/layoutModel.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
@@ -488,7 +489,10 @@ function MegaStripePanel({
   // perque mitja composicio el fa servir, pero ara vol dir `isLandscapeTablet`.
   const esCarrilPagina1024 = typeof window !== 'undefined'
     && esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight });
-  const ampleCarrilPaginaP2 = esCarrilPagina1024 ? Math.min(939.2, window.innerWidth - 80) : 0;
+  // El carril de la pagina: el seu, si es l'iPad Pro 13 apaïssat (1000).
+  const ampleCarrilPaginaP2 = esCarrilPagina1024
+    ? (carrilIPadPro13() ?? Math.min(939.2, window.innerWidth - 80))
+    : 0;
   // LA STRIPE ACABA A 5 px DE LA COLUMNA (03/10/2026). En Marc: «La stripe de la
   // p2 ha d'acabar a 10 px de la columna de col·leccions», precisat amb «Per la
   // cintura» i, en veure-ho, «Posa'l a 5 px». L'objectiu del hook son els

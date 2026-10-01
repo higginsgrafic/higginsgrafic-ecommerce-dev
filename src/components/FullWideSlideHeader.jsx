@@ -10,7 +10,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '@/utils/layoutMetrics';
-import { laneForViewport, carrilDeclarat } from '@/utils/layoutModel';
+import { laneForViewport, carrilDeclarat, carrilIPadPro13 } from '@/utils/layoutModel';
 import { getLayoutViewportWidth } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
@@ -2556,8 +2556,14 @@ function FullWideSlideHeader({
         // A 1024 NO S'HI ENTRA: allà el segon carril ja hi és des de l'01/10 i
         // la seva composició té els números calibrats amb l'escala 1 (la banda
         // del 1024 és 1000-1050, vegeu `esCarrilPagina1024`).
+        // EL CARRIL DE L'iPAD PRO 13 APAÏSSAT ES SEU (03/10/2026). En Marc:
+        // «Crea un segon carril per l'iPad Pro 13» i, en triar, «el carril propi
+        // i una mica més ample (1000 px)»: el model fa 1376 i amb el segon
+        // carril compartit li sobraven 218 px per banda. A la resta de la banda
+        // apaïssada el carril de la pagina segueix sent `min(939.2, 100vw - 80)`.
+        const carrilModel = carrilIPadPro13();
         const carrilPagina = typeof window !== 'undefined'
-          ? Math.min(939.2, Math.max(0, window.innerWidth - 80))
+          ? (carrilModel ?? Math.min(939.2, Math.max(0, window.innerWidth - 80)))
           : 0;
         // A TOTA LA BANDA APAÏSSADA, TAMBÉ LES ESTRETES (03/10/2026). Abans
         // nome's a partir de 1050 i les tauletes de 853, 934 i 981 es quedaven
@@ -2656,12 +2662,14 @@ function FullWideSlideHeader({
         // apaissades mes estretes (853, 934, 981) el carril es mes petit i la
         // composicio hi desbordava (mesurat a 853: el bloc de la p1 anava de 167
         // a 940 en un carril de 40 a 813). A 1024 i per sobre, escala 1.
+        // Amb el carril propi (1000) la composicio del 1024 CREIX un 6,5 %
+        // (1000 / 939,2); a la resta de la banda nome s pot encongir.
         const escalaCarrilPagina = (usaCarrilPagina && CARRIL_PAGINA_PX > 0)
           ? +(beltFinal / CARRIL_PAGINA_PX).toFixed(4)
           : 1;
         root.style.setProperty(
           '--hg-escala-mega',
-          String((isPortraitTablet || isLandscapeTablet) ? Math.min(1, escalaCarrilPagina) : escalaMegaslide(beltWidth)),
+          String((isPortraitTablet || isLandscapeTablet) ? (carrilModel != null ? escalaCarrilPagina : Math.min(1, escalaCarrilPagina)) : escalaMegaslide(beltWidth)),
         );
       } catch {
         // ignore

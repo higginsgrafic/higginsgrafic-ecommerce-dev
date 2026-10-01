@@ -1,3 +1,4 @@
+import { carrilIPadPro13 } from '@/utils/layoutModel';
 import { useEffect, useState } from 'react';
 import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 
@@ -29,9 +30,14 @@ const COLOR_CARRIL = 'rgba(37, 99, 235, 0.85)';
 // `min(939.2px, 100vw - 80px)` centrat (el del header, la hero i la taula de la
 // p1); el del megaslide es el de les guies blaves. Van amb el mateix commutador.
 const COLOR_CARRIL_PAGINA = 'rgba(22, 163, 74, 0.85)';
-const AMPLE_CARRIL_PAGINA = 'min(939.2px, calc(100vw - 80px))';
+const AMPLE_CARRIL_PAGINA_BASE = 'min(939.2px, calc(100vw - 80px))';
 
 export default function CarrilGuidesOverlay({ enabled, onToggle }) {
+  // EL CARRIL DEL MODEL, SI EN TE (03/10/2026). L'iPad Pro 13 apaïssat te el
+  // seu (1000 px, vegeu `layoutModel`): les segones guies l'han d'ensenyar, que
+  // son les que fa servir l'amo per comprovar que tot hi cau.
+  const carrilModel = carrilIPadPro13();
+  const ampleCarrilPagina = carrilModel != null ? `${carrilModel}px` : AMPLE_CARRIL_PAGINA_BASE;
   // EL COMMUTADOR, TAMBE AMB EL TECLAT (02/10/2026). La barra de botons nome s
   // surt a les rutes d'edicio, pero aquestes guies es poden encendre a qualsevol
   // pagina (`?carril=1`): si s'encenen en una pagina sense barra, no hi ha cap
@@ -143,7 +149,7 @@ export default function CarrilGuidesOverlay({ enabled, onToggle }) {
         data-guia-carril-pagina="esq"
         style={{
           position: 'fixed',
-          left: `calc((100vw - ${AMPLE_CARRIL_PAGINA}) / 2)`,
+          left: `calc((100vw - ${ampleCarrilPagina}) / 2)`,
           top: 0,
           height: '100vh',
           width: 0,
@@ -154,7 +160,7 @@ export default function CarrilGuidesOverlay({ enabled, onToggle }) {
         data-guia-carril-pagina="dret"
         style={{
           position: 'fixed',
-          left: `calc((100vw + ${AMPLE_CARRIL_PAGINA}) / 2)`,
+          left: `calc((100vw + ${ampleCarrilPagina}) / 2)`,
           top: 0,
           height: '100vh',
           width: 0,

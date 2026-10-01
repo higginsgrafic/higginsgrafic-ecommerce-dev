@@ -313,3 +313,23 @@ export function esIPadPro13({ ample, alt } = {}) {
   return IPAD_PRO_13_AMPLADES.some((a) => Math.abs(w - a) <= marge)
     && (es.isPortraitTablet || es.isLandscapeTablet);
 }
+
+/**
+ * EL CARRIL DE L'iPAD PRO 13 APAÏSSAT (03/10/2026).
+ *
+ * En Marc: «Crea un segon carril per l'iPad Pro 13» i, quan se li van donar les
+ * opcions, «el carril propi i una mica més ample (1000 px)». El model fa 1376 px
+ * d'ample i amb el segon carril compartit (939,2) li sobraven 218 px per banda.
+ *
+ * El carril es propi del model: nome s el fa servir quan la finestra es l'iPad
+ * Pro 13 APAÏSSAT (la vertical te el seu tauler de 992 i es una altra feina).
+ * Mai no passa de la finestra menys 80 px, que es la regla del segon carril.
+ */
+export const CARRIL_IPAD_PRO_13_APAISSADA_PX = 1000;
+export function carrilIPadPro13({ ample, alt } = {}) {
+  const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
+  const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
+  if (!esIPadPro13({ ample: w, alt: h })) return null;
+  if (!deviceLayoutFromViewport(w, h).isLandscapeTablet) return null;
+  return Math.min(CARRIL_IPAD_PRO_13_APAISSADA_PX, Math.max(320, w - 80));
+}
