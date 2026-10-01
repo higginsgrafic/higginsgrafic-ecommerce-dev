@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Trash2, Save, Heart, HeartOff, RotateCcw } from 'lucide-react';
+import { Trash2, Save,   RotateCcw } from 'lucide-react';
 import { supabase } from '@/api/supabase-products';
 import { useToast } from '@/components/ui/use-toast';
 

@@ -100,63 +100,63 @@ function MarkdownViewer({ filePath, onClose }) {
                     remarkPlugins={[remarkGfm]}
                     components={{
                     // Estils personalitzats per elements Markdown
-                    h1: ({node, ...props}) => (
+                    h1: ({_node, ...props}) => (
                       <h1 className="font-oswald text-[32pt] font-bold mb-4 mt-6" style={{ color: 'hsl(var(--grey-ink-strong))' }} {...props} />
                     ),
-                    h2: ({node, ...props}) => (
+                    h2: ({_node, ...props}) => (
                       <h2 className="font-oswald text-[24pt] font-bold mb-3 mt-5 border-b border-line pb-2" style={{ color: 'hsl(var(--grey-ink-strong))' }} {...props} />
                     ),
-                    h3: ({node, ...props}) => (
+                    h3: ({_node, ...props}) => (
                       <h3 className="font-oswald text-[18pt] font-bold mb-2 mt-4" style={{ color: 'hsl(var(--grey-ink-strong))' }} {...props} />
                     ),
-                    h4: ({node, ...props}) => (
+                    h4: ({_node, ...props}) => (
                       <h4 className="font-oswald text-[16pt] font-bold mb-2 mt-3" style={{ color: 'hsl(var(--grey-ink-strong))' }} {...props} />
                     ),
-                    p: ({node, ...props}) => (
+                    p: ({_node, ...props}) => (
                       <p className="font-roboto text-[13pt] text-ink-2 mb-4 leading-relaxed" {...props} />
                     ),
-                    a: ({node, ...props}) => (
+                    a: ({_node, ...props}) => (
                       <a className="text-blue-600 hover:text-blue-700 underline" {...props} />
                     ),
-                    ul: ({node, ...props}) => (
+                    ul: ({_node, ...props}) => (
                       <ul className="font-roboto text-[13pt] text-ink-2 list-disc list-inside mb-4 space-y-1" {...props} />
                     ),
-                    ol: ({node, ...props}) => (
+                    ol: ({_node, ...props}) => (
                       <ol className="font-roboto text-[13pt] text-ink-2 list-decimal list-inside mb-4 space-y-1" {...props} />
                     ),
-                    li: ({node, ...props}) => (
+                    li: ({_node, ...props}) => (
                       <li className="font-roboto text-[13pt] text-ink-2" {...props} />
                     ),
-                    code: ({node, inline, ...props}) => (
+                    code: ({_node, inline, ...props}) => (
                       inline
                         ? <code className="bg-paper-soft px-1.5 py-0.5 rounded font-mono text-[12pt] text-red-600" {...props} />
                         : <code className="block bg-ink-strong text-green-400 p-4 rounded-lg font-mono text-[12pt] overflow-x-auto mb-4" {...props} />
                     ),
-                    pre: ({node, ...props}) => (
+                    pre: ({_node, ...props}) => (
                       <pre className="bg-ink-strong text-green-400 p-4 rounded-lg font-mono text-[12pt] overflow-x-auto mb-4" {...props} />
                     ),
-                    blockquote: ({node, ...props}) => (
+                    blockquote: ({_node, ...props}) => (
                       <blockquote className="border-l-4 border-line-strong pl-4 italic text-ink-2 mb-4" {...props} />
                     ),
-                    table: ({node, ...props}) => (
+                    table: ({_node, ...props}) => (
                       <div className="overflow-x-auto mb-4">
                         <table className="min-w-full divide-y divide-line border border-line" {...props} />
                       </div>
                     ),
-                    thead: ({node, ...props}) => (
+                    thead: ({_node, ...props}) => (
                       <thead className="bg-paper-soft" {...props} />
                     ),
-                    th: ({node, ...props}) => (
+                    th: ({_node, ...props}) => (
                       <th className="px-4 py-2 text-left font-oswald text-[12pt] font-bold border border-line" style={{ color: 'hsl(var(--grey-ink-strong))' }} {...props} />
                     ),
-                    td: ({node, ...props}) => (
+                    td: ({_node, ...props}) => (
                       <td className="px-4 py-2 font-roboto text-[12pt] text-ink-2 border border-line" {...props} />
                     ),
-                    hr: ({node, ...props}) => (
+                    hr: ({_node, ...props}) => (
                       <hr className="my-6 border-t border-line-strong" {...props} />
                     ),
                     // Suport per checkboxes
-                    input: ({node, ...props}) => (
+                    input: ({_node, ...props}) => (
                       <input className="mr-2" {...props} />
                     )
                   }}

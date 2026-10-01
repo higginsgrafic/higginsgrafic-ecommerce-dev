@@ -1,4 +1,3 @@
-import { carrilPx } from '../../utils/layoutMetrics.js';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import OptimizedImg from './OptimizedImg.jsx';
 import { estilCaixaBloc, ALCADA_PASTILLA_SELECTOR_PX } from './estilsBlocs.js';
@@ -175,7 +174,7 @@ export function FirstContactDibuix00Buttons({
   // Si la variant rebuda esta amagada, la pastilla es queda al mig (Color), que
   // es l'acabat que sempre hi es.
   const selectedKey = buttons.some((b) => b.key === selectedVariant) ? selectedVariant : 'color';
-  const selectedIndex = Math.max(0, ORDRE.indexOf(selectedKey));
+  const _selectedIndex = Math.max(0, ORDRE.indexOf(selectedKey));
 
   // Mode compacte: redueix l'espai entre textos, manté l'últim (Negre) fixat
   const btnH = compact ? 24 : slotPct;
@@ -344,7 +343,7 @@ export function FirstContactDibuix00Buttons({
 export function FirstContactDibuix09Buttons({
   onPrev,
   onNext,
-  tileSize,
+  _tileSize,
   // UNA FLETXA A DALT I L'ALTRA A BAIX (24/09/2026, ho va demanar l'amo).
   //
   // Amb `vertical` la botonera deixa de ser quadrada i fa la MATEIXA forma que

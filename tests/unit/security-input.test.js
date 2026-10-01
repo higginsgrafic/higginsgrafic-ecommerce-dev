@@ -5,7 +5,7 @@
  * amb caràcters no vàlids. L'objectiu és verificar que els inputs de l'usuari
  * no poden injectar HTML/JS o causar comportaments inesperats.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { createElement } from 'react';
 import { render } from '@react-email/render';
 

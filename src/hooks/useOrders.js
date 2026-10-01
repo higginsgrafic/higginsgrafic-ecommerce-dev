@@ -54,7 +54,7 @@ function mapOrderFromApi(o) {
   };
 }
 
-const MOCK_ORDERS = [
+const _MOCK_ORDERS = [
   { num: '#00000000000000000000027', status: 'PENDENT', date: '12-07-26', active: true, total: '45,90€', icon: 'MoreHorizontal' },
   { num: '#00000000000000000000026', status: 'EN PREPARACIÓ', date: '10-07-26', active: true, total: '32,50€', icon: 'Loader2' },
   { num: '#00000000000000000000025', status: 'EN REPARTIMENT', date: '08-07-26', active: true, total: '78,00€', icon: 'Truck' },

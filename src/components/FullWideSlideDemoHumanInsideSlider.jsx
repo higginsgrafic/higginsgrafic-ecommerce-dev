@@ -32,7 +32,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
 }) {
   const nxImgRef = useRef(null);
   const nccImgRef = useRef(null);
-  const [nxScale, setNxScale] = useState(0.75);
+  const [_nxScale, setNxScale] = useState(0.75);
   const preloadedSrcRef = useRef(new Set());
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
@@ -127,7 +127,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
     return base.replace(/\.(png|jpg|jpeg|webp)$/i, '').replace(/[-_]+/g, ' ');
   };
 
-  const resolveSrc = (it) => {
+  const _resolveSrc = (it) => {
     if (!it) return null;
     const variant = variantOverride || (isHumanInside ? humanInsideVariant : firstContactVariant);
     if (isPathItem(it) && collectionId) {
@@ -366,7 +366,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
           >
             {trackItems.map((slot, trackPos) => {
               const it = slot.it;
-              const originalIndex = slot.originalIndex;
+              const _originalIndex = slot.originalIndex;
               const shouldMeasure = slot.originalIndex === 1 && trackPos >= baseStart && trackPos < baseEnd;
 
               return (

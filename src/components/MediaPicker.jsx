@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Image as ImageIcon, Video, Check, Folder, ChevronRight, Home } from 'lucide-react';
+import { X, Upload, Image as  Video, Check, Folder, ChevronRight, Home } from 'lucide-react';
 import { uploadFile, listFiles, getPublicUrl } from '@/api/storage';
 import { useToast } from '@/components/ui/use-toast';
 

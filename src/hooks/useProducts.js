@@ -104,7 +104,7 @@ export const useProductSearch = (initialQuery = '', debounceDelay = 300) => {
 /**
  * Hook per filtrar productes amb múltiples criteris
  */
-export const useProductFilters = (initialFilters = {}) => {
+export const useProductFilters = (_initialFilters = {}) => {
   const { filters, setFilters, getFilteredProducts } = useProductContext();
   const [sortBy, setSortBy] = useState('relevance');
 

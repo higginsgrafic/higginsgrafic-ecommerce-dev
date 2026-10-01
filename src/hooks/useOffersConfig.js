@@ -53,7 +53,7 @@ export const useOffersConfig = () => {
           });
           return;
         }
-      } catch (error) {
+      } catch {
         console.warn('⚠️ No s\'ha pogut obtenir configuració de Supabase, provant altres fonts');
       }
 
@@ -77,7 +77,7 @@ export const useOffersConfig = () => {
             discountRate: 0,
           });
           return;
-        } catch (error) {
+        } catch {
           console.warn('⚠️ Error parseant localStorage');
         }
       }
@@ -102,7 +102,7 @@ export const useOffersConfig = () => {
           });
           return;
         }
-      } catch (error) {
+      } catch {
         console.warn('⚠️ No s\'ha pogut obtenir configuració del backend');
       }
 

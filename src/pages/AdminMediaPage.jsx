@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, X, Copy, Image as ImageIcon, Trash2, Check, Video, FileText, Music, Folder, FolderPlus, Home, ChevronRight } from 'lucide-react';
+import { Upload,  Copy, Image as  Trash2, Check, Video, FileText, Music, Folder, FolderPlus, Home, ChevronRight } from 'lucide-react';
 import { uploadFile, listFiles, deleteFile, getPublicUrl, createFolder } from '@/api/storage';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -124,7 +124,7 @@ export default function AdminMediaPage() {
         description: "L'enllaç s'ha copiat al portapapers",
       });
       setTimeout(() => setCopiedUrl(null), 2000);
-    } catch (err) {
+    } catch {
       toast({
         title: "Error",
         description: "No s'ha pogut copiar l'URL",
@@ -203,7 +203,7 @@ export default function AdminMediaPage() {
     setCurrentFolder(newPath);
   };
 
-  const navigateUp = () => {
+  const _navigateUp = () => {
     const parts = currentFolder.split('/');
     parts.pop();
     setCurrentFolder(parts.join('/'));

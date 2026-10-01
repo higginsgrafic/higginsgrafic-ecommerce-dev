@@ -19,7 +19,7 @@ import {
  * @returns {string|null} ruta a la imatge stripe o null
  */
 export function resolveForItem(it, tileVariant, ctx) {
-  const { active, displayedShirtColor, resolvedOverlaySrc } = ctx;
+  const { active, displayedShirtColor, _resolvedOverlaySrc } = ctx;
 
   if (active === 'first_contact') {
     if (tileVariant === 'white') return FIRST_CONTACT_MEDIA_WHITE[it] || FIRST_CONTACT_MEDIA[it] || null;

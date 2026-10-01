@@ -12,7 +12,7 @@
  */
 import { test, expect } from '@playwright/test';
 import { execSync } from 'child_process';
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 const LIGHTHOUSE_OUTPUT_DIR = 'test-results/lighthouse';

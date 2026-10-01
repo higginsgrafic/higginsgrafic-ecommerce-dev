@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 vi.stubEnv('SITE_URL', 'https://test.higginsgrafic.com');
 vi.stubEnv('TRACKING_TOKEN_EXPIRY_DAYS', '90');

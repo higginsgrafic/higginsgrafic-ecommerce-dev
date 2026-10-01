@@ -82,7 +82,7 @@ export const uploadFile = async (file, folder = '') => {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = folder ? `${folder}/${fileName}` : fileName;
 
-    const { data, error } = await supabase.storage
+    const { _data, error } = await supabase.storage
       .from('media')
       .upload(filePath, file, {
         // UN ANY, NO UNA HORA (28/09/2026). Amb una hora, el navegador torna a

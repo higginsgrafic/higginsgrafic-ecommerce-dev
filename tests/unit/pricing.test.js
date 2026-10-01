@@ -14,7 +14,7 @@ vi.mock('stripe', () => ({
 const mockFromSelect = vi.fn();
 const mockFromInsert = vi.fn();
 const mockFromUpdate = vi.fn();
-const mockSingle = vi.fn();
+const _mockSingle = vi.fn();
 const mockRpc = vi.fn();
 
 vi.mock('@supabase/supabase-js', () => ({

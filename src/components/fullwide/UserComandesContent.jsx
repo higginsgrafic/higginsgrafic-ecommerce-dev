@@ -132,7 +132,7 @@ function UserComandesContent({ userEmail }) {
     setEditForm({ ent: card.ent, nom: card.nom, num: card.num, exp: card.exp, cvvVerified: card.cvvVerified });
     setCvvInput('');
   };
-  const handleVerifyCvv = () => {
+  const _handleVerifyCvv = () => {
     const isValid = cvvInput.length >= 3;
     setEditForm(p => ({ ...p, cvvVerified: isValid }));
     if (isValid) setCvvInput('');
@@ -182,7 +182,6 @@ function UserComandesContent({ userEmail }) {
   const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'hsl(var(--grey-ink-2))' };
 
   // Graella de 5 columnes irregulars amb gutter de 7.5px (mesurades del mockup)
-  const COL_TEMPLATE = '374px 299px 186px 188px 288px';
   const GUTTER = '7.5px';
   // Les 1.5 primeres línies de la pauta són espai en blanc (tabs a la posició original)
   const TOP_OFFSET = 1.5 * ROW_H;
@@ -228,7 +227,7 @@ function UserComandesContent({ userEmail }) {
         marginRight: 'auto',
         transform: 'translateX(-4px)',
       }}>
-        {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((tab, i) => {
+        {['COMANDES', 'MISSATGES', 'COMPTE', 'SEGURETAT'].map((tab, _i) => {
           const isActive = activeTab === tab;
           return (
             <div
@@ -348,7 +347,7 @@ function UserComandesContent({ userEmail }) {
                     <span>{text}{req && <span style={supStyle}>1</span>}</span>
                   </div>
                 );
-                const pwd = (text) => (
+                const _pwd = (text) => (
                   <div className="compte-ph-wrap">
                     {/* eslint-disable-next-line react/no-unknown-property -- atribut no estàndard de Safari (WebKit); React 18 el deixa passar tal qual */}
                     <input type="password" placeholder=" " autoComplete="new-password" passwordrules="minlength: 30; required: lower; required: upper; required: digit; required: special;" />
@@ -357,7 +356,7 @@ function UserComandesContent({ userEmail }) {
                     </span>
                   </div>
                 );
-                const passwordMask = (count = 5) => (
+                const _passwordMask = (count = 5) => (
                   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', padding: '0 10px', boxSizing: 'border-box' }}>
                     <span style={{ color: COL_WEAK, fontFamily: 'Roboto Condensed, sans-serif', fontSize: '14pt', letterSpacing: '4px', lineHeight: 1, userSelect: 'text' }}>
                       {'\u2022'.repeat(count)}
@@ -682,7 +681,6 @@ function UserComandesContent({ userEmail }) {
                 const cellStyle = { ...TEXT, padding: '0 10px', display: 'flex', alignItems: 'center', height: '100%', boxSizing: 'border-box' };
                 const supSt = { fontFamily: 'Oswald, sans-serif', fontWeight: 700, fontSize: '0.65em', verticalAlign: 'baseline', position: 'relative', top: '-0.35em', marginLeft: '2px' };
                 const RED = 'hsl(var(--grey-ink-2))';
-                const SEG_SHIFT_X = '7.55px';
                 const optRow = (label, checked = false, muted = false, sup = null) => (
                   <div style={{ ...cellStyle, fontSize: '11pt', color: muted ? 'hsl(var(--grey-muted))' : 'hsl(var(--grey-ink-2))', gap: '8px' }}>
                     <span style={{ width: '12px', height: '12px', borderRadius: '3px', border: `1px solid ${muted ? 'hsl(var(--grey-line-strong))' : 'hsl(var(--grey-muted-2))'}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', flexShrink: 0 }}>
@@ -731,7 +729,7 @@ function UserComandesContent({ userEmail }) {
                   null,
                 ];
                 const anyBottomOpen = formatsOpen || mailingOpen || factorOpen || gestioOpen;
-                const eyeBtn = (
+                const _eyeBtn = (
                   <span
                     role="button"
                     aria-label={segVisible ? 'Amaga les dades' : 'Mostra les dades'}
@@ -793,7 +791,7 @@ function UserComandesContent({ userEmail }) {
                     }
                     const cardIdx = r - 2;
                     const d = paymentMethods[cardIdx];
-                    const noPupilEye = (
+                    const _noPupilEye = (
                       <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M1 5C2.8 2.3 5.6 1 9 1C12.4 1 15.2 2.3 17 5C15.2 7.7 12.4 9 9 9C5.6 9 2.8 7.7 1 5Z" stroke="hsl(var(--grey-muted))" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
@@ -1493,7 +1491,7 @@ function UserComandesContent({ userEmail }) {
         </colgroup>
         <thead>
           <tr style={{ height: '30px' }}>
-            {['COMANDA', 'ESTAT', 'DATA', 'TOT PLEGAT', 'EN DETALL'].map((h, i) => {
+            {['COMANDA', 'ESTAT', 'DATA', 'TOT PLEGAT', 'EN DETALL'].map((h, _i) => {
               const sortable = h !== 'EN DETALL';
               return (
               <th

@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { verifyAdmin } from '../lib/auth.js';
-import { checkRateLimit } from '../lib/rate-limit.js';
 import { jsonResponse } from '../lib/cors.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -86,7 +85,7 @@ async function updateSupabase(supabase, rates) {
   }
 }
 
-export async function handler(event, context) {
+export async function handler(event, _context) {
   const httpMethod = event.httpMethod;
 
   if (httpMethod === 'GET') {

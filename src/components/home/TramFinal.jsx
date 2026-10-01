@@ -27,10 +27,10 @@ const DEFAULT_POSTER_LINES = [];
 
 const TramFinal = forwardRef(function TramFinal(
   {
-    rowHeight = 38,
+    _rowHeight = 38,
     posterLines = DEFAULT_POSTER_LINES,
     posterTextOffsetX = '10px',
-    tambeTitle = 'cada dibuix té una història',
+    _tambeTitle = 'cada dibuix té una història',
     tambeHref = '/constructor/pdp',
     marginTop = '-552px',
     // Desplaçament vertical del titol del rail (per encaixar-lo entre el poster

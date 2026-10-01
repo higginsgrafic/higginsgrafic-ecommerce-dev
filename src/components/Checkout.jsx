@@ -7,7 +7,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useGridDebug } from '@/contexts/GridDebugContext';
 import { formatPrice } from '@/utils/formatters';
 
-function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
+function Checkout({ isOpen, onClose, _items, totalPrice, onComplete }) {
   const { error } = useToast();
   const { getDebugStyle, isSectionEnabled } = useGridDebug();
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -115,7 +115,6 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
   if (typeof document === 'undefined') return null;
 
   const wrapperHeight = viewportHeight || (typeof window !== 'undefined' ? window.innerHeight : 0);
-  const paddingPx = 0;
   const modalMaxHeight = wrapperHeight || undefined;
   const shippingOriginalPrice = 4.2;
 

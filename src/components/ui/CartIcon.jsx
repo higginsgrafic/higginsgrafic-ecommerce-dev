@@ -4,8 +4,8 @@ function CartIcon({
   onClick,
   className = '',
   iconSize = 'clamp(1.75rem, 3.5vw, 1.640625rem)',
-  badgeSize = 'clamp(1.40625rem, 3.125vw, 1.23046875rem)',
-  badgeFontSize = 'clamp(0.875rem, 1.875vw, 0.8203125rem)'
+  _badgeSize = 'clamp(1.40625rem, 3.125vw, 1.23046875rem)',
+  _badgeFontSize = 'clamp(0.875rem, 1.875vw, 0.8203125rem)'
 }) {
   return (
     <button

@@ -72,7 +72,6 @@ const CADE_BAIXADA = 56;
  * des del cadenat, la hero no hi pot tocar mai: el primer dese d'aire ja el deixa
  * a sota.
  */
-const CADENAT_BAIX_PX = 58;
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
 const FILES_MIN = 8;
 const FILES_MAX = 32;
@@ -230,7 +229,7 @@ function MarcInici({ seccions }) {
         //
         // ES LA LINIA, NO L'ALCADA DEL PANELL: a la linia hi sumem la capcalera.
         const ample = window.innerWidth;
-        const alt = window.innerHeight;
+        const _alt = window.innerHeight;
         const alcadaPanellEstimada = esVertical
           ? 0.585 * carril
           : (ample <= 1376 ? 0.2529 * carril + 5.3 : 0.1775 * carril + 111.3);
@@ -326,7 +325,7 @@ function MarcInici({ seccions }) {
       // la cel·la (el coixi de sota), i nome's s'hi aplica si hi cap de sobres.
       // Si no hi cap, tot queda exactament com estava.
       const ambCadenat = CADE_BAIXADA + natural;
-      const encaixa = ambCadenat <= disponible;
+      const _encaixa = ambCadenat <= disponible;
       // A LES DUES MIDES DE PORTATIL (1280 i 1366) la hero s'ALINEA AL FONS DEL
       // VIEWPORT, tant si hi cap com si no:
       //

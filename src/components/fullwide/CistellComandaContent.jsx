@@ -629,7 +629,7 @@ function CistellComandaContent({ cartItems, setCartItems, onFinalizeOrder, onAmp
           }, 0);
           const fmt = (n) => n.toFixed(2).replace('.', ',') + '€';
           const renderOverlay = (orientation) => {
-            const isPortrait = orientation === 'portrait';
+            const _isPortrait = orientation === 'portrait';
             return createPortal((
               <div style={{
                 // Fins que no hi ha mesura, el bloc no es veu: si no, sortia a la

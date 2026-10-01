@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
-import { Plus, X, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 const STATUS_LABELS = {
   pending: 'Pendent de pagament',
@@ -201,7 +201,7 @@ function AccountTab({ profile, addresses, onUpdateProfile }) {
 }
 
 export function UserProfileTabs({ onTabChange }) {
-  const { user } = useAuth();
+  const { _user } = useAuth();
   const { profile, addresses, orders, loading, updateProfile } = useProfile();
 
   const [tabs] = useState([
@@ -272,6 +272,6 @@ export function UserProfileTabs({ onTabChange }) {
   );
 }
 
-export function UserProfileContent({ activeTab }) {
+export function UserProfileContent({ _activeTab }) {
   return null;
 }

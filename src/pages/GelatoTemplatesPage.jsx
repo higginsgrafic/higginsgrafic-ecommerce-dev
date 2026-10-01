@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { syncGelatoStoreProducts } from '../api/gelato';
 
 export default function GelatoTemplatesPage() {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import ProductGallery from '@/components/ProductGallery';
@@ -96,7 +96,7 @@ const extractDesignFromImageUrl = (url) => {
 const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { products, getProductById, toggleWishlist, isInWishlist } = useProductContext();
+  const { _products, getProductById, toggleWishlist, isInWishlist } = useProductContext();
   const { success } = useToast();
   const { isAdmin } = useAdmin();
 
@@ -138,7 +138,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
 
   const [selectedSize, setSelectedSize] = useState(availableSizes[0] || 'M');
   const [selectedColor, setSelectedColor] = useState(null);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, _setQuantity] = useState(1);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [galleryImageIndex, setGalleryImageIndex] = useState(0);
@@ -286,7 +286,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     return normalizeToCanonicalColor(v.color) === normalizeToCanonicalColor(selectedColor);
   }) || validVariants[0];
 
-  const colorThumbnails = useMemo(() => {
+  const _colorThumbnails = useMemo(() => {
     const productImages = Array.isArray(product?.images) ? product.images : [];
     const targetDesignKey = normalizeLooseKey(selectedVariant?.design || product?.name);
     return (availableColors || []).map((c) => {
@@ -1046,7 +1046,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
           url: window.location.href
         });
         trackShare('product', product.id, 'native');
-      } catch (error) {
+      } catch {
         // User cancelled share
       }
     } else {

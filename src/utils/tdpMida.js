@@ -49,7 +49,7 @@ export function tdpColumnes(ampleFinestra) {
  * @param {number} alcadaFinestra  alcada de la finestra, en px
  * @returns {{amplada: number, alcada: number, columnes: number, gutter: number, pas: number}}
  */
-export function tdpMidaFitxa(carrilAmple, ampleFinestra, alcadaFinestra = 0) {
+export function tdpMidaFitxa(carrilAmple, ampleFinestra, _alcadaFinestra = 0) {
   const columnes = tdpColumnes(ampleFinestra);
   const amplada = Math.round((carrilAmple - (columnes - 1) * TDP_GUTTER_X) / columnes);
   // L'alcada es proporcional a l'AMPLADA de la fitxa (5:4), que es com es veu

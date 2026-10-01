@@ -36,7 +36,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
     []
   );
 
-  const pautaFrameStyle = {
+  const _pautaFrameStyle = {
     position: 'absolute',
     left: '50%',
     top: TDP_PAGE_TOP_OFFSET,
@@ -45,7 +45,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
     transform: `translateX(calc(-50% + ${TDP_PAGE_LEFT_OFFSET}))`,
   };
 
-  const pautaGridStyle = {
+  const _pautaGridStyle = {
     position: 'relative',
     display: 'grid',
     height: '100%',
@@ -55,7 +55,7 @@ function TdpPage({ pautaEnabled = false, tableEnabled = false }) {
     rowGap: PAUTA_GUTTER_Y,
   };
 
-  const pautaRowTrackStyle = {
+  const _pautaRowTrackStyle = {
     position: 'absolute',
     left: 'calc((100% - 45px) / 3 + 11.25px - 12px)',
     top: 0,

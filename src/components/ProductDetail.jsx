@@ -11,7 +11,7 @@ function ProductDetail({ product, onClose, onAddToCart }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const sizes = ['S', 'M', 'L', 'XL'];
-  const modalRef = useRef(null);
+  const _modalRef = useRef(null);
   const closeButtonRef = useRef(null);
   const { getDebugStyle, isSectionEnabled } = useGridDebug();
 

@@ -16,7 +16,7 @@ import { deltaObjectiuPageLift, alcadaPanellMegaslide, desplacamentFranjaEscript
 // seves regles, que són les que fan que les files de dibuixos caiguin a les
 // files dels cercles de color.
 
-const AMPLE_BASE_DESKTOP = () => {
+const _AMPLE_BASE_DESKTOP = () => {
   const base = midaDibuix(false, false);
   const gapH = gapHorizontal(false, false);
   return GRAELLA_COLUMNES * base + (GRAELLA_COLUMNES - 1) * gapH; // 875

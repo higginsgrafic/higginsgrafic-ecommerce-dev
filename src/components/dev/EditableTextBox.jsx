@@ -25,14 +25,14 @@ function EditableTextBox({
   columns = null,
   onClick,
   onDoubleClick,
-  selectedColumn,
-  onColumnSelect,
+  _selectedColumn,
+  _onColumnSelect,
   renderText = true,
-  renderHandle = false,
-  onSettingsChange,
-  onTextChange,
-  presetVersion,
-  editorPreview,
+  _renderHandle = false,
+  _onSettingsChange,
+  _onTextChange,
+  _presetVersion,
+  _editorPreview,
 }) {
   const text = initialText ?? '';
   const settings = {

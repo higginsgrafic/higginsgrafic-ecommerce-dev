@@ -23,7 +23,7 @@ const LlistaCheckout = ({ items, onBreadcrumbClick, country = 'Espanya' }) => {
   const productTableRef = useRef(null);
   const scrollViewportRef = useRef(null);
   const [scrollRow, setScrollRow] = useState(0);
-  const [productTableHeight, setProductTableHeight] = useState(0);
+  const [_productTableHeight, setProductTableHeight] = useState(0);
 
   const checkoutRenderItems = useMemo(() => items, [items]);
   const visibleProductRows = Math.min(Math.max(checkoutRenderItems.length, PRODUCT_TABLE_MIN_ROWS), PRODUCT_TABLE_MAX_ROWS);
@@ -55,7 +55,7 @@ const LlistaCheckout = ({ items, onBreadcrumbClick, country = 'Espanya' }) => {
     }
   }, [visibleProductRows, checkoutRenderItems.length]);
 
-  const { getCost, zoneInfo } = useShippingCosts();
+  const { getCost, _zoneInfo } = useShippingCosts();
   const itemTotal = checkoutRenderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const totalQuantity = checkoutRenderItems.reduce((total, item) => total + (item.quantity || 1), 0);
   const shipping = getCost(country, totalQuantity, itemTotal);

@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 
-function HtmlBasePage({ pautaEnabled = false, tableEnabled = false }) {
+function HtmlBasePage({ _pautaEnabled = false, _tableEnabled = false }) {
   return (
     <section className="bg-background">
       <Helmet>

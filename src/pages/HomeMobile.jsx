@@ -1,7 +1,6 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Shuffle } from 'lucide-react';
-import TDP1 from '@/components/tdp/TDP1';
 import CollectionTableCard from '@/components/tdp/CollectionTableCard';
 import StoryPosterLink from '@/components/StoryPosterLink';
 import { buildHomeDrawingPlan, buildHeroStripePlan } from '@/components/home/homeDrawings';

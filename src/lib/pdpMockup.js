@@ -149,7 +149,7 @@ export function collectionGridHoverVariantsFor(collectionSlug, productRoute, shi
       { color: 'white', inks: INK_INVERTS_ON_LIGHT, contrari: 'black', acabat: 'BLANC' },
       { color: 'black', inks: INK_INVERTS_ON_DARK, contrari: 'white', acabat: 'NEGRE' },
     ];
-    for (const { color, inks: inversos, contrari, acabat } of PARELLA_INVERSA) {
+    for (const { _color, inks: inversos, contrari, acabat } of PARELLA_INVERSA) {
       if (!inversos.includes(shirtColor)) continue;
       if (!inks.includes(acabat === 'BLANC' ? INK_WHITE : INK_BLACK)) continue;
       const versio = tdpImageFor(collectionSlug, productRoute, contrari, acabat);

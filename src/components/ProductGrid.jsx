@@ -35,7 +35,7 @@ function ProductGrid({
   cartItems,
   onUpdateQuantity,
   collectionPath,
-  backgroundColor
+  _backgroundColor
 }) {
   const { getDebugStyle, isSectionEnabled } = useGridDebug();
   const gridTitleFontSize = useResponsiveFontSize(typography.productGrid.title);

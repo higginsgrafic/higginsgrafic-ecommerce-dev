@@ -1,6 +1,6 @@
 // @vitest-environment node
 // (esbuild no pot funcionar dins de jsdom: necessita el TextEncoder real)
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect,   vi } from 'vitest';
 import { build } from 'esbuild';
 import { createRequire } from 'module';
 import { readFileSync, readdirSync, statSync } from 'fs';

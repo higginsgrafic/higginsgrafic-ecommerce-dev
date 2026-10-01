@@ -130,7 +130,7 @@ export default function TambeRail({
     let raf = null;
     let ro = null;
     let mo = null;
-    const readCssNumber = (name) => {
+    const _readCssNumber = (name) => {
       try {
         const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         if (!raw) return null;

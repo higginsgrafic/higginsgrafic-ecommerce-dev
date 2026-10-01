@@ -16,7 +16,7 @@ describe('stripe.js — restriccions de seguretat reals', () => {
   });
 
   it('createPaymentIntent rebutja items buits (no envia request)', async () => {
-    const fetchSpy = vi.stubbedFetch || fetch;
+    const _fetchSpy = vi.stubbedFetch || fetch;
     const mod = await import('../../src/api/stripe.js');
 
     // Items buits — el server rebutja, però el client tampoc hauria d'enviar

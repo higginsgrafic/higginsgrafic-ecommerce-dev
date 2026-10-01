@@ -76,10 +76,10 @@ export default function BottomTabBar() {
       style={{ bottom: '0px' }}
     >
       <div className="flex items-center justify-around h-16 max-w-md mx-auto">
-        {tabs.map(({ to, icon: Icon, label, isLogo, isCart }) => {
+        {tabs.map(({ to, icon: Icon, _label, isLogo, isCart }) => {
           const isCerca = to === 'cerca';
           const navTo = isCerca ? '/' : to;
-          const isActive = !isCerca && (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to));
+          const _isActive = !isCerca && (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to));
 
           if (isCerca) {
             return (

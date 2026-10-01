@@ -5,9 +5,9 @@ import {
   ChevronDown,
   Trash2,
   Plus,
-  Eye,
+  _Eye,
   EyeOff,
-  GripVertical,
+  _GripVertical,
   X,
   Check,
   Edit3
@@ -103,7 +103,7 @@ export default function ColleccioSettingsPage() {
       //   3) esborrat NOMÉS de les que ja no són a la llista
       // Si qualsevol pas falla, les dades existents queden intactes.
       const collectionsToSave = collections.map((collection, index) => {
-        const { created_at, ...collectionData } = collection;
+        const { _created_at, ...collectionData } = collection;
         return {
           ...collectionData,
           display_order: index,

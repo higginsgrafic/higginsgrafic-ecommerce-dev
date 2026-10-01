@@ -1,4 +1,4 @@
-import { useEffect, useCallback, Suspense } from 'react';
+import { useEffect, useCallback } from 'react';
 import { installLayoutMetricsProbe } from '@/utils/layoutMetrics';
 import { useDebugOverlays } from '@/hooks/useDebugOverlays';
 import useMegaStripeDebugState from '@/hooks/useMegaStripeDebugState';
@@ -24,21 +24,21 @@ export default function DebugLayer({
   isEmbeddedPreview,
   isHomeRoute,
   isDevHeaderRoute,
-  isDevLayoutRoute,
+  _isDevLayoutRoute,
   isAdminRoute,
   isPrivacyRoute,
-  isComponentsCatalogTemplateRoute,
-  isContactSheetRoute,
+  _isComponentsCatalogTemplateRoute,
+  _isContactSheetRoute,
   cartItemCount,
   onCartClick,
   onUserClick,
   onDebugStateChange,
   appHeaderOffset,
-  demoHeaderOffset,
-  baseHeaderHeight,
+  _demoHeaderOffset,
+  _baseHeaderHeight,
   adminBannerHeight,
-  offersHeaderHeight,
-  isLargeScreen,
+  _offersHeaderHeight,
+  _isLargeScreen,
 }) {
   const beltEnabledFromUrl = (() => {
     try {
@@ -64,19 +64,19 @@ export default function DebugLayer({
   const rulerInset = rulersOverlayActive ? 18 : 0;
 
   const layoutInspectorActive = debugOverlaysEnabled && !isEmbeddedPreview && (isAdmin || isDevDemoRoute) ? layoutInspectorEnabled : false;
-  const layoutInspectorWrap = Boolean(layoutInspectorActive);
+  const _layoutInspectorWrap = Boolean(layoutInspectorActive);
 
   const {
-    selectedElement,
+    _selectedElement,
     selectedContainerToken,
     copyContainerStatus,
     selectionStatus,
-    layoutInspectorPickEnabled,
-    setLayoutInspectorPickEnabled,
+    _layoutInspectorPickEnabled,
+    _setLayoutInspectorPickEnabled,
     clicksEnabled,
     setClicksEnabled,
     clickMarks,
-    setClickMarks,
+    _setClickMarks,
     debugButtonsWrapRef,
     copySelectedContainer,
   } = useLayoutInspector({ layoutInspectorActive });

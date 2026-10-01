@@ -260,7 +260,7 @@ export default function useMegaStripeDebugState({ beltEnabledFromUrl, locationPa
       const rawDy = window.localStorage.getItem('MEGA_STRIPE_DY');
       const rawSpriteEnabled = window.localStorage.getItem('MEGA_STRIPE_SPRITE_ENABLED');
       const rawBelt = window.localStorage.getItem('MEGA_STRIPE_BELT');
-      const rawOverlayMode = window.localStorage.getItem('MEGA_STRIPE_OVERLAY_MODE');
+      const _rawOverlayMode = window.localStorage.getItem('MEGA_STRIPE_OVERLAY_MODE');
       const rawShirtDrawingEnabledNew = window.localStorage.getItem('HG_SHIRT_DRAWING_ENABLED');
       const rawShirtDrawingEnabledOld = window.localStorage.getItem('HG_SHIRT_DRAWING_OVERLAY_ENABLED');
       const rawDrawingOverlaySrc = window.localStorage.getItem('HG_DRAWING_OVERLAY_SRC');

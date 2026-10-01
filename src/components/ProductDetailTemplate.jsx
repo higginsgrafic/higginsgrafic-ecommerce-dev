@@ -103,7 +103,7 @@ export default function ProductDetailTemplate({ product }) {
   const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
 
   const pautaGridRef = useRef(null);
-  const [rowHeight, setRowHeight] = useState(38);
+  const [_rowHeight, setRowHeight] = useState(38);
   const [exactRowHeight, setExactRowHeight] = useState(38);
 
   useLayoutEffect(() => {

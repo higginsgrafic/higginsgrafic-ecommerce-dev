@@ -25,7 +25,6 @@ const STATUS_ICON = {
 
 const LEGEND = ['PENDENT', 'PREPARACIÓ', 'REPARTIMENT', 'ATURADA', 'CANCEL·LADA', 'ENTREGADA'];
 
-const COL_TEMPLATE = '2.2fr 1fr 1.3fr 1.3fr 0.9fr';
 
 const TEXT = { fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: '9pt', color: 'hsl(var(--grey-ink-2))' };
 const HEAD = { fontFamily: 'Oswald, sans-serif', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'hsl(var(--grey-ink))' };
@@ -41,7 +40,7 @@ const PHONE_PREFIXES = [
 
 const IMG_W = 1024;
 const IMG_H = 270;
-const IMG_RATIO = IMG_H / IMG_W;
+const _IMG_RATIO = IMG_H / IMG_W;
 
 const TransparentInput = React.forwardRef(function TransparentInput({ placeholder, defaultValue, style, onBlur, error }, ref) {
   return (
@@ -71,10 +70,10 @@ export default function MegaslidePagina4({
   isPortraitTablet = false,
   isLandscapeTablet = false,
   orders,
-  adminEmail,
-  touchMegaPublicActivity,
+  _adminEmail,
+  _touchMegaPublicActivity,
 }) {
-  const { user, authReady, signOut } = useAuth();
+  const { user, _authReady, signOut } = useAuth();
   const { profile, orders: profileOrders, addresses, updateProfile, updateAddress, addAddress } = useProfile();
   const navigate = useNavigate();
 
@@ -110,7 +109,7 @@ export default function MegaslidePagina4({
   const [missingFields, setMissingFields] = useState([]);
   const fileInputRef = useRef(null);
 
-  const formSlideOpen = messagesSlideOpen;
+  const _formSlideOpen = messagesSlideOpen;
 
   const nameRef = useRef(null);
   const emailRef = useRef(null);

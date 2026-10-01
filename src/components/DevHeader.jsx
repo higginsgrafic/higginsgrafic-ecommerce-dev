@@ -12,7 +12,7 @@ function DevHeader({
   onUserClick,
 }) {
   const location = useLocation();
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
   const suppressThemeOverrides = location.pathname === '/admin/controls';
   const cartClickTimeoutRef = useRef(null);
 

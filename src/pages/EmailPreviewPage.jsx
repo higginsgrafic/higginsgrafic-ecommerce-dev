@@ -392,7 +392,7 @@ export default function EmailPreviewPage() {
         `}</style>
       )}
 
-      {filtered.map(({ id, name, html, bgImage }) => {
+      {filtered.map(({ _id, name, html, bgImage }) => {
         const renderGrid = showGrid;
         return (
           <section key={name} style={{ marginBottom: '56px' }}>

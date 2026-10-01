@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ZoomIn, ZoomOut } from 'lucide-react';
 import { tshirtSrc } from '@/utils/placeholders';
 
@@ -8,7 +8,7 @@ const ProductGallery = ({
   productName,
   onImageClick,
   layout = 'desktop',
-  colorThumbnails = null,
+  _colorThumbnails = null,
   selectedColor = null,
   onColorSelect = null,
   thumbnailRows = null
@@ -356,7 +356,7 @@ const ProductGallery = ({
         animate: { opacity: 0 },
         transition: { duration: 0.3, ease: [0.32, 0.72, 0, 1] }
       };
-  const indexColorKey = (() => {
+  const _indexColorKey = (() => {
     if (!selectedColorKey) return null;
     const thumbRows = Array.isArray(thumbnailRows) ? thumbnailRows : [];
     const flatThumbs = thumbRows.flatMap((r) => (Array.isArray(r) ? r : []));

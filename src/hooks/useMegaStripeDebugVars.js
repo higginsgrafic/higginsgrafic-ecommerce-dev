@@ -29,7 +29,7 @@ const parseBool = (raw, fallback = true) => {
   return v === '' || v === '1' || v === 'true' || v === 'on' || v === 'yes';
 };
 
-const readRefPair = (enabledKey, srcKey) => {
+const _readRefPair = (enabledKey, srcKey) => {
   try {
     const en = window.localStorage.getItem(enabledKey) === '1';
     const src = String(window.localStorage.getItem(srcKey) || '');

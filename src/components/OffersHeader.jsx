@@ -9,7 +9,7 @@ import { useGridDebug } from '@/contexts/GridDebugContext';
 const OffersHeader = ({ adminBannerVisible = false }) => {
   const texts = useTexts();
   const navigate = useNavigate();
-  const { enabled, text, loading, bgColor, textColor, fontSize, font, link, clickable } = useOffersConfig();
+  const { enabled, text, loading, _bgColor, _textColor, fontSize, font, link, clickable } = useOffersConfig();
   const { getDebugStyle, isSectionEnabled } = useGridDebug();
 
   // Determinar si s'ha de mostrar (mentre carrega o quan està enabled)

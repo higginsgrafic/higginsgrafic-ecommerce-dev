@@ -4,7 +4,7 @@ vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
 vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-key');
 
 const mockAuthGetUser = vi.fn();
-const mockStaffSingle = vi.fn();
+const _mockStaffSingle = vi.fn();
 const mockRpc = vi.fn();
 
 // Build a chainable mock for supabase.from(table)
@@ -14,8 +14,8 @@ function buildFromMock(opts = {}) {
     selectError = 'not found',
     insertData = null,
     insertError = null,
-    updateData = null,
-    updateError = null,
+    _updateData = null,
+    _updateError = null,
   } = opts;
 
   const singleFn = vi.fn().mockResolvedValue({ data: selectData, error: selectError });

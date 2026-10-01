@@ -11,7 +11,7 @@ import {
   AlertCircle,
   FileText,
   Image as ImageIcon,
-  Tag,
+  _Tag,
   Ruler,
   Palette,
   DollarSign,

@@ -101,7 +101,7 @@ class ErrorBoundary extends React.Component {
     'rgba(218,165,32,0.25)',
   ];
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true };
   }
 

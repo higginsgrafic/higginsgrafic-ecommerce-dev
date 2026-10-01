@@ -1,10 +1,8 @@
-import { useState, useLayoutEffect, useRef, useMemo, useEffect } from 'react';
+import { useState, useLayoutEffect, useRef, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { Shuffle } from 'lucide-react';
-import HeroSlider from '@/components/HeroSlider';
 import HomeColleccio from '@/components/home/HomeColleccio';
-import EditableTextBox from '@/components/dev/EditableTextBox';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
 import { buildHomeDrawingPlan, buildHeroStripePlan } from '@/components/home/homeDrawings';
 import StoryPosterLink from '@/components/StoryPosterLink';
@@ -17,7 +15,7 @@ import { laneForViewport } from '@/utils/layoutModel';
 import { tdpMidaFitxa } from '@/utils/tdpMida';
 import { tshirtSrc } from '@/utils/placeholders';
 
-const HERO_SLIDES = [
+const _HERO_SLIDES = [
   {
     id: 'first-contact',
     imageSrc: tshirtSrc('royal'),
@@ -98,7 +96,7 @@ const COLLECTIONS_MENU = [
   },
 ];
 
-function CollectionTitle({ index, kicker, title, subtitle, align = 'left', numberAlign, titleOffsetX = 0, titleOffsetY = 0, numberOffsetX = -20, numberOffsetY = 0, numberTopPercent = 50, subtitleOffsetX = 0, subtitleOffsetY = 0, titleTextAlign, collectionHref }) {
+function CollectionTitle({ index, _kicker, title, subtitle, align = 'left', numberAlign, titleOffsetX = 0, titleOffsetY = 0, numberOffsetX = -20, numberOffsetY = 0, numberTopPercent = 50, subtitleOffsetX = 0, subtitleOffsetY = 0, titleTextAlign, collectionHref }) {
   const isRight = align === 'right';
   const resolvedNumberAlign = numberAlign || align;
   const isNumberRight = resolvedNumberAlign === 'right';

@@ -280,7 +280,7 @@ function CartBlocksGrid({
   totalPrice,
   onUpdateQuantity,
   onRemove,
-  onUpdateSize,
+  _onUpdateSize,
   onViewCart,
   onCheckout,
   onClearCart,
@@ -550,13 +550,15 @@ function SimpleConfirmModal({
   return createPortal(modal, document.body);
 }
 
+// Component de cistella complet, encara no connectat a cap vista (02/10/2026).
+// eslint-disable-next-line no-unused-vars
 function CartContent({
   preset,
   cartItems,
   totalPrice,
   onUpdateQuantity,
   onRemove,
-  onUpdateSize,
+  _onUpdateSize,
   onViewCart,
   onCheckout,
   onClearCart,
@@ -785,7 +787,7 @@ export default function SlideShell({
   onRemove,
   onUpdateSize,
   onViewCart,
-  onCheckout,
+  _onCheckout,
   onClearCart,
   onLogout,
 }) {

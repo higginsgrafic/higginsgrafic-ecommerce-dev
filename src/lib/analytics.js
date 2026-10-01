@@ -61,7 +61,7 @@ export function trackEvent(eventName, options = {}) {
     if (typeof plausible === 'function') {
       plausible(eventName, options);
     }
-  } catch (err) {
+  } catch {
     // Silenciós per no trencar l'UX
   }
 }

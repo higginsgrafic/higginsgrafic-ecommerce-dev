@@ -71,7 +71,7 @@ vi.mock('../../netlify/lib/email.js', () => ({
 
 const { handler } = await import('../../netlify/functions/stripe-webhook.js');
 
-function makeWebhookEvent(stripeEventId = 'evt_001') {
+function makeWebhookEvent(_stripeEventId = 'evt_001') {
   return {
     httpMethod: 'POST',
     headers: { 'stripe-signature': 'sig_test' },

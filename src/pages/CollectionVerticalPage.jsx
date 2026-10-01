@@ -32,7 +32,7 @@ import {
   TDP_SEPARACIO_FONS_PX,
   TDP_FONS_BLEED_PX,
   TDP_POSTER_SEPARACIO_PX,
-  TDP_POSTER_PADDING_TOP_PX,
+  _TDP_POSTER_PADDING_TOP_PX,
   TDP_PEUSEPARACIO_PX,
 } from '@/config/collectionVertical';
 import { readOverlayState, writeOverlayState } from '@/utils/collectionOverlayState';
@@ -72,7 +72,7 @@ function CollectionVerticalPage({ slug }) {
   } = config;
 
   const isMobile = useIsMobile();
-  const [overlayState, setOverlayState] = useState(() => readOverlayState(copy));
+  const [overlayState, _setOverlayState] = useState(() => readOverlayState(copy));
   const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
   // Alcada d'una fila de la graella de logotips: es proporcional a l'amplada
   // del carril (mesurat a 540, 720 i 900 px), aixi que es calcula en lloc de
@@ -115,15 +115,15 @@ function CollectionVerticalPage({ slug }) {
   // graella (files fixes amb pitch variable). Es mesura en un `useLayoutEffect`
   // (ABANS del pintat) i es publica com a variable CSS, aixi no cal ni cap
   // re-render ni cap bucle de punt fix ni cap `setTimeout`.
-  const [isLandscapeTablet, setIsLandscapeTablet] = useState(esTauletaApaisada());
-  const [isPortraitTablet, setIsPortraitTablet] = useState(
+  const [isLandscapeTablet, _setIsLandscapeTablet] = useState(esTauletaApaisada());
+  const [isPortraitTablet, _setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
       && window.innerWidth <= 1024
       && window.innerHeight > window.innerWidth
   );
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
-  const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
+  const { _pautaOpacity, _tableOpacity, _backgroundOpacity } = overlayState;
   const otherImages = useMemo(() => buildOtherCollectionsImages(slug), [slug]);
   const getCardLayout = useCollectionCardLayout({ isPortraitTablet, isLandscapeTablet });
 
@@ -134,7 +134,7 @@ function CollectionVerticalPage({ slug }) {
   // Les proporcions son mesurades a 768/1024/1280/1366/1440/1920:
   // alcada = carril x 0,4446 (tauleta) o x 0,308 (escriptori).
   // Entre files: 30 px de bleed de baix + 15 px d'aire + 30 px de bleed de dalt.
-  const esTauleta = isPortraitTablet || isLandscapeTablet;
+  const _esTauleta = isPortraitTablet || isLandscapeTablet;
   // La mida de la fitxa surt de `tdpMidaFitxa`, que es l'UNICA font de veritat
   // i que tambe fa servir la pagina d'inici. Aixi les dues no es poden
   // desincronitzar.
@@ -145,8 +145,8 @@ function CollectionVerticalPage({ slug }) {
   );
   const alcadaFitxa = midaTdp.alcada;
   const ampladaFitxa = midaTdp.amplada;
-  const numColumnes = midaTdp.columnes;
-  const gutterX = midaTdp.gutter;
+  const _numColumnes = midaTdp.columnes;
+  const _gutterX = midaTdp.gutter;
   const pasColumna = midaTdp.pas;
   const margeEsquerre = tdpMargeEsquerre(carrilAmple, midaTdp);
   const separacioFiles = TDP_SEPARACIO_FONS_PX + 2 * TDP_FONS_BLEED_PX; // 15 + 60
@@ -276,7 +276,7 @@ function CollectionVerticalPage({ slug }) {
         // de dalt i el de baix no son iguals si es mesura la caixa. El mesurem
         // amb el text, que es el que es veu.
         const posterTextEl = poster.firstElementChild || poster;
-        const alcadaPoster = posterTextEl.getBoundingClientRect().height;
+        const _alcadaPoster = posterTextEl.getBoundingClientRect().height;
         // L'exces que desborda el contingut del bloc final (i del seu
         // contenidor): el peu ha de quedar DESPRES del contingut, no de la
         // caixa, que es mes curta.
@@ -292,7 +292,7 @@ function CollectionVerticalPage({ slug }) {
           const targetesBottom = targetes.length
             ? Math.max(...targetes.map((a) => a.getBoundingClientRect().bottom))
             : railEl.getBoundingClientRect().bottom;
-          const contingutBottom = Math.max(
+          const _contingutBottom = Math.max(
             tram.getBoundingClientRect().bottom,
             targetesBottom,
           );
@@ -627,7 +627,7 @@ function CollectionVerticalPage({ slug }) {
             const producte = products[idx % products.length];
             const color = colorAt(rowIdx, colIdx);
             if (!color || !producte) return null;
-            const col = colIdx + 1;
+            const _col = colIdx + 1;
             const Card = CollectionTableCard;
             // Totes les fitxes son EXACTAMENT com la primera: nom a sobre la
             // samarreta i el fons sense girar. Fora, doncs, l'alternanca de

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { tdpImageFor, availableFinishesFor, defaultFinishFor } from '@/lib/pdpMockup';
 import { PDP_REGISTRY_BY_ROUTE } from '@/data/pdpRegistry';
@@ -61,7 +61,7 @@ export default function PdpPage() {
     );
   }
 
-  const PRODUCT_SLUG = product.slug;
+  const _PRODUCT_SLUG = product.slug;
   const PRODUCT_ROUTE = product.route;
   const PRODUCT_NAME = product.name;
   const COLLECTION_NAME = product.collectionName;

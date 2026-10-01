@@ -1,4 +1,4 @@
-import { syncGelatoStoreProducts, mapGelatoProduct, gelatoClient } from './gelato';
+import { syncGelatoStoreProducts,  gelatoClient } from './gelato';
 import productsService from './supabase-products';
 import { supabase } from './supabase-products';
 
@@ -10,7 +10,7 @@ function calculateSellingPrice() {
   return SELLING_PRICE;
 }
 
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const _sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function fetchVariantCosts(storeProduct) {
   if (!gelatoClient || !storeProduct.variants) return;
@@ -27,7 +27,7 @@ async function fetchVariantCosts(storeProduct) {
         if (entry && entry.price != null) {
           v.cost = parseFloat(entry.price) * (1 - GELATO_PLUS_DISCOUNT);
         }
-      } catch (e) {
+      } catch {
         // s'usa el fallback GELATO_COST_PRICE
       }
     }));
@@ -198,7 +198,7 @@ function transformStoreProductForSupabase(storeProduct) {
   }
 
   const mockupUrl = storeProduct.mockupUrl || storeProduct.previewUrl || storeProduct.imageUrl;
-  const images = mockupUrl ? [mockupUrl] : [];
+  const _images = mockupUrl ? [mockupUrl] : [];
 
   const variants = (storeProduct.variants || []).map(v => {
     const parts = (v.title || '').split(' - ');

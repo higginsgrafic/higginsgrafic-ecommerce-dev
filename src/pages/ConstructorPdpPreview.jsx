@@ -1,10 +1,8 @@
-import { useEffect, useState, useLayoutEffect, useRef } from 'react';
+import { useState, useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Pauta4ColsOverlay from '@/components/pauta/Pauta4ColsOverlay';
-import CollectionProductCard from '@/components/tdp/CollectionProductCard';
 import TambeRail from '@/pages/productRail/TambeRail';
-import RespescaTitle from '@/pages/productRail/RespescaTitle';
 import CarouselArrows from '@/pages/productRail/CarouselArrows';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import EditableTextBox from '@/components/dev/EditableTextBox';
@@ -48,17 +46,17 @@ const PDP_SIZE_SETTINGS = {
   letterSpacing: 0, lineHeight: 1, textAlign: 'center', verticalAlign: 'center',
   color: 'hsl(var(--grey-ink-2))', textTransform: 'none',
 };
-const PDP_SPECS_HEADING_SETTINGS = {
+const _PDP_SPECS_HEADING_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Oswald', fontSize: 24, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.04, lineHeight: 1, textAlign: 'right', verticalAlign: 'bottom',
   color: 'hsl(var(--grey-ink-2))', textTransform: 'uppercase',
 };
-const PDP_SPEC_LABEL_SETTINGS = {
+const _PDP_SPEC_LABEL_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Roboto Condensed', fontSize: 8, fontWeight: 700, selectedFontWeight: 700,
   letterSpacing: 0.2, lineHeight: 1.2, textAlign: 'right', verticalAlign: 'bottom',
   color: 'hsl(var(--grey-ink-strong))', textTransform: 'uppercase',
 };
-const PDP_SPEC_VALUE_SETTINGS = {
+const _PDP_SPEC_VALUE_SETTINGS = {
   x: 0, y: 0, fontFamily: 'Roboto', fontSize: 16, fontWeight: 300, selectedFontWeight: 700,
   letterSpacing: 0.03, lineHeight: 1.2, textAlign: 'right', verticalAlign: 'top',
   color: 'rgba(71, 80, 89, 0.7)', textTransform: 'none',
@@ -128,14 +126,14 @@ function ConstructorPdpPreview() {
   const productName = colorToProductName(OFFICIAL_COLORS[effectiveInitialIndex]);
 
   const {
-    pdpControlsEnabled,
-    pautaEnabled,
+    _pdpControlsEnabled,
+    _pautaEnabled,
     setPautaEnabled,
-    tableEnabled,
+    _tableEnabled,
     setTableEnabled,
-    pautaOpacity,
+    _pautaOpacity,
     setPautaOpacity,
-    tableOpacity,
+    _tableOpacity,
     setTableOpacity,
   } = useDebugOverlays();
 
@@ -151,11 +149,11 @@ function ConstructorPdpPreview() {
   const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
 
   const pautaGridRef = useRef(null);
-  const [rowHeight, setRowHeight] = useState(38);
+  const [_rowHeight, setRowHeight] = useState(38);
   // Alçada EXACTA d'una fila de la pauta real (70 files) per dimensionar les
   // fletxes "També et pot interessar" exactament com l'alçada d'una fila.
   const [exactRowHeight, setExactRowHeight] = useState(38);
-  const [copiedDesign, setCopiedDesign] = useState(false);
+  const [_copiedDesign, _setCopiedDesign] = useState(false);
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -183,7 +181,7 @@ function ConstructorPdpPreview() {
     };
   }, []);
 
-  const updateState = (patch) => {
+  const _updateState = (patch) => {
     if ('pautaEnabled' in patch) setPautaEnabled(patch.pautaEnabled);
     if ('tableEnabled' in patch) setTableEnabled(patch.tableEnabled);
     if ('pautaOpacity' in patch) setPautaOpacity(patch.pautaOpacity);

@@ -1,5 +1,5 @@
 import { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import TambeRail from '@/pages/productRail/TambeRail';
 import CarouselArrows from '@/pages/productRail/CarouselArrows';
@@ -68,7 +68,7 @@ const OFFICIAL_COLORS = [
   'daisy', 'gold', 'red', 'dark-chocolate', 'ice-grey', 'rs-sport-grey',
   'charcoal', 'black',
 ];
-const THUMB_COUNT = OFFICIAL_COLORS.length;
+const _THUMB_COUNT = OFFICIAL_COLORS.length;
 
 const SPECS = [
   { label: 'Material', value: '100% cotó pentinat de 150 g/m²' },
@@ -166,7 +166,7 @@ function PdpDesktop({ product }) {
   const [railGeo, setRailGeo] = useState(null);
   const [tdpAvailableHeight, setTdpAvailableHeight] = useState(null);
   const [beltWidth, setBeltWidth] = useState(null);
-  const [beltLeft, setBeltLeft] = useState(null);
+  const [_beltLeft, setBeltLeft] = useState(null);
   const [isPortraitTablet, setIsPortraitTablet] = useState(
     typeof window !== 'undefined'
       && window.innerWidth >= 768
@@ -383,7 +383,7 @@ function PdpDesktop({ product }) {
   const portraitHorizontalCardWidth = portraitAvailableWidth != null
     ? Math.floor((portraitAvailableWidth - 10) / 3)
     : null;
-  const portraitBelt = portraitRailViewportWidth;
+  const _portraitBelt = portraitRailViewportWidth;
 
   // --- Ample del contenidor de 3 columnes ---
   const portraitControlWidth = isPortraitTablet && portraitHorizontalCardWidth
@@ -457,7 +457,7 @@ function PdpDesktop({ product }) {
     : `repeat(4, 1fr)`;
   const titleSettings = isCompactTablet ? { ...PDP_TITLE_SETTINGS, fontSize: 19, lineHeight: 0.95 } : PDP_TITLE_SETTINGS;
   const collectionSettings = isCompactTablet ? { ...PDP_COLLECTION_SETTINGS, fontSize: 14, lineHeight: 1 } : PDP_COLLECTION_SETTINGS;
-  const descriptionSettings = isCompactTablet
+  const _descriptionSettings = isCompactTablet
     ? { ...PDP_DESCRIPTION_SETTINGS, fontSize: 12, lineHeight: 1.2, letterSpacing: 0.02 }
     : { ...PDP_DESCRIPTION_SETTINGS, lineHeight: PDP_DESCRIPTION_SETTINGS.lineHeight };
   const priceSettings = isCompactTablet ? { ...PDP_PRICE_SETTINGS, fontSize: 19 } : PDP_PRICE_SETTINGS;

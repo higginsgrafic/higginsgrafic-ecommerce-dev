@@ -175,7 +175,7 @@ export function carrilDeclarat({ ample, alt } = {}) {
  * `maxAmple` es el carril declarat quan n'hi ha: el marc del lloc i el carril
  * son la mateixa cosa, i per això el marc tambe ha de poder seguir el 3/5.
  */
-export function siteFrameForViewport({ vw, vh, rulerInset = 0, maxAmple = 1350 } = {}) {
+export function siteFrameForViewport({ vw, _vh, rulerInset = 0, maxAmple = 1350 } = {}) {
   const ample = Number.isFinite(vw) && vw > 0 ? vw : getLayoutViewportWidth();
   if (!Number.isFinite(ample) || ample <= 0) return null;
   const disponible = Math.max(0, ample - rulerInset);
@@ -197,7 +197,7 @@ export function siteFrameForViewport({ vw, vh, rulerInset = 0, maxAmple = 1350 }
  */
 export function computeLayoutModel({
   deviceLayout,
-  teCapcaleraDev = false,
+  _teCapcaleraDev = false,
   alcadaOfertesPx = 0,
   alcadaBannerAdminPx = 0,
   rulerInsetPx = 0,

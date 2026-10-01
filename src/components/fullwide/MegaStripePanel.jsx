@@ -2,19 +2,18 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import MegaColumn from './MegaColumn.jsx';
 import { DibuixFranja, resolDibuixDeCasella, desplacamentsGapFranja, FACTOR_ESCALA_CALIBRATGES_VERTICAL_P2 } from './DibuixFranja.jsx';
 import ClicAreaOverlay from './ClicAreaOverlay.jsx';
-import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { esTauletaApaisada } from '../../utils/layoutMetrics.js';
-import { carrilMegaslide, paramsMegaslide, versioMegaslide } from '../../utils/layoutModel.js';
+import { carrilMegaslide, paramsMegaslide } from '../../utils/layoutModel.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
 import {
-  DIBUIXOS_FRANJA_DX,
-  DIBUIXOS_FRANJA_DY,
-  DIBUIXOS_FRANJA_AMPLADA_NATURAL,
-  escalaDibuixFranja,
+  _DIBUIXOS_FRANJA_DX,
+  _DIBUIXOS_FRANJA_DY,
+  _DIBUIXOS_FRANJA_AMPLADA_NATURAL,
+  _escalaDibuixFranja,
   alcadaReservaGraellaPanellCss,
   esBandaEstretaFranja,
   AJUST_BAIX_BLOC_FRANJA_PX,
@@ -26,15 +25,15 @@ import {
   areesClicEstreta,
   VECTOR_FRANJA_SAMARRETES,
   VECTOR_FRANJA_SAMARRETES_01,
-  VECTOR_FRANJA_CAIXES,
+  _VECTOR_FRANJA_CAIXES,
   VECTOR_FRANJA_VIEWBOX,
   VECTOR_FRANJA_VIEWBOX_OBERT,
   VECTOR_FRANJA_CONTINGUT,
-  VECTOR_FRANJA_SAMARRETA,
-  VECTOR_FRANJA_SAMARRETA_01,
-  VECTOR_FRANJA_IMPRESSIO_01,
-  VECTOR_FRANJA_MIDA_SENCERA,
-  VECTOR_FRANJA_MIDA_IMPRESSIO,
+  _VECTOR_FRANJA_SAMARRETA,
+  _VECTOR_FRANJA_SAMARRETA_01,
+  _VECTOR_FRANJA_IMPRESSIO_01,
+  _VECTOR_FRANJA_MIDA_SENCERA,
+  _VECTOR_FRANJA_MIDA_IMPRESSIO,
   VEL_SAMARETA_CAIXA,
   VEL_SILUETA_CAIXES,
 } from '../../config/vectorFranja.js';
@@ -1510,7 +1509,7 @@ function MegaStripePanel({
                           if (picked === false) {
                             return null;
                           }
-                          const imgUrl = picked ? encodeURI(picked) : '';
+                          const _imgUrl = picked ? encodeURI(picked) : '';
                           const safeW = Number(r?.width) || 0;
                           const safeH = Number(r?.height) || 0;
                           const safeL = Number(r?.left) || 0;

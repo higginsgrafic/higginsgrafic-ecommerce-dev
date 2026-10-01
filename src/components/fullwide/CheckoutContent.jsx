@@ -569,7 +569,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     if (!inks.includes(ink)) ink = inks[0];
     return ink;
   };
-  const mockupSrc = (item) => {
+  const _mockupSrc = (item) => {
     if (!item.collectionSlug || !item.productRoute) return null;
     const design = item.productRoute;
     const color = colorSlug(item.color);

@@ -94,7 +94,7 @@ export default function PromotionsManagerPage() {
           setPinnedTexts(data.pinned);
         }
         toast({ title: 'Importat correctament' });
-      } catch (err) {
+      } catch {
         toast({ title: 'Error', description: 'Fitxer no vàlid', variant: 'destructive' });
       }
     };

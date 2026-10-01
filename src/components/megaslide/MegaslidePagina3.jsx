@@ -8,11 +8,11 @@ export default function MegaslidePagina3({
   setCartItems,
   setActive,
   localCartItemCount,
-  megaAccordionLocked,
+  _megaAccordionLocked,
   acordioExpanded,
-  setAcordioExpanded,
-  touchMegaPublicActivity,
-  accordionPautaScale,
+  _setAcordioExpanded,
+  _touchMegaPublicActivity,
+  _accordionPautaScale,
 }) {
   const navigate = useNavigate();
   const [ampleNatural, setAmpleNatural] = useState(null);

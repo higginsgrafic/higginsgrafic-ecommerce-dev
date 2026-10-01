@@ -38,7 +38,7 @@ const STATUS_LABELS = {
 };
 
 
-export async function handler(event, context) {
+export async function handler(event, _context) {
   if (event.httpMethod === 'OPTIONS') {
     return jsonResponse(event, 200, {});
   }
@@ -99,7 +99,7 @@ export async function handler(event, context) {
       }
 
       // Authenticated user: list own orders
-      const { user, error: userError } = await verifyUser(event);
+      const { user, error: _userError } = await verifyUser(event);
 
       // Un administrador autenticat TAMBÉ passa verifyUser. Si demana una
       // comanda concreta (per número o per email), ha de poder veure-la encara

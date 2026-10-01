@@ -351,7 +351,7 @@ export default function useLayoutInspector({ layoutInspectorActive }) {
         const ok = fallbackCopy();
         if (!ok) throw new Error('copy_failed');
       }
-      setCopyContainerStatus((prev) => {
+      setCopyContainerStatus((_prev) => {
         const isRepeat = lastCopiedTokenRef.current && lastCopiedTokenRef.current === text;
         return isRepeat ? 'copied_again' : 'copied';
       });

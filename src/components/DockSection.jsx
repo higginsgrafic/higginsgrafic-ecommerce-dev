@@ -6,7 +6,7 @@ import ProductGrid from '@/components/ProductGrid';
 
 function DockSection({ collectionSlug, onAddToCart, cartItems, onUpdateQuantity }) {
   const { getRandomProductsByCollection, getProductsByCollection } = useProductContext();
-  const { getDebugStyle, isSectionEnabled } = useGridDebug();
+  const { _getDebugStyle, _isSectionEnabled } = useGridDebug();
   const [collection, setCollection] = useState(null);
 
   const isFirstContact = (collectionSlug || '').toString().trim().toLowerCase() === 'first-contact';

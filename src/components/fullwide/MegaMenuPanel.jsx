@@ -19,7 +19,7 @@ import {
 } from '../megaslide/geometriaMegaslide.js';
 import { alturaTaulaVertical, CapaTaulaVertical, TaulaVerticalP1 } from '../megaslide/TaulaVertical.jsx';
 import { CercadorDibuixosGraella, dibuixosGraella16x4 } from './CercadorTextRow.jsx';
-import { FirstContactDibuix00Buttons, FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
+import { FirstContactDibuix00Buttons } from './firstContactPanels.jsx';
 
 const MegaslidePagina3 = lazy(() => import('../megaslide/MegaslidePagina3.jsx'));
 const MegaslidePagina4 = lazy(() => import('../megaslide/MegaslidePagina4.jsx'));
@@ -344,7 +344,7 @@ export default function MegaMenuPanel({
 
   // La graella de dibuixos de la taula ensenya 7 dibuixos alhora (com la
   // columna de l'horitzontal) i les fletxes passen de pagina.
-  const [paginaGraella, setPaginaGraella] = useState(0);
+  const [paginaGraella, _setPaginaGraella] = useState(0);
   const DIBUIXOS_PER_PAGINA = 7;
 
   // Les props compartides de la franja de la pagina 1: les fan servir la

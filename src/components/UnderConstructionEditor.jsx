@@ -26,7 +26,7 @@ export default function UnderConstructionEditor() {
     globalRedirect: false
   });
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [_saving, setSaving] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState('saved');
   const [initialLoad, setInitialLoad] = useState(true);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);

@@ -42,7 +42,7 @@ function AdminBanner({ rulerInset = 0 }) {
       const ok = fallbackCopy();
       if (!ok) throw new Error('copy_failed');
       info('URL copiada al porta-retalls');
-    } catch (err) {
+    } catch {
       error('No s\'ha pogut copiar la URL');
     }
   };

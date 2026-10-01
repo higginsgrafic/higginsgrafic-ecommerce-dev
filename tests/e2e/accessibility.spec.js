@@ -189,7 +189,7 @@ test.describe('a11y — lang i title', () => {
 
   test('About té <title> únic (BUG: mateix títol que Home)', async ({ page }) => {
     await page.goto('/');
-    const homeTitle = await page.title();
+    const _homeTitle = await page.title();
 
     await page.goto('/about');
     await page.waitForLoadState('domcontentloaded');

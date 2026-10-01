@@ -21,7 +21,6 @@ import { TITOL_CARDS_FACTOR } from '@/config/iniciNou';
  * per construccio, i el marge de la seccio passa a ser l'aire que es veu.
  */
 const PINDOLA_TOP = 130;
-const PINDOLA_ALCADA_U = 39;
 
 /**
  * Una galeria de la pagina d'inici: el titol d'una colleccio i la seva fila de

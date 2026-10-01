@@ -11,7 +11,6 @@ vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
 vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-service-key');
 
 let factura = null;
-let correuEnviat = null;
 
 vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({

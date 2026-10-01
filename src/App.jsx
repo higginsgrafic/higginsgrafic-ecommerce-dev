@@ -128,7 +128,7 @@ function App() {
       products: [],
     });
 
-  const { cartItems, getTotalItems, getTotalPrice, addToCart, updateQuantity, removeFromCart, updateSize, clearCart, loading, error, products } =
+  const { cartItems, getTotalItems, _getTotalPrice, addToCart, updateQuantity, _removeFromCart, _updateSize, clearCart, loading, error, products } =
     safeProductContext;
 
   const isHomeRoute = location.pathname === '/';
@@ -215,7 +215,7 @@ function App() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const heroSettingsDevHeaderHeight = isDevHeaderRoute ? baseHeaderHeight : 0;
+  const _heroSettingsDevHeaderHeight = isDevHeaderRoute ? baseHeaderHeight : 0;
   const offersHeaderHeight = offersHeaderVisible ? 40 : 0;
   // LA BARRA DE DESENVOLUPAMENT NO ENTRA A LES PAGINES DEL LLOC.
   //
@@ -233,7 +233,7 @@ function App() {
     && (isAdmin || isAdminRoute || isDevDemoRoute)
     && !isEmbeddedPreview;
   const adminBannerHeight = adminBannerVisible ? 40 : 0;
-  const offersHeaderTop = adminBannerVisible ? adminBannerHeight : 0;
+  const _offersHeaderTop = adminBannerVisible ? adminBannerHeight : 0;
   const adminRouteDevHeaderHeight = (isAdminRoute && devHeaderVisible) ? baseHeaderHeight : 0;
 
   const isPrivacyRoute = location.pathname === '/privacy';

@@ -3,7 +3,7 @@ import { CERCADOR_COLLECTIONS, CERCADOR_COLORS, etiquetaColleccio } from './Cerc
 // La geometria de la graella viu a midesGraella.js perquè també la fa servir
 // el mòdul de mesura única. Aquí només es consumeix.
 import {
-  GRAELLA_COLUMNES, GRAELLA_ESQUERRA_LANDSCAPE,
+  GRAELLA_COLUMNES, _GRAELLA_ESQUERRA_LANDSCAPE,
   midaDibuix, gapHorizontal, gapVertical, colorGap,
   midesGraellaCompacta,
   MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,
@@ -64,7 +64,6 @@ const BULLET_CX = 0.40;     // centre x del bullet des del connector (18px)
 const TEXT_X = 0.886;       // inici del text des del connector (40px)
 const INK = 'hsl(var(--grey-ink))';
 const INK_HOVER = INK;
-const INK_SELECTED = 'hsl(var(--grey-ink-pure))';
 
 
 // Mapping: text label -> stripe item ID (per seleccionar el disseny a la franja)
@@ -281,7 +280,7 @@ const COLUMNS = [
   [{ bullet: true, collection: 'miscellania', subcollection: null, items: ['Arthur D The Second', 'Death staR2D2', 'DJ Vader', 'Pont Del Diable', 'R2D2 Quote'] }],
 ];
 
-function Group({ group, isFirst, dimmed, clickable, selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave }) {
+function Group({ group, isFirst, dimmed, clickable, _selectedStripeItem, hoveredStripeItem, onSelectGroup, onHoverItem, onHoverLeave }) {
   const { bullet, items, collection, subcollection } = group;
   const n = items.length;
   const firstStripeItem = STRIPE_MAP[items[0]];
@@ -1464,11 +1463,9 @@ export function CercadorColleccionsColumna({
   const COIX_VERTICAL_PX = 2;
   // L'alcada de la caixa blanca (22,59 px a 1920: la xifra que ha mesurat
   // l'amo). La franja en fa 27 i el coixi vertical se'n menja 6.
-  const ALCADA_CAIXA_PX = 22.59;
   // L'alcada de la caixa COMPTA la vora d'1 px interior: `border-box`.
-  const BORA_CAIXA_PX = 1;
   const COIX_COLUMNA_PX = COIX_LATERAL_PX;
-  const coixInset = COIX_LATERAL_PX;
+  const _coixInset = COIX_LATERAL_PX;
   // LA LLETRA DELS ENLLACOS, PROPORCIONAL TAMBE A LES TAULETES (01/10/2026).
   //
   // Era fixa de 13,5 px a les dues tauletes, i la columna no hi arriba: a 1024
@@ -2181,7 +2178,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // Dins el carril, tot el que es pinta son proporcions seves; les tauletes
     // (un disseny a part) i la banda estreta tenen les seves excepcions.
     const esTauleta = isPortraitTablet || isLandscapeTablet;
-    const esBandaEstreta = typeof window !== 'undefined' && !esTauleta
+    const _esBandaEstreta = typeof window !== 'undefined' && !esTauleta
       && window.innerWidth >= MIDA_TAULETA_APAISADA_MIN && window.innerWidth <= MIDA_TAULETA_APAISADA_MAX
       && window.innerWidth >= window.innerHeight;
     // La graella de dibuixos és de 16 columnes × 4 files (64 dibuixos). Els

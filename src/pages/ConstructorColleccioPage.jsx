@@ -96,11 +96,11 @@ function loadOverlayState() {
 }
 
 function ConstructorColleccioPage() {
-  const [overlayState, setOverlayState] = useState(loadOverlayState);
-  const [zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
-  const pautaGridRef = useRef(null);
+  const [overlayState, _setOverlayState] = useState(loadOverlayState);
+  const [_zeroLeftOffsetPx, setZeroLeftOffsetPx] = useState(0);
+  const _pautaGridRef = useRef(null);
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
-  const { pautaOpacity, tableOpacity, backgroundOpacity } = overlayState;
+  const { _pautaOpacity, _tableOpacity, backgroundOpacity } = overlayState;
 
   useEffect(() => {
     try {

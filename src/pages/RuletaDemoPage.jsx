@@ -27,11 +27,9 @@ export default function RuletaDemoPage() {
     []
   );
 
-  const UI_BLUE = '#2d6cff';
-  const UI_YELLOW = '#ffd400';
 
   const [viewport, setViewport] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
-  const [visualVp, setVisualVp] = useState(() => {
+  const [_visualVp, setVisualVp] = useState(() => {
     const vv = window.visualViewport;
     return vv ? { w: vv.width, h: vv.height, scale: vv.scale, offsetLeft: vv.offsetLeft, offsetTop: vv.offsetTop } : null;
   });
@@ -221,7 +219,7 @@ export default function RuletaDemoPage() {
     const dx = (e.clientX - thumbDragRef.current.startX) / s;
     const dy = (e.clientY - thumbDragRef.current.startY) / s;
     if (e.shiftKey) {
-      setThumbArcRadius((prev) => {
+      setThumbArcRadius((_prev) => {
         const base = thumbDragRef.current.startRadius;
         const next = Math.round(base + dy);
         return clamp(next, 120, 900);
@@ -295,7 +293,7 @@ export default function RuletaDemoPage() {
   };
 
   const polar = (cx, cy, r, a) => ({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) });
-  const arcPath = (cx, cy, rOuter, rInner, a0, a1) => {
+  const _arcPath = (cx, cy, rOuter, rInner, a0, a1) => {
     const p0 = polar(cx, cy, rOuter, a0);
     const p1 = polar(cx, cy, rOuter, a1);
     const p2 = polar(cx, cy, rInner, a1);

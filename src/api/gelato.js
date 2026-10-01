@@ -3,14 +3,10 @@
  * Documentació: https://gelato.com/api-docs
  */
 
-import apiClient from './client';
 import { supabase } from './supabase-products';
 
-const GELATO_PRODUCTS_API = 'https://product.gelatoapis.com/v3';
-const GELATO_ORDER_API = 'https://order.gelatoapis.com/v4';
 // GELATO_API_KEY removed from client — server-side only via Netlify functions and edge function
 
-const GELATO_COST_PRICE = 5.91;
 const SELLING_PRICE = 15.50;
 
 function calculateSellingPrice() {
@@ -55,7 +51,7 @@ class GelatoClient {
     return headers;
   }
 
-  async request(endpoint, options = {}, useOrdersAPI = false) {
+  async request(endpoint, options = {}, _useOrdersAPI = false) {
       // Construir URL de la edge function amb paràmetres
       let url;
       try {
@@ -535,14 +531,14 @@ export const syncGelatoCatalog = async () => {
                 const detailedProduct = await gelatoClient.getProduct(productUid);
 
                 detailedProducts.push(detailedProduct);
-      } catch (error) {
+      } catch {
                 detailedProducts.push(product);
       }
     }
 
     const mappedProducts = detailedProducts.map((product, index) => mapGelatoProduct(product, index));
 
-    const collections = [...new Set(mappedProducts.map(p => p.collection))];
+    const _collections = [...new Set(mappedProducts.map(p => p.collection))];
             return mappedProducts;
 };
 
@@ -595,13 +591,13 @@ export const syncGelatoStoreProducts = async () => {
                     try {
             const templateData = await gelatoClient.getTemplate(product.templateId);
             product.template = templateData;
-          } catch (error) {
+          } catch {
             /* silenci intencional (02/10/2026): si el template no es pot obtenir, el producte es publica igualment sense template */
           }
         }
 
         detailedProducts.push(product);
-              } catch (error) {
+              } catch {
                 /* silenci intencional (02/10/2026): si el processament d'un producte falla, es salta i la sincronització continua amb la resta */
               }
     }

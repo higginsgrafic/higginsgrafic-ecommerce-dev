@@ -1,5 +1,5 @@
 
-export default function RespescaTitle({ leftPx = 0, title = 'també et pot interessar', subtitle = 'COSES PECULIARS', style , enFlux = false, desplacamentY = 0 }) {
+export default function RespescaTitle({ leftPx = 0, title = 'també et pot interessar', subtitle = 'COSES PECULIARS', style , enFlux = false, _desplacamentY = 0 }) {
   // En mode estatic el titol va en el flux (a sobre de les targetes, com a part
   // del bloc), no absolut amb el desplaçament del carrousel.
   const finalStyle = style || (enFlux

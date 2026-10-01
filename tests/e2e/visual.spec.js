@@ -23,7 +23,7 @@ const snapshotElement = async (page, locator, name) => {
   });
 };
 
-const snapshot = async (page, name) => {
+const _snapshot = async (page, name) => {
   await disableAnimations(page);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForLoadState('domcontentloaded');
@@ -32,7 +32,7 @@ const snapshot = async (page, name) => {
   });
 };
 
-const snapshotCollectionHeader = async (page, name) => {
+const _snapshotCollectionHeader = async (page, name) => {
   await disableAnimations(page);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForLoadState('domcontentloaded');

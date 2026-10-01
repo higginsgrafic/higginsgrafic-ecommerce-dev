@@ -22,7 +22,6 @@ import { siteFrameForViewport } from '@/utils/layoutModel';
  */
 
 const SITE_FRAME_MAX_WIDTH = 1350;
-const SITE_FRAME_MIN_GUTTER = 16;
 
 function readRulerInset() {
   try {

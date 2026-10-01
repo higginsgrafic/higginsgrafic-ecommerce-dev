@@ -53,7 +53,7 @@ const HERO_DIBUIX_MIDA_PER_NOM = Object.fromEntries(
 );
 
 /** El color de cada samarreta, de la taula canonica del lloc. */
-const HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.hex]));
+const _HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.hex]));
 
 /**
  * LA HERO DE L'INICI NOU: LES FRANGES.
@@ -223,7 +223,7 @@ function HeroInici() {
         }}
       >
         {franges.map((band, i) => {
-          const esFosc = DARK_COLORS.has(band.color);
+          const _esFosc = DARK_COLORS.has(band.color);
           return (
             <a
               key={`${band.drawingId}-${i}`}

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, Folder, Archive, X, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, File,  Archive, X, Check, AlertCircle, Loader2 } from 'lucide-react';
 import JSZip from 'jszip';
 import SEO from '@/components/SEO';
 import { uploadFileToPath } from '@/api/storage';

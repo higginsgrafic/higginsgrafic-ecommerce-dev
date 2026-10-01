@@ -4,12 +4,12 @@ import FullWideSlideHeader from '@/components/FullWideSlideHeader';
 import useComponentCatalogConfig from '@/hooks/useComponentCatalogConfig';
 import { useProductContext } from '@/contexts/ProductContext';
 
-export default function FullWideSlidePage({ pautaEnabled = false, tableEnabled = false }) {
+export default function FullWideSlidePage({ _pautaEnabled = false, _tableEnabled = false }) {
   const { config: componentCatalogConfig, loading: componentCatalogLoading, error: componentCatalogError } = useComponentCatalogConfig();
   const navigate = useNavigate();
   const { getTotalItems } = useProductContext();
   const pageRef = useRef(null);
-  const [pautaTopOffsetPx, setPautaTopOffsetPx] = useState(0);
+  const [_pautaTopOffsetPx, setPautaTopOffsetPx] = useState(0);
 
   const fullWideSlide = componentCatalogConfig?.components?.fullWideSlide;
   const megaMenu = fullWideSlide?.megaMenu;

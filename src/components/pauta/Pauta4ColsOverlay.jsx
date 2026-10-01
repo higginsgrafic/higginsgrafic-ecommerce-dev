@@ -63,7 +63,7 @@ const PAUTA4_DEFAULTS = {
  */
 export default function Pauta4ColsOverlay({
   overlay = false,
-  pautaEnabled = false,
+  _pautaEnabled = false,
   tableEnabled = false,
   numCols = PAUTA4_DEFAULTS.numCols,
   numRows = PAUTA4_DEFAULTS.numRows,
@@ -75,7 +75,7 @@ export default function Pauta4ColsOverlay({
   bottomPadding = PAUTA4_DEFAULTS.bottomPadding,
   leftOffset = PAUTA4_DEFAULTS.leftOffset,
   zIndex = overlay ? DEV_LAYER_Z.pauta : undefined,
-  pautaOpacity = 1,
+  _pautaOpacity = 1,
   tableOpacity = 1,
   className,
   style,
@@ -165,7 +165,7 @@ export default function Pauta4ColsOverlay({
   // Posició dels números: al centre del primer canal entre col 1 i col 2.
   // canal-x = col1_width + gutterX/2, on col1_width = (100% - 3·gutterX)/4.
   // Centrem una caixa de 24px amb -12px.
-  const numbersLeft = `calc((100% - ${totalGutterCalc}) / ${numCols} + (${gutterX}) / 2 - 12px)`;
+  const _numbersLeft = `calc((100% - ${totalGutterCalc}) / ${numCols} + (${gutterX}) / 2 - 12px)`;
 
   const markup = (
     <div className={className} style={{ ...containerStyle, ...style }} data-pauta="4-cols" data-is-overlay={overlay ? "true" : undefined}>

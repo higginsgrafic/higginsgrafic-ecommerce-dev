@@ -2,7 +2,6 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { createGelatoOrderServer } from '../lib/gelato.js';
 import { sendOrderEmail } from '../lib/notify.js';
-import { buildTrackingLink } from '../lib/token.js';
 import { jsonResponse } from '../lib/cors.js';
 
 // El client de Stripe es crea quan realment es necessita, no en carregar el
@@ -218,7 +217,7 @@ async function fulfillGelato(supabase, order) {
   }
 }
 
-export async function handler(event, context) {
+export async function handler(event, _context) {
   if (event.httpMethod === 'OPTIONS') {
     return jsonResponse(event, 200, {}, { methods: 'POST, OPTIONS', headers: 'Content-Type, Stripe-Signature' });
   }

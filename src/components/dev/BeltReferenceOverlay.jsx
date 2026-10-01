@@ -393,7 +393,7 @@ export default function BeltReferenceOverlay({ enabled, onToggle }) {
       const xR = Number.isFinite(siteFrameXR)
         ? siteFrameXR
         : (resolveX(userIconAnchor, 'right') ?? resolveX(rightArrow, 'right') ?? resolveX(cartViewportAnchor, 'right'));
-      const hasMegaSlideReference = !!(cartCardTopAnchor || stripeImg || accordionPauta || finalizeOrderBtn);
+      const _hasMegaSlideReference = !!(cartCardTopAnchor || stripeImg || accordionPauta || finalizeOrderBtn);
       // Belt2: el TOP es manté ancorat al cart-card-top-anchor (o al
       // valor persistit prèviament en rutes que no el rendereixen). El
       // BOTTOM representa la base de la ZONA PAUTA de l'acordió: si la
@@ -418,8 +418,8 @@ export default function BeltReferenceOverlay({ enabled, onToggle }) {
       // (ruta sense slide obert), perquè el bottom de la pauta = bottom
       // del carrusel + 1px + 737*scale.
       const yCarouselBottom = resolveY(cartCardTopAnchor, 'bottom');
-      const pautaBottomFromDom = resolveY(accordionPauta, 'bottom');
-      const finalizeBottomDom = resolveY(finalizeOrderBtn, 'bottom') ?? resolveY(stripeImg, 'bottom');
+      const _pautaBottomFromDom = resolveY(accordionPauta, 'bottom');
+      const _finalizeBottomDom = resolveY(finalizeOrderBtn, 'bottom') ?? resolveY(stripeImg, 'bottom');
       const fullWideYTop = resolveY(cartCardTopAnchor, 'top') ?? resolveY(stripeImg, 'top');
       const checkoutYTop = resolveY(checkoutTopAnchor, 'top');
       const checkoutLayoutYTop = resolveY(document.getElementById('stripe-guide-checkout-layout-top-anchor'), 'top');

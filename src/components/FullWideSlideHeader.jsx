@@ -16,7 +16,7 @@ import {
   FIRST_CONTACT_MEDIA,
   FIRST_CONTACT_MEDIA_WHITE,
   FIRST_CONTACT_MEDIA_COLOR,
-  THE_HUMAN_INSIDE_MEDIA,
+  _THE_HUMAN_INSIDE_MEDIA,
   CUBE_MEDIA,
 } from './fullwide/megaSlideMedia.js';
 import { touchMegaPublicActivity, getMegaPublicSelectorFor, setMegaPublicSelectorFor } from './fullwide/megaPublicSelectorState.js';

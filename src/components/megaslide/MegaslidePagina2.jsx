@@ -6,8 +6,8 @@ import {
   centratgeSelectorY,
   desplacTopSelector,
   visualOffsetYFranjaPagina2,
-  desplacamentCentratgeFranja,
-  casaIniciGrupActiu,
+  _desplacamentCentratgeFranja,
+  _casaIniciGrupActiu,
   buscaGrupActiuFranja,
   desplacamentGrupActiuFranja,
   AIRE_FRANJA_COLLECCIONS_PX,
@@ -27,8 +27,6 @@ import {
 } from '../fullwide/CercadorTextRow.jsx';
 import { colorGap, midaDibuix, gapVertical, gapHorizontal, GRAELLA_COLUMNES } from '../fullwide/midesGraella.js';
 import { ampladaCarril } from './TaulaVertical.jsx';
-import MegaHeroSlider from '../MegaHeroSlider.jsx';
-import Pauta4ColsOverlay from '../pauta/Pauta4ColsOverlay';
 import useMegaslideCalibration from '@/hooks/useMegaslideCalibration';
 import {
   CONTROL_TILE_BN,
@@ -65,20 +63,20 @@ export default function MegaslidePagina2({
   selectedItemByCollection,
   hoveredStripeItem,
   setHoveredStripeItem,
-  hoveredStripeItemCollection,
+  _hoveredStripeItemCollection,
   setHoveredStripeItemCollection,
   setStripeOverlayOverrideActive,
   setFirstContactSelectedItem,
   setHumanInsideSelectedItem,
   setSelectedItemByCollection,
-  megaHeroGridRef,
-  megaHeroRowHeight,
+  _megaHeroGridRef,
+  _megaHeroRowHeight,
   stripeBaseImageSrc,
   page1MegaTileSize,
   page1StripePreviewHPx,
   page1PageLift = 0,
   resolvedMegaFiltered,
-  resolvedMega,
+  _resolvedMega,
   showStripe,
   stripeOverlayLoadState,
   resolvedOverlaySrc,
@@ -828,7 +826,7 @@ export default function MegaslidePagina2({
     // `null` a tot el que no fos l'activa.
     let inici = 0;
     while (inici < TIRA_ITEMS.length) {
-      const [it0, coll0, sub0] = TIRA_ITEMS[inici];
+      const [_it0, coll0, sub0] = TIRA_ITEMS[inici];
       let fi = inici;
       while (fi < TIRA_ITEMS.length && TIRA_ITEMS[fi][1] === coll0 && TIRA_ITEMS[fi][2] === sub0) fi += 1;
       const mitjans = TIRA_ITEMS.slice(inici, fi).map(([, , , m]) => m);

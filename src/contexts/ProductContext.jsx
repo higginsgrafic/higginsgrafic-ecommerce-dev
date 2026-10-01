@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect,  useMemo } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { tshirtSrc } from '@/utils/placeholders';
@@ -22,7 +22,7 @@ const normalizeColorKey = (value) => {
     .toLowerCase();
 };
 
-const isBlackOrWhite = (value) => {
+const _isBlackOrWhite = (value) => {
   const key = normalizeColorKey(value);
   return (
     key === 'blanc' ||
@@ -195,7 +195,7 @@ export const ProductProvider = ({ children }) => {
     return 'first-contact';
   }
 
-  function mapStoreProductToInternal(storeProduct, index = 0) {
+  function _mapStoreProductToInternal(storeProduct, index = 0) {
     const id = storeProduct?.id?.toString() || `store-${index}`;
     const rawName = storeProduct?.title || storeProduct?.name || `Producte ${index + 1}`;
     const name = (rawName || '').toString().includes('_')

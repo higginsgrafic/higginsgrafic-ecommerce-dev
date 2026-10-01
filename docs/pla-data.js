@@ -1,4 +1,4 @@
-const PHASES = [
+const _PHASES = [
   {n:0, name:'Infraestructura'},
   {n:1, name:'Catàleg de productes reals'},
   {n:2, name:'Autenticació de clients'},
@@ -7,7 +7,7 @@ const PHASES = [
   {n:5, name:'Poliment i legal'},
 ];
 
-const STEPS = [
+const _STEPS = [
   {id:'0.1',phase:0,title:'Verificar Supabase',what:'Confirmar projecte actiu, taules i RLS',files:'Cap (verificació)',verify:'VITE_SUPABASE_URL + ANON_KEY al .env. Taules products/orders/profiles/addresses. SUPABASE_SERVICE_ROLE_KEY a Netlify. RLS activada.',deps:[],opt:false},
   {id:'0.2',phase:0,title:'Configurar Stripe',what:'Obtenir claus Stripe i configurar-les',files:'.env + Netlify',verify:'pk_test_ al .env, STRIPE_SECRET_KEY a Netlify, build OK',deps:[],opt:false},
   {id:'0.3',phase:0,title:'Verificar Gelato',what:'Confirmar credencials i productes',files:'Cap (verificació)',verify:'GELATO_API_KEY + STORE_ID al .env, productes al dashboard, sync retorna dades',deps:['0.1'],opt:false},
@@ -38,7 +38,7 @@ const STEPS = [
   {id:'5.3',phase:5,title:'Testing final end-to-end',what:'Flux complet manual: registre → navegar → cistell → pagar → confirmació',files:'Cap (testing)',verify:'Tot el flux completa sense errors. Mobile responsive. Error boundary actiu.',deps:['4.6','5.1'],opt:false},
 ];
 
-const INITIAL_STATE = {
+const _INITIAL_STATE = {
   '0.1': 'completed',
   '0.2': 'completed',
   '0.3': 'completed',
@@ -47,7 +47,7 @@ const INITIAL_STATE = {
   '3.2': 'completed',
 };
 
-const ACCEPTANCE = [
+const _ACCEPTANCE = [
   'Productes reals visibles (mínim 1 per col·lecció)',
   'Registre i login de clients funcionen',
   'Pagament Stripe processat (test mode primer, live després)',

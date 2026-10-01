@@ -15,10 +15,10 @@
   try {
     const saved = JSON.parse(localStorage.getItem('pla-obertura-state') || '{}');
     Object.keys(saved).forEach(k => { if (state[k]) state[k] = saved[k]; });
-  } catch(e) { /* buit a propòsit */ }
+  } catch { /* buit a propòsit */ }
 
   function saveState() {
-    try { localStorage.setItem('pla-obertura-state', JSON.stringify(state)); } catch(e) { /* buit a propòsit */ }
+    try { localStorage.setItem('pla-obertura-state', JSON.stringify(state)); } catch { /* buit a propòsit */ }
   }
 
   function depsMet(step) {

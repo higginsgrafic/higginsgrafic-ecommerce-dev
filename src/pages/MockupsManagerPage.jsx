@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { mockupsAPI } from '../api/mockups';
 import { useToast } from '../components/ui/use-toast';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Search, Filter, Upload, Download } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff,  Filter,  Download } from 'lucide-react';
 import { getPublicUrl as getMediaPublicUrl } from '@/api/storage';
 
 export default function MockupsManagerPage() {
@@ -426,7 +426,7 @@ export default function MockupsManagerPage() {
 
       setMockups(filtered);
       setFilteredCount(filtered.length);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'No s\'han pogut carregar els mockups',
@@ -447,7 +447,7 @@ export default function MockupsManagerPage() {
     }
   }
 
-  async function loadCounts(nextFilters) {
+  async function loadCounts(_nextFilters) {
     try {
       const total = await mockupsAPI.countAll({});
       setTotalCount(total);

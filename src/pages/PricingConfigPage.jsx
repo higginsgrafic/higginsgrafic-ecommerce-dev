@@ -34,7 +34,7 @@ export default function PricingConfigPage() {
         setCollectionPrices(collMap);
       }
 
-      const { data: prods, error: prodError } = await supabase
+      const { data: prods, error: _prodError } = await supabase
         .from('products')
         .select(`
           id, name, collection, price, currency,
@@ -74,7 +74,7 @@ export default function PricingConfigPage() {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
-  const resolvePrice = (productId, collection, variantId) => {
+  const _resolvePrice = (productId, collection, variantId) => {
     if (variantId != null && variantPrices[variantId] != null) return variantPrices[variantId];
     if (collection && collectionPrices[collection] != null) return collectionPrices[collection];
     const product = products.find(p => p.id === productId);

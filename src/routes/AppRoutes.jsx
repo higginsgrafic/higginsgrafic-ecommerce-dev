@@ -37,7 +37,7 @@ import {
   FullWideSlidePage,
   MegaslideIconsTestPage,
   ConstructorColleccioPage,
-  PdpRoute,
+  _PdpRoute,
   PdpPage,
   ConstructorPdpPreview,
   HtmlBasePage,
@@ -121,7 +121,7 @@ function PdpDeColleccio(props) {
   return <MotionDiv><ProductDetailPage {...props} /></MotionDiv>;
 }
 
-export default function AppRoutes({ location, pageProps, pautaEnabled, tableEnabled, clearCart, demoHeaderOffset }) {
+export default function AppRoutes({ location, pageProps, _pautaEnabled, _tableEnabled, _clearCart, _demoHeaderOffset }) {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>

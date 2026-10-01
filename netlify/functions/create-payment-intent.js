@@ -266,7 +266,7 @@ async function calculateServerSideTotal(supabase, items, shippingZone) {
   };
 }
 
-export async function handler(event, context) {
+export async function handler(event, _context) {
   if (event.httpMethod === 'OPTIONS') {
     return jsonResponse(event, 200, {}, { methods: 'POST, OPTIONS' });
   }

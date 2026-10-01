@@ -227,7 +227,7 @@ export function deltaObjectiuPageLift({ selectorTop, panelTop, ample, alt, esTau
   // El desplaçament de 10 px el porten TANT la banda estreta com les dues
   // tauletes (es el que hi havia abans); el que canvia es que a la tauleta no
   // s'hi ha d'afegir cap marge extra.
-  const bandaEstreta = ample >= MIDA_TAULETA_APAISADA_MIN && ample <= MIDA_TAULETA_APAISADA_MAX && ample >= alt;
+  const _bandaEstreta = ample >= MIDA_TAULETA_APAISADA_MIN && ample <= MIDA_TAULETA_APAISADA_MAX && ample >= alt;
   // El contingut baixa 20 px a TOT l'escriptori (banda estreta i desktop
   // ample), que son els 20 px de marge que s'han afegit a la pesta­nya. Les
   // tauletes es queden amb el seu desplacament de sempre.
@@ -283,7 +283,7 @@ export function alcadaPanellMegaslide({ p1ContentBottom, gap = 30, margeExtra = 
  */
 export const DESPLACAMENT_FRANJA_ESCRIPTORI_PX = 20;
 
-export function desplacamentFranjaEscriptori({ ample, alt, esTauleta = false }) {
+export function desplacamentFranjaEscriptori({ ample, _alt, esTauleta = false }) {
   // La franja baixa els mateixos 20 px que la resta del contingut, a TOT
   // l'escriptori. A les tauletes i al mobil, 0.
   if (esTauleta || ample < 768) return 0;

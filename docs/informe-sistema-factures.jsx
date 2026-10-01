@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * INFORME DEL SISTEMA DE FACTURES — Higgins GRÀFIC

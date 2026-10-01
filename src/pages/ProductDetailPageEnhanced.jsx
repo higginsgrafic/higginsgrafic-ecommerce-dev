@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
   ChevronLeft,
@@ -10,7 +10,7 @@ import {
   ShoppingCart,
   Truck,
   Shield,
-  Package,
+  _Package,
   AlertCircle,
   Loader2,
   Check,
@@ -19,7 +19,7 @@ import {
   Leaf,
   Zap,
   Clock,
-  Ruler,
+  _Ruler,
   Droplet,
   Coffee,
   ThermometerSun,
@@ -290,7 +290,7 @@ export default function ProductDetailPageEnhanced() {
           text: product.description,
           url: window.location.href
         });
-      } catch (err) { /* silenci intencional (02/10/2026): l'usuari pot cancel·lar el diàleg de compartir (AbortError); no cal fer res */ }
+      } catch { /* silenci intencional (02/10/2026): l'usuari pot cancel·lar el diàleg de compartir (AbortError); no cal fer res */ }
     } else {
       navigator.clipboard.writeText(window.location.href);
       success('Enllaç copiat al porta-retalls');

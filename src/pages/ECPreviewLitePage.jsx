@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 export default function ECPreviewLitePage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const mountedAtRef = useRef(Date.now());
+  const _mountedAtRef = useRef(Date.now());
 
   const params = useMemo(() => new URLSearchParams(location.search || ''), [location.search]);
   const debug = (params.get('debug') || '').trim() === '1' || (params.get('noRedirect') || '').trim() === '1';

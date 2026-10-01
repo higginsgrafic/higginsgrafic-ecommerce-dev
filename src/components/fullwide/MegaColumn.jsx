@@ -32,7 +32,7 @@ const CONTROL_TILE_ARROWS = 'botonera-fletxes';
 export const GAP_X_PX = 12;
 
 function MegaColumn({
-  title,
+  _title,
   items,
   row = false,
   megaTileSize,
@@ -51,7 +51,7 @@ function MegaColumn({
   onHumanNext,
   onSelectItem,
   onTileSize,
-  disableMulti = false,
+  _disableMulti = false,
   stripeVariantVisibility,
   megaTileSelectorParams,
   onStartSelectorDrag,
@@ -69,7 +69,7 @@ function MegaColumn({
   const esTauleta = typeof window !== 'undefined'
     && (esTauletaVertical({ ample: window.innerWidth, alt: window.innerHeight })
       || esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight }));
-  const humanInsideEnabled = Boolean(isHumanInside);
+  const _humanInsideEnabled = Boolean(isHumanInside);
   const effectiveTileSize = megaTileSize || tileSize;
   const selectorTilePitchPx = (Number(effectiveTileSize) || 120) + 12;
   const selectorSizePx = Math.round(Number(megaTileSelectorParams?.sizePx) || 200);
@@ -83,10 +83,10 @@ function MegaColumn({
   const selectorStepY = Number.isFinite(Number(megaTileSelectorParams?.stepY)) ? Number(megaTileSelectorParams?.stepY) : 0;
   const selectorDxPx = selectorStepX * selectorTilePitchPx;
   const selectorDyPx = selectorStepY * selectorTilePitchPx;
-  const selectorTranslateX = selectorDxPx + (selectorExtendRightPx - selectorExtendLeftPx) / 2;
-  const selectorTranslateY = selectorDyPx + (selectorExtendBottomPx - selectorExtendTopPx) / 2;
-  const selectorWidthPx = Math.max(1, selectorSizePx + selectorExtendLeftPx + selectorExtendRightPx);
-  const selectorHeightPx = Math.max(1, selectorSizePx + selectorExtendTopPx + selectorExtendBottomPx);
+  const _selectorTranslateX = selectorDxPx + (selectorExtendRightPx - selectorExtendLeftPx) / 2;
+  const _selectorTranslateY = selectorDyPx + (selectorExtendBottomPx - selectorExtendTopPx) / 2;
+  const _selectorWidthPx = Math.max(1, selectorSizePx + selectorExtendLeftPx + selectorExtendRightPx);
+  const _selectorHeightPx = Math.max(1, selectorSizePx + selectorExtendTopPx + selectorExtendBottomPx);
   const [selectedItem, setSelectedItem] = useState(null);
   const [pageStart, setPageStart] = useState(0);
 
@@ -374,7 +374,7 @@ function MegaColumn({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- resolveSrc/resolveGridThumbSrc son funcions del component (identitat inestable): afegir-les re-executaria la precarrega a cada render; el disparador real (baseItems/collectionId) ja hi es (02/10/2026)
   }, [baseItems, collectionId]);
 
-  const miscellaniaStripeTiles = collectionId === 'miscellania' ? Math.max(0, Math.min(7, baseItems.length)) : 7;
+  const _miscellaniaStripeTiles = collectionId === 'miscellania' ? Math.max(0, Math.min(7, baseItems.length)) : 7;
 
   const thinSlideEnabled = isHumanInside && row && drawableItems.length > 7;
   const pagingEnabled = row && !thinSlideEnabled && drawableItems.length > 7;
@@ -835,7 +835,7 @@ function MegaColumn({
     return resolveSrc(it);
   };
 
-  const resolveStripeThumbSrc = (it) => {
+  const _resolveStripeThumbSrc = (it) => {
     if (!it || typeof it !== 'string') return null;
     const raw = it.trim();
 
@@ -1074,7 +1074,7 @@ function MegaColumn({
     return null;
   };
 
-  const gridScaleFor = (it) => {
+  const _gridScaleFor = (it) => {
     if (!it || typeof it !== 'string') return 0.6;
     const k = gridCalibKeyFor(it);
     const v = Number.parseFloat(gridScales?.[k] ?? '');
