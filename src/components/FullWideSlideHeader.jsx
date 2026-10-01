@@ -10,7 +10,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '@/utils/layoutMetrics';
-import { laneForViewport, carrilDeclarat, carrilIPadPro13 } from '@/utils/layoutModel';
+import { laneForViewport, carrilDeclarat, carrilIPadPro13, esIPadPro13 } from '@/utils/layoutModel';
 import { getLayoutViewportWidth } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
@@ -3600,7 +3600,17 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
           <div
             className="ml-auto hidden min-[600px]:flex items-center"
-            style={{ gap: '0px' }}
+            style={{
+              gap: '0px',
+              // SENSE L'AIRE DE DINS DE L'ULTIMA ICONA (03/10/2026). En Marc:
+              // «Elimina aquests 5 px d'aire» i tot seguit «Fes extensiva
+              // aquesta modificació a tot el site»: l'ultim boto fa 40 px i el
+              // seu dibuix n'ocupa 29, o sigui que la icona acabava 5 px a
+              // l'esquerra de la vora del carril (mesurat a 1376: el dibuix a
+              // 1183 i la vora a 1188). Amb el marge negatiu, el dibuix de
+              // l'ultima icona toca la vora del carril a totes les vistes.
+              marginRight: '-5px',
+            }}
             data-icons-wrap="true"
           >
             <div>

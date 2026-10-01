@@ -56,10 +56,18 @@ for (const v of VISTES) {
       p2col: q(document.querySelector('[data-colleccions-franja="1"], [data-colleccions-columna="1"]')),
       p2franja: cossos(document.querySelector('[data-stripe-visual-content="2"]')),
       cadenat: q(document.querySelector('img[src*="cadenat"]')),
+      icones: (() => {
+        const wrap = document.querySelector('[data-icons-wrap="true"]');
+        if (!wrap) return null;
+        const dins = [...wrap.children];
+        const ultim = dins[dins.length - 1];
+        const gl = ultim?.querySelector('svg,img') || ultim;
+        return { grup: [rd(wrap.getBoundingClientRect().left), rd(wrap.getBoundingClientRect().right)], dibuixDreta: gl ? rd(gl.getBoundingClientRect().right) : null };
+      })(),
       fletxes: document.querySelectorAll('[data-fletxes-p1="1"]').length,
     };
   });
-  console.log(`${v.nom.padEnd(26)} ipad=${m.ipad ? 'SI' : 'no '} carril=${String(m.carril).padEnd(6)} esc=${String(m.escala).padEnd(7)} panell=${JSON.stringify(m.panell)} p1bloc=${JSON.stringify(m.p1bloc)} p2sel=${JSON.stringify(m.p2sel)} graella=${JSON.stringify(m.p2graella)} colors=${JSON.stringify(m.p2colors)} col=${JSON.stringify(m.p2col)} cintura=${JSON.stringify(m.p2franja)} cadenat=${JSON.stringify(m.cadenat)} fletxes=${m.fletxes}${errs.length ? ' ERR' : ''}`);
+  console.log(`${v.nom.padEnd(26)} ipad=${m.ipad ? 'SI' : 'no '} carril=${String(m.carril).padEnd(6)} esc=${String(m.escala).padEnd(7)} panell=${JSON.stringify(m.panell)} p1bloc=${JSON.stringify(m.p1bloc)} p2sel=${JSON.stringify(m.p2sel)} graella=${JSON.stringify(m.p2graella)} colors=${JSON.stringify(m.p2colors)} col=${JSON.stringify(m.p2col)} cintura=${JSON.stringify(m.p2franja)} cadenat=${JSON.stringify(m.cadenat)} icones=${JSON.stringify(m.icones)} fletxes=${m.fletxes}${errs.length ? ' ERR' : ''}`);
   await ctx.close();
 }
 await b.close();
