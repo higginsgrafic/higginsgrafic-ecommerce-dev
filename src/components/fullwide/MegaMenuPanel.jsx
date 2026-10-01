@@ -213,12 +213,13 @@ export default function MegaMenuPanel({
   // contingut (que fa que la mesura de la pagina 1 sigui 20 px mes gran). Si
   // s'hi sumessin tambe aqui, es comptarien DUES vegades i el panell creixeria
   // 40 px en comptes de 20.
-  // L'AIRE DE BAIX, A 20 px A L'iPAD PRO 13 (03/10/2026). En Marc: «Deixa 20 px
-  // d'aire a sobre i a sota de la p1 i la p2»: al model el cul de la franja
-  // queda 20 px per sobre del final del megaslide (a la resta, 15).
+  // L'AIRE DE BAIX, A 40 px A L'iPAD PRO 13 (03/10/2026). En Marc: «Deixa 40 px
+  // d'aire sobre i sota la p1 i la p2»: al model el cul de la franja queda 40 px
+  // per sobre del final del megaslide (a la resta, 15). Sobre els 15 de sempre,
+  // doncs, 25; i com que abans ja n'hi havia 5, ara son 26.
   const alcadaGuard = useCallback((p1Bottom) => alcadaPanellMegaslide({
     p1ContentBottom: p1Bottom,
-    gap: P1_STRIPE_BOTTOM_GAP + (esIPadPro13({ ample: w, alt: h }) ? 5 : 0),
+    gap: P1_STRIPE_BOTTOM_GAP + (esIPadPro13({ ample: w, alt: h }) ? 26 : 0),
     paddingVertical: paddingVerticalPanellPx,
   }), [paddingVerticalPanellPx, w, h]);
 
@@ -511,6 +512,13 @@ export default function MegaMenuPanel({
               >
                 <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
+                    // L'AIRE DE DALT DE LA P1, A 40 px (03/10/2026). En Marc:
+                    // «Deixa 40 px d'aire sobre i sota la p1 i la p2». El
+                    // contingut de la p1 (les caselles de la graella) queia a
+                    // 18,6 px del bottom del header, i aquests 21,4 px son el que
+                    // li falta. El panell creix amb el contingut (`p1ContentBottom`
+                    // el mesura), o sigui que l'aire de baix no es mou.
+                    ...(esIPadPro13({ ample: w, alt: h }) ? { marginTop: '21.4px' } : null),
                     // A la VERTICAL, el contingut de debò de la pagina 1 queda
                     // AMAGAT i el que s'hi veu es la TAULA dibuixada (la
                     // mateixa que a la pagina 2). A la resta de formats no es

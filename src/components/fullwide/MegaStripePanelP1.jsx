@@ -13,6 +13,14 @@ import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VI
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, getBeltWidth, escalaMegaslide, esTauletaVertical, esTauletaApaisada } from '../../utils/layoutMetrics.js';
 import { carrilIPadPro13 } from '../../utils/layoutModel.js';
+
+/**
+ * L'AIRE ENTRE EL SELECTOR I LA STRIPE A L'iPAD PRO 13 APAÏSSAT (03/10/2026).
+ *
+ * En Marc: «Deixa 20 px de gap entre la stripe i el selector». A la resta de la
+ * composicio estreta en son 10 (`PAGINA1_AIRE_SOTA_BLOC_1024_PX`).
+ */
+const AIRE_SOTA_BLOC_IPAD13_PX = 20;
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
@@ -592,7 +600,13 @@ function MegaStripePanelP1({
         const f1 = document.querySelector('[data-mega-page-viewport="1"] [data-stripe-visual-content="1"]');
         if (!f2 || !f1) return;
         const dy = esAjust1024P1
-          ? +((bloc.getBoundingClientRect().bottom + PAGINA1_AIRE_SOTA_BLOC_1024_PX) - f1.getBoundingClientRect().top).toFixed(1)
+          // A L'iPAD PRO 13 APAÏSSAT, 20 px (03/10/2026). En Marc: «Deixa 20 px de
+          // gap entre la stripe i el selector» (a 1024-1366 en son 10, que es el
+          // que va demanar el 02/10: «Alinea el top de les samarretes a 10 px del
+          // bottom del selector»). El megaslide creix el que calgui.
+          ? +((bloc.getBoundingClientRect().bottom
+            + (carrilIPadPro13() != null ? AIRE_SOTA_BLOC_IPAD13_PX : PAGINA1_AIRE_SOTA_BLOC_1024_PX))
+            - f1.getBoundingClientRect().top).toFixed(1)
           : +(f2.getBoundingClientRect().top - f1.getBoundingClientRect().top).toFixed(1);
         setAlcadaBlocEstretaP1((prev) => {
           prevAjustRef.current = prev;
