@@ -7,7 +7,14 @@
             <path d="M72,133.5l0,-53.552l97,0l0,53.552c0,26.768 -21.732,48.5 -48.5,48.5c-26.768,0 -48.5,-21.732 -48.5,-48.5Z"/>
         </clipPath>
         <g clip-path="url(#_clip1)">
-            <path d="M72,133.5l0,-58.604l97,-0l0,58.604c0,26.768 -21.732,48.5 -48.5,48.5c-26.768,0 -48.5,-21.732 -48.5,-48.5Zm2.021,-0c0,25.653 20.827,46.479 46.479,46.479c25.653,0 46.479,-20.827 46.479,-46.479l0,-58.604l-92.958,0l-0,58.604Z" style="fill:rgb(233,235,237);"/>
+            <!-- EL CONTORN INTERIOR, DIBUIXAT (03/10/2026). En Marc: «El cadenat
+                 sembla que ha perdut el contorn intern. S'ha fet molt prim». El
+                 fitxer portava el contorn com un ANELL (la forma de fora menys
+                 la de dins, amb fill), i a la mida que es pinta (48 px per a un
+                 viewBox de 96) quedava en 1 px. Aqui es dibuixa amb stroke, amb
+                 el gris de linia de la casa, i el gruix es un sol numero
+                 (stroke-width) que es pot pujar o baixar sense tocar res mes. -->
+            <path d="M72,133.5l0,-58.604l97,-0l0,58.604c0,26.768 -21.732,48.5 -48.5,48.5c-26.768,0 -48.5,-21.732 -48.5,-48.5Z" style="fill:none;stroke:rgb(210,214,218);stroke-width:7;"/>
             <g transform="matrix(1.010417,0,0,1.010417,0.260417,-1.895833)">
                 <!-- EL CADENAT JA NO VIU AQUI (02/10/2026). Aquest fitxer es
                      nome s la PLACA: la caixa blanca amb el seu contorn
