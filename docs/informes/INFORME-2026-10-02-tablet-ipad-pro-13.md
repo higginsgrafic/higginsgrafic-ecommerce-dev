@@ -489,6 +489,30 @@ baix: l'aire de la primera i de la cinquena franja és zero.
 tornar a mesurar: n'hi ha prou de carregar la imatge en un canvas i buscar la primera i l'última
 fila amb alfa.
 
+## 3terdecies. Els 8/10, a tots els horitzontals (04/10/2026)
+
+En Marc: «Per què tinc la sensació que no a tot arreu hi ha aplicada la norma del 8/10?» i, quan
+se li va preguntar l'abast, «A tots els formats horitzontals, vols dir, oi?». Sí: la hero es
+reparteix en **desens** (1/10 d'aire, 8/10 de franges, 1/10 d'aire) a **tots els formats
+horitzontals de 768 en amunt** —que és on hi ha megaslide, com diu `esMobilAqui`—. Els
+**verticals** es queden com estaven (la seva proporció i els aires de 50/25/0 px).
+
+Això substitueix el gate que hi havia (només els portàtils de 1200 i 1280 amb alçada 586 o 720),
+que venia del «T'he dit que ho apliquessis a 1200x720. Enlloc més».
+
+| vista | hero (aspecte) | aire dalt / baix |
+|---|---|---|
+| 1920×1080 | 568,8 (2,0) | 71 / 71,1 |
+| 1440×900 | 471,2 (1,8) | 58,8 / 58,9 |
+| 1366×946 | 520 (1,8) | 65 / 65 |
+| 1280×666 | 296 (3,2) | 38,6 / 35,4 |
+| 1200×800 | 375,2 (2,9) | 48,4 / 45,4 |
+| 1180×820 | 391,2 (2,8) | 49,2 / 48,7 |
+| 1024×690 | 315,2 (3,0) | 39,4 / 39,4 |
+| 1376×954 | 473,6 (2,5) | 59,3 / 59,2 |
+| 844×390 (mòbil girat) | 122,4 | 15,3 / 15,3 |
+| 1032×1304 i 768×952 (verticals) | 639,6 i 234,8 | com sempre |
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
