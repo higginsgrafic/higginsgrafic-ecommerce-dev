@@ -235,40 +235,40 @@ function MarcInici({ seccions }) {
       // serà simètric» i, en concretar-ho, «des del panell» i «que es
       // redimensioni amb els 4/6».
       //
-      // O sigui: l'espai de sota la vora del panell es reparteix en VUITENS, 1/8
-      // d'aire, 6/8 de franges i 1/8 d'aire. Quan el megaslide es obert mana
+      // O sigui: l'espai de sota la vora del panell es reparteix en DESENS, 1/10
+      // d'aire, 8/10 de franges i 1/10 d'aire. Quan el megaslide es obert mana
       // aquest repartiment i no la proporcio de disseny (952/401): la cel·la
       // publica l'alcada de la hero com a `--inici-hero-alcada` i la caixa la
       // llegeix. Sense megaslide (els mobils) la variable no hi es i la caixa
       // torna a la seva proporcio.
       //
-      // EL REPARTIMENT ES 6/8 I NO 4/6 (04/10/2026). Es va muntar amb els 4/6
+      // EL REPARTIMENT, A MA (04/10/2026). Es va muntar amb els 4/6
       // centrals que va proposar l'amo i, en veure-ho, «Massa petit. Prova amb
-      // 6/8»: amb 6/8 la hero s'emporta el 75 % de l'espai (abans el 66,7 %) i
-      // els aires queden a 1/8 (abans 1/6).
+      // 6/8» i tot seguit, amb mes espai, «prova amb 8/10»: la hero s'emporta el 80 %
+      // de l'espai i els aires queden a 1/10 (amb 6/8 era el 75 % i 1/8).
       //
       // EL CADENAT PENJA 58 px DINS D'AQUEST ESPAI, i a sota seu hi ha d'anar la
-      // hero: si el primer vuite es mes curt que aixo (a 1280x720, que fa 586 de
-      // viewport, el vuite en fa 36), els DOS aires s'allarguen fins als 60 px
+      // hero: si el primer dese es mes curt que aixo (a 1280x720, que fa 586 de
+      // viewport, el dese en fa 29), els DOS aires s'allarguen fins als 60 px
       // (58 del cadenat mes 2 d'aire) i la hero cedeix el que calgui. Amb l'aire
-      // gran el repartiment queda exactament als 6/8; amb l'aire petit, els 6/8
+      // gran el repartiment queda exactament als 8/10; amb l'aire petit, els 8/10
       // es queden curts pero SIMETRICS.
       //
-      // A 1280x720 la guarda amb els 6/8 pelats deixava el cadenat 1,2 px DINS de
+      // A 1280x720 la guarda amb els 8/10 pelats deixava el cadenat 1,2 px DINS de
       // la hero (mesurat): per allo l'alcada es `disponible − 2 x aire` i no
-      // `6/8 x disponible`.
+      // `8/10 x disponible`.
       //
       // Aixo substitueix els aires de 50 px (escriptori) i 25/0 px (els dos
       // portatils) del 28/09 i l'01/10, i tambe el topall: la hero ja no es
-      // mesura amb la seva proporcio sino que fa els 4/6 que toquen.
+      // mesura amb la seva proporcio sino que fa els 8/10 que toquen.
       const disponibleHero = Math.max(0, window.innerHeight - linia);
-      const aireHero = Math.max(CADENAT_BAIX_PX, disponibleHero / 8);
-      // AMB L'AIRE GRAN, AIXO ES EXACTAMENT 6/8 DEL DISPONIBLE (1/8 + 6/8 +
-      // 1/8 = 1). Amb l'aire forcada pels 56 px del cadenat, la hero cedeix la
+      const aireHero = Math.max(CADENAT_BAIX_PX, disponibleHero / 10);
+      // AMB L'AIRE GRAN, AIXO ES EXACTAMENT 8/10 DEL DISPONIBLE (1/10 + 8/10 +
+      // 1/10 = 1). Amb l'aire forcada pels 60 px del cadenat, la hero cedeix la
       // diferencia i els dos aires queden iguals.
       const alcadaHero = Math.max(0, disponibleHero - 2 * aireHero);
       // LA CEL·LA DE LA PAGINA ES TOT L'ESPAI DE SOTA EL PANELL: els dos
-      // vuitens d'aire i els sis de franges hi cauen a dins exactes.
+      // desens d'aire i els vuit de franges hi cauen a dins exactes.
       const blocPagina = disponibleHero;
       const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcadaHero * 4) / 4}|${Math.round(aireHero * 4) / 4}`;
       if (ara === anterior) return;
@@ -354,8 +354,8 @@ function MarcInici({ seccions }) {
           data-cella-de={segona.id}
           style={{
             height: 'var(--inici-bloc-pagina, 0px)',
-            // ELS DOS VUITENS D'AIRE (04/10/2026): el de dalt es menja el
-            // cadenat si el vuitè no hi arriba (vegeu el repartiment).
+            // ELS DOS DESENS D'AIRE (04/10/2026): el de dalt es menja el
+            // cadenat si el desè no hi arriba (vegeu el repartiment).
             paddingBlockStart: `${repartiment.aireHero ?? 0}px`,
             paddingBlockEnd: `${repartiment.aireHero ?? 0}px`,
             boxSizing: 'border-box',
