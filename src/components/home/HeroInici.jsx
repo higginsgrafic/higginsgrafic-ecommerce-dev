@@ -7,6 +7,29 @@ import { deviceLayoutFromViewport, esIPadPro13Estricte } from '@/utils/layoutMod
 import { HERO_DIBUIX_MIDA, HERO_DIBUIX_MIDA_DEFECTE } from '@/config/iniciNou';
 import { MIDA_TAULETA_APAISADA_MAX, MIDA_TAULETA_VERTICAL_MAX } from '@/utils/layoutMetrics';
 
+/**
+ * EL MARGE INVISIBLE DE LA IMATGE DE LA SAMARRETA (04/10/2026).
+ *
+ * En Marc: «la samarreta no esta posada com a mi m'agradaria. A la primera
+ * franja hi ha aire per sobre de la imatge i a la cinquena n'hi ha per sota. La
+ * samarreta hauria d'omplir les franges completament, si no, tinc una mesura que
+ * he de tenir en compte, pero que no veig». La mesura que no es veu es el MARGE
+ * TRANSPARENT del mockup: el dibuix de la samarreta no arriba a les vores de la
+ * imatge (800x800). Mesurat amb l'alfa de les imatges que fa servir el pla
+ * (`mockup-gildan-t-shirt-*.webp`, que comparteixen plantilla): 18 px per dalt
+ * (2,25 %) i 33 per baix (4,13 %). L'ice-grey en fa 20 i 36, o sigui que entre
+ * colors hi ha ±0,25 %, menys d'1 px quan la franja en fa 90.
+ *
+ * LA CAPA, DONCS, S'HA DE CORREGIR: la samarreta s'ha de fer mes gran perque el
+ * DIBUIX ompli la capa (1 / (1 - 0,0225 - 0,0413) = 1,0682) i s'ha de pujar el
+ * seu marge de dalt, ja escalat (0,0225 x 1,0682 = 2,40 %). Va a les DUES capes
+ * (la samarreta i el dibuix) perque el dibuix no es mogui del pit.
+ */
+const HERO_MOCKUP_MARGE_DALT = 0.0225;
+const HERO_MOCKUP_MARGE_BAIX = 0.0413;
+const HERO_MOCKUP_ESCALA = 1 / (1 - HERO_MOCKUP_MARGE_DALT - HERO_MOCKUP_MARGE_BAIX);
+const HERO_MOCKUP_PUJADA_PCT = HERO_MOCKUP_MARGE_DALT * HERO_MOCKUP_ESCALA * 100;
+
 /** El color de cada samarreta, de la taula canonica del lloc. */
 const HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.hex]));
 
@@ -189,7 +212,11 @@ function HeroInici() {
                   backgroundSize: 'auto 100%',
                   backgroundPosition: 'center top',
                   backgroundRepeat: 'no-repeat',
-                  transform: `translateY(-${i * 20}%)`,
+                  // EL MARGE INVISIBLE, CORREGIT (04/10/2026): vegeu les
+                  // constants de dalt. Sense aixo el dibuix no arriba a les
+                  // vores i queda aire a la primera franja i a la cinquena.
+                  transform: `translateY(calc(${-i * 20}% - ${HERO_MOCKUP_PUJADA_PCT}%)) scale(${HERO_MOCKUP_ESCALA})`,
+                  transformOrigin: '50% 0',
                   pointerEvents: 'none',
                 }}
               />
@@ -217,7 +244,11 @@ function HeroInici() {
                     })()}%`,
                     backgroundPosition: 'center 35%',
                     backgroundRepeat: 'no-repeat',
-                    transform: `translateY(-${i * 20}%)`,
+                    // EL MATEIX MARGE INVISIBLE, CORREGIT (04/10/2026): la capa
+                    // del dibuix porta la MATEIXA correccio que la de la
+                    // samarreta, i aixi el dibuix no es mou del pit.
+                    transform: `translateY(calc(${-i * 20}% - ${HERO_MOCKUP_PUJADA_PCT}%)) scale(${HERO_MOCKUP_ESCALA})`,
+                    transformOrigin: '50% 0',
                     pointerEvents: 'none',
                     opacity: 0.95,
                   }}
