@@ -533,6 +533,32 @@ rectangle més els 2 px del darrer gap) i el cadenat es mou amb la disposició.
 | 1280×666 | 887,5 | 887 |
 | 1024×690 | 765,5 | 765,6 |
 
+## 3quindecies. Quotes a la hero: la mida del dibuix i la clau duplicada (04/10/2026)
+
+En Marc: «Quotes i First Contact han tornat a petar», concretat amb «a la hero: les franges
+d'aquestes col·leccions surten malament».
+
+**La causa**: `HERO_DIBUIX_MIDA` (la mida afinada de cada dibuix de la hero) té les claus amb les
+rutes **velles**. Diu `austen/it-is-a-truth-b-stripe.webp` quan el fitxer és a
+`austen/quotes/black/it-is-a-truth-b-stripe.webp`: els dibuixos es van reorganitzar en carpetes de
+col·lecció i de tinta i el mapa no s'hi va actualitzar. Amb la cerca exacta, **cap dibuix de
+Quotes** agafava la seva mida i queien tots al 30 % de defecte, en comptes de 12,16 / 4,8 / 2,4.
+
+**La solució** (a `HeroInici`): es prova la ruta sencera, després el **nom del fitxer** i, si
+només hi és l'altra tinta, la **germana**. La mida només depèn del dibuix i no de la tinta: al
+mapa, `the-phoenix` té les dues entrades i són idèntiques (46,585 i 42,35). El nom és únic perquè
+porta la tinta (`-b-` / `-w-`). Verificat: els vuit dibuixos de Quotes del pla (les dues tintes)
+ara prenen la mida del mapa.
+
+**La clau duplicada, fora** («Neteja-ho ara»): `austen/i-admire-and-love-you-b-stripe.webp` hi era
+dues vegades, amb `tauleta: 6` i amb `tauleta: 12,8`. En JavaScript guanyava la segona, o sigui
+que el comportament no canvia; i 12,8 és també el que té la seva bessona `it-is-a-truth`, que fa
+el mateix 12,16 a escriptori. El mapa queda amb 14 entrades i cap duplicada.
+
+**Pendent** (no tocat): els altres dibuixos de First Contact (`vulcans-end`, `plasma-escape`,
+`dj-vader`, `r2d2-quote`, `pont-del-diable`…) no són al mapa i van amb el 30 % de defecte. Si
+algun surt malament, cal la seva mida.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
