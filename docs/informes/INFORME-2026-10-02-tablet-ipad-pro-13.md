@@ -179,6 +179,33 @@ columna de col·leccions de la p2 cau a x914 en una finestra de 753. Cal adaptar
 (millor per model, com ha dit l'amo) abans de canviar-li el carril; el que s'hi va provar
 (min(992, vp−32) i escala proporcional) no hi fa res perquè la taula no en depèn.
 
+
+## 3quinquies. La stripe de la p2, a 10 px de la columna (03/10/2026)
+
+En Marc: «La stripe de la p2 ha d'acabar a 10 px de la columna de col·leccions» i, per
+acabar-ho de precisar, «Per la cintura».
+
+L'objectiu del `useEscalaFranjaCarril` de la p2 (`MegaStripePanel`) són els COSSOS de la
+franja, o sigui les cintures, i la columna fa `GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350.
+Al carril de la pàgina, doncs, l'objectiu es queda en `carril x (1 - 152/1350) - 10`, i la
+cintura acaba exactament 10 px a l'esquerra de la columna: el mateix aire que la graella
+ja hi reserva (`columnGap` de 10 px a `CercadorTextRow`), o sigui que franja i graella
+acaben a la mateixa x.
+
+Mesurat (cintura de la franja contra el track de la columna, que és la seva vora
+esquerra): 865,9 vs 875,9 a 1024; 1036 vs 1046 a 1366; 1041 vs 1051 a 1376 — **10,0 px** a
+totes tres. El primer enllaç de la columna va 3 px endins del track (879 a 1024), o sigui
+que la distància al text és de 14.
+
+I també s'ha estès a la resta de la banda apaïssada la mateixa definició de
+`esCarrilPagina1024` que faltava en aquest fitxer (era l'últim lloc que encara mirava la
+finestra 1000-1050): sense això l'objectiu de la franja era el carril sencer i la cintura
+passava per sota de la columna.
+
+**NOTA (pendent de decisió):** a l'escriptori (1440 i 1920) la p2 té una altra composició
+i allà la cintura acaba a 6-7 px del primer enllaç del mosaic de col·leccions. No s'hi ha
+tocat.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta

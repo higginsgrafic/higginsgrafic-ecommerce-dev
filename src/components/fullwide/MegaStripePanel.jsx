@@ -5,6 +5,7 @@ import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
+import { esTauletaApaisada } from '../../utils/layoutMetrics.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
@@ -482,12 +483,21 @@ function MegaStripePanel({
   // —de la vora esquerra del carril a la columna— i el centre es la meitat del
   // propi objectiu (`centreAlContenidor`). La columna fa la mida de disseny del
   // carril (`GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350).
+  // LA COMPOSICIO DEL 1024 ES LA DE TOTES LES TAUETES APAISSADES (02/10/2026).
+  // En Marc: «S'ha d'aplicar la 1024 a totes les tablets». El nom es queda
+  // perque mitja composicio el fa servir, pero ara vol dir `isLandscapeTablet`.
   const esCarrilPagina1024 = typeof window !== 'undefined'
-    && window.innerWidth >= 1000 && window.innerWidth <= 1050
-    && window.innerWidth >= window.innerHeight;
+    && esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight });
   const ampleCarrilPaginaP2 = esCarrilPagina1024 ? Math.min(939.2, window.innerWidth - 80) : 0;
+  // LA STRIPE ACABA A 10 px DE LA COLUMNA (03/10/2026). En Marc: «La stripe de la
+  // p2 ha d'acabar a 10 px de la columna de col·leccions»: es el mateix aire que
+  // la graella ja reserva a la columna a la composicio del 1024 (`columnGap` de
+  // 10 px, vegeu `CercadorTextRow`), o sigui que la franja i la graella acaben
+  // a la mateixa x. L'objectiu del hook son els COSSOS de la franja (les
+  // cintures), i la columna fa `GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350.
+  const AIRE_STRIPE_COLUMNA_PX = 10;
   const ampleCossosP2 = ampleCarrilPaginaP2 > 0
-    ? ampleCarrilPaginaP2 * (1 - GRAELLA_COLUMNA_DRETA_CARRIL_PX / 1350)
+    ? ampleCarrilPaginaP2 * (1 - GRAELLA_COLUMNA_DRETA_CARRIL_PX / 1350) - AIRE_STRIPE_COLUMNA_PX
     : 0;
   const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, ampleCossosP2, esCarrilPagina1024);
   // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
