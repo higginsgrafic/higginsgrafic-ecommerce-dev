@@ -23,6 +23,9 @@ export default function ProductMockups({
 
   useEffect(() => {
     loadMockups();
+    // (02/10/2026) Intencional: loadMockups és inestable (recreada a cada render) i afegir-la
+    // faria un refetch en bucle; la càrrega només depèn d'aquests tres paràmetres.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [collection, designName, variantId]);
 
   useEffect(() => {
@@ -33,6 +36,9 @@ export default function ProductMockups({
         onMockupChange(mockups[0]);
       }
     }
+    // (02/10/2026) Intencional: auto-selecció NOMÉS quan encara no n'hi ha (guard
+    // selectedMockup === null); afegir deps només reexecutaria per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [mockups]);
 
   async function loadMockups() {

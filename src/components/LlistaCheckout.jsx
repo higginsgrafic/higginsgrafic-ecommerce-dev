@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatPrice } from '@/utils/formatters';
 import { useShippingCosts } from '@/hooks/useShippingCosts';

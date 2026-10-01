@@ -175,7 +175,7 @@ function TdpConstructorProduct({
       setVariantIdx((i) => (i + 1) % variantImages.length);
     }, hoverIntervalMs);
   };
-  useEffect(() => stopCarousel, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => stopCarousel, []);  
   const shownImageSrc = canCarousel ? variantImages[variantIdx] : imageSrc;
   // Enllaç dels elements clicables de la fitxa (imatge + nom): prioritza la
   // pàgina de producte (productHref) i, si no n'hi ha, cau a la col·lecció.

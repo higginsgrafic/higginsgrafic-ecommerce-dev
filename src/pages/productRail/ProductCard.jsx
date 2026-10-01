@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const DEFAULT_TILE_STYLE = {
@@ -111,7 +110,7 @@ export default function ProductCard({
                   }}
                   onError={() => {
                     try {
-                      // eslint-disable-next-line no-console
+                       
                       console.error('[ProductCard] drawing overlay failed to load', { overlaySrc });
                     } catch {
                       // ignore

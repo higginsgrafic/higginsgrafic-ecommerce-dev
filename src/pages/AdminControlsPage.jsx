@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import SEO from '@/components/SEO';
 import FullWideSlide from '@/components/FullWideSlide';
 

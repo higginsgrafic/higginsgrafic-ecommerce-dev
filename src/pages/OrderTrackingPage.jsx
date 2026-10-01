@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SEO from '@/components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -141,6 +141,7 @@ const OrderTrackingPage = () => {
     if (trackingTokenFromUrl || (orderIdFromUrl && email)) {
       handleTrackOrder();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) busca automatica nomes al muntatge (vegeu el comentari de sobre); afegir les deps re-dispararia la consulta
   }, []);
 
   // Estats de la comanda amb icones i colors

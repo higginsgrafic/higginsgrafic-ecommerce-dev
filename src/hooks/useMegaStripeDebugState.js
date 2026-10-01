@@ -478,6 +478,7 @@ export default function useMegaStripeDebugState({ beltEnabledFromUrl, locationPa
     } catch {
       // ignore
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- efecte d'inicialitzacio NOME'S AL MUNTATGE (llegeix localStorage/URL una vegada): beltEnabledFromUrl es un valor de muntatge i afegir-lo re-executaria tots els inicialitzadors (02/10/2026)
   }, []);
 
   // ─── Effects: persist to localStorage + sync CSS vars ───────────────
@@ -918,7 +919,7 @@ export default function useMegaStripeDebugState({ beltEnabledFromUrl, locationPa
     const h = Math.max(0, Math.round(vh));
     if (h <= 0) return;
     setMegaStripeHudLockedHPx(h);
-  }, [locationPathname, megaStripeHudOwnHPx]);
+  }, [locationPathname, megaStripeHudLockedHPx, megaStripeHudLockedTopPx, megaStripeHudOwnHPx]);
 
   useLayoutEffect(() => {
     const activeRoute = locationPathname === '/full-wide-slide' || locationPathname === '/constructor/full-wide-slide' || locationPathname === '/full-wide-slide-demo';
@@ -1021,7 +1022,7 @@ export default function useMegaStripeDebugState({ beltEnabledFromUrl, locationPa
         // ignore
       }
     };
-  }, [locationPathname, megaStripeHudTopPx, megaStripeHudLockedHPx, megaStripeHudLockedTopPx]);
+  }, [locationPathname, megaStripeHudTopPx, megaStripeHudLockedHPx, megaStripeHudLockedTopPx, megaStripeHudOwnHPx]);
 
   useLayoutEffect(() => {
     const activeRoute = locationPathname === '/full-wide-slide' || locationPathname === '/constructor/full-wide-slide' || locationPathname === '/full-wide-slide-demo';
@@ -1335,7 +1336,7 @@ export default function useMegaStripeDebugState({ beltEnabledFromUrl, locationPa
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [locationPathname, megaStripeNudgeStep, stripeEditTool]);
+  }, [locationPathname, megaStripeNudgeStep, megaStripeRefSrc, stripeEditTool]);
 
   // ─── Return all state + setters + refs + drafts ─────────────────────
   return {

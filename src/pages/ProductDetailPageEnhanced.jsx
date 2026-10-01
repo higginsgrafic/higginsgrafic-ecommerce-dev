@@ -84,6 +84,9 @@ export default function ProductDetailPageEnhanced() {
 
   useEffect(() => {
     loadProduct();
+    // (02/10/2026) Intencional: loadProduct es recrea a cada render; afegir-la faria un
+    // refetch en bucle. La càrrega només depèn de l'id de la ruta.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [id]);
 
   useEffect(() => {

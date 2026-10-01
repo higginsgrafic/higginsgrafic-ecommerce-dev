@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronUp,
@@ -43,6 +43,7 @@ export default function ColleccioSettingsPage() {
 
   useEffect(() => {
     loadCollections();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) carrega inicial un cop al muntatge; loadCollections es recrea a cada render
   }, []);
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export default function ColleccioSettingsPage() {
     }, 1000);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) autosave: la entrada reactiva es collections; saveCollections es recrea a cada render i afegir-la rearmeria el debounce a cada render
   }, [collections]);
 
   const loadCollections = async () => {

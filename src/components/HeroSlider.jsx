@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './HeroSlider.module.css';
 import { tshirtSrc } from '@/utils/placeholders';
 
@@ -153,6 +153,9 @@ export default function HeroSlider({
     }));
   };
 
+  // (02/10/2026) Intencional: getDefaultSlides només llegeix `slides` (ja a les deps); és
+  // inestable i afegir-la treuria l'estabilitat del memo (i refaría effects que en depenen).
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   const resolvedSlides = useMemo(() => getDefaultSlides(), [slides]);
 
   const rootRef = useRef(null);
@@ -309,7 +312,7 @@ export default function HeroSlider({
                     }}
                     onError={() => {
                       try {
-                        // eslint-disable-next-line no-console
+                         
                         console.error('[HeroSlider] drawing overlay failed to load', { drawingOverlaySrc });
                       } catch {
                         // ignore

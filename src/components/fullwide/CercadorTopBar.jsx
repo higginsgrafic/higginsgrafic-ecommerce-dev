@@ -1,4 +1,3 @@
-import React from 'react';
 import { colorGap, colorMida } from './midesGraella.js';
 
 /**

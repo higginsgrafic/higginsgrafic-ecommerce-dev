@@ -1,4 +1,3 @@
-import React from 'react';
 import MegaGridDibuixos from '@/components/fullwide/MegaGridDibuixos';
 
 /**

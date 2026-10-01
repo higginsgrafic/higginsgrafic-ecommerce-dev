@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, ChevronLeft, ChevronRight, LogOut, Lock, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';

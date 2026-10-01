@@ -1,6 +1,5 @@
 console.log('🚀 ULTRA SIMPLE main.jsx starting...');
 
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 console.log('📦 React imported');

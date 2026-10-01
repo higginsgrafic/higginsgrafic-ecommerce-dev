@@ -39,6 +39,7 @@ function UserComandesContent({ userEmail }) {
   const ORDERS = useMemo(() => fetchedOrders.map(o => ({
     ...o,
     icon: ICON_MAP[o.icon] || MoreHorizontal,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ICON_MAP es un objecte recreat a cada render (nomes entry imports constants de lucide): afegir-lo faria recomputar el memo a cada render inutilment (02/10/2026)
   })), [fetchedOrders]);
   const [activeTab, setActiveTab] = usePersistentState('HG_USER_ACTIVE_TAB', 'COMANDES');
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Trash2, Save, Heart, HeartOff, RotateCcw } from 'lucide-react';
 import { supabase } from '@/api/supabase-products';
 import { useToast } from '@/components/ui/use-toast';
@@ -202,6 +202,9 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
+    // (02/10/2026) Intencional: els handlers tanquen sobre draggingIndex/stops (ja deps);
+    // afegir les funcions (inestables) només re-subscriria els listeners a cada render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [draggingIndex, stops]);
 
   return (

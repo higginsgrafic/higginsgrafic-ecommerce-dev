@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useMemo, useCallback, useTransition, Suspense, lazy } from 'react';
+import { useState, useEffect, useLayoutEffect, useMemo, useCallback, useTransition, Suspense, lazy } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useProductContext } from '@/contexts/ProductContext';

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -296,6 +296,7 @@ export default function FullWideSlideDemoHumanInsideSlider({
       const src = resolveThinPlaceholderSrc(it);
       preloadSrc(src);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resolveThinPlaceholderSrc es una funcio del component (identitat inestable): afegir-la re-executaria la precarrega a cada render; els disparadors reals (trackIndex, drawingItems) ja hi son (02/10/2026)
   }, [trackIndex, clones, humanInsideTotal, drawingItems, activeVariant]);
 
   return (

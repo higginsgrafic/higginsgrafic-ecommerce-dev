@@ -1,4 +1,4 @@
-import React, { startTransition } from 'react';
+import { startTransition } from 'react';
 import { ToggleRow, OpacitySlider, getPdpDesignPackage, applyPdpDesignPackage } from './DevControls';
 
 export default function PdpControlsPanel({

@@ -225,7 +225,7 @@ export default function MegaMenuPanel({
     // la versio de l'iPad Pro 13 es queda amb els 40 de sempre.
     gap: P1_STRIPE_BOTTOM_GAP + (modelAqui ? modelAqui.extraAireSota : 0),
     paddingVertical: paddingVerticalPanellPx,
-  }), [paddingVerticalPanellPx, w, h, modelAqui]);
+  }), [paddingVerticalPanellPx, modelAqui]);
 
   const viewport1Ref = useRef(null);
   const handlePortraitScroll1 = useCallback(() => {

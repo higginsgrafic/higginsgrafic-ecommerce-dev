@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import FullWideSlideHeaderMegaMenuContained from '@/components/FullWideSlideHeaderMegaMenuContained';
 
 export default function PlantillaCatalegComponentsPage() {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { tshirtSrc } from '@/utils/placeholders';
@@ -354,6 +354,14 @@ export const ProductProvider = ({ children }) => {
     };
   }
 
+  // ── Per què NO envolcalllem aquestes funcions amb useCallback (02/10/2026) ──
+  // Les funcions de baix alimenten el useMemo del value del context (~línia 539) i es
+  // recreen a cada render, així que el memo es reconstrueix a cada render: el
+  // comportament observable és el de sempre. Memoitzar-les estabilitzaria les
+  // identitats però canviaria el patró de renders del Provider (i caldria reordenar
+  // l'efecte de muntatge que crida loadProducts abans de declarar-la). Criteri de
+  // casa: no canviar mai el comportament en execució → es documenta cada avís.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) vegeu "Per què NO envolcalllem" a dalt
   async function loadProducts() {
     setLoading(true);
     setError(null);
@@ -379,6 +387,7 @@ export const ProductProvider = ({ children }) => {
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) vegeu "Per què NO envolcalllem" a dalt
   async function syncGelatoProducts() {
     setLoading(true);
     setError(null);
@@ -402,6 +411,7 @@ export const ProductProvider = ({ children }) => {
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) vegeu "Per què NO envolcalllem" a dalt
   async function syncMockProducts() {
     setLoading(true);
     setError(null);
@@ -430,6 +440,7 @@ export const ProductProvider = ({ children }) => {
     window.__PRODUCTS__ = products || [];
   }, [products]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) vegeu "Per què NO envolcalllem" a dalt
   const getProductById = (id) => {
     const numId = parseInt(id);
     return products.find(p => p.id === id || p.id === numId || p.slug === id);
@@ -439,6 +450,7 @@ export const ProductProvider = ({ children }) => {
     return slugify((value || '').toString().replace(/_/g, '-'));
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) vegeu "Per què NO envolcalllem" a dalt
   const getProductsByCollection = (collection, productType = null) => {
     const wanted = normalizeCollectionKey(collection);
     return products.filter(p =>
@@ -448,6 +460,7 @@ export const ProductProvider = ({ children }) => {
     );
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) vegeu "Per què NO envolcalllem" a dalt
   const getRandomProductsByCollection = (collection, count = 4, productType = null) => {
     const wanted = normalizeCollectionKey(collection);
     const collectionProducts = products.filter(p =>
@@ -461,6 +474,7 @@ export const ProductProvider = ({ children }) => {
     return collectionProducts.slice(0, count);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) vegeu "Per què NO envolcalllem" a dalt
   const searchProducts = (query) => {
     const lowercaseQuery = query.toLowerCase();
     return products.filter(p =>
@@ -470,6 +484,7 @@ export const ProductProvider = ({ children }) => {
   };
 
   // Aplicar filtres
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) vegeu "Per què NO envolcalllem" a dalt
   const getFilteredProducts = () => {
     let filtered = [...products];
 

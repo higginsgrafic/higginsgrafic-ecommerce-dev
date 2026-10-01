@@ -1,4 +1,3 @@
-import React from 'react';
 
 const BAND_HEIGHT = {
   title: 'var(--page-band-title-height)',

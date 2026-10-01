@@ -151,6 +151,7 @@ export default function RulerTool() {
         drawLabel(ctx, points[1].x, points[1].y - 20, `${angle.toFixed(1)}°`);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) drawAngle/drawDistance es recreen a cada render; l'efecte ja reacciona a tot l'estat que determina el dibuix (points, measurements, mode)
   }, [isActive, points, measurements, mode]);
 
   const calculateAngle = (p1, p2, p3) => {

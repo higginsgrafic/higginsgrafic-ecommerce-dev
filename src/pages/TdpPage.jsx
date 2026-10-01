@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
 import { tshirtSrc } from '@/utils/placeholders';

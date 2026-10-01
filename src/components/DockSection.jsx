@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useGridDebug } from '@/contexts/GridDebugContext';
 import { useProductContext } from '@/contexts/ProductContext';
 import { supabase } from '@/api/supabase-products';

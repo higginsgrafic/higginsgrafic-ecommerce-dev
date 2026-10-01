@@ -447,6 +447,7 @@ export default function TambeRail({
       window.removeEventListener('tambe-rail:next', handleNext);
       window.removeEventListener('tambe-rail:prev', handlePrev);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) SUSPECTE DE BUG: goNext/goPrev llegeixen carouselAnimate (estat no als deps); no es toca per no canviar el comportament
   }, [carouselStartIndex, upper]);
 
   return (

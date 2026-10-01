@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default function FullBleedUnderHeader({ as: Component = 'div', className = '', style = {}, children, ...props }) {
   return (

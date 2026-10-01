@@ -169,11 +169,13 @@ export default function MockupsManagerPage() {
     loadCollections();
     loadCounts({});
     loadAllMockups();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) carrega inicial un cop al muntatge; els loaders es recreen a cada render
   }, []);
 
   useEffect(() => {
     loadMockups();
     loadCounts({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) la entrada reactiva es filters; loadMockups es recrea a cada render i afegir-la refariria la consulta a cada render
   }, [filters]);
 
   const normalizeMediaKeyForDiagnostics = (value, ctx = {}) => {
@@ -288,6 +290,7 @@ export default function MockupsManagerPage() {
       duplicateKeyGroups,
       duplicateSemanticGroups
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) normalizeMediaKeyForDiagnostics es recrea a cada render; la entrada reactiva real es allMockups
   }, [allMockups]);
 
   const gridData = useMemo(() => {

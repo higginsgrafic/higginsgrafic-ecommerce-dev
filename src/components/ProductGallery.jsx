@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ZoomIn, ZoomOut } from 'lucide-react';
 import { tshirtSrc } from '@/utils/placeholders';
@@ -332,6 +332,10 @@ const ProductGallery = ({
     for (const u of unique.slice(0, 48)) {
       prefetchUrl(u);
     }
+    // (02/10/2026) Intencional: `imagesSignature` ja captura el contingut d'`images`
+    // i `buildInkPairMap` només llegeix `thumbnailRows` (ja a les deps). Afegir-les
+    // només repetiria el prefetch amb identitats noves a cada render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [imagesSignature, thumbnailRows]);
 
   useEffect(() => {
@@ -340,6 +344,9 @@ const ProductGallery = ({
     const img = Array.isArray(images) ? images[selectedImage] : null;
     prevSelectedColorKeyRef.current = selectedColorKey;
     prevInkKeyRef.current = inferInkKeyFromUrl(img);
+    // (02/10/2026) Intencional: només s'escriuen refs de depuració; `imagesSignature`
+    // ja cobreix els canvis de contingut d'`images`, la identitat de l'array no hi aporta res.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [selectedImage, selectedColorKey, imagesSignature]);
 
   const overlayFadeMotion = disableFadeForComparison
@@ -391,6 +398,9 @@ const ProductGallery = ({
       if (prev >= images.length) return 0;
       return prev;
     });
+    // (02/10/2026) Intencional: reacciona al CONTINGUT d'`images` (via imagesSignature),
+    // no a la identitat de l'array; el clamp de l'índex és idempotent.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [imagesSignature]);
 
   useEffect(() => {
@@ -424,6 +434,9 @@ const ProductGallery = ({
     });
 
     if (idx >= 0) setSelectedImage(idx);
+    // (02/10/2026) Intencional: la sincronització de color NO ha de reexecutar-se quan
+    // canvia `selectedImage` (clic explícit a la galeria); només reacciona a color/dades.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [selectedColor, images, thumbnailRows]);
 
   useLayoutEffect(() => {

@@ -70,7 +70,6 @@ window.addEventListener('unhandledrejection', (e) => {
   }
 });
 
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ProductProvider } from '@/contexts/ProductContext';

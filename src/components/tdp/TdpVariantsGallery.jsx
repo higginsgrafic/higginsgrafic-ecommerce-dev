@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import TdpConstructorProduct from '@/components/tdp/TdpConstructorProduct';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';
 import { tshirtSrc } from '@/utils/placeholders';

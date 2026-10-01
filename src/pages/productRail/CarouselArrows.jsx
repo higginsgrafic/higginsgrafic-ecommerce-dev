@@ -1,4 +1,3 @@
-import React from 'react';
 
 function ArrowButton({ ariaLabel, onClick, rowHeight = 44, children }) {
   const dynamicStyle = {

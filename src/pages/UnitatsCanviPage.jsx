@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Copy, Plus, Trash2, Play, CheckCircle2, Circle, ClipboardList } from 'lucide-react';
 import SEO from '@/components/SEO';
 

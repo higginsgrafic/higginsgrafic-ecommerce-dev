@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CERCADOR_COLLECTIONS, CERCADOR_COLORS, etiquetaColleccio } from './CercadorTopBar.jsx';
 // La geometria de la graella viu a midesGraella.js perquè també la fa servir
 // el mòdul de mesura única. Aquí només es consumeix.

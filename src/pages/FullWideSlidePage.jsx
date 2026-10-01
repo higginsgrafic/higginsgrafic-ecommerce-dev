@@ -210,7 +210,7 @@ html, body { scrollbar-width: none; }
             m.el.style.outlineOffset = '1px';
           });
 
-        // eslint-disable-next-line no-console
+         
         console.table(
           matches
             .sort((a, b) => b.score - a.score)

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -145,7 +145,7 @@ export default function ECPreviewLitePage() {
 
   useEffect(() => {
     if (!debug) return;
-    // eslint-disable-next-line no-console
+     
     console.log('[ec-preview-lite debug]', {
       backgroundType,
       effectiveBackgroundType,
@@ -181,6 +181,7 @@ export default function ECPreviewLitePage() {
     }, 50);
 
     return () => window.clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) doRedirect es recrea a cada render; les seves entrades reactives (debug, redirectUrl) ja hi son i navigate es estable
   }, [debug, shouldAutoRedirect, redirectUrl, redirectMode, backgroundType, videoUrl]);
 
   const handleVideoEnd = () => {

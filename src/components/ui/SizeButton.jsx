@@ -1,4 +1,3 @@
-import React from 'react';
 
 function SizeButton({ size, selected = false, onClick, className = '', labelClassName = '' }) {
   return (

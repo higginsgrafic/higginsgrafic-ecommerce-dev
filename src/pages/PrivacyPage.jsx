@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import SEO from '@/components/SEO';
 import useIsMobile from '@/hooks/useIsMobile';
 import ServiceDocument from '@/components/ServiceDocument';

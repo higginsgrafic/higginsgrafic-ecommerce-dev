@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTexts } from '@/hooks/useTexts';
 
 const SkipLink = () => {

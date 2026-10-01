@@ -1,6 +1,5 @@
 console.log('🚀 main-minimal.jsx is loading...');
 
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 console.log('📦 React imported successfully');

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, Info, AlertCircle } from 'lucide-react';
 
@@ -6,6 +6,12 @@ const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
+
+  // removeToast es declara ABANS d'addToast (02/10/2026) perquè addToast el faci
+  // servir com a dependència amb identitat estable (ambdós useCallback amb deps buides).
+  const removeToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
 
   const addToast = useCallback((message, type = 'info') => {
     const id = Math.random().toString(36).substring(7);
@@ -17,11 +23,7 @@ export const ToastProvider = ({ children }) => {
     setTimeout(() => {
       removeToast(id);
     }, 4000);
-  }, []);
-
-  const removeToast = useCallback((id) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  }, []);
+  }, [removeToast]);
 
   const success = useCallback((message) => addToast(message, 'success'), [addToast]);
   const info = useCallback((message) => addToast(message, 'info'), [addToast]);

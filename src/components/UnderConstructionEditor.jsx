@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/api/supabase-products';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -36,6 +36,7 @@ export default function UnderConstructionEditor() {
 
   useEffect(() => {
     loadConfig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) carrega inicial un cop al muntatge; loadConfig es recrea a cada render
   }, []);
 
   const loadConfig = async () => {
@@ -92,6 +93,7 @@ export default function UnderConstructionEditor() {
     }, 1000);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) autosave sobre config; afegir initialLoad dispararia un save quan flipa a false, i handleSave es recrea a cada render
   }, [config]);
 
   const handleSave = async () => {

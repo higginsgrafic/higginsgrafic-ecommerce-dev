@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function invertHex(hex) {
   const h = String(hex || 'hsl(var(--grey-paper))').replace('#', '');

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { CERCADOR_COLORS } from '../fullwide/CercadorTopBar.jsx';
 import CercadorTextRow from '../fullwide/CercadorTextRow.jsx';
 import MegaStripePanel from '../fullwide/MegaStripePanel.jsx';
@@ -591,7 +591,10 @@ export default function MegaslidePagina2({
     // s'ha de tornar a calcular. Com que l'avís arriba des d'un efecte de
     // layout del fill (abans que aquest), la passada nova ja mesura el DOM amb
     // la mida bona: el selector neix centrat i no s'ha de corregir després.
-  }, [active, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, esComposicioEstreta, esComposicioFranja, esCarrilPagina1024, ampleCarrilPaginaP2, topGraellaColors, mesuraGraellaP2]);
+    // (02/10/2026) midaSelectorP2 hi entra: es derivat de bnSliderSize i
+    // esCarrilPagina1024 (que ja hi son) i d'una constant de modul
+    // (pagina1BlocDretaPx(1)), aixi que no afegeix cap re-execucio nova.
+  }, [active, midaSelectorP2, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, esComposicioEstreta, esComposicioFranja, esCarrilPagina1024, ampleCarrilPaginaP2, topGraellaColors, mesuraGraellaP2]);
 
   // (El centratge del selector amb la graella de colors s'ha fusionat amb
   // l'efecte de dalt. Era un segon bucle que reescrivia el valor que el primer

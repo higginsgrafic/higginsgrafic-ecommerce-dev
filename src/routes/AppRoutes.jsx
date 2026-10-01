@@ -1,5 +1,4 @@
 import VerticalParadigmaPreview from '@/pages/VerticalParadigmaPreview';
-import React from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PDP_REGISTRY } from '@/data/pdpRegistry';

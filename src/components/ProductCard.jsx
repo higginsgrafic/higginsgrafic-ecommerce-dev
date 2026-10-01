@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartIcon from './ui/CartIcon';
 import SizeButtonGroup from './ui/SizeButtonGroup';

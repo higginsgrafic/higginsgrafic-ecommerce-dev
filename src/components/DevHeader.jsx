@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -82,6 +82,7 @@ function DevHeader({
   useEffect(() => {
     if (suppressThemeOverrides) return;
     applyThemeVars({ strong: strongHex, soft: softHex });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) aplicacio inicial nomes al muntatge; el segon efecte ja reacciona als canvis de tema
   }, []);
 
   useEffect(() => {
@@ -93,6 +94,7 @@ function DevHeader({
     } catch {
       // ignore
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) applyThemeVars es recrea a cada render; afegir-la reexecutaria l'efecte (i localStorage) a cada render
   }, [strongHex, softHex, suppressThemeOverrides]);
 
   const demoLinks = [

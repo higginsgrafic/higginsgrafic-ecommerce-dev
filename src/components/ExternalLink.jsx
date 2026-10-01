@@ -1,4 +1,3 @@
-import React from 'react';
 
 function ExternalLink({ className = "w-4 h-4" }) {
   return (

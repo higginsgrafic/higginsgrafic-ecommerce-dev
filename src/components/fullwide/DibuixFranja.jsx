@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   STRIPE_DRAWING_CALIBRATIONS,
   PASSOS_ESCALA_GAP_DIBUIX_VERTICAL,

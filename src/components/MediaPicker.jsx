@@ -17,6 +17,7 @@ export default function MediaPicker({ isOpen, onClose, onSelect, mediaType = 'al
     if (isOpen) {
       loadFiles();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) loadFiles es recrea a cada render; la entrada reactiva real es isOpen/currentFolder (recarrega en obrir i en canviar de carpeta)
   }, [isOpen, currentFolder]);
 
   const loadFiles = async () => {

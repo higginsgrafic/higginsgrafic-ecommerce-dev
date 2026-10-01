@@ -538,7 +538,7 @@ function FullWideSlideHeader({
       window.removeEventListener('pageshow', sincronitza);
       window.removeEventListener('popstate', enPopState);
     };
-  }, []);
+  }, [setMegaPage]);
 
   // LA COLLECCIO TAMBE VA A LA URL (25/09/2026).
   //
@@ -665,7 +665,7 @@ function FullWideSlideHeader({
       window.removeEventListener('pageshow', keepLockedAccordionOpen);
       window.removeEventListener('visibilitychange', keepLockedAccordionOpen);
     };
-  }, [megaAccordionLocked, megaPage, setAcordioExpanded, setAcordioExpandedPage4]);
+  }, [megaAccordionLocked, megaPage, localCartItemCount, setAcordioExpanded, setAcordioExpandedPage4]);
 
   const overlaySrcFromUrl = useMemo(() => {
     try {
@@ -729,7 +729,7 @@ function FullWideSlideHeader({
     if (variant === 'white' && cercadorSelectedColor === 'white') return 'black';
     if (variant === 'black' && cercadorSelectedColor === 'black') return 'white';
     return cercadorSelectedColor;
-  }, [active, firstContactVariant, humanInsideVariant, cercadorSelectedColor]);
+  }, [active, austenSubcollection, firstContactVariant, humanInsideVariant, cercadorSelectedColor]);
 
   // Pàgina 2: displayedShirtColor propi amb les variants P2 i color P2
   const displayedShirtColorP2 = useMemo(() => {
@@ -739,7 +739,7 @@ function FullWideSlideHeader({
     if (variant === 'white' && cercadorSelectedColorP2 === 'white') return 'black';
     if (variant === 'black' && cercadorSelectedColorP2 === 'black') return 'white';
     return cercadorSelectedColorP2;
-  }, [active, firstContactVariantP2, humanInsideVariantP2, cercadorSelectedColorP2]);
+  }, [active, austenSubcollection, firstContactVariantP2, humanInsideVariantP2, cercadorSelectedColorP2]);
 
   const austenSelectedIsCrosswords = useMemo(() => {
     try {
@@ -820,6 +820,7 @@ function FullWideSlideHeader({
     } catch {
       // ignore
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- readStripeVariantFromUrl es una funcio del component (identitat inestable): afegir-la re-executaria l'efecte a cada render; ja reacciona a location.search (02/10/2026)
   }, [location.search]);
 
   // LES COLLECCIONS NOME'S-COLOR MANEN (28/09/2026).
@@ -1223,7 +1224,7 @@ function FullWideSlideHeader({
         const file = map[k] || null;
         const out = file ? `/custom_logos/drawings/images_stripe/cube/${file}` : null;
         if (import.meta.env.DEV && !out) {
-          // eslint-disable-next-line no-console
+           
           console.error('[CUBE stripe overlay] unresolved label', { key, normalized: k });
         }
         return out;
@@ -1256,7 +1257,7 @@ function FullWideSlideHeader({
           return null;
         })();
         if (import.meta.env.DEV && !out) {
-          // eslint-disable-next-line no-console
+           
           console.error('[MISCELLANIA stripe overlay] unresolved label', { key, normalized: k });
         }
         return out;
@@ -1865,7 +1866,7 @@ function FullWideSlideHeader({
     } catch {
       // ignore
     }
-  }, [overlayStorageKey, resolvedOverlaySrc, stripeOverlayOverrideActive]);
+  }, [active, overlayStorageKey, resolvedOverlaySrc, stripeOverlayOverrideActive]);
   const [megaTileSize, setMegaTileSize] = useState(null);
   const effectiveMegaTileSize = megaTileSize || 120;
   const [megaTileSelectorParams, setMegaTileSelectorParams] = useState(() => {
@@ -2355,7 +2356,10 @@ function FullWideSlideHeader({
     //
     // Comprovat a 768x1024: amb la dependencia, l'alcada de la franja torna a
     // ser 84 px, que es la de la referencia bona del 23/09.
-  }, [active, isPortraitTablet, panellMuntat]);
+    // (02/10/2026) isLandscapeTablet hi entra: el llegeix per triar l'ample de
+    // contingut, igual que isPortraitTablet (que ja hi era). Amb calibratge
+    // idempotent, re-executar nomes importa quan canvia la classe de tauleta.
+  }, [active, isPortraitTablet, isLandscapeTablet, panellMuntat]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -2452,7 +2456,7 @@ function FullWideSlideHeader({
 
     window.addEventListener('hg:open-full-wide-cart', openFullWideCart);
     return () => window.removeEventListener('hg:open-full-wide-cart', openFullWideCart);
-  }, [setMegaPage, setAcordioExpanded]);
+  }, [setMegaPage, setAcordioExpanded, addToCart]);
 
   useEffect(() => {
     const openUserTab = (e) => {
@@ -3338,6 +3342,7 @@ function FullWideSlideHeader({
       return;
     }
     setActive(demoManualEnabled ? 'first_contact' : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- location.search congelat a posta: la sincronitzacio URL->estat la fa useUrlActiveCollection; afegir-la dispararia el reserva final (setActive) a cada navegacio i resetejaria la colleccio (02/10/2026)
   }, [contained, demoManualEnabled, initialActiveId, manualEnabledOverride, manualOverrideClosed]);
 
   useEffect(() => {

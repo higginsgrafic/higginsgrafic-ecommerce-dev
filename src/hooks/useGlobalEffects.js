@@ -78,7 +78,8 @@ export default function useGlobalEffects({
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [location.pathname]);
+    // setIsNavigating es un setter de useState: identitat estable, inofensiu (02/10/2026)
+  }, [location.pathname, setIsNavigating]);
 
   // Scroll to top on route change
   useEffect(() => {
@@ -109,7 +110,8 @@ export default function useGlobalEffects({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    // setIsLargeScreen es un setter de useState: identitat estable, inofensiu (02/10/2026)
+  }, [setIsLargeScreen]);
 
   // Handle global redirect
   useEffect(() => {

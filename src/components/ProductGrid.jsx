@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ProductCard from '@/components/ProductCard';
@@ -50,13 +50,16 @@ function ProductGrid({
     show: { opacity: 1, y: 0 }
   };
 
-  const safeProducts = Array.isArray(products)
-    ? products
-        .filter(Boolean)
-        .filter(p => p?.id || p?.slug || p?.gelatoProductId)
-    : [];
-
+  // (02/10/2026) `safeProducts` es calcula DINS del memo: tenia identitat nova a cada render
+  // (filter) i invalidava el memo constantment. El resultat és idèntic (llavor estable a
+  // sessionStorage), només es recalculeu quan canvia `products`.
   const displayProducts = useMemo(() => {
+    const safeProducts = Array.isArray(products)
+      ? products
+          .filter(Boolean)
+          .filter(p => p?.id || p?.slug || p?.gelatoProductId)
+      : [];
+
     const miscellania = safeProducts.filter((p) => (p?.collection || '').toString().toLowerCase() === 'miscellania');
     if (miscellania.length === 0) return safeProducts;
 
@@ -151,7 +154,7 @@ function ProductGrid({
     });
 
     return mapped;
-  }, [safeProducts]);
+  }, [products]);
 
   return (
     <section

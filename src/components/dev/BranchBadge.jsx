@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const BRANCH = typeof __HG_GIT_BRANCH__ !== 'undefined' ? __HG_GIT_BRANCH__ : 'unknown';
 

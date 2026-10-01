@@ -20,7 +20,7 @@
  * Aquest fitxer no té side effects: només exporta funcions pures.
  */
 
-/* eslint-disable no-restricted-globals */
+ 
 
 const isBrowser = () => typeof window !== 'undefined' && typeof document !== 'undefined';
 

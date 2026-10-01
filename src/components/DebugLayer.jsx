@@ -88,6 +88,7 @@ export default function DebugLayer({
       if (cur === next) return prev;
       return next;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) megaStripeState es un objecte nou a cada render; l'entrada reactiva real (megaStripeRefSrc) ja hi es i el setter es estable
   }, [megaStripeState.megaStripeRefSrc]);
 
   useEffect(() => {

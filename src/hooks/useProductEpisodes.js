@@ -85,6 +85,9 @@ export default function useProductEpisodes({ product, language = 'ca' }) {
   const langFolders = useMemo(() => buildLangFolders(language), [language]);
   const fallbackLanguage = useMemo(() => flipLanguage(language), [language]);
   const fallbackLangFolders = useMemo(() => buildLangFolders(fallbackLanguage), [fallbackLanguage]);
+  // (02/10/2026) Intencional: només depèn dels camps slug/name/id; afegir l'objecte `product`
+  // sencer refaría els fetchs d'episodis quan canviï la identitat sense canviar les claus.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   const candidateKeys = useMemo(() => buildCandidateKeys(product), [product?.slug, product?.name, product?.id]);
 
   const storageBaseKey = useMemo(() => {

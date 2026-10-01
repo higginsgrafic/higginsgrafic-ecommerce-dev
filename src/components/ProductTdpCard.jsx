@@ -1,4 +1,3 @@
-import React from 'react';
 import CartIcon from '@/components/ui/CartIcon';
 import SizeButton from '@/components/ui/SizeButton';
 import { SELLING_PRICE_LABEL } from '@/config/pricing';

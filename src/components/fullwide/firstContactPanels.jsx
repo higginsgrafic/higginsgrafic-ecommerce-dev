@@ -1,5 +1,4 @@
 import { carrilPx } from '../../utils/layoutMetrics.js';
-import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import OptimizedImg from './OptimizedImg.jsx';
 import { estilCaixaBloc, ALCADA_PASTILLA_SELECTOR_PX } from './estilsBlocs.js';

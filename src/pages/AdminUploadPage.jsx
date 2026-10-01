@@ -1,10 +1,85 @@
-import React, { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, File, Folder, Archive, X, Check, AlertCircle, Loader2 } from 'lucide-react';
 import JSZip from 'jszip';
 import SEO from '@/components/SEO';
 import { uploadFileToPath } from '@/api/storage';
 import { supabase } from '@/api/supabase-products';
+
+// Funcions pures a nivell de modul: identitat estable per al useCallback d'onDrop (02/10/2026)
+const toTitleCase = (value) => {
+  return (value || '')
+    .toString()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+};
+
+const suggestPathFromFilename = (fileName) => {
+  const name = (fileName || '').toString().trim();
+  if (!name) return null;
+
+  const base = name.replace(/\.[^.]+$/, '');
+  const tokens = base
+    .split(/[-_]+/)
+    .map(t => t.trim())
+    .filter(Boolean);
+
+  if (tokens.length < 2) return null;
+
+  const knownCollections = new Set(['miscellania', 'first', 'contact', 'first-contact', 'austen', 'cube', 'the', 'human', 'inside', 'the-human-inside', 'grafic']);
+
+  let collection = null;
+  if (tokens[0] === 'first' && tokens[1] === 'contact') {
+    collection = 'first-contact';
+  } else if (tokens[0] === 'the' && tokens[1] === 'human' && tokens[2] === 'inside') {
+    collection = 'the-human-inside';
+  } else if (tokens[0] === 'first-contact' || tokens[0] === 'the-human-inside') {
+    collection = tokens[0];
+  } else if (knownCollections.has(tokens[0])) {
+    collection = tokens[0];
+  }
+
+  const colorTokenToCanonical = (t) => {
+    const v = (t || '')
+      .toString()
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    if (v === 'blanc' || v === 'white') return 'Blanc';
+    if (v === 'negre' || v === 'black') return 'Negre';
+    if (v === 'vermell' || v === 'red') return 'Vermell';
+    if (v.includes('militar') || v.includes('military')) return 'Militar';
+    if (v.includes('forest')) return 'Forest';
+    if (v.includes('royal')) return 'Royal';
+    if (v.includes('navy') || v.includes('marina')) return 'Navy';
+    return null;
+  };
+
+  let color = null;
+  let colorIdx = -1;
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    const c = colorTokenToCanonical(tokens[i]);
+    if (c) {
+      color = c;
+      colorIdx = i;
+      break;
+    }
+  }
+
+  if (!collection || !color) return null;
+
+  const startIdx = collection === 'first-contact' ? 2 : collection === 'the-human-inside' ? 3 : 1;
+  const designTokens = tokens.slice(startIdx, colorIdx >= 0 ? colorIdx : undefined);
+  const designRaw = designTokens.join(' ').trim();
+  const designName = toTitleCase(designRaw || 'Design');
+
+  return `${collection}/${designName}/${color}/${name}`;
+};
 
 const AdminUploadPage = () => {
   const [files, setFiles] = useState([]);
@@ -134,6 +209,7 @@ const AdminUploadPage = () => {
     console.log('Processed files:', newFiles);
     setFiles(prev => [...prev, ...newFiles]);
     setUploadError(null);
+    // suggestPathFromFilename viu a nivell de modul (identitat estable): fora de les deps, ho demana el propi linter (02/10/2026)
   }, []);
 
   const needsManualPath = (path) => {
@@ -144,80 +220,6 @@ const AdminUploadPage = () => {
 
   const updateFilePath = (id, nextPath) => {
     setFiles(prev => prev.map(f => (f.id === id ? { ...f, path: nextPath } : f)));
-  };
-
-  const toTitleCase = (value) => {
-    return (value || '')
-      .toString()
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
-  };
-
-  const suggestPathFromFilename = (fileName) => {
-    const name = (fileName || '').toString().trim();
-    if (!name) return null;
-
-    const base = name.replace(/\.[^.]+$/, '');
-    const tokens = base
-      .split(/[-_]+/)
-      .map(t => t.trim())
-      .filter(Boolean);
-
-    if (tokens.length < 2) return null;
-
-    const knownCollections = new Set(['miscellania', 'first', 'contact', 'first-contact', 'austen', 'cube', 'the', 'human', 'inside', 'the-human-inside', 'grafic']);
-
-    let collection = null;
-    if (tokens[0] === 'first' && tokens[1] === 'contact') {
-      collection = 'first-contact';
-    } else if (tokens[0] === 'the' && tokens[1] === 'human' && tokens[2] === 'inside') {
-      collection = 'the-human-inside';
-    } else if (tokens[0] === 'first-contact' || tokens[0] === 'the-human-inside') {
-      collection = tokens[0];
-    } else if (knownCollections.has(tokens[0])) {
-      collection = tokens[0];
-    }
-
-    const colorTokenToCanonical = (t) => {
-      const v = (t || '')
-        .toString()
-        .trim()
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '');
-
-      if (v === 'blanc' || v === 'white') return 'Blanc';
-      if (v === 'negre' || v === 'black') return 'Negre';
-      if (v === 'vermell' || v === 'red') return 'Vermell';
-      if (v.includes('militar') || v.includes('military')) return 'Militar';
-      if (v.includes('forest')) return 'Forest';
-      if (v.includes('royal')) return 'Royal';
-      if (v.includes('navy') || v.includes('marina')) return 'Navy';
-      return null;
-    };
-
-    let color = null;
-    let colorIdx = -1;
-    for (let i = tokens.length - 1; i >= 0; i--) {
-      const c = colorTokenToCanonical(tokens[i]);
-      if (c) {
-        color = c;
-        colorIdx = i;
-        break;
-      }
-    }
-
-    if (!collection || !color) return null;
-
-    const startIdx = collection === 'first-contact' ? 2 : collection === 'the-human-inside' ? 3 : 1;
-    const designTokens = tokens.slice(startIdx, colorIdx >= 0 ? colorIdx : undefined);
-    const designRaw = designTokens.join(' ').trim();
-    const designName = toTitleCase(designRaw || 'Design');
-
-    return `${collection}/${designName}/${color}/${name}`;
   };
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({

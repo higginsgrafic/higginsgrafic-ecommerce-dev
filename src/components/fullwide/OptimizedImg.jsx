@@ -67,7 +67,7 @@ const OptimizedImg = React.forwardRef(function OptimizedImg(
             || s.includes('/custom_logos/drawings/images_originals/stripe/first_contact/')
             || s.includes('/custom_logos/drawings/images_grid/miscel');
           if (shouldLog) {
-            // eslint-disable-next-line no-console
+             
             console.error('[OptimizedImg] tile error loading', { src, currentSrc, originalSrc });
           }
         }

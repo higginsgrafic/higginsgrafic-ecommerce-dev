@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
 import { sanitizeHtml } from '@/utils/sanitizeHtml';
@@ -94,6 +94,7 @@ function StoreProductsTab() {
 
   useEffect(() => {
     loadGelatoProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) carrega inicial un cop al muntatge; loadGelatoProducts es recrea a cada render
   }, []);
 
   const loadGelatoProducts = async () => {

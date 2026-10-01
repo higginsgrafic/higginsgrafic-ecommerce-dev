@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { typography, getTypographyClasses } from '@/config/typography';
@@ -46,6 +46,9 @@ const HeroPreview = ({ slides = [], autoplayInterval = 8000, className = '' }) =
     }, autoplayInterval);
 
     return () => clearInterval(timer);
+    // (02/10/2026) Intencional: nextSlide és inestable i només fa servir setState funcional
+    // + slides.length (ja dep); l'interval es reinicia amb currentSlide a propòsit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [autoplayInterval, currentSlide, slides.length]);
 
   const nextSlide = () => {

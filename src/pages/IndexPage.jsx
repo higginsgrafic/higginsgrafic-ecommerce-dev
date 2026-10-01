@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Save, RotateCcw, FileText, Folder, File } from 'lucide-react';
 import SEO from '@/components/SEO';

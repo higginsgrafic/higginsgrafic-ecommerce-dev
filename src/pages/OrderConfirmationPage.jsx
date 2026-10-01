@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Loader2 } from 'lucide-react';
@@ -89,7 +89,8 @@ const OrderConfirmationPage = () => {
     }
 
     fetchOrder();
-  }, [orderId]);
+    // trackingToken es un primitiu de searchParams que l'efecte llegeix per triar la via de consulta: cal reaccionar-hi (02/10/2026)
+  }, [orderId, trackingToken]);
 
   if (loading) {
     return (

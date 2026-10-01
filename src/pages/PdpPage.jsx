@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
+import { useState, useLayoutEffect, useRef, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import TambeRail from '@/pages/productRail/TambeRail';
@@ -366,6 +366,9 @@ function PdpDesktop({ product }) {
       const vf = VARIANT_TO_FINISH[urlVariant];
       if (vf && AVAILABLE_FINISHES.includes(vf)) setSelectedFinish(vf);
     }
+    // (02/10/2026) Intencional: AVAILABLE_FINISHES i VARIANT_TO_FINISH tenen identitat nova
+    // a cada render però contingut constant per ruta; l'efecte només ha de reaccionar a la URL.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [location.search]);
 
   const isTablet = isPortraitTablet || isLandscapeTablet;

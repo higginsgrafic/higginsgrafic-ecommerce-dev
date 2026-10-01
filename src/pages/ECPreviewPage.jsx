@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -220,6 +220,7 @@ function ECPreviewPage() {
     }, 50);
 
     return () => window.clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) doRedirect es recrea a cada render; afegir-lo rearmeria el temporitzador de redireccio a cada render
   }, [config, navigate, isAdmin, debug]);
 
   const loadECPage = async () => {

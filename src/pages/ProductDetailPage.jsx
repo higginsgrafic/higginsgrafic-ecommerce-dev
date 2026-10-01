@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
@@ -17,6 +17,81 @@ import useProductEpisodes from '@/hooks/useProductEpisodes';
 import { useRelatedProducts } from '@/hooks/useProducts';
 import { useAdmin } from '@/contexts/AdminContext';
 import { formatPrice } from '@/utils/formatters';
+
+// ── Helpers purs de color/disseny (02/10/2026): abans vivien dins del component i es
+// recreaven a cada render (avis exhaustive-deps de segon ordre als useMemo de la galeria).
+// Són pures, així que pujar-los a nivell de mòdul no canvia cap comportament.
+const normalizeToCanonicalColor = (value) => {
+  const v = (value || '')
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  const vv = v
+    .replace(/%20/g, ' ')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!vv) return null;
+
+  // Els noms de color es mostren TAL COM SÓN AL CATÀLEG (en anglès): són els
+  // noms que fa servir Gelato per fabricar la peça.
+  //
+  // Abans es traduïen cinc colors al català ('Black'→'Negre', 'White'→
+  // 'Blanc'...) i això va arribar a trencar el pagament: la fitxa enviava al
+  // servidor el nom traduït, el catàleg no tenia cap color 'Negre' i la
+  // compra fallava amb "no s'ha pogut identificar la variant". Es va decidir
+  // deixar-los tots en anglès, com el proveïdor.
+  if (vv === 'white' || vv === 'blanc') return 'White';
+  if (vv === 'black' || vv === 'negre') return 'Black';
+  if (vv === 'red' || vv === 'vermell') return 'Red';
+  if (vv === 'green' || vv.includes('militar') || vv.includes('military') || vv.includes('army')) return 'Military Green';
+  if (vv.includes('forest')) return 'Forest Green';
+  if (vv.includes('royal')) return 'Royal';
+  if (vv.includes('navy') || vv.includes('marina')) return 'Navy';
+  // Els 4 colors nous del 64000 (29/09/2026). El catàleg ja en té peces.
+  if (vv.includes('sport grey') || vv.includes('sport-grey') || vv.includes('rs sport')) return 'RS Sport Grey';
+  if (vv.includes('ice grey') || vv.includes('ice-grey')) return 'Ice Grey';
+  if (vv.includes('charcoal')) return 'Charcoal';
+  if (vv.includes('chocolate')) return 'Dark Chocolate';
+
+  return null;
+};
+
+const extractCanonicalColorFromImageUrl = (url) => {
+  const normalized = (url || '').toString().replace(/\\/g, '/');
+  const parts = normalized.split('/').filter(Boolean);
+  if (parts.length < 2) return null;
+
+  // Ignore filename so we only match directory segments (Collection/Design/Color/file)
+  const end = Math.max(0, parts.length - 1);
+  for (let i = end - 1; i >= 0; i -= 1) {
+    const canonical = normalizeToCanonicalColor(parts[i]);
+    if (canonical) return canonical;
+  }
+
+  return null;
+};
+
+const extractDesignFromImageUrl = (url) => {
+  const normalized = (url || '').toString().replace(/\\/g, '/');
+  const parts = normalized.split('/').filter(Boolean);
+  if (parts.length < 3) return null;
+
+  // Ignore filename so we only match directory segments
+  const end = Math.max(0, parts.length - 1);
+  for (let i = end - 1; i >= 1; i -= 1) {
+    const canonical = normalizeToCanonicalColor(parts[i]);
+    if (canonical) {
+      return parts[i - 1] || null;
+    }
+  }
+
+  return parts[parts.length - 3] || null;
+};
 
 const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => {
   const { id } = useParams();
@@ -43,6 +118,9 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
   });
 
   // Obtenir talles i colors disponibles de les variants
+  // (02/10/2026) Intencional: l'efecte de sincronització talla/color ja es reexecuta a cada
+  // render via `validVariants`; memoitzar `availableSizes` no canviaria res observable.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   const availableSizes = validVariants.length > 0
     ? [...new Set(validVariants.map(v => v.size))].sort((a, b) => {
         const order = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', 'XXXL', '3XL', '4XL', '5XL'];
@@ -70,78 +148,6 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     if (haystack.includes('white') || haystack.includes('blanc')) return 'white';
     if (haystack.includes('black') || haystack.includes('negre')) return 'black';
     return 'black';
-  };
-
-  const normalizeToCanonicalColor = (value) => {
-    const v = (value || '')
-      .toString()
-      .trim()
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-
-    const vv = v
-      .replace(/%20/g, ' ')
-      .replace(/[_-]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    if (!vv) return null;
-
-    // Els noms de color es mostren TAL COM SÓN AL CATÀLEG (en anglès): són els
-    // noms que fa servir Gelato per fabricar la peça.
-    //
-    // Abans es traduïen cinc colors al català ('Black'→'Negre', 'White'→
-    // 'Blanc'...) i això va arribar a trencar el pagament: la fitxa enviava al
-    // servidor el nom traduït, el catàleg no tenia cap color 'Negre' i la
-    // compra fallava amb "no s'ha pogut identificar la variant". Es va decidir
-    // deixar-los tots en anglès, com el proveïdor.
-    if (vv === 'white' || vv === 'blanc') return 'White';
-    if (vv === 'black' || vv === 'negre') return 'Black';
-    if (vv === 'red' || vv === 'vermell') return 'Red';
-    if (vv === 'green' || vv.includes('militar') || vv.includes('military') || vv.includes('army')) return 'Military Green';
-    if (vv.includes('forest')) return 'Forest Green';
-    if (vv.includes('royal')) return 'Royal';
-    if (vv.includes('navy') || vv.includes('marina')) return 'Navy';
-    // Els 4 colors nous del 64000 (29/09/2026). El catàleg ja en té peces.
-    if (vv.includes('sport grey') || vv.includes('sport-grey') || vv.includes('rs sport')) return 'RS Sport Grey';
-    if (vv.includes('ice grey') || vv.includes('ice-grey')) return 'Ice Grey';
-    if (vv.includes('charcoal')) return 'Charcoal';
-    if (vv.includes('chocolate')) return 'Dark Chocolate';
-
-    return null;
-  };
-
-  const extractCanonicalColorFromImageUrl = (url) => {
-    const normalized = (url || '').toString().replace(/\\/g, '/');
-    const parts = normalized.split('/').filter(Boolean);
-    if (parts.length < 2) return null;
-
-    // Ignore filename so we only match directory segments (Collection/Design/Color/file)
-    const end = Math.max(0, parts.length - 1);
-    for (let i = end - 1; i >= 0; i -= 1) {
-      const canonical = normalizeToCanonicalColor(parts[i]);
-      if (canonical) return canonical;
-    }
-
-    return null;
-  };
-
-  const extractDesignFromImageUrl = (url) => {
-    const normalized = (url || '').toString().replace(/\\/g, '/');
-    const parts = normalized.split('/').filter(Boolean);
-    if (parts.length < 3) return null;
-
-    // Ignore filename so we only match directory segments
-    const end = Math.max(0, parts.length - 1);
-    for (let i = end - 1; i >= 1; i -= 1) {
-      const canonical = normalizeToCanonicalColor(parts[i]);
-      if (canonical) {
-        return parts[i - 1] || null;
-      }
-    }
-
-    return parts[parts.length - 3] || null;
   };
 
   const normalizeLooseKey = (value) => {
@@ -268,7 +274,9 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       .sort((a, b) => (a?.color || '').localeCompare(b?.color || ''));
 
     return [...orderedPreferred, ...remaining];
-  }, [validVariants, selectedSize, product?.images, product?.collection, product?.name]);
+    // (02/10/2026) Dep simplificada: `product` cobreix product?.images/collection/name
+    // (identitat estable). El memo ja es recalcula a cada render via `validVariants`.
+  }, [validVariants, selectedSize, product]);
 
   // Obtenir la variant actual seleccionada
   const selectedVariant = validVariants.find((v) => {
@@ -297,6 +305,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
         thumbnail: c?.thumbnail || thumb
       };
     });
+    // (02/10/2026) Les funcions d'extracció han pujat a nivell de mòdul (pures): deps originals.
   }, [availableColors, product?.images, selectedVariant?.design, product?.name]);
 
   useEffect(() => {
@@ -341,7 +350,10 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
       // 'Militar' but the product has no Militar variant), keep selectedColor so the UI
       // can still show a placeholder main image and keep the slot highlighted.
     }
-  }, [product?.id, availableSizes.join('|'), selectedSize, selectedColor, validVariants]);
+    // (02/10/2026) Deps afegides (`product`, `availableSizes`) i tret el `join('|')`
+    // (expressió complexa): l'efecte ja es reexecuta a cada render via `validVariants`,
+    // així que el resultat no canvia.
+  }, [product, availableSizes, selectedSize, selectedColor, validVariants]);
 
   const {
     episodes,
@@ -890,7 +902,9 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
     }
 
     return result;
-  }, [rawImages, product, availableColors, extractDesignFromImageUrl, extractCanonicalColorFromImageUrl]);
+    // (02/10/2026) Dep afegida (`validVariants`): el memo ja es recalcula a cada render
+    // via `rawImages`. Les funcions d'extracció han pujat a nivell de mòdul (pures).
+  }, [rawImages, product, availableColors, validVariants]);
 
   useEffect(() => {
     if (!showGalleryModal) return;
@@ -903,6 +917,9 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
+    // (02/10/2026) Intencional: nextGalleryImage/prevGalleryImage es recrearien a cada render
+    // i només fan servir setState funcional; la subscripció ja es refesca amb showGalleryModal.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, [showGalleryModal, galleryImageIndex]);
 
   useEffect(() => {

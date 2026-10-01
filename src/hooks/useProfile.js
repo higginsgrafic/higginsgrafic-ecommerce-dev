@@ -98,7 +98,9 @@ export function useProfile() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+    // (02/10/2026) Deps afegides (primitius que el callback ja llegeix: email i nom), per
+    // evitar tancaments obsolets si canvien sense canviar l'id d'usuari.
+  }, [user?.id, user?.email, user?.user_metadata?.full_name]);
 
   useEffect(() => {
     loadProfile();

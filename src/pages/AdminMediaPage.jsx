@@ -17,6 +17,7 @@ export default function AdminMediaPage() {
 
   useEffect(() => {
     loadFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) loadFiles es recrea a cada render; la entrada reactiva real es currentFolder (carrega al muntar i en canviar de carpeta)
   }, [currentFolder]);
 
   const loadFiles = async () => {

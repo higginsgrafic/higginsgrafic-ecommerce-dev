@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AUSTEN_QUOTES_ASSETS,
@@ -229,6 +229,7 @@ function MegaColumn({
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- gridCalibKeyFor es una funcio del component (identitat inestable): afegir-la re-executaria l'efecte a cada render; els disparadors reals (selectedItem, cubeAdjustable, cubeLocked) ja hi son (02/10/2026)
   }, [collectionId, cubeAdjustable, cubeLocked, selectedItem, gridCalibEnabled]);
 
   const effectiveItems = useMemo(() => {
@@ -249,7 +250,7 @@ function MegaColumn({
   const drawableItems = useMemo(() => {
     const list = Array.isArray(effectiveItems) ? effectiveItems.filter(Boolean) : [];
     return list.filter((it) => it !== CONTROL_TILE_BN && it !== CONTROL_TILE_ARROWS);
-  }, [CONTROL_TILE_ARROWS, CONTROL_TILE_BN, effectiveItems]);
+  }, [effectiveItems]);
 
   useEffect(() => {
     setPageStart(0);
@@ -275,7 +276,7 @@ function MegaColumn({
       windowed.push(drawableItems[(start + i) % len]);
     }
     return [CONTROL_TILE_BN, ...windowed, CONTROL_TILE_ARROWS];
-  }, [CONTROL_TILE_ARROWS, CONTROL_TILE_BN, drawableItems, effectiveItems, pageStart, row]);
+  }, [drawableItems, effectiveItems, pageStart, row]);
 
   useLayoutEffect(() => {
     try {
@@ -370,6 +371,7 @@ function MegaColumn({
       const src = resolveGridThumbSrc(it, collectionId) || resolveSrc(it);
       preloadThumbSrc(src);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resolveSrc/resolveGridThumbSrc son funcions del component (identitat inestable): afegir-les re-executaria la precarrega a cada render; el disparador real (baseItems/collectionId) ja hi es (02/10/2026)
   }, [baseItems, collectionId]);
 
   const miscellaniaStripeTiles = collectionId === 'miscellania' ? Math.max(0, Math.min(7, baseItems.length)) : 7;
@@ -816,7 +818,7 @@ function MegaColumn({
       const file = map[key] || map[keySpaced];
       const out = file ? ensureThumbSuffix(`/custom_logos/drawings/images_grid/cube/${file}`, 'grid') : null;
       if (import.meta.env.DEV && !out) {
-        // eslint-disable-next-line no-console
+         
         console.error('[CUBE grid thumb] unresolved', { it, key, raw });
       }
       return out;
@@ -1232,7 +1234,7 @@ function MegaColumn({
                     if (typeof onSelectItem !== 'function') return;
                     e.preventDefault();
                     if (import.meta.env.DEV && collectionId === 'cube') {
-                      // eslint-disable-next-line no-console
+                       
                       console.error('[MEGA cube tile click]', {
                         it,
                         thumb: resolveGridThumbSrc(it, collectionId),

@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * TaulaVertical — les DUES taules dibuixades de la vista vertical del megaslide.

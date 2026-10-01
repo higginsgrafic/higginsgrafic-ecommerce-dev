@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Truck, ChevronDown, X, Pin, Download } from 'lucide-react';
 import { getPromotionsConfig, updatePromotionsConfig, togglePromotionsBanner } from '@/api/promotions';
 import { useToast } from '@/components/ui/use-toast';
@@ -28,6 +28,7 @@ export default function PromotionsManagerPage() {
     loadConfig();
     loadTextHistory();
     loadPinnedTexts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- (02/10/2026) carrega inicial un cop al muntatge; els loaders es recreen a cada render
   }, []);
 
   const loadTextHistory = () => {

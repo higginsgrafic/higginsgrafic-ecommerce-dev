@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AdminContext = createContext();
 
@@ -162,6 +162,10 @@ export function AdminProvider({ children }) {
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
+    // (02/10/2026) Intencional: isAllowedAdminEmail és inestable i l'inicialització d'auth
+    // (listener de Supabase) només ha de córrer en muntar; afegir-la re-crearia la
+    // subscripció a cada render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- motiu documentat a dalt
   }, []);
 
   // Netejar el bypass quan l'usuari deixa de ser admin
