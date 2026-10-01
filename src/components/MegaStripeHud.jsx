@@ -341,19 +341,19 @@ function MegaStripeHud({
 
                           {/* Seccions expandides */}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, fontSize: 13 }}>
-                            <div style={{ fontWeight: 700, fontSize: 14 }}>Dades d'usuari</div>
+                            <div style={{ fontWeight: 700, fontSize: 14 }}>Dades d&apos;usuari</div>
                             <div style={{ fontWeight: 700, fontSize: 14 }}>Classe de gas</div>
                             
                             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                               <input type="checkbox" defaultChecked style={{ width: 16, height: 16 }} />
-                              <span>He vist i estic d'acord amb les condicions</span>
+                              <span>He vist i estic d&apos;acord amb les condicions</span>
                             </label>
 
                             <div style={{ fontWeight: 700, fontSize: 14, marginTop: 8 }}>Enviament i facturació</div>
                             
                             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                               <input type="checkbox" style={{ width: 16, height: 16 }} />
-                              <span>És igual l'adreça de facturació que la de compra</span>
+                              <span>És igual l&apos;adreça de facturació que la de compra</span>
                             </label>
 
                             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
@@ -375,7 +375,7 @@ function MegaStripeHud({
 
                             {/* Footer */}
                             <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.6)', textAlign: 'center', lineHeight: 1.6, marginTop: 16 }}>
-                              <div>Política de reemborsament | Política d'enviament</div>
+                              <div>Política de reemborsament | Política d&apos;enviament</div>
                               <div>Política de privacitat | Termes del servei</div>
                               <div style={{ marginTop: 8 }}>Higgins Gràfic 2026</div>
                             </div>
@@ -1233,6 +1233,7 @@ function MegaStripeHud({
                                   const qs = next.toString();
                                   navigate(qs ? `${location.pathname}?${qs}` : location.pathname, { replace: true });
                                 } catch {
+                                  /* silenci intencional (02/10/2026): si el toggle de debug falla, el HUD no ha d'aturar mai la pàgina */
                                 }
                               }}
                               style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.15)', background: (() => { const sp = new URLSearchParams(location.search || ''); const has = sp.has('stripeOverlayDebug'); const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase(); return has && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes') ? 'rgba(59,130,246,0.16)' : 'rgba(255,255,255,0.35)'; })(), color: (() => { const sp = new URLSearchParams(location.search || ''); const has = sp.has('stripeOverlayDebug'); const cur = String(sp.get('stripeOverlayDebug') || '').trim().toLowerCase(); return has && (cur === '' || cur === '1' || cur === 'true' || cur === 'on' || cur === 'yes') ? 'rgba(37,99,235,0.95)' : 'rgba(0,0,0,0.70)'; })(), fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}

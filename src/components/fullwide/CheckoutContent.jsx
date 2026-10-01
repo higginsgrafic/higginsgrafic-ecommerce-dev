@@ -607,7 +607,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
     <div style={{ marginTop: isPortraitTablet ? '-10px' : undefined, marginBottom: isPortraitTablet ? undefined : `${FIELD_GAP}px` }}>
       <label style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'9.5pt', lineHeight:1.25, fontWeight:300 }}>
         <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} style={{ marginTop:'1px' }} />
-        <span>Accepto els <a href="/terms" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Política d'enviaments</a>.</span>
+        <span>Accepto els <a href="/terms" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Termes del Servei</a>, la <a href="/privacy" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Política de Privacitat</a> i la <a href="/shipping" style={{ color:'hsl(var(--grey-ink-2))', textDecoration:'underline' }}>Política d&apos;enviaments</a>.</span>
       </label>
     </div>
   );
@@ -700,7 +700,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
         </div>
 
         <div style={bloc}>
-          <div style={titol}>Dades d'enviament</div>
+          <div style={titol}>Dades d&apos;enviament</div>
           <div style={{ display: 'grid', gap: '10px' }}>
             {campsEnviament.map(([nom, textEtiqueta]) => (
               <div key={nom}>
@@ -759,7 +759,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
             <span>
               Accepto els <a href="/terms" style={{ color: 'hsl(var(--grey-ink-2))', textDecoration: 'underline' }}>Termes del Servei</a>, la{' '}
               <a href="/privacy" style={{ color: 'hsl(var(--grey-ink-2))', textDecoration: 'underline' }}>Política de Privacitat</a> i la{' '}
-              <a href="/shipping" style={{ color: 'hsl(var(--grey-ink-2))', textDecoration: 'underline' }}>Política d'enviaments</a>.
+              <a href="/shipping" style={{ color: 'hsl(var(--grey-ink-2))', textDecoration: 'underline' }}>Política d&apos;enviaments</a>.
             </span>
           </label>
 
@@ -895,7 +895,7 @@ function CheckoutContentInner({ cartItems, setCartItems, onCloseMegaSlide, isPor
               (572,6) i el primer camp al nivell de la primera capsa de la
               targeta (659,6): 64,3px fins al primer camp, dels quals 43 son el
               desnivell que ha pujat el retol. A l'escriptori, 15px. */}
-          <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '5px' : (isPortraitTablet ? `${P_TITOL_ENVIAMENT_MB}px` : '15px') }}>Dades d'enviament</div>
+          <div style={{ fontSize:'12pt', fontWeight:500, marginTop: isLandscapeTablet ? '10px' : undefined, marginBottom: isLandscapeTablet ? '5px' : (isPortraitTablet ? `${P_TITOL_ENVIAMENT_MB}px` : '15px') }}>Dades d&apos;enviament</div>
           <div style={cosEnviament}>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', columnGap:'10px' }}>
             <div><input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nom" style={inputStyle} />{formErrors.firstName && <div style={errorStyle}>{formErrors.firstName}</div>}</div>

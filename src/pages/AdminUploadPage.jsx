@@ -1056,7 +1056,7 @@ const AdminUploadPage = () => {
               <div className="flex items-start space-x-3">
                 <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
                 <div className="flex-1">
-                  <h3 className="font-medium text-red-900 mb-1">Error durant l'upload</h3>
+                  <h3 className="font-medium text-red-900 mb-1">Error durant l&apos;upload</h3>
                   <div className="flex items-start justify-between gap-3">
                     <pre className="text-sm text-red-800 font-mono whitespace-pre-wrap break-all max-h-56 overflow-auto flex-1">{uploadError}</pre>
                     <button
@@ -1099,6 +1099,8 @@ const AdminUploadPage = () => {
               }`}
             >
               <input {...getInputProps()} />
+              {/* eslint-disable react/no-unknown-property -- (02/10/2026) `directory` és un atribut no estàndard
+                  acompanyant de webkitdirectory per a la pujada de carpetes; els navegadors usen webkitdirectory. */}
               <input
                 ref={folderInputRef}
                 type="file"
@@ -1108,6 +1110,7 @@ const AdminUploadPage = () => {
                 style={{ display: 'none' }}
                 onChange={onFolderSelected}
               />
+              {/* eslint-enable react/no-unknown-property */}
               <Upload className="w-12 h-12 text-muted-2 mx-auto mb-4" />
               {isDragActive ? (
                 <p className="text-blue-600 font-medium">Deixa anar els fitxers aquí...</p>
@@ -1233,7 +1236,7 @@ const AdminUploadPage = () => {
           {uploadRuns.length > 0 && (
             <div className="mt-6 bg-paper rounded-lg shadow-sm border border-line">
               <div className="p-4 border-b border-line flex items-center justify-between gap-3">
-                <h2 className="font-semibold text-ink-strong">Registre d'Uploads ({uploadRuns.length})</h2>
+                <h2 className="font-semibold text-ink-strong">Registre d&apos;Uploads ({uploadRuns.length})</h2>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -1309,11 +1312,11 @@ const AdminUploadPage = () => {
             <div className="flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
-                <h3 className="font-medium text-blue-900 mb-1">Informació d'Upload</h3>
+                <h3 className="font-medium text-blue-900 mb-1">Informació d&apos;Upload</h3>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• Suporta fitxers individuals de qualsevol tipus</li>
                   <li>• Podeu pujar arxius .zip comprimits</li>
-                  <li>• Les carpetes es processaran mantenint l'estructura</li>
+                  <li>• Les carpetes es processaran mantenint l&apos;estructura</li>
                   <li>• Els fitxers es guardaran al directori de uploads</li>
                 </ul>
               </div>

@@ -14,6 +14,7 @@ export default function DevLinksPage() {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') setSelectedByPath(parsed);
     } catch {
+      /* silenci intencional (02/10/2026): si el JSON desat és corrupte, es parteix de la selecció buida */
     }
   }, []);
 
@@ -21,6 +22,7 @@ export default function DevLinksPage() {
     try {
       localStorage.setItem('devLinks:selectedByPath', JSON.stringify(selectedByPath));
     } catch {
+      /* silenci intencional (02/10/2026): localStorage pot fallar (quota o desactivat); la persistència és opcional */
     }
   }, [selectedByPath]);
 

@@ -24,20 +24,10 @@ const OrderConfirmationLayout = ({
   const [scrollIndex, setScrollIndex] = useState(0);
   const isScrolling = useRef(false);
 
-  if (!orderData) return null;
-
-  const items = orderData.items || [];
-  const itemTotal = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
-  const shipping = orderData.shipping || 0;
-  const ivaAmount = orderData.iva || 0;
-  const totalPlegat = orderData.total || itemTotal;
-  // El subtotal que desa el servidor és la base imposable: el preu de la peça
-  // sense transport i sense IVA. Amb les tres xifres (subtotal + transport +
-  // IVA) s'arriba exactament al total, igual que al checkout.
-  const subtotal = orderData.subtotal != null
-    ? orderData.subtotal
-    : (totalPlegat - shipping - ivaAmount);
-  const discountAmount = discountEnabled ? subtotal * discountRate : 0;
+  // Els hooks es criden sempre, abans de qualsevol retorn primerenc
+  // (rules-of-hooks); amb orderData buit no fan res perquè
+  // productsRef.current encara és null.
+  const items = orderData?.items || [];
   const maxScroll = Math.max(0, items.length - VISIBLE_ROWS);
 
   useEffect(() => {
@@ -65,6 +55,20 @@ const OrderConfirmationLayout = ({
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
   }, [maxScroll]);
+
+  if (!orderData) return null;
+
+  const itemTotal = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
+  const shipping = orderData.shipping || 0;
+  const ivaAmount = orderData.iva || 0;
+  const totalPlegat = orderData.total || itemTotal;
+  // El subtotal que desa el servidor és la base imposable: el preu de la peça
+  // sense transport i sense IVA. Amb les tres xifres (subtotal + transport +
+  // IVA) s'arriba exactament al total, igual que al checkout.
+  const subtotal = orderData.subtotal != null
+    ? orderData.subtotal
+    : (totalPlegat - shipping - ivaAmount);
+  const discountAmount = discountEnabled ? subtotal * discountRate : 0;
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>

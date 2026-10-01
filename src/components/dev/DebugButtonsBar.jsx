@@ -118,8 +118,8 @@ export default function DebugButtonsBar({
             e.stopPropagation();
             try {
               window.__DEV_GUIDES_CLEAR__?.();
-            } catch {}
-            try { localStorage.removeItem('devGuidesV2'); } catch {}
+            } catch { /* silenci intencional (02/10/2026): netejar les guies de debug no ha de llençar mai cap error a la UI */ }
+            try { localStorage.removeItem('devGuidesV2'); } catch { /* silenci intencional (02/10/2026): localStorage pot no estar disponible; la neteja de guies és opcional */ }
           }}
         >
           Clear

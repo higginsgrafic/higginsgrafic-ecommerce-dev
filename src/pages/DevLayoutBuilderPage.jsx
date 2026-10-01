@@ -39,6 +39,7 @@ export default function DevLayoutBuilderPage() {
         if (typeof parsed.selectedWidthKey === 'string') setSelectedWidthKey(parsed.selectedWidthKey);
       }
     } catch {
+      /* silenci intencional (02/10/2026): si la preferència desada és corrupta, es parteix dels valors per defecte */
     }
   }, []);
 
@@ -46,6 +47,7 @@ export default function DevLayoutBuilderPage() {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ selectedPaths, selectedWidthKey }));
     } catch {
+      /* silenci intencional (02/10/2026): localStorage pot fallar (quota o desactivat); desar la preferència és opcional */
     }
   }, [selectedPaths, selectedWidthKey]);
 

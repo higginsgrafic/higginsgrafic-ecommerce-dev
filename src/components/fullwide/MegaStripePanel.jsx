@@ -1217,7 +1217,6 @@ function MegaStripePanel({
                           <defs>
                             <mask
                               id={`hgTintMask-${idRetall}`}
-                              maskType="alpha"
                               style={{ maskType: 'alpha' }}
                               maskUnits="userSpaceOnUse"
                               x={0}

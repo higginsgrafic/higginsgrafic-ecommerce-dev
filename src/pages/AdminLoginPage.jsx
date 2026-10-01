@@ -79,7 +79,7 @@ function AdminLoginPageInner() {
               Accés Administrador
             </h1>
             <p className="text-center text-ink-2 mb-6">
-              Inicieu sessió per accedir al panell d'administració
+              Inicieu sessió per accedir al panell d&apos;administració
             </p>
 
             <button
@@ -161,7 +161,7 @@ function AdminLoginPageInner() {
                 onClick={() => navigate('/')}
                 className="text-sm text-ink-2 hover:text-ink-strong transition-colors"
               >
-                Torneu a l'inici
+                Torneu a l&apos;inici
               </button>
             </div>
           </div>

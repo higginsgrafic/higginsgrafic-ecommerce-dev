@@ -3,46 +3,49 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const EpisodeControls = ({ currentEpisode, onPrevious, onNext, layout = 'desktop' }) => {
+  // Els hooks es criden sempre, incondicionalment (rules-of-hooks)
+  const [arrowsLeft, setArrowsLeft] = useState(null);
+
+  useLayoutEffect(() => {
+    if (layout !== 'desktop') return;
+
+    const compute = () => {
+      const cartButton = document.querySelector('[data-cart-button="1"]');
+      if (!cartButton) {
+        setArrowsLeft(null);
+        return;
+      }
+
+      const desktopContainer = document.querySelector('[data-pdp-desktop="1"]');
+      if (!desktopContainer) {
+        setArrowsLeft(null);
+        return;
+      }
+
+      const cartRect = cartButton.getBoundingClientRect();
+      const desktopRect = desktopContainer.getBoundingClientRect();
+
+      const rightLimit = cartRect.right - desktopRect.left;
+      const desiredLeft = rightLimit - 70;
+
+      const minLeft = 0;
+      const maxLeft = desktopRect.width - 70;
+      const clampedLeft = Math.max(minLeft, Math.min(desiredLeft, maxLeft));
+
+      setArrowsLeft(`${Math.round(clampedLeft)}px`);
+    };
+
+    const raf1 = requestAnimationFrame(compute);
+    const raf2 = requestAnimationFrame(compute);
+    window.addEventListener('resize', compute);
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      window.removeEventListener('resize', compute);
+    };
+  }, [layout]);
+
   if (layout === 'desktop') {
-    const [arrowsLeft, setArrowsLeft] = useState(null);
-
-    useLayoutEffect(() => {
-      const compute = () => {
-        const cartButton = document.querySelector('[data-cart-button="1"]');
-        if (!cartButton) {
-          setArrowsLeft(null);
-          return;
-        }
-
-        const desktopContainer = document.querySelector('[data-pdp-desktop="1"]');
-        if (!desktopContainer) {
-          setArrowsLeft(null);
-          return;
-        }
-
-        const cartRect = cartButton.getBoundingClientRect();
-        const desktopRect = desktopContainer.getBoundingClientRect();
-
-        const rightLimit = cartRect.right - desktopRect.left;
-        const desiredLeft = rightLimit - 70;
-
-        const minLeft = 0;
-        const maxLeft = desktopRect.width - 70;
-        const clampedLeft = Math.max(minLeft, Math.min(desiredLeft, maxLeft));
-
-        setArrowsLeft(`${Math.round(clampedLeft)}px`);
-      };
-
-      const raf1 = requestAnimationFrame(compute);
-      const raf2 = requestAnimationFrame(compute);
-      window.addEventListener('resize', compute);
-      return () => {
-        cancelAnimationFrame(raf1);
-        cancelAnimationFrame(raf2);
-        window.removeEventListener('resize', compute);
-      };
-    }, []);
-
     return (
       <>
         <div className="font-roboto text-right flex flex-col items-end justify-center gap-0.5" style={{ position: 'absolute', top: '78px', left: '768px', width: '219.5px', height: '32px', transform: 'scale(1.01)', paddingRight: '8px', zIndex: 2 }}>

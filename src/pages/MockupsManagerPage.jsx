@@ -1109,7 +1109,7 @@ export default function MockupsManagerPage() {
 
           {mockups.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-ink-soft">No s'han trobat mockups amb aquests filtres</p>
+              <p className="text-ink-soft">No s&apos;han trobat mockups amb aquests filtres</p>
             </div>
           )}
         </div>

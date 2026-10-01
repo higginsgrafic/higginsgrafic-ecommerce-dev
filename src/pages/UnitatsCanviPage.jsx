@@ -509,7 +509,7 @@ export default function UnitatsCanviPage() {
                   <div className="mt-1 text-xs text-ink-2">{cmdFor(activeTask).start}</div>
                 </div>
               ) : (
-                <div className="text-sm text-ink-2">No n'hi ha cap en curs.</div>
+                <div className="text-sm text-ink-2">No n&apos;hi ha cap en curs.</div>
               )}
             </div>
           </div>

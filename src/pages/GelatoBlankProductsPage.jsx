@@ -113,7 +113,7 @@ export default function GelatoBlankProductsPage() {
           <div className="bg-paper rounded-lg shadow p-8 text-center">
             <p className="text-ink-soft mb-4">No hi ha productes guardats</p>
             <p className="text-sm text-muted-2">
-              Executa: <code className="bg-paper-soft px-2 py-1 rounded">npm run fetch-blank "t-shirt"</code>
+              Executa: <code className="bg-paper-soft px-2 py-1 rounded">npm run fetch-blank &quot;t-shirt&quot;</code>
             </p>
           </div>
         ) : (

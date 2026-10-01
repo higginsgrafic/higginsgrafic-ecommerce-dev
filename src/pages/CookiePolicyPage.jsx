@@ -138,7 +138,7 @@ function CookiePolicyPage() {
             {/* Intro */}
             <div className="mb-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-ink leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
-                Higgins GRÀFIC utilitza cookies per millorar l'experiència de navegació i oferir un servei de qualitat. Aquesta política explica quines cookies utilitzem, per què i com pots gestionar-les, en compliment amb la Llei 34/2002 de serveis de la societat de la informació i de comerç electrònic (LSSI) i el Reglament General de Protecció de Dades (RGPD).
+                Higgins GRÀFIC utilitza cookies per millorar l&apos;experiència de navegació i oferir un servei de qualitat. Aquesta política explica quines cookies utilitzem, per què i com pots gestionar-les, en compliment amb la Llei 34/2002 de serveis de la societat de la informació i de comerç electrònic (LSSI) i el Reglament General de Protecció de Dades (RGPD).
               </p>
             </div>
 
@@ -204,7 +204,7 @@ function CookiePolicyPage() {
             {/* Footer */}
             <div className="mt-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-ink-2 leading-[1.25]">
-                Aquesta Política de Cookies està obligatòriament subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, de la Política de Cookies.
+                Aquesta Política de Cookies està obligatòriament subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l&apos;acceptació, de facto, de la Política de Cookies.
               </p>
             </div>
           </div>

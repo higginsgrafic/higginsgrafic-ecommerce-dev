@@ -328,7 +328,7 @@ function TermsPage() {
             {/* Intro */}
             <div className="mb-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-ink leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
-                Us recomanem que llegiu amb atenció aquestes Condicions Generals abans de fer una comanda, ja que fer servir els nostres serveis equival a l'acceptació, de facto, de totes elles. Dites Condicions Generals estan dissenyades per protegir tant els teus drets com a consumidor com els nostres com a empresa en el compliment de la legislació vigent.
+                Us recomanem que llegiu amb atenció aquestes Condicions Generals abans de fer una comanda, ja que fer servir els nostres serveis equival a l&apos;acceptació, de facto, de totes elles. Dites Condicions Generals estan dissenyades per protegir tant els teus drets com a consumidor com els nostres com a empresa en el compliment de la legislació vigent.
               </p>
             </div>
 

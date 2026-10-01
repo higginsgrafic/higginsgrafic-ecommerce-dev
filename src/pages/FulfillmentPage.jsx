@@ -84,7 +84,7 @@ export default function FulfillmentPage() {
               Catàleg de Productes
             </h1>
             <p className="font-roboto text-lg max-w-2xl mx-auto" style={{ color: 'hsl(var(--grey-ink-strong))', opacity: 0.8 }}>
-              Productes d'alta qualitat amb impressió personalitzada. Cada peça és única i feta especialment per a tu.
+              Productes d&apos;alta qualitat amb impressió personalitzada. Cada peça és única i feta especialment per a tu.
             </p>
           </div>
 
@@ -197,7 +197,7 @@ export default function FulfillmentPage() {
                   Print on Demand
                 </h3>
                 <p className="font-roboto text-sm" style={{ color: 'hsl(var(--grey-ink-strong))', opacity: 0.7 }}>
-                  Cada producte s'imprimeix especialment per a tu quan fas la comanda
+                  Cada producte s&apos;imprimeix especialment per a tu quan fas la comanda
                 </p>
               </div>
               <div>
@@ -206,7 +206,7 @@ export default function FulfillmentPage() {
                   Alta Qualitat
                 </h3>
                 <p className="font-roboto text-sm" style={{ color: 'hsl(var(--grey-ink-strong))', opacity: 0.7 }}>
-                  Materials premium i impressió d'última generació per garantir la millor qualitat
+                  Materials premium i impressió d&apos;última generació per garantir la millor qualitat
                 </p>
               </div>
               <div>

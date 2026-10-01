@@ -10,42 +10,45 @@ const EpisodeDisplay = ({
   onDoubleClick,
   layout = 'desktop'
 }) => {
+  // Els hooks es criden sempre, incondicionalment (rules-of-hooks)
+  const [desktopWidth, setDesktopWidth] = useState(null);
+
+  useLayoutEffect(() => {
+    if (layout !== 'desktop') return;
+
+    const compute = () => {
+      const cartButton = document.querySelector('[data-cart-button="1"]');
+      if (!cartButton) {
+        setDesktopWidth(null);
+        return;
+      }
+
+      const desktopContainer = document.querySelector('[data-pdp-desktop="1"]');
+      if (!desktopContainer) {
+        setDesktopWidth(null);
+        return;
+      }
+
+      const cartRect = cartButton.getBoundingClientRect();
+      const desktopRect = desktopContainer.getBoundingClientRect();
+
+      const left = 645;
+      const rightLimit = cartRect.right - desktopRect.left;
+      const width = Math.max(0, Math.round(rightLimit - left));
+      if (width > 0) setDesktopWidth(`${width}px`);
+    };
+
+    const raf1 = requestAnimationFrame(compute);
+    const raf2 = requestAnimationFrame(compute);
+    window.addEventListener('resize', compute);
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      window.removeEventListener('resize', compute);
+    };
+  }, [layout]);
+
   if (layout === 'desktop') {
-    const [desktopWidth, setDesktopWidth] = useState(null);
-
-    useLayoutEffect(() => {
-      const compute = () => {
-        const cartButton = document.querySelector('[data-cart-button="1"]');
-        if (!cartButton) {
-          setDesktopWidth(null);
-          return;
-        }
-
-        const desktopContainer = document.querySelector('[data-pdp-desktop="1"]');
-        if (!desktopContainer) {
-          setDesktopWidth(null);
-          return;
-        }
-
-        const cartRect = cartButton.getBoundingClientRect();
-        const desktopRect = desktopContainer.getBoundingClientRect();
-
-        const left = 645;
-        const rightLimit = cartRect.right - desktopRect.left;
-        const width = Math.max(0, Math.round(rightLimit - left));
-        if (width > 0) setDesktopWidth(`${width}px`);
-      };
-
-      const raf1 = requestAnimationFrame(compute);
-      const raf2 = requestAnimationFrame(compute);
-      window.addEventListener('resize', compute);
-      return () => {
-        cancelAnimationFrame(raf1);
-        cancelAnimationFrame(raf2);
-        window.removeEventListener('resize', compute);
-      };
-    }, []);
-
     return (
       <div style={{ position: 'absolute', top: '133px', left: '645px', width: desktopWidth || '322.5px', height: 'calc(24pt * 6)', transform: 'scale(1.01)' }}>
         {isEditing ? (

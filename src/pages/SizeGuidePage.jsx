@@ -207,7 +207,7 @@ function SizeGuidePage() {
             {/* Footer */}
             <div className="mt-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-ink-2 leading-[1.25]">
-                Aquesta guia de talles està, obligatòriament, subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, d'aquesta informació.
+                Aquesta guia de talles està, obligatòriament, subjecta a la legislació espanyola i europea. Fer servir els nostres serveis equival a l&apos;acceptació, de facto, d&apos;aquesta informació.
               </p>
             </div>
           </div>

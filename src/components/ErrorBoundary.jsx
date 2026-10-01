@@ -247,7 +247,7 @@ class ErrorBoundary extends React.Component {
                   border: '1px solid hsl(var(--grey-line))',
                 }}>
                   <summary style={{ cursor: 'pointer', fontWeight: 500, marginBottom: '8px', color: 'hsl(var(--grey-ink-2))' }}>
-                    Detalls de l'error
+                    Detalls de l&apos;error
                   </summary>
                   <pre style={{
                     fontSize: '11px',

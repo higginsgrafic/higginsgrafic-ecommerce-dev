@@ -105,7 +105,7 @@ const OrderConfirmationPage = () => {
         <div style={{ textAlign: 'center' }}>
           <p style={{ fontSize: '18px', fontWeight: 500, marginBottom: '8px', color: 'hsl(var(--grey-ink-strong))' }}>{error || 'Comanda no trobada'}</p>
           <Link to="/" style={{ display: 'inline-block', marginTop: '16px', padding: '12px 32px', backgroundColor: 'hsl(var(--grey-ink-strong))', color: 'hsl(var(--grey-paper))', textDecoration: 'none', borderRadius: '4px' }}>
-            Tornar a l'inici
+            Tornar a l&apos;inici
           </Link>
         </div>
       </div>

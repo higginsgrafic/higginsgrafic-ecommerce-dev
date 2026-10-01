@@ -134,7 +134,7 @@ const UserSidebar = ({ isOpen, onClose }) => {
               onClick={onClose}
             >
               <User className="h-5 w-5 text-ink-soft group-hover:text-ink-strong transition-colors" />
-              <span className="group-hover:translate-x-1 transition-transform">Perfil d'usuari</span>
+              <span className="group-hover:translate-x-1 transition-transform">Perfil d&apos;usuari</span>
             </Link>
 
             <div className="h-px bg-paper-tint my-4" />

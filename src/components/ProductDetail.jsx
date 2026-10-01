@@ -256,7 +256,7 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-ink-strong mt-0.5">•</span>
-                      <span>Impressió DTF (Direct-to-Film) d'alta definició i màxima intensitat</span>
+                      <span>Impressió DTF (Direct-to-Film) d&apos;alta definició i màxima intensitat</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-ink-strong mt-0.5">•</span>
@@ -276,7 +276,7 @@ function ProductDetail({ product, onClose, onAddToCart }) {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-ink-strong mt-0.5">•</span>
-                      <span>Disseny d'il·lustració d'autor exclusiu</span>
+                      <span>Disseny d&apos;il·lustració d&apos;autor exclusiu</span>
                     </li>
                   </ul>
                 </div>

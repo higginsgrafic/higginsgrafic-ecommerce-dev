@@ -76,7 +76,7 @@ function ContactPage() {
             Contacte
           </h1>
           <p className="font-roboto text-[10pt] font-normal text-ink-soft mb-24 text-center">
-            Diga'm Higgins
+            Diga&apos;m Higgins
           </p>
         </div>
 

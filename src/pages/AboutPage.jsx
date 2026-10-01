@@ -96,7 +96,7 @@ function AboutPage() {
             {/* Intro */}
             <div className="mb-10">
               <p className="font-roboto text-[12pt] font-normal text-ink leading-[1.25] text-center">
-                La samarreta és l'últim bastió de la llibertat d'expressió.
+                La samarreta és l&apos;últim bastió de la llibertat d&apos;expressió.
               </p>
             </div>
 

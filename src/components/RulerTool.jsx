@@ -352,7 +352,7 @@ export default function RulerTool() {
 
           {mode === 'angle' && (
             <div className="text-xs text-muted-foreground bg-muted/60 p-2 rounded">
-              Shift+Click (o Alt+Click) en tres punts per mesurar l'angle (el segon punt és el vèrtex)
+              Shift+Click (o Alt+Click) en tres punts per mesurar l&apos;angle (el segon punt és el vèrtex)
             </div>
           )}
         </div>

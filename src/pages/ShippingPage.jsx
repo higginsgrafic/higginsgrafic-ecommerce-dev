@@ -179,7 +179,7 @@ function ShippingPage() {
             {/* Intro */}
             <div className="mb-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-gray-800 leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
-                Higgins GRÀFIC ven cada peça sota demanda per evitar malbaratament de material i acumulació d'estoc. Aquesta política explica els temps de producció, enviaments, costos i el procés de devolució en compliment de la normativa europea de protecció del consumidor.
+                Higgins GRÀFIC ven cada peça sota demanda per evitar malbaratament de material i acumulació d&apos;estoc. Aquesta política explica els temps de producció, enviaments, costos i el procés de devolució en compliment de la normativa europea de protecció del consumidor.
               </p>
             </div>
 
@@ -282,7 +282,7 @@ function ShippingPage() {
             {/* Footer */}
             <div className="mt-10 self-center w-[500px] bg-white border border-[#DFEBED] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-gray-700 leading-[1.25]">
-                Aquesta política d'enviaments i devolucions està subjecta, obligatòriament, a la legislació espanyola i europea. Fer servir els nostres serveis equival a l'acceptació, de facto, d'aquesta política.
+                Aquesta política d&apos;enviaments i devolucions està subjecta, obligatòriament, a la legislació espanyola i europea. Fer servir els nostres serveis equival a l&apos;acceptació, de facto, d&apos;aquesta política.
               </p>
             </div>
           </div>

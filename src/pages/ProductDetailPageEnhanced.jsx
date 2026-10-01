@@ -287,7 +287,7 @@ export default function ProductDetailPageEnhanced() {
           text: product.description,
           url: window.location.href
         });
-      } catch (err) {}
+      } catch (err) { /* silenci intencional (02/10/2026): l'usuari pot cancel·lar el diàleg de compartir (AbortError); no cal fer res */ }
     } else {
       navigator.clipboard.writeText(window.location.href);
       success('Enllaç copiat al porta-retalls');
@@ -807,7 +807,7 @@ export default function ProductDetailPageEnhanced() {
                 <ul className="space-y-2 font-roboto">
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Impressió sublimada d'alta qualitat amb colors vibrants que no s'esvaeixen</span>
+                    <span>Impressió sublimada d&apos;alta qualitat amb colors vibrants que no s&apos;esvaeixen</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -1053,7 +1053,7 @@ export default function ProductDetailPageEnhanced() {
                         No trobes la resposta?
                       </h3>
                       <p className="font-roboto text-sm text-blue-800 mb-3">
-                        El nostre equip està aquí per ajudar-te. Contacta'ns i et respondrem el més aviat possible.
+                        El nostre equip està aquí per ajudar-te. Contacta&apos;ns i et respondrem el més aviat possible.
                       </p>
                       <Button
                         variant="outline"
@@ -1090,7 +1090,7 @@ export default function ProductDetailPageEnhanced() {
                 <RotateCcw className="w-12 h-12 mx-auto mb-3 text-ink-2" />
                 <h3 className="font-oswald font-bold text-sm uppercase mb-2">Devolució Fàcil</h3>
                 <p className="text-sm font-roboto text-ink-2">
-                  14 dies per canviar d'opinió
+                  14 dies per canviar d&apos;opinió
                 </p>
               </div>
               <div className="text-center">

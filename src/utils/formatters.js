@@ -16,7 +16,7 @@ export const formatPrice = (price, options = {}) => {
   const parsed = (() => {
     if (typeof price === 'number') return price;
     if (typeof price === 'string') {
-      const cleaned = price.replace(',', '.').replace(/[^0-9.\-]/g, '');
+      const cleaned = price.replace(',', '.').replace(/[^0-9.-]/g, '');
       const asNumber = Number.parseFloat(cleaned);
       return asNumber;
     }

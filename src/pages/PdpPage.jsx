@@ -101,7 +101,7 @@ function PdpPage() {
         </Helmet>
         <div style={{ padding: '4rem', textAlign: 'center' }}>
           <h1>Producte no trobat</h1>
-          <p>No s'ha trobat cap producte per a la ruta <code>{registryKey}</code>.</p>
+          <p>No s&apos;ha trobat cap producte per a la ruta <code>{registryKey}</code>.</p>
         </div>
       </section>
     );

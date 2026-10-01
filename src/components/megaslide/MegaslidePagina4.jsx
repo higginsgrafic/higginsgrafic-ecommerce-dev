@@ -818,7 +818,7 @@ export default function MegaslidePagina4({
                       <thead>
                         <tr style={{ transform: 'translateY(-5px)' }}>
                           <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades de contacte</th>
-                          <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades d'enviament</th>
+                          <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades d&apos;enviament</th>
                         </tr>
                       </thead>
                       <tbody style={{ transform: 'translateY(-5px)' }}>
@@ -872,7 +872,7 @@ export default function MegaslidePagina4({
                     <thead>
                       <tr style={{ transform: 'translateY(-5px)' }}>
                         <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades de contacte</th>
-                        <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades d'enviament</th>
+                        <th style={{ ...HEAD, fontSize: '7pt', textAlign: 'center', padding: '1px 4px 4px', border: 'none' }}>Dades d&apos;enviament</th>
                       </tr>
                     </thead>
                     <tbody style={{ transform: 'translateY(-5px)' }}>

@@ -241,7 +241,7 @@ function StoreProductsTab() {
             {filteredProducts.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p>No s'han trobat productes</p>
+                <p>No s&apos;han trobat productes</p>
                 <p className="text-sm mt-2">
                   Total productes disponibles: {products.length}
                 </p>
@@ -297,10 +297,10 @@ function StoreProductsTab() {
                 Selecciona un producte
               </p>
               <p className="text-sm">
-                Fes clic a un producte de l'esquerra per veure totes les seves dades
+                Fes clic a un producte de l&apos;esquerra per veure totes les seves dades
               </p>
               <p className="text-xs mt-4 text-gray-500">
-                Cerca "Gildan 64000" per veure el producte de referència
+                Cerca &quot;Gildan 64000&quot; per veure el producte de referència
               </p>
             </div>
           </div>
@@ -376,7 +376,7 @@ function BlankProductsTab() {
             No hi ha productes en blanc guardats
           </p>
           <p className="text-sm">
-            Executa: <code className="bg-gray-100 px-2 py-1 rounded">npm run fetch-blank "store-product-id"</code>
+            Executa: <code className="bg-gray-100 px-2 py-1 rounded">npm run fetch-blank &quot;store-product-id&quot;</code>
           </p>
         </div>
       </div>
@@ -439,7 +439,7 @@ function BlankProductsTab() {
                 Selecciona un producte
               </p>
               <p className="text-sm">
-                Fes clic a un producte de l'esquerra per veure les seves dades
+                Fes clic a un producte de l&apos;esquerra per veure les seves dades
               </p>
             </div>
           </div>
@@ -924,7 +924,7 @@ function ProductDetailsPanel({ product }) {
 
                     {variant.placeholders && variant.placeholders.length > 0 && (
                       <div>
-                        <p className="text-xs font-medium text-gray-500 mb-2">Placeholders (zones d'impressió)</p>
+                        <p className="text-xs font-medium text-gray-500 mb-2">Placeholders (zones d&apos;impressió)</p>
                         <pre className="text-xs bg-white p-3 rounded border border-gray-200 overflow-x-auto">
                           {JSON.stringify(variant.placeholders, null, 2)}
                         </pre>

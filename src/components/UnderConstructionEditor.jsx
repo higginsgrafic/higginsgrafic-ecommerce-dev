@@ -203,7 +203,7 @@ export default function UnderConstructionEditor() {
     <div className="flex flex-col h-full p-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6 flex-shrink-0">
         <div>
-          <h2 className="text-2xl font-bold">Configuració "En Construcció"</h2>
+          <h2 className="text-2xl font-bold">Configuració &quot;En Construcció&quot;</h2>
           <div className="flex items-center gap-2">
             <p className="text-ink-2 text-sm">Personalitzeu la pàgina de manteniment del lloc web</p>
             <span className={`text-xs px-2 py-1 rounded-full ${
@@ -244,7 +244,7 @@ export default function UnderConstructionEditor() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-base font-bold">Mode "En Construcció"</h3>
+                  <h3 className="text-base font-bold">Mode &quot;En Construcció&quot;</h3>
                   {config.globalRedirect && (
                     <span className="px-2 py-1 bg-red-600 text-paper text-xs font-bold rounded-full">
                       ACTIU
@@ -492,7 +492,7 @@ export default function UnderConstructionEditor() {
               {/* Button */}
               <div className="bg-paper rounded-lg border p-3">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-base font-semibold">Botó d'Acció</h3>
+                  <h3 className="text-base font-semibold">Botó d&apos;Acció</h3>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"

@@ -135,7 +135,7 @@ export default function ResetPasswordPage() {
               Nova contrasenya
             </h1>
             <p className="text-center text-ink-soft text-sm mb-6">
-              Introdueix la teva nova contrasenya per recuperar l'accés al compte
+              Introdueix la teva nova contrasenya per recuperar l&apos;accés al compte
             </p>
 
             {error && (
@@ -147,7 +147,7 @@ export default function ResetPasswordPage() {
             {success && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-                <span>Contrasenya actualitzada. Redirigint a l'inici de sessió...</span>
+                <span>Contrasenya actualitzada. Redirigint a l&apos;inici de sessió...</span>
               </div>
             )}
 
@@ -220,7 +220,7 @@ export default function ResetPasswordPage() {
             {error && (
               <p className="text-center text-sm text-ink-soft mt-6">
                 <Link to="/login" className="text-ink-strong font-medium hover:underline">
-                  Torna a l'inici de sessió
+                  Torna a l&apos;inici de sessió
                 </Link>
               </p>
             )}

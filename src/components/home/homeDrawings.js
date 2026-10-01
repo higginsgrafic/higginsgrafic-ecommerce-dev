@@ -263,10 +263,12 @@ const DRAWING_LABELS = {
   // Austen (no crosswords / no lfmd)
   'austen/keep-calm': 'Keep Calm',
   'austen/pemberley-house': 'Pemberley House',
-  'austen/you-have-bewitched-me': 'Body and Soul',
+  // (02/10/2026) Trets dos duplicats: 'austen/you-have-bewitched-me' ("Body and
+  // Soul") i 'austen/i-admire-and-love-you' ("I Admire and Love You"), definits
+  // mes avall amb el valor final que es feia servir ("You Have Bewitched Me" /
+  // "You Must Allow Me").
   'austen/half-agony-half-hope': 'Half Agony, Half Hope',
   'austen/it-is-a-truth': 'It is a Truth',
-  'austen/i-admire-and-love-you': 'I Admire and Love You',
   'austen/unsociable-and-taciturn': 'Unsociable and Taciturn',
   'austen/you-have-bewitched-me': 'You Have Bewitched Me',
   'austen/i-admire-and-love-you': 'You Must Allow Me',

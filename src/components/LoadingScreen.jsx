@@ -110,7 +110,7 @@ export const dismissAppPreloader = () => {
   if (el && !el.classList.contains('fade-out')) {
     el.classList.add('fade-out');
     setTimeout(() => {
-      try { el.remove(); } catch {}
+      try { el.remove(); } catch { /* silenci intencional (02/10/2026): si el node del preloader ja no existeix, no cal fer res */ }
     }, 500);
   }
 };

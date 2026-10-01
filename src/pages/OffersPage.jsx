@@ -36,7 +36,7 @@ function OffersPage() {
                 Enviament Gratuït
               </h1>
               <p className="font-roboto text-lg sm:text-xl md:text-2xl font-light max-w-3xl mx-auto opacity-95">
-                A GRÀFIC, creiem que l'art ha de ser accessible per a tothom. Per això, oferim enviament gratuït en totes les comandes.
+                A GRÀFIC, creiem que l&apos;art ha de ser accessible per a tothom. Per això, oferim enviament gratuït en totes les comandes.
               </p>
             </motion.div>
           </div>
@@ -65,7 +65,7 @@ function OffersPage() {
               </div>
               <h2 className="font-oswald text-2xl sm:text-3xl font-semibold mb-3 text-ink-strong">Sense Mínims</h2>
               <p className="font-roboto text-base sm:text-lg text-ink-2 leading-relaxed">
-                No importa si compres una samarreta o deu. L'enviament sempre és gratuït, sense excepcions ni condicions ocultes.
+                No importa si compres una samarreta o deu. L&apos;enviament sempre és gratuït, sense excepcions ni condicions ocultes.
               </p>
             </motion.div>
 
@@ -81,7 +81,7 @@ function OffersPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
               </div>
-              <h2 className="font-oswald text-2xl sm:text-3xl font-semibold mb-3 text-ink-strong">Arreu d'Europa</h2>
+              <h2 className="font-oswald text-2xl sm:text-3xl font-semibold mb-3 text-ink-strong">Arreu d&apos;Europa</h2>
               <p className="font-roboto text-base sm:text-lg text-ink-2 leading-relaxed">
                 Enviem a tot Europa amb els millors serveis de missatgeria. Normalment reps la teva comanda entre 3-7 dies laborables.
               </p>

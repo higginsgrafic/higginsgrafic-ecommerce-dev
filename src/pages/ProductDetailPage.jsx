@@ -931,7 +931,7 @@ const ProductDetailPage = ({ onAddToCart, cartItems = [], language = 'ca' }) => 
             onClick={() => navigate('/')}
             className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
           >
-            Tornar a l'inici
+            Tornar a l&apos;inici
           </button>
         </div>
       </div>

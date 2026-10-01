@@ -373,7 +373,7 @@ export default function PromotionsManagerPage() {
                   />
                   {config.discountRate > 0 && (
                     <p className="text-xs text-muted-2 mt-1">
-                      Es mostrarà "Descompte (-{config.discountRate}%)" al checkout i a la confirmació de comanda.
+                      Es mostrarà &quot;Descompte (-{config.discountRate}%)&quot; al checkout i a la confirmació de comanda.
                     </p>
                   )}
                 </div>
@@ -383,7 +383,7 @@ export default function PromotionsManagerPage() {
 
           {/* Link i Clickable */}
           <div className="border-t border-line pt-4">
-            <h2 className="text-sm font-medium mb-3">Configuració d'enllaç</h2>
+            <h2 className="text-sm font-medium mb-3">Configuració d&apos;enllaç</h2>
 
             <div className="space-y-3">
               <div className="flex items-center gap-2">

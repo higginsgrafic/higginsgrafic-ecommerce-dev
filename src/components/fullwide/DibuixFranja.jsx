@@ -419,6 +419,8 @@ export function DibuixFranja({
         : 'none';
 
   return (
+    /* eslint-disable react/no-unknown-property -- (02/10/2026) fetchpriority és atribut HTML estàndard;
+       React 18 encara no suporta la forma camelCase, així que es manté en minúscules. */
     <img
       src={imgUrl ? imgUrl : undefined}
       alt=""
@@ -444,5 +446,6 @@ export function DibuixFranja({
       decoding="async"
       fetchpriority={idx === 0 ? 'high' : undefined}
     />
+    /* eslint-enable react/no-unknown-property */
   );
 }

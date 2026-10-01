@@ -170,7 +170,7 @@ export default function GelatoTemplatesPage() {
                 Cap producte sincronitzat
               </h3>
               <p className="text-ink-2 mb-4">
-                Clica el botó "Sincronitzar" per obtenir els productes de la teva botiga de Gelato
+                Clica el botó &quot;Sincronitzar&quot; per obtenir els productes de la teva botiga de Gelato
               </p>
             </div>
           </div>

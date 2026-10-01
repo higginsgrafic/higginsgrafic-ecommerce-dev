@@ -204,7 +204,7 @@ function Checkout({ isOpen, onClose, items, totalPrice, onComplete }) {
                       </div>
 
                       <div className="py-6 pr-6 pl-0" style={{ color: "hsl(var(--grey-ink-strong))" }}>
-                        <h3 className="font-semibold">Dades d'enviament</h3>
+                        <h3 className="font-semibold">Dades d&apos;enviament</h3>
                       </div>
                       <div className="pl-6 pr-0 pb-6 pt-0">
                         <div className="grid grid-cols-2 gap-4">

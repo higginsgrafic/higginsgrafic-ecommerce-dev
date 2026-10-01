@@ -29,6 +29,30 @@ export default function PdpPage() {
   const registryKey = location.pathname.replace(/^\//, '');
   const product = PDP_REGISTRY_BY_ROUTE[registryKey];
 
+  // Els hooks es criden sempre, abans de qualsevol retorn primerenc
+  // (rules-of-hooks); els valors derivats del producte es protegeixen
+  // perquè amb producte inexistent el retorn primerenc els ignora.
+  const searchParams = new URLSearchParams(location.search);
+  const urlColor = searchParams.get('color');
+  const initialIndex = urlColor ? OFFICIAL_COLORS.indexOf(urlColor) : 0;
+  const effectiveInitialIndex = initialIndex >= 0 ? initialIndex : 0;
+
+  const VARIANT_TO_FINISH = { white: 'BLANC', black: 'NEGRE', color: 'COLOR' };
+  const urlFinish = searchParams.get('finish');
+  const urlVariant = searchParams.get('variant');
+  const variantFinish = urlVariant && VARIANT_TO_FINISH[urlVariant];
+  const IMAGE_COLLECTION = product ? (product.imageCollection || product.collectionSlug) : null;
+  const AVAILABLE_FINISHES = product ? availableFinishesFor(IMAGE_COLLECTION) : [];
+  const DEFAULT_FINISH = product ? defaultFinishFor(IMAGE_COLLECTION) : 'BLANC';
+  const resolvedFinish = (urlFinish && AVAILABLE_FINISHES.includes(urlFinish)) ? urlFinish
+    : (variantFinish && AVAILABLE_FINISHES.includes(variantFinish)) ? variantFinish
+    : DEFAULT_FINISH;
+
+  const [selectedFinish, setSelectedFinish] = useState(resolvedFinish);
+  const [selectedSize, setSelectedSize] = useState('M');
+  const [mainVariantIndex, setMainVariantIndex] = useState(effectiveInitialIndex);
+  const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
+
   if (!product) {
     return (
       <div style={{ padding: '90px 16px 60px', textAlign: 'center', color: 'hsl(var(--grey-ink-2))' }}>
@@ -42,29 +66,8 @@ export default function PdpPage() {
   const PRODUCT_NAME = product.name;
   const COLLECTION_NAME = product.collectionName;
   const COLLECTION_SLUG = product.collectionSlug;
-  const IMAGE_COLLECTION = product.imageCollection || product.collectionSlug;
 
   const TDP_IMAGE = (color, finish) => tdpImageFor(IMAGE_COLLECTION, PRODUCT_ROUTE, color, finish);
-  const AVAILABLE_FINISHES = availableFinishesFor(IMAGE_COLLECTION);
-  const DEFAULT_FINISH = defaultFinishFor(IMAGE_COLLECTION);
-
-  const searchParams = new URLSearchParams(location.search);
-  const urlColor = searchParams.get('color');
-  const initialIndex = urlColor ? OFFICIAL_COLORS.indexOf(urlColor) : 0;
-  const effectiveInitialIndex = initialIndex >= 0 ? initialIndex : 0;
-
-  const VARIANT_TO_FINISH = { white: 'BLANC', black: 'NEGRE', color: 'COLOR' };
-  const urlFinish = searchParams.get('finish');
-  const urlVariant = searchParams.get('variant');
-  const variantFinish = urlVariant && VARIANT_TO_FINISH[urlVariant];
-  const resolvedFinish = (urlFinish && AVAILABLE_FINISHES.includes(urlFinish)) ? urlFinish
-    : (variantFinish && AVAILABLE_FINISHES.includes(variantFinish)) ? variantFinish
-    : DEFAULT_FINISH;
-
-  const [selectedFinish, setSelectedFinish] = useState(resolvedFinish);
-  const [selectedSize, setSelectedSize] = useState('M');
-  const [mainVariantIndex, setMainVariantIndex] = useState(effectiveInitialIndex);
-  const mainVariantColor = OFFICIAL_COLORS[mainVariantIndex];
 
   const goPrevVariant = () => setMainVariantIndex((i) => (i - 1 + OFFICIAL_COLORS.length) % OFFICIAL_COLORS.length);
   const goNextVariant = () => setMainVariantIndex((i) => (i + 1) % OFFICIAL_COLORS.length);

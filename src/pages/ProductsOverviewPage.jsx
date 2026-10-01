@@ -141,8 +141,8 @@ export default function ProductsOverviewPage() {
               <div>
                 <p className="font-semibold text-amber-900 mb-1">Falten productes mock</p>
                 <p className="text-sm text-amber-800">
-                  S'esperaven {totalExpected} productes però només n'hi ha {totalActual} a la base de dades.
-                  Potser cal executar un script d'importació de productes mock.
+                  S&apos;esperaven {totalExpected} productes però només n&apos;hi ha {totalActual} a la base de dades.
+                  Potser cal executar un script d&apos;importació de productes mock.
                 </p>
               </div>
             </div>

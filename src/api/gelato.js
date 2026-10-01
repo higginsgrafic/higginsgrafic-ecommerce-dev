@@ -55,7 +55,7 @@ class GelatoClient {
     return headers;
   }
 
-  async request(endpoint, options = {}, useOrdersAPI = false) {    try {
+  async request(endpoint, options = {}, useOrdersAPI = false) {
       // Construir URL de la edge function amb paràmetres
       let url;
       try {
@@ -114,12 +114,10 @@ class GelatoClient {
 
       const data = await response.json();
                         if (data?.products?.length > 0) {
+          /* bloc buit intencional (02/10/2026): no-op residual; la resposta ja es retorna a sota sense cap tractament addicional */
               }
 
       return data;
-    } catch (error) {
-                        throw error;
-    }
   }
 
   // ==================== CATÀLEG ====================
@@ -188,8 +186,7 @@ class GelatoClient {
    * Llistar productes de la botiga
    */
   async listStoreProducts(options = {}) {
-    try {
-      const url = new URL(this.edgeFunctionUrl);
+    const url = new URL(this.edgeFunctionUrl);
       url.searchParams.set('action', 'store-products');
       if (this.storeId) {
         url.searchParams.set('storeId', this.storeId);
@@ -213,9 +210,6 @@ class GelatoClient {
 
       const data = await response.json();
             return data;
-    } catch (error) {
-            throw error;
-    }
   }
 
   async listAllStoreProducts(options = {}) {
@@ -247,8 +241,7 @@ class GelatoClient {
    * Obtenir detalls d'un producte de la botiga
    */
   async getStoreProduct(productId) {
-    try {
-      const url = new URL(this.edgeFunctionUrl);
+    const url = new URL(this.edgeFunctionUrl);
       url.searchParams.set('action', 'store-product');
       url.searchParams.set('productId', productId);
       if (this.storeId) {
@@ -266,17 +259,13 @@ class GelatoClient {
 
       const data = await response.json();
             return data;
-    } catch (error) {
-            throw error;
-    }
   }
 
   /**
    * Obtenir template (si el producte té templateId)
    */
   async getTemplate(templateId) {
-    try {
-      const url = new URL(this.edgeFunctionUrl);
+    const url = new URL(this.edgeFunctionUrl);
       url.searchParams.set('action', 'template');
       url.searchParams.set('templateId', templateId);
 
@@ -291,9 +280,6 @@ class GelatoClient {
 
       const data = await response.json();
             return data;
-    } catch (error) {
-            throw error;
-    }
   }
 
   // ==================== COMANDES ====================
@@ -530,8 +516,8 @@ export const syncGelatoCatalog = async () => {
         return [];
   }
 
-  try {
-            const productsResponse = await gelatoClient.getCatalog(null);
+
+    const productsResponse = await gelatoClient.getCatalog(null);
 
                 if (!productsResponse || !productsResponse.products || productsResponse.products.length === 0) {
                               return [];
@@ -558,9 +544,6 @@ export const syncGelatoCatalog = async () => {
 
     const collections = [...new Set(mappedProducts.map(p => p.collection))];
             return mappedProducts;
-  } catch (error) {
-                    throw error;
-  }
 };
 
 /**
@@ -585,18 +568,14 @@ export const getGelatoOrderStatus = async (gelatoOrderId) => {
     };
   }
 
-  try {
-    const order = await gelatoClient.getOrder(gelatoOrderId);
-    return {
-      orderId: order.orderId,
-      status: order.status,
-      trackingNumber: order.tracking?.trackingNumber || null,
-      trackingUrl: order.tracking?.trackingUrl || null,
-      estimatedDelivery: order.estimatedDelivery || null
-    };
-  } catch (error) {
-        throw error;
-  }
+  const order = await gelatoClient.getOrder(gelatoOrderId);
+  return {
+    orderId: order.orderId,
+    status: order.status,
+    trackingNumber: order.tracking?.trackingNumber || null,
+    trackingUrl: order.tracking?.trackingUrl || null,
+    estimatedDelivery: order.estimatedDelivery || null
+  };
 };
 
 /**
@@ -607,8 +586,7 @@ export const syncGelatoStoreProducts = async () => {
         return [];
   }
 
-  try {
-    const products = await gelatoClient.listAllStoreProducts();
+  const products = await gelatoClient.listAllStoreProducts();
         const detailedProducts = [];
 
     for (const product of products) {
@@ -618,18 +596,17 @@ export const syncGelatoStoreProducts = async () => {
             const templateData = await gelatoClient.getTemplate(product.templateId);
             product.template = templateData;
           } catch (error) {
-                      }
+            /* silenci intencional (02/10/2026): si el template no es pot obtenir, el producte es publica igualment sense template */
+          }
         }
 
         detailedProducts.push(product);
               } catch (error) {
+                /* silenci intencional (02/10/2026): si el processament d'un producte falla, es salta i la sincronització continua amb la resta */
               }
     }
 
         return detailedProducts;
-  } catch (error) {
-        throw error;
-  }
 };
 
 export { gelatoClient };

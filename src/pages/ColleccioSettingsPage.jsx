@@ -530,7 +530,7 @@ export default function ColleccioSettingsPage() {
                   </div>
 
                   <p className="text-sm text-ink-2 mb-6">
-                    Estàs segur que vols esborrar la col·lecció "{collections[deleteConfirmDialog]?.name}"?
+                    Estàs segur que vols esborrar la col·lecció &quot;{collections[deleteConfirmDialog]?.name}&quot;?
                     Aquesta acció no es pot desfer.
                   </p>
 

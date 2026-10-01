@@ -1104,7 +1104,7 @@ export default function SlideShell({
                             {isCartPreset && activeScreen === 'details' ? (
                               <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-6">
                                 <div className="text-xs font-semibold tracking-[0.18em] text-muted-foreground">DADES</div>
-                                <div className="mt-3 text-2xl font-black tracking-tight text-foreground">Informació d'enviament</div>
+                                <div className="mt-3 text-2xl font-black tracking-tight text-foreground">Informació d&apos;enviament</div>
 
                                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                                   <div>
@@ -1303,7 +1303,9 @@ export default function SlideShell({
                             ) : isViewPreset ? (
                               <FastViewContent preset={preset} onLogout={onLogout} />
                             ) : (
-                              <SlideContent preset={preset} onLogout={onLogout} />
+                              // (02/10/2026) SlideContent no s'ha definit mai; FastViewContent
+                              // es l'unic component del fitxer amb la signatura (preset, onLogout).
+                              <FastViewContent preset={preset} onLogout={onLogout} />
                             )}
                           </>
                         ) : (
@@ -1334,7 +1336,9 @@ export default function SlideShell({
                       ) : isViewPreset ? (
                         <FastViewContent preset={preset} onLogout={onLogout} />
                       ) : (
-                        <SlideContent preset={preset} onLogout={onLogout} />
+                        // (02/10/2026) SlideContent no s'ha definit mai; FastViewContent
+                        // es l'unic component del fitxer amb la signatura (preset, onLogout).
+                        <FastViewContent preset={preset} onLogout={onLogout} />
                       )}
                     </SlideContentErrorBoundary>
                   )}

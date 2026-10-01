@@ -52,7 +52,8 @@ export const STRIPE_DRAWING_DY_VERTICAL = {
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/black/pemberley-house-b-stripe.webp': 29.51,
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/color/pemberley-house-multi-light-stripe.webp': 29.57,
   '/custom_logos/drawings/images_stripe/austen/pemberley_house/white/pemberley-house-w-stripe.webp': 29.57,
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp': 27.87,
+  // (02/10/2026) Treta l'entrada duplicada del mateix fitxer (27.87): guanyava
+  // el valor final de mes avall (25.49).
   '/custom_logos/drawings/images_stripe/austen/quotes/black/half-agony-half-hope-b-stripe.webp': 26.02,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/i-prefer-to-be-b-stripe.webp': 27.87,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/it-is-a-truth-b-stripe.webp': 29.54,
@@ -61,7 +62,8 @@ export const STRIPE_DRAWING_DY_VERTICAL = {
   // mes amunt, i sense entrada al mapa es quedava amb el valor generic.
   '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp': 25.49,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/i-admire-and-love-you-b-stripe.webp': 29.98,
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-have-bewitched-me-w-stripe.webp': 28.03,
+  // (02/10/2026) Treta l'entrada duplicada del mateix fitxer (28.03): guanyava
+  // el valor final de mes avall (25.65).
   '/custom_logos/drawings/images_stripe/austen/quotes/white/half-agony-half-hope-w-stripe.webp': 26.37,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/i-prefer-to-be-w-stripe.webp': 28.03,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/it-is-a-truth-w-stripe.webp': 29.61,
@@ -242,7 +244,7 @@ export const STRIPE_DRAWING_DX_VERTICAL = {
   // Els dibuixos de Quotes: porten un dx de 3,25-3,75 al calibratge compartit
   // (la resta de dibuixos van a 0,5-1,25) i a la vertical es veien tots desplacats
   // a la dreta. Aqui se'ls hi porta el dx al nivell de la resta (0,5).
-  '/custom_logos/drawings/images_stripe/austen/quotes/black/you-have-bewitched-me-b-stripe.webp': -3.25,
+  // (02/10/2026) Treta l'entrada duplicada del mateix fitxer: mateix valor (-3.25).
   '/custom_logos/drawings/images_stripe/austen/quotes/black/half-agony-half-hope-b-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/i-prefer-to-be-b-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/black/it-is-a-truth-b-stripe.webp': -3.98,
@@ -254,7 +256,7 @@ export const STRIPE_DRAWING_DX_VERTICAL = {
   '/custom_logos/drawings/images_stripe/austen/quotes/color/i-prefer-to-be-multi-light-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/color/it-is-a-truth-multi-light-stripe.webp': -3.98,
   '/custom_logos/drawings/images_stripe/austen/quotes/color/i-admire-and-love-you-multi-light-stripe.webp': -3.48,
-  '/custom_logos/drawings/images_stripe/austen/quotes/white/you-have-bewitched-me-w-stripe.webp': -3.25,
+  // (02/10/2026) Treta l'entrada duplicada del mateix fitxer: mateix valor (-3.25).
   '/custom_logos/drawings/images_stripe/austen/quotes/white/half-agony-half-hope-w-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/i-prefer-to-be-w-stripe.webp': -3.25,
   '/custom_logos/drawings/images_stripe/austen/quotes/white/it-is-a-truth-w-stripe.webp': -3.98,

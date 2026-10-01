@@ -127,7 +127,7 @@ function LegalNoticePage() {
             {/* Intro */}
             <div className="mb-10 self-center w-[500px] bg-paper border border-[hsl(var(--grey-line))] rounded-md p-[26px]">
               <p className="font-roboto text-[8pt] font-bold text-ink leading-[1.25] text-justify" style={{ hyphens: 'auto', WebkitHyphens: 'auto' }}>
-                L'accés al lloc web higginsgrafic.com implica l'acceptació d'aquest avís legal. Si no esteu d'acord amb tot o part d'aquestes condicions, si us plau, no utilitzeu el lloc web.
+                L&apos;accés al lloc web higginsgrafic.com implica l&apos;acceptació d&apos;aquest avís legal. Si no esteu d&apos;acord amb tot o part d&apos;aquestes condicions, si us plau, no utilitzeu el lloc web.
               </p>
             </div>
 

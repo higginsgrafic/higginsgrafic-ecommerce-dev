@@ -78,7 +78,7 @@ async function loadPricingConfig() {
       else if (row.scope === 'collection' && row.collection) pricingCache.collections[row.collection] = parseFloat(row.price);
     });
     pricingLoaded = true;
-  } catch {}
+  } catch { /* silenci intencional (02/10/2026): si pricing_config no és disponible, es fan servir els preus base del producte */ }
 }
 
 function resolvePrice(basePrice, collection) {

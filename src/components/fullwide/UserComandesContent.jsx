@@ -19,6 +19,10 @@ import {
 import usePersistentState from '@/hooks/usePersistentState';
 import { useOrders } from '@/hooks/useOrders';
 
+// (02/10/2026) Interruptor de la pauta general (debug) extret del literal `false`
+// de la condicio, per complir no-constant-binary-expression.
+const MOSTRA_PAUTA_GENERAL = false;
+
 // Plantilla de la secció COMANDES del perfil d'usuari — alineada amb la pauta verda
 function UserComandesContent({ userEmail }) {
   const { orders: fetchedOrders } = useOrders(userEmail);
@@ -196,7 +200,8 @@ function UserComandesContent({ userEmail }) {
       ...TEXT,
     }}>
       {/* Mockup JPG guia per pestanya — desactivada */}
-      {true && activeTab === 'SEGURETAT' && (
+      {/* (02/10/2026) tret el literal `true &&` de la condicio (eslint no-constant-binary-expression) */}
+      {activeTab === 'SEGURETAT' && (
         <div style={{
           position: 'absolute',
           top: '-1px',
@@ -344,6 +349,7 @@ function UserComandesContent({ userEmail }) {
                 );
                 const pwd = (text) => (
                   <div className="compte-ph-wrap">
+                    {/* eslint-disable-next-line react/no-unknown-property -- atribut no estàndard de Safari (WebKit); React 18 el deixa passar tal qual */}
                     <input type="password" placeholder=" " autoComplete="new-password" passwordrules="minlength: 30; required: lower; required: upper; required: digit; required: special;" />
                     <span className="compte-ph" style={{ color: COL_WEAK }}>
                       <span>{text}</span>
@@ -514,16 +520,16 @@ function UserComandesContent({ userEmail }) {
                     );
                     const segCells = segVisible ? [
                       <>{rect}{withEye(d.ent)}</>,
-                      <span style={{ display: 'inline-block', transform: 'translateX(-245px)' }}>{d.nom}</span>,
-                      <span style={{ display: 'inline-block', transform: 'translateX(-7.5px)', whiteSpace: 'nowrap' }}>{d.num}</span>,
-                      <span style={{ display: 'inline-block', transform: 'translateX(158.5px)', whiteSpace: 'nowrap' }}>{d.exp}</span>,
-                      <span style={{ display: 'inline-block', transform: 'translateX(240px)', whiteSpace: 'nowrap' }}>{d.cvv}</span>,
+                      <span key="nom" style={{ display: 'inline-block', transform: 'translateX(-245px)' }}>{d.nom}</span>,
+                      <span key="num" style={{ display: 'inline-block', transform: 'translateX(-7.5px)', whiteSpace: 'nowrap' }}>{d.num}</span>,
+                      <span key="exp" style={{ display: 'inline-block', transform: 'translateX(158.5px)', whiteSpace: 'nowrap' }}>{d.exp}</span>,
+                      <span key="cvv" style={{ display: 'inline-block', transform: 'translateX(240px)', whiteSpace: 'nowrap' }}>{d.cvv}</span>,
                     ] : [
                       <>{rect}{withEye('')}</>,
-                      <span style={{ display: 'inline-block', transform: 'translateX(-245px)' }}>Nom</span>,
-                      <span style={{ display: 'inline-block', transform: 'translateX(-7.5px)', letterSpacing: '2px', fontSize: '1.5em', whiteSpace: 'nowrap' }}>{cardDots}</span>,
-                      <span style={{ display: 'inline-block', transform: 'translateX(158.5px)', letterSpacing: '2px', fontSize: '1.5em', whiteSpace: 'nowrap' }}>{'\u2022\u2022/\u2022\u2022'}</span>,
-                      <span style={{ display: 'inline-block', transform: 'translateX(240px)', letterSpacing: '2px', fontSize: '1.5em', whiteSpace: 'nowrap' }}>{'\u2022\u2022\u2022'}</span>,
+                      <span key="nom" style={{ display: 'inline-block', transform: 'translateX(-245px)' }}>Nom</span>,
+                      <span key="num" style={{ display: 'inline-block', transform: 'translateX(-7.5px)', letterSpacing: '2px', fontSize: '1.5em', whiteSpace: 'nowrap' }}>{cardDots}</span>,
+                      <span key="exp" style={{ display: 'inline-block', transform: 'translateX(158.5px)', letterSpacing: '2px', fontSize: '1.5em', whiteSpace: 'nowrap' }}>{'\u2022\u2022/\u2022\u2022'}</span>,
+                      <span key="cvv" style={{ display: 'inline-block', transform: 'translateX(240px)', letterSpacing: '2px', fontSize: '1.5em', whiteSpace: 'nowrap' }}>{'\u2022\u2022\u2022'}</span>,
                     ];
                     return (
                       <tr key={r} style={{ height: '30px' }}>
@@ -1547,7 +1553,7 @@ function UserComandesContent({ userEmail }) {
                   letterSpacing: '0.5px',
                   textAlign: 'center',
                 }}>
-                  Encara no s'ha fet cap comanda
+                  Encara no s&apos;ha fet cap comanda
                 </div>
               </td>
             </tr>
@@ -1670,7 +1676,7 @@ function UserComandesContent({ userEmail }) {
 
       </>)}
 
-      {false && activeTab === 'SEGURETAT' && (
+      {MOSTRA_PAUTA_GENERAL && activeTab === 'SEGURETAT' && (
         <div style={{
           position: 'absolute',
           top: 0,

@@ -23,6 +23,40 @@ const STATUS_COLORS = {
   returned: '#f8d7da',
 };
 
+// Constants d'estil restaurades de la versió original (commit 7f38448d),
+// on eren locals dins del component i es van perdre en el refactor.
+const titleStyle = {
+  fontFamily: 'Roboto Condensed, sans-serif',
+  fontSize: '15pt',
+  fontWeight: 500,
+  color: '#000',
+  marginBottom: '20px',
+  marginTop: '0',
+};
+
+const labelStyle = {
+  fontFamily: 'Roboto Condensed, sans-serif',
+  fontSize: '15pt',
+  fontWeight: 400,
+  color: '#000',
+  display: 'block',
+  marginBottom: '6px',
+};
+
+const inputStyle = {
+  width: '100%',
+  padding: '8px 12px',
+  fontFamily: 'Roboto Condensed, sans-serif',
+  fontSize: '12pt',
+  fontWeight: 300,
+  border: '1px solid #ccc',
+  borderRadius: '0',
+  outline: 'none',
+  backgroundColor: 'white',
+};
+
+const fieldMargin = { marginBottom: '18px' };
+
 function OrdersTab({ orders }) {
   if (!orders || orders.length === 0) {
     return (

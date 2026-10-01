@@ -38,11 +38,85 @@ const ProductInfo = ({
     return cleaned;
   };
 
-  if (layout === 'desktop') {
-    const [pillWidth, setPillWidth] = useState(null);
-    const [titleFontPx, setTitleFontPx] = useState(47);
-    const titleRef = React.useRef(null);
+  // Els hooks es criden sempre, incondicionalment (rules-of-hooks)
+  const [pillWidth, setPillWidth] = useState(null);
+  const [titleFontPx, setTitleFontPx] = useState(47);
+  const titleRef = React.useRef(null);
 
+  useLayoutEffect(() => {
+    if (layout !== 'desktop') return;
+
+    const compute = () => {
+      const cartButton = document.querySelector('[data-cart-button="1"]');
+      const desktopContainer = document.querySelector('[data-pdp-desktop="1"]');
+      if (!cartButton || !desktopContainer) {
+        setPillWidth(null);
+        return;
+      }
+
+      const cartRect = cartButton.getBoundingClientRect();
+      const desktopRect = desktopContainer.getBoundingClientRect();
+
+      const left = 645;
+      const rightLimit = cartRect.right - desktopRect.left;
+      const width = Math.max(0, Math.round(rightLimit - left));
+      if (width > 0) setPillWidth(`${width}px`);
+    };
+
+    const raf1 = requestAnimationFrame(compute);
+    const raf2 = requestAnimationFrame(compute);
+    window.addEventListener('resize', compute);
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      window.removeEventListener('resize', compute);
+    };
+  }, [layout]);
+
+  useLayoutEffect(() => {
+    if (layout !== 'desktop') return;
+
+    const el = titleRef.current;
+    if (!el) return;
+
+    let raf = 0;
+    const fit = () => {
+      const available = pillWidth ? parseFloat(pillWidth) : el.getBoundingClientRect().width;
+      if (!available || !Number.isFinite(available)) return;
+
+      // Fit title in one line by scaling font size down when needed.
+      const base = 47; // ~35.25pt
+      el.style.fontSize = `${base}px`;
+      el.style.whiteSpace = 'nowrap';
+      el.style.overflow = 'visible';
+      el.style.textOverflow = 'clip';
+
+      const scroll = el.scrollWidth;
+      if (!scroll || !Number.isFinite(scroll)) {
+        setTitleFontPx(base);
+        return;
+      }
+
+      const ratio = available / scroll;
+      const next = Math.max(18, Math.min(base, Math.floor(base * Math.min(1, ratio))));
+      setTitleFontPx(next);
+    };
+
+    raf = requestAnimationFrame(fit);
+
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(fit);
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [layout, pillWidth, product?.name]);
+
+  if (layout === 'desktop') {
     const DESKTOP_SIZE_SLOTS = ['S', 'M', 'L', 'XL'];
 
     const normalizeLoose = (value) =>
@@ -52,75 +126,6 @@ const ProductInfo = ({
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '');
-
-    useLayoutEffect(() => {
-      const compute = () => {
-        const cartButton = document.querySelector('[data-cart-button="1"]');
-        const desktopContainer = document.querySelector('[data-pdp-desktop="1"]');
-        if (!cartButton || !desktopContainer) {
-          setPillWidth(null);
-          return;
-        }
-
-        const cartRect = cartButton.getBoundingClientRect();
-        const desktopRect = desktopContainer.getBoundingClientRect();
-
-        const left = 645;
-        const rightLimit = cartRect.right - desktopRect.left;
-        const width = Math.max(0, Math.round(rightLimit - left));
-        if (width > 0) setPillWidth(`${width}px`);
-      };
-
-      const raf1 = requestAnimationFrame(compute);
-      const raf2 = requestAnimationFrame(compute);
-      window.addEventListener('resize', compute);
-      return () => {
-        cancelAnimationFrame(raf1);
-        cancelAnimationFrame(raf2);
-        window.removeEventListener('resize', compute);
-      };
-    }, []);
-
-    useLayoutEffect(() => {
-      const el = titleRef.current;
-      if (!el) return;
-
-      let raf = 0;
-      const fit = () => {
-        const available = pillWidth ? parseFloat(pillWidth) : el.getBoundingClientRect().width;
-        if (!available || !Number.isFinite(available)) return;
-
-        // Fit title in one line by scaling font size down when needed.
-        const base = 47; // ~35.25pt
-        el.style.fontSize = `${base}px`;
-        el.style.whiteSpace = 'nowrap';
-        el.style.overflow = 'visible';
-        el.style.textOverflow = 'clip';
-
-        const scroll = el.scrollWidth;
-        if (!scroll || !Number.isFinite(scroll)) {
-          setTitleFontPx(base);
-          return;
-        }
-
-        const ratio = available / scroll;
-        const next = Math.max(18, Math.min(base, Math.floor(base * Math.min(1, ratio))));
-        setTitleFontPx(next);
-      };
-
-      raf = requestAnimationFrame(fit);
-
-      const onResize = () => {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(fit);
-      };
-
-      window.addEventListener('resize', onResize);
-      return () => {
-        cancelAnimationFrame(raf);
-        window.removeEventListener('resize', onResize);
-      };
-    }, [pillWidth, product?.name]);
 
     return (
       <>

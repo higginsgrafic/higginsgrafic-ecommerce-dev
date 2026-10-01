@@ -398,7 +398,7 @@ export default function GradientEditor({ stops, angle, onStopsChange, onAngleCha
         )}
 
         <p className="text-xs text-ink-soft mt-2">
-          Clica la barra per afegir colors • Arrossega els cercles per moure'ls • Clica un cercle per editar-lo
+          Clica la barra per afegir colors • Arrossega els cercles per moure&apos;ls • Clica un cercle per editar-lo
         </p>
       </div>
 

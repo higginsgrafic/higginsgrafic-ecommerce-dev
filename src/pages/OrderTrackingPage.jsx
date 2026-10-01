@@ -205,7 +205,7 @@ const OrderTrackingPage = () => {
               Seguiment de Comanda
             </h1>
             <p className="font-roboto text-lg text-ink-2">
-              Introdueix el teu número de comanda per veure l'estat
+              Introdueix el teu número de comanda per veure l&apos;estat
             </p>
           </div>
 
@@ -448,7 +448,7 @@ const OrderTrackingPage = () => {
                 {order.shippingAddress && (
                   <div className="mt-6 pt-6 border-t">
                     <h3 className="font-roboto font-semibold text-ink-strong mb-3">
-                      Adreça d'Enviament
+                      Adreça d&apos;Enviament
                     </h3>
                     <div className="text-sm text-ink-2 font-roboto">
                       <div>{order.shippingAddress.firstName} {order.shippingAddress.lastName}</div>
