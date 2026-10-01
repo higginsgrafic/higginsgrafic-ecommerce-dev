@@ -16,6 +16,7 @@ import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibration
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 import { caminsSiluetes, precarregaSiluetesSamarreta } from './siluetesSamarreta.js';
 import { estilCaixaBloc, ALCADA_PASTILLA_SELECTOR_PX, COIX_ENLLAC_COLLECCIONS_PX } from './estilsBlocs.js';
+import { esIPadPro13 } from '../../utils/layoutModel.js';
 
 /**
  * CercadorTextRow
@@ -1641,8 +1642,15 @@ export function CercadorColleccionsColumna({
         // composicio estreta (a 1024-1366 els enllacos son la franja), i allo es
         // l'unic que l'amo vol amb el contorn recuperat: «Recupera el contorn a
         // les versions 1920/1440».
-        border: '1px solid hsl(var(--grey-line-strong))',
-        borderRadius: '6px',
+        // EL MATEIX ESTIL QUE EL SELECTOR, A L'iPAD PRO 13 APAÏSSAT (03/10/2026).
+        // En Marc: «Fes la columna de colleccions del mateix estil que el
+        // selector». Al model el selector es el quadrat de la p1: radi de 5,3,
+        // ombra suau de 0 1px 3px i SENSE contorn; la columna portava el radi de
+        // 6 i el contorn d'1 px de la seva versio d'escriptori. A la resta de
+        // mides es queda com estava.
+        border: (esIPadPro13() && isLandscapeTablet) ? 'none' : '1px solid hsl(var(--grey-line-strong))',
+        borderRadius: (esIPadPro13() && isLandscapeTablet) ? '5.3px' : '6px',
+        boxShadow: (esIPadPro13() && isLandscapeTablet) ? '0 1px 3px rgba(0, 0, 0, 0.12)' : undefined,
         backgroundColor: 'hsl(var(--grey-paper-soft))',
         // EL COIXI DE LA COLUMNA (26/09/2026), amb les xifres de l'amo:
         // l'offset entre la caixa blanca i la columna es de 3 px, i el contorn
