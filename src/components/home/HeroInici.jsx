@@ -42,31 +42,21 @@ function HeroInici() {
   // gairebe la mida que te a 1440 (321).
   const esVertical = typeof window !== 'undefined'
     && deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isPortraitTablet;
-  // LA HERO, UN 25 % MES GRAN A QUATRE VISTES APAIXADES (02/10/2026).
+  // LA HERO, FINS AL CARRIL A TOTES LES VISTES (02/10/2026).
   //
-  // En Marc: «Escalat de la hero: 1440 com 1920, 1180x820 +25 %, 1200x800 +25 %,
-  // 1024x768 +25 %» i, quan li vaig dir que a 1440 no hi cap la mida de 1920,
-  // «Augmenta un 25 % la 1440».
+  // El cami fins aqui, tot del mateix dia: primer es va escalar la hero un 25 %
+  // a quatre vistes apaissades («Escalat de la hero: 1440 com 1920, 1180x820
+  // +25 %, 1200x800 +25 %, 1024x768 +25 %»), despres es va reduir un 25 % a tot
+  // arreu («Redueix la hero un 25 %») i, finalment, el que mana es aixo: «Eixampla
+  // totes les hero fins al carril. Excepte la 1024» (que ja hi era des del canvi
+  // anterior: «Eixampla la hero fins l'amplada del segon carril»).
   //
-  // La caixa fa el 80 % del carril (`paddingInline: 10 %`), i un 25 % mes es
-  // EXACTAMENT el carril sencer: 684 x 1,25 = 855 a 1440. Alla el coixi passa a
-  // zero, com a la vista vertical.
-  //
-  // I EL 1440, UN 10 % MES A LES TRES PETITES (02/10/2026). En Marc: «Escalat de la
-  // hero: 1180x820 +10 %, 1200x800 +10 %, 1024x768 +10 %» i, quan li vaig aplicar
-  // el 10 % sobre el 80 % de disseny, «No, home, que li pugis un 10 % mes!»: el
-  // 10 % es sobre el carril sencer que ja hi havia, o sigui que la caixa fa el
-  // 110 % del carril i en surt un 5 % per banda (per aixo va amb `marginInline`
-  // negatiu).
+  // O sigui que el coixi de costat (`paddingInline`) es ZERO a totes les vistes
+  // apaissades i a la vertical, i la caixa fa el 100 % del carril. Nome's els
+  // mobils de costat estret (vertical i per sota de 768) es queden amb el seu
+  // aire del 20 % per banda.
   const ampleFinestra = typeof window !== 'undefined' ? window.innerWidth : 0;
   const esApaissada = typeof window !== 'undefined' && window.innerWidth >= window.innerHeight;
-  // El 1440 va amb un marge de 40 px perque la finestra pot no fer-los exactes.
-  const esHeroCarrilSencer = esApaissada && ampleFinestra >= 1400 && ampleFinestra <= 1480;
-  const esHeroDeuPerCent = esApaissada && ampleFinestra >= 1024 && ampleFinestra <= 1200;
-  // I LA DE 1920, A TOT EL CARRIL (02/10/2026). En Marc: «Augmenta la hero de la
-  // 1920 un 10 % mes» (del 80 % al 88 %) i tot seguit «Eixampla la hero a tot el
-  // carril»: tambe a 1920, com a 1440.
-  const esHeroCarrilSencer1920 = esApaissada && ampleFinestra > 1480;
   // A 1280 I 1366, NOMES LA SECCIO (02/10/2026). En Marc: «A les 1366 i 1280,
   // tambe, pero nome's l'amplada de la seccio, no escalis les franges». La caixa
   // va de vora a vora del carril, pero la seva alcada es queda la del 80 % de
@@ -74,13 +64,6 @@ function HeroInici() {
   // amb `auto 100 %` de l'alcada de la franja, i si l'alcada no canvia, la
   // samarreta tampoc.
   const esHeroSeccioAmpla = esApaissada && ampleFinestra > 1200 && ampleFinestra <= 1366;
-  // I LA DE 1024, A TOT EL SEGON CARRIL (02/10/2026). En Marc: «Eixampla la hero
-  // fins l'amplada del segon carril». A 1024 el carril de la pagina fa 939,2 px
-  // (el del header, el bloc de la p1, la franja i les segones guies) i la hero hi
-  // ha de caure de vora a vora, com a 1440 i a 1920: el seu coixi passa a zero i
-  // la caixa fa el 100 % del carril. Nome's alla: a la resta de la banda estreta
-  // es queda com estava.
-  const esHeroCarrilSencer1024 = esApaissada && ampleFinestra >= 1000 && ampleFinestra <= 1050;
   // A LA VISTA 1024, EL TRACKING DELS NOMS A LA MEITAT (02/10/2026). En Marc: «A
   // la vista 1024 redueix el traking de les colleccions de la hero a la meitat»:
   // allo on els noms hi van justos, el `letterSpacing` passa de 0,18em a 0,09em.
@@ -95,22 +78,17 @@ function HeroInici() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        // LA HERO, AL 75 % DEL QUE FAIA (02/10/2026). En Marc: «Redueix la hero un
-        // 25 %»: sobre totes les vistes, tambe les que s'havien eixamplat. El
+        // LA HERO, FINS AL CARRIL (02/10/2026). En Marc: «Eixampla totes les hero
+        // fins al carril. Excepte la 1024» (a 1024 ja hi era des d'abans). El
         // percentatge va al BLOC i no a la caixa perque el padding d'un
-        // percentatge es mesura sobre l'amplada del PARE, que es el carril: aixi
-        // la caixa queda centrada i l'aire es reparteix a parts iguals.
+        // percentatge es mesura sobre l'amplada del PARE, que es el carril: amb
+        // zero, la caixa fa exactament el carril i queda centrada.
         //
-        //   80 % de disseny  x 0,75 = 60 %   -> 20 % d'aire per banda
-        //   carril sencer    x 0,75 = 75 %   -> 12,5 %
-        //   110 % (petites)  x 0,75 = 82,5 % -> 8,75 %
-        //
-        // I a la vertical no hi ha aire: la caixa fa el carril.
-        paddingInline: (esVertical || esHeroCarrilSencer1024)
-          ? 0
-          : (esHeroCarrilSencer || esHeroCarrilSencer1920 || esHeroSeccioAmpla
-            ? '12.5%'
-            : (esHeroDeuPerCent ? '8.75%' : '20%')),
+        // Aixo desfà la reduccio del 25 % de mes tard del mateix dia («Redueix la
+        // hero un 25 %»): el que hi havia era el 60 %, el 75 % o el 82,5 % del
+        // carril i ara totes les vistes apaissades fan el carril. Nome's els
+        // mobils de costat estret (vertical i < 768) es queden amb el seu aire.
+        paddingInline: (esVertical || esApaissada || ampleFinestra >= 768) ? 0 : '20%',
       }}
     >
       <div
