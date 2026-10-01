@@ -3875,24 +3875,42 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 oberta per dalt, on va enganxada al panell), o sigui que va amb
                 `drop-shadow` i no amb una ombra de caixa, que hi pintaria el
                 rectangle del fitxer. */}
-            <img
-              src="/custom_logos/icons/cadenat.svg"
-              alt=""
-              aria-hidden="true"
-              draggable={false}
+            {/* EL TALL DE L'OMBRA, A LA VORA DE DALT (03/10/2026). En Marc:
+                «Encara hi ha ombra». Amb el `drop-shadow` el difuminat sempre
+                deixa una cua de 2-3 px per sobre de la placa (mesurat: el blanc
+                baixava de 255 a 251 just a sobre de la vora), i la placa hi ha
+                de ser contigua al fons. Aquest contenidor te la MATEIXA vora de
+                dalt que la placa i 16 px d'aire als costats i 20 a baix, amb
+                `overflow: hidden`: la cua de dalt queda tallada i l'ombra dels
+                costats i del cul es queda. Els marges negatius fan que la caixa
+                de layout segueixi sent la de la placa (48), o sigui que ni la
+                posicio ni el cadenat injectat (que es centra al boto) es mouen. */}
+            <div
               style={{
-                width: CADENAT_AMPLADA_PX,
-                height: 'auto',
-                display: 'block',
-                // L'OMBRA, NOMES CAP AVALL (03/10/2026). En Marc: «No vull que
-                // es vegi l'ombra per la part de dalt. Vull que la pastilla
-                // tingui continuitat amb el fons». Amb `0 5px 6px` l'halo de la
-                // difuminacio arribava 1 px per sobre de la placa i s'hi veia;
-                // amb el desplacament mes gran que el difuminat (6 i 6) no hi
-                // arriba i l'ombra nomes surt cap avall.
-                filter: 'drop-shadow(0 6px 6px rgba(0, 0, 0, 0.18))',
+                width: CADENAT_AMPLADA_PX + 32,
+                marginInline: -16,
+                paddingBottom: 20,
+                marginBottom: -20,
+                overflow: 'hidden',
+                display: 'flex',
+                justifyContent: 'center',
               }}
-            />
+            >
+              <img
+                src="/custom_logos/icons/cadenat.svg"
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                style={{
+                  width: CADENAT_AMPLADA_PX,
+                  height: 'auto',
+                  display: 'block',
+                  // L'OMBRA, NOMES CAP AVALL (03/10/2026): amb el desplacament
+                  // mes gran que el difuminat (6 i 6) l'ombra surt cap avall.
+                  filter: 'drop-shadow(0 6px 6px rgba(0, 0, 0, 0.18))',
+                }}
+              />
+            </div>
             {/* EL CADENAT, INJECTAT (02/10/2026, ho va demanar l'amo: «Trec el
                 cadenat de l'svg i l'hi poses tu injectat»). Es un SVG en línia i
                 no una imatge per dues coses: el color surt dels tokens de la
