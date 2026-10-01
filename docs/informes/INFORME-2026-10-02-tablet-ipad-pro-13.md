@@ -206,6 +206,32 @@ passava per sota de la columna.
 i allà la cintura acaba a 6-7 px del primer enllaç del mosaic de col·leccions. No s'hi ha
 tocat.
 
+
+## 3sexies. Totes les vistes, alineades amb el segon carril (03/10/2026)
+
+En Marc: «Assegura't que totes les vistes estan ben alineades amb el segon carril».
+Mesurat vista a vista contra les guies (`scripts/_tmp-alineacio-carril.mjs`), hi havia
+dues coses fora de lloc de debò:
+
+1. **Les tauletes apaïssades estretes (853, 934 i 981)** no agafaven el segon carril: el
+   carril de la pàgina només s'aplicava a partir de 1050 i allà el megaslide anava amb el
+   3/5, mentre que la seva composició ja era la del 1024. El bloc de la p1 hi sortia de
+   167 a 940 en un carril de 40 a 813 (mesurat). Ara agafen el carril de la pàgina (773,
+   854 i 901) i la composició s'hi escala (`beltFinal / 939,2`: 0,823, 0,909 i 0,959).
+2. **La fila del header** es centrava amb l'amplada de maquetació (que reserva la barra de
+   desplaçament) i sortia 7,4 px a l'esquerra de les guies i de la p2 a 1180, 1280, 1366 i
+   1376. Ara es centra amb `window.innerWidth`, com les guies i com la p1/p2.
+
+El que queda, i és el que ja es va acceptar l'01/10: **7,4-7,5 px** entre les peces
+centrades a la finestra (les guies, el header, la p2) i les que centra el CSS (la hero i
+les seccions de la pàgina nova, i el bloc de la p1). És mitja barra de desplaçament
+(`(100vw - amplada de maquetació) / 2`) i per treure'l caldria tocar el contenidor del
+carril a `foundation.css` (`.hg-marc__contingut` i `.hg-carril`), que és de tot el lloc.
+
+I les desviacions que són de disseny: la graella de la p2 arrenca després del selector
+(107 px), la columna de col·leccions acaba a la vora dreta del carril, i la cintura de la
+franja queda a 5 px de la columna.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta

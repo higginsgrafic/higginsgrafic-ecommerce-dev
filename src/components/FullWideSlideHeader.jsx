@@ -44,6 +44,8 @@ import { MARGE_DALT_BLOC_FRANJA_PX } from './megaslide/geometriaMegaslide.js';
  *  filtre `AUSTEN_SUB_PREFIXES`, que viu dins del component). */
 /** El tauler de la tauleta vertical (el mateix numero que `layoutModel`). */
 const BELT_TABLET_VERTICAL_PX = 992;
+/** El carril de la pagina (el segon carril): `min(939.2px, 100vw - 80px)`. */
+const CARRIL_PAGINA_PX = 939.2;
 
 const SUBS_AUSTEN = new Set(['pemberley', 'keep_calm', 'quotes', 'crosswords', 'looking_for_my_darcy']);
 
@@ -2557,9 +2559,15 @@ function FullWideSlideHeader({
         const carrilPagina = typeof window !== 'undefined'
           ? Math.min(939.2, Math.max(0, window.innerWidth - 80))
           : 0;
+        // A TOTA LA BANDA APAÏSSADA, TAMBÉ LES ESTRETES (03/10/2026). Abans
+        // nome's a partir de 1050 i les tauletes de 853, 934 i 981 es quedaven
+        // amb el carril 3/5 mentre la seva composicio ja era la del 1024: el
+        // bloc de la p1 hi sortia de 167 a 940 en un carril de 40 a 813
+        // (mesurat). La banda del 1024 (1000-1050) es queda com estava, que alla
+        // el carril de la pagina ja el posa la propia composicio.
         const usaCarrilPagina = isLandscapeTablet
           && typeof window !== 'undefined'
-          && window.innerWidth > 1050
+          && (window.innerWidth < 1000 || window.innerWidth > 1050)
           && carrilPagina > 0;
         const beltFinal = usaCarrilPagina
           ? Math.round(carrilPagina)
@@ -2571,8 +2579,16 @@ function FullWideSlideHeader({
         // queia: la fila 1 del megaslide anava a 174 i el logo del header a 219.
         // Centrar les dues amplades es el mateix —`belt.left` també era el
         // centre del seu propi belt— i no depen de cap mesura.
+        // CENTRAT A LA FINESTRA, COM LES GUIES I COM LA P1/P2 (03/10/2026). En
+        // Marc: «Assegura't que totes les vistes estan ben alineades amb el segon
+        // carril». El segon carril de les guies (`data-guia-carril-pagina`) es
+        // `min(939.2px, 100vw - 80px)` centrat, i la p1 i la p2 el centren amb
+        // `window.innerWidth`; aqui es feia amb l'amplada de MAQUETACIO (que
+        // reserva la barra de desplacament), i sortien 7,4 px de diferencia amb
+        // les guies i amb el bloc de la p1 (mesurat a 1024, 1180, 1280, 1366,
+        // 1376 i als escriptoris).
         const vpLayout = vp;
-        const xFinal = Math.max(0, Math.round((vpLayout - beltFinal) / 2));
+        const xFinal = Math.max(0, Math.round((window.innerWidth - beltFinal) / 2));
         root.style.setProperty('--hg-mega-x', `${xFinal}px`);
         // La FRANJA central: del left del logo al right de la icona d'usuari.
         // Es la mesura que han de fer servir les peces que hi han d'encaixar
@@ -2635,7 +2651,18 @@ function FullWideSlideHeader({
         // 992 i a un iPad de 768 la columna de colleccions de la p2 hi cau
         // fora; la taula es pinta a amplada fixa i no segueix ni el carril ni
         // l'escala (mesurat: els enllacos, a x914 en una finestra de 753).
-        root.style.setProperty('--hg-escala-mega', String((isPortraitTablet || isLandscapeTablet) ? 1 : escalaMegaslide(beltWidth)));
+        // LA COMPOSICIO DEL 1024, ESCALADA AL CARRIL QUE TOCA (03/10/2026). Els
+        // seus numeros son de disseny amb el carril de 939,2; a les tauletes
+        // apaissades mes estretes (853, 934, 981) el carril es mes petit i la
+        // composicio hi desbordava (mesurat a 853: el bloc de la p1 anava de 167
+        // a 940 en un carril de 40 a 813). A 1024 i per sobre, escala 1.
+        const escalaCarrilPagina = (usaCarrilPagina && CARRIL_PAGINA_PX > 0)
+          ? +(beltFinal / CARRIL_PAGINA_PX).toFixed(4)
+          : 1;
+        root.style.setProperty(
+          '--hg-escala-mega',
+          String((isPortraitTablet || isLandscapeTablet) ? Math.min(1, escalaCarrilPagina) : escalaMegaslide(beltWidth)),
+        );
       } catch {
         // ignore
       }
