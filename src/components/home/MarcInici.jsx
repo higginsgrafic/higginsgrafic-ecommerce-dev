@@ -64,9 +64,15 @@ const CADE_BAIXADA = 56;
  * `CADE_BAIXADA` es el desplacament del seu contenidor des de la linia; el que
  * ocupa de debò (la caixa del cadenat, amb la vora del panell pel mig) son 58 px.
  * Mesurat a 1920, 1440, 1366, 1280, 1200, 1024 i 1376: a tot arreu el cadenat
- * acaba 58 px sota la vora del panell. Amb 2 px de marge, 60.
+ * acaba 58 px sota la vora del panell.
+ *
+ * ES LA REFERENCIA DE L'ESPAI DE LA HERO: el megaslide acaba on acaba el cadenat,
+ * i l'espai es compta DES D'ALLA (04/10/2026: «T'he dit que el cadenat ja no toca
+ * la hero. Ho has de calcular des del bottom del megaslide»). Amb l'espai comptat
+ * des del cadenat, la hero no hi pot tocar mai: el primer dese d'aire ja el deixa
+ * a sota.
  */
-const CADENAT_BAIX_PX = 60;
+const CADENAT_BAIX_PX = 58;
 /**
  * ELS FORMATS DELS 8/10 (04/10/2026).
  *
@@ -351,14 +357,16 @@ function MarcInici({ seccions }) {
       // franges, 1/10 d'aire) i la cel·la el publica com a `--inici-hero-alcada`.
       // A la resta de formats tot queda com era.
       //
-      // EL CADENAT PENJA 58 px DINS D'AQUEST ESPAI: si el dese es mes curt que
-      // aixo (amb la finestra de 586 fa 25), els DOS aires s'allarguen fins als
-      // 60 px i la hero cedeix la diferencia, o sigui que els aires son
-      // SIMETRICS sempre.
+      // L'ESPAI ES COMPTA DES DEL BOTTOM DEL MEGASLIDE (04/10/2026). En Marc:
+      // «T'he dit que el cadenat ja no toca la hero. Ho has de calcular des del
+      // bottom del megaslide» i «El cadenat ara es a la dreta del carril. S'ha
+      // alliberat l'espai»: el cadenat no ocupa espai dins del carril, o sigui
+      // que el bottom del megaslide es la vora del panell i els 8/10 son EXACTES
+      // (1/10 d'aire, 8/10 de franges i 1/10 d'aire, simetrics).
       const vuitDecimes = esHeroVuitDecimes();
       const disponibleHero = Math.max(0, window.innerHeight - linia);
-      const aireHero = vuitDecimes ? Math.max(CADENAT_BAIX_PX, disponibleHero / 10) : 0;
-      const alcadaHero = vuitDecimes ? Math.max(0, disponibleHero - 2 * aireHero) : 0;
+      const aireHero = vuitDecimes ? disponibleHero / 10 : 0;
+      const alcadaHero = vuitDecimes ? (disponibleHero * 8) / 10 : 0;
       const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}|${baixAlViewport ? 1 : 0}|${aireBaix}|${Math.round(alcadaHero * 4) / 4}|${Math.round(aireHero * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
