@@ -180,22 +180,22 @@ columna de col·leccions de la p2 cau a x914 en una finestra de 753. Cal adaptar
 (min(992, vp−32) i escala proporcional) no hi fa res perquè la taula no en depèn.
 
 
-## 3quinquies. La stripe de la p2, a 10 px de la columna (03/10/2026)
+## 3quinquies. La stripe de la p2, a 5 px de la columna (03/10/2026)
 
-En Marc: «La stripe de la p2 ha d'acabar a 10 px de la columna de col·leccions» i, per
-acabar-ho de precisar, «Per la cintura».
+En Marc: «La stripe de la p2 ha d'acabar a 10 px de la columna de col·leccions», precisat
+amb «Per la cintura» i, en veure-ho, «Posa'l a 5 px».
 
 L'objectiu del `useEscalaFranjaCarril` de la p2 (`MegaStripePanel`) són els COSSOS de la
 franja, o sigui les cintures, i la columna fa `GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350.
-Al carril de la pàgina, doncs, l'objectiu es queda en `carril x (1 - 152/1350) - 10`, i la
-cintura acaba exactament 10 px a l'esquerra de la columna: el mateix aire que la graella
-ja hi reserva (`columnGap` de 10 px a `CercadorTextRow`), o sigui que franja i graella
-acaben a la mateixa x.
+Al carril de la pàgina, doncs, l'objectiu es queda en `carril x (1 - 152/1350) - 4`, i la
+cintura acaba 5 px a l'esquerra de la columna. La constant és 4 i no 5 perquè la franja de
+la tauleta va un 0,2% més petita (`scale(0.998)` a `MegaslidePagina2`), que en aquest
+carril fa ~1 px: amb 5, la cintura en quedava a 6 (mesurat).
 
-Mesurat (cintura de la franja contra el track de la columna, que és la seva vora
-esquerra): 865,9 vs 875,9 a 1024; 1036 vs 1046 a 1366; 1041 vs 1051 a 1376 — **10,0 px** a
-totes tres. El primer enllaç de la columna va 3 px endins del track (879 a 1024), o sigui
-que la distància al text és de 14.
+Mesurat (cintura de la franja contra la caixa de la columna, que és la seva vora
+esquerra): 870,9 vs 875,9 a 1024; 1045,9 vs 1050,9 a 1366; 1050,9 vs 1055,9 a 1376 —
+**5,0 px** a totes tres. El primer enllaç va 3 px endins de la columna (878,9 a 1024), o
+sigui que la distància al text és de 8.
 
 I també s'ha estès a la resta de la banda apaïssada la mateixa definició de
 `esCarrilPagina1024` que faltava en aquest fitxer (era l'últim lloc que encara mirava la

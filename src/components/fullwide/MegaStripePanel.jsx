@@ -489,13 +489,17 @@ function MegaStripePanel({
   const esCarrilPagina1024 = typeof window !== 'undefined'
     && esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight });
   const ampleCarrilPaginaP2 = esCarrilPagina1024 ? Math.min(939.2, window.innerWidth - 80) : 0;
-  // LA STRIPE ACABA A 10 px DE LA COLUMNA (03/10/2026). En Marc: «La stripe de la
-  // p2 ha d'acabar a 10 px de la columna de col·leccions»: es el mateix aire que
-  // la graella ja reserva a la columna a la composicio del 1024 (`columnGap` de
-  // 10 px, vegeu `CercadorTextRow`), o sigui que la franja i la graella acaben
-  // a la mateixa x. L'objectiu del hook son els COSSOS de la franja (les
-  // cintures), i la columna fa `GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350.
-  const AIRE_STRIPE_COLUMNA_PX = 10;
+  // LA STRIPE ACABA A 5 px DE LA COLUMNA (03/10/2026). En Marc: «La stripe de la
+  // p2 ha d'acabar a 10 px de la columna de col·leccions», precisat amb «Per la
+  // cintura» i, en veure-ho, «Posa'l a 5 px». L'objectiu del hook son els
+  // COSSOS de la franja (les cintures) i la columna fa
+  // `GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350, o sigui que la cintura acaba
+  // aquests 5 px a l'esquerra de la columna.
+  //
+  // LA CONSTANT ES 4 I NO 5 perque la franja de la tauleta va un 0,2% mes
+  // petita (`scale(0.998)` a `MegaslidePagina2`), que en aquest carril fa ~1 px:
+  // amb 5, la cintura en quedava a 6 (mesurat).
+  const AIRE_STRIPE_COLUMNA_PX = 4;
   const ampleCossosP2 = ampleCarrilPaginaP2 > 0
     ? ampleCarrilPaginaP2 * (1 - GRAELLA_COLUMNA_DRETA_CARRIL_PX / 1350) - AIRE_STRIPE_COLUMNA_PX
     : 0;
