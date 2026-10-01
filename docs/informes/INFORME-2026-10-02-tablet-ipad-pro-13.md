@@ -426,6 +426,44 @@ i cap desbordament. I la resta no es mou: 1180, 1200 i 1032 segueixen amb el meg
 ell —1105 → 1205 d'ample i 418,9 → 456,8 d'alçada—. Si es vol que la hero es quedi a 1105, cal
 deslligar-la del carril.
 
+## 3septendecies. La hero, en vuitens (6/8) i l'aire de sota del megaslide 1100 (04/10/2026)
+
+**La hero es reparteix en vuitens.** En Marc: «Per tal de dimensionar correctament la hero a
+cada format podríem dividir l'espai disponible, un cop obert el megaslide, en 6 parts i que les
+franges de la samarreta ocupin els 4/6 centrals. Així, la hero es proporcionarà de forma natural
+i l'espai a sobre i a sota serà simètric»; en concretar-ho, «des del panell»; i, en veure-ho amb
+4/6, «Massa petit. Prova amb 6/8» i «Aplica els 6/8».
+
+L'espai de sota la vora del panell es reparteix en **vuitens**: 1/8 d'aire, **6/8 de franges** i
+1/8 d'aire. Ho calcula `MarcInici` (que és qui reparteix la pàgina) i ho publica com a
+`--inici-hero-alcada`; la caixa de la hero el llegeix. Sense megaslide (els mòbils) la variable
+no hi és i la caixa torna a la seva proporció. Això substitueix els aires de 50 px (escriptori) i
+25/0 px (els dos portàtils) del 28/09 i l'01/10, i també el topall.
+
+**El cadenat penja 58 px dins d'aquest espai.** Si el primer vuitè és més curt que això (a
+1280×720, que fa 586 de viewport, el vuitè en fa 36), els **dos** aires s'allarguen fins als 60 px
+(58 del cadenat més 2) i la hero cedeix la diferència: l'alçada és `disponible − 2 × aire`, o
+sigui que els aires són **simètrics sempre**. Amb els 6/8 pelats el cadenat queia 1,2 px **dins**
+de la hero (mesurat).
+
+| vista | alçada de la hero (aspecte) | aire dalt / baix |
+|---|---|---|
+| 1920×1080 | 533,3 (2,2) | 88,8 / 88,9 |
+| 1440×900 | 441,8 (1,9) | 73,5 / 73,6 |
+| 1366×946 | 487,5 (1,9) | 81,3 / 81,3 |
+| 1200×800 | 349 (3,2) | 61,5 / 58,5 |
+| 1024×690 | 282 (3,3) | ~56 / ~56 |
+| 1376×954 | 444 (2,7) | 74,1 / 73,9 |
+| 1032×1304 | 477,8 (2,0) | 79,4 / 79,6 |
+| **1280×720 (586 de viewport)** | **170** | **60,8 / 59,3** (cadenat 2,8 px per sobre) |
+
+**L'aire de sota del megaslide 1100, de 40 a 20 px.** En Marc: «Fem un canvi al megaslide 1100.
+L'aire de sota, en lloc de 40 px que en siguin 20». És ara un paràmetre de cada versió
+(`extraAireSota`): 6 per al megaslide 1100 i 26 per a l'iPad Pro 13, que es queda amb els 40 de
+sempre. Mesurat: a 1180 i 1200, sota la p1 20,6 i sota la p2 20,4 (abans 40,6 i 40,4) i el panell
+passa de 298 a 278; a 1376 es queda a 40,3/40,1; a 1024 no es mou (15,0/14,8). La petjada de les
+13 vistes només canvia en les tres línies del megaslide 1100.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
