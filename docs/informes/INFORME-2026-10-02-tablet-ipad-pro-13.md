@@ -346,6 +346,31 @@ desbordament horitzontal. I **cap altra vista s'ha mogut**: la petjada de les 11
 exactament la mateixa (les dues noves s'han afegit a
 `scripts/_tmp-ipad13-abans-despres.mjs`, que ara en mesura 13).
 
+## 3quaterdecies. El model, per amplada (correcció) i al visor (03/10/2026)
+
+**En Marc no hi veia cap canvi**: «No veig cap canvi a 1180x820 ni a 1200x800». I tenia raó, i la
+causa és la diferència entre la **finestra** i el **viewport**: una finestra de 1180x820 dona un
+viewport de ~1180x742 (el navegador se'n menja ~78 px, exactament com al model: 1032 → 954) i la
+de 1200x800, ~1200x722. La primera versió lligava la vista a la **parella exacta** (amplada i
+alçada), o sigui que només entrava amb la finestra de DevTools i no amb una finestra de debò ni
+amb el visor.
+
+Ara **mana l'amplada** (`MEGASLIDE_MODEL_AMPLADES = [1180, 1200]`, com les del model) i tant la
+finestra com el viewport exacte hi entren igual. L'iPad Air 11 apaïssat també fa 1180x820 de
+pantalla, o sigui que també porta el megaslide del model: és la mateixa amplada i la mateixa
+classe de tauleta.
+
+Verificat a **1180x820, 1180x780, 1180x742, 1200x820, 1200x800 i 1200x742**: carril 1100, escala
+1,1712, aires 20/20 i 40,5, columna amb la cintura a 5,0 px i 9/9 clics. La resta de vistes de la
+petjada, sense cap canvi (l'única línia que es mou és la de 1180x742, que és precisament el cas de
+la finestra).
+
+I **els formats nous són al visor** («Posa'm els formats a l'editor iframe. Bé, és un visor més
+que un editor»): `Model 1180×780` i `Model 1200×820` a `FORMATS` de
+`public/browser-overlay.html`, al grup *Tauleta apaïssada* i amb el mateix `ct` que els veïns
+(78), o sigui que la finestra que ensenyen és **1180x702** i **1200x742** (totes dues amb el
+megaslide del model).
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
