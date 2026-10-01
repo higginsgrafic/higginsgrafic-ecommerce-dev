@@ -285,3 +285,31 @@ export function laneForViewport(vw = getLayoutViewportWidth()) {
   const ambMinim = Math.max(objectiu, min);
   return Math.max(min, Math.min(ambMinim, sostre));
 }
+
+/**
+ * L'iPad Pro 13: la vista que es treballa a part (03/10/2026).
+ *
+ * En Marc: «Comencem les adaptacions amb l'iPad Pro 13. Només treballarem sobre
+ * aquesta vista. Cap altra s'ha de veure afectada». Es el primer model que
+ * s'adapta a ma, i tot el que s'hi faci ha de quedar tancat aqui.
+ *
+ * LES DUES AMPLADES SON SEVES I DE NINGU MES. L'iPad Pro 13 fa 1032x1376 en
+ * vertical i 1376x1032 en apaïssat (amplades CSS, vegeu
+ * `scripts/mesura-formats.mjs`), i cap altre format de la llista fa 1032 ni
+ * 1376: son les dues fronteres de tauleta que vam pujar el 02/10. La finestra
+ * util es mes curta (el navegador se'n menja 72 i 78 px), pero l'amplada no
+ * canvia, i per aixo la clau es l'amplada (amb 2 px de marge per si el
+ * navegador arrodoneix) mes la classe de tauleta, que es qui diu l'orientacio.
+ *
+ * @param {{ample?: number, alt?: number}} [mides]
+ * @returns {boolean}
+ */
+export const IPAD_PRO_13_AMPLADES = [1032, 1376];
+export function esIPadPro13({ ample, alt } = {}) {
+  const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
+  const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
+  const es = deviceLayoutFromViewport(w, h);
+  const marge = 2;
+  return IPAD_PRO_13_AMPLADES.some((a) => Math.abs(w - a) <= marge)
+    && (es.isPortraitTablet || es.isLandscapeTablet);
+}
