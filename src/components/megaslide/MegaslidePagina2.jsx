@@ -1232,17 +1232,41 @@ export default function MegaslidePagina2({
           width: Math.round(c.width * 10) / 10,
           height: Math.round(c.height * 10) / 10,
         } : null;
-        setOmbraManiga(caixa);
+        // Nome's es canvia si els numeros es MOUEN: amb un objecte nou a cada
+        // passada, el MutationObserver de sota es realimentaria.
+        setOmbraManiga((previ) => {
+          if (previ && caixa
+            && Math.abs(previ.left - caixa.left) < 0.5 && Math.abs(previ.top - caixa.top) < 0.5
+            && Math.abs(previ.width - caixa.width) < 0.5 && Math.abs(previ.height - caixa.height) < 0.5) {
+            return previ;
+          }
+          return caixa;
+        });
       });
     };
     mesura();
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(mesura) : null;
     observer?.observe(capa);
     if (visual) observer?.observe(visual);
+    // LA COLUMNA TAMBE (02/10/2026): l'ombra es mesura contra la SEVA caixa, i
+    // la columna es mou (els bucles li canvien el `top` i l'alcada).
+    if (columna) observer?.observe(columna);
+    // I ELS CANVIS DE POSICIO (02/10/2026). En Marc: «L'ombra encara vola»: el
+    // ResizeObserver nome's veu els canvis de MIDA, i la franja i la columna es
+    // MOUEN (els bucles d'alineacio els escriuen el `top` a l'estil en linia):
+    // l'ombra es quedava amb la mesura vella i queia desplaçada. Amb l'observador
+    // d'estils, cada moviment torna a mesurar.
+    const observadorEstil = typeof MutationObserver !== 'undefined'
+      ? new MutationObserver(mesura)
+      : null;
+    if (observadorEstil && capa.parentElement) {
+      observadorEstil.observe(capa.parentElement, { attributes: true, attributeFilter: ['style'], subtree: true });
+    }
     window.addEventListener('resize', mesura);
     return () => {
       cancelAnimationFrame(frame);
       observer?.disconnect();
+      observadorEstil?.disconnect();
       window.removeEventListener('resize', mesura);
     };
   }, [isPortraitTablet, isLandscapeTablet]);
