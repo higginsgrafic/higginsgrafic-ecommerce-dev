@@ -587,6 +587,35 @@ amb 22 entrades, cap duplicada, i les nou parelles amb el mateix valor.
 `dj-vader`, `r2d2-quote`, `pont-del-diable`…) no són al mapa i van amb el 30 % de defecte, igual
 que els altres 37 blancs sense parella afinada. Si algun surt malament, cal la seva mida.
 
+## 3sexdecies. La hero ja no es mou: l'estimació de la línia, recalibrada (04/10/2026)
+
+En Marc: «Quan el megaslide es tanca, la hero es mou. No s'ha de moure. També, quan clico el logo
+per tornar a Inici, les hero es tornen petites».
+
+**Les dues coses eren la mateixa**: quan el panell no ha publicat la seva vora —en carregar la
+pàgina i també en una recàrrega des del logo— la línia s'**estima**. I l'estimació era de **289 px
+clavats** per a tota la banda de tauleta, un número d'abans dels canvis del dia: amb el carril
+propi del model (1100 i 1200) i l'aire de sota del megaslide 1100 a 20 px, el panell fa **244**
+(a 1024, 1280 i 1366), **279** (a 1180 i 1200) i **310** (a 1376). O sigui que en carregar la
+línia quedava fins a **45 px massa avall** i la hero **36 px massa curta**: en obrir el megaslide
+creixia, i en tornar a Inici es tornava petita.
+
+**La recta nova**, amb els tres punts mesurats: `alçada = 0,2529 × carril + 5,3` per a
+`ample <= 1376`. I el **model entra en aquesta branca** (abans el tall era 1366 i el 1376 queia a
+la fórmula d'escriptori, que li donava 325 en comptes de 310).
+
+| vista | càrrega neta | megaslide obert | diferència |
+|---|---|---|---|
+| 1376×954 | 473,6 | 473,6 | **0** |
+| 1280×586 | 232 | 232 | **0** |
+| 1024×690 · 1366×946 | 315,2 · 520 | 315,2 · 520 | **0** |
+| 1920×1080 | 570,3 | 568,8 | −1,5 |
+| 1440×900 | 467,2 | 471,2 | +4 |
+| 1180×820 · 1200×800 | 386,6 · 370,6 | 391,2 · 375,2 | +4,6 |
+
+I els quatre estats (càrrega neta, obert, **tancat** i **logo**) donen la mateixa alçada de hero:
+a 1376, 473,6 als quatre; a 1280×586, 232 als quatre.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
