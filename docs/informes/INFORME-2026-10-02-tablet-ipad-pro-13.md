@@ -513,6 +513,26 @@ que venia del «T'he dit que ho apliquessis a 1200x720. Enlloc més».
 | 844×390 (mòbil girat) | 122,4 | 15,3 / 15,3 |
 | 1032×1304 i 768×952 (verticals) | 639,6 i 234,8 | com sempre |
 
+## 3quaterdecies. La icona de barrejar, entre la cintura i el cadenat (04/10/2026)
+
+En Marc: «Centra la icona shuffle entre la cintura de la imatge de la samarreta i el cadenat. En
+X». Es calcula i no s'escriu, perquè l'amplada de la imatge de la samarreta depèn de l'alçada de
+la hero (el mockup és quadrat i es pinta amb `auto 100 %` de la capa, que fa l'alçada del
+rectangle més els 2 px del darrer gap) i el cadenat es mou amb la disposició.
+
+- **La cintura, dins de la imatge: 0,775 de l'amplada.** Mesurat amb l'alfa, per franges: la 1
+  (espatlles) 0,911; la 2 (manigues) 0,959; la 3 0,834; la 4 0,774; la 5 (baix) 0,779.
+- El botó va al **punt mig** entre aquesta vora i la vora esquerra del cadenat, que es llegeix del
+  DOM (`img[src*="cadenat"]`). Es recalcula amb un `ResizeObserver` de la caixa i amb el `resize`
+  de la finestra.
+
+| vista | centre del botó | punt mig real |
+|---|---|---|
+| 1376×954 | 1026 | 1026,4 |
+| 1920×1080 | 1298,5 | 1298,1 |
+| 1280×666 | 887,5 | 887 |
+| 1024×690 | 765,5 | 765,6 |
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
