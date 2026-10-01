@@ -8,7 +8,7 @@ import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react'
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
-import { esIPadPro13 } from '../../utils/layoutModel.js';
+import { paramsMegaslide } from '../../utils/layoutModel.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
 import {
   MARGE_EXTRA_ESCRIPTORI_PX,
@@ -173,9 +173,9 @@ export default function MegaMenuPanel({
   // dalt) i el marge extra: la p1 hi quedava amb 5 px d'aire a dalt i 35 a
   // baix. Amb la clau del model, fa els coixins de la composicio estreta (32
   // per banda) com a 1366.
-  const esIpad13Aqui = esIPadPro13({ ample: w, alt: h });
-  const esVerticalAqui = w >= 768 && (w <= 1366 || (esIpad13Aqui && h > w)) && h > w;
-  const esApaissadaAqui = w >= 768 && (w <= 1366 || esIpad13Aqui) && w >= h;
+  const modelAqui = paramsMegaslide({ ample: w, alt: h });
+  const esVerticalAqui = w >= 768 && (w <= 1366 || (modelAqui && h > w)) && h > w;
+  const esApaissadaAqui = w >= 768 && (w <= 1366 || modelAqui) && w >= h;
   const esMobilAqui = w < 768;
   const esEscriptoriAqui = !esVerticalAqui && !esApaissadaAqui && !esMobilAqui;
   // EL COIXI DE DALT DEL PANELL, RETALLAT A L'ESCRIPTORI (28/09/2026).
@@ -198,7 +198,7 @@ export default function MegaMenuPanel({
   // l'escriptori (17,1 px a dalt): la p1 hi quedava amb 5 px d'aire en comptes
   // dels 20 que li toquen. Amb la clau del model, el panell es comporta com a
   // 1366 (32 px de coixi per banda) i la p1 hi torna a caure a 20.
-  const esEstretaAqui = w >= 1024 && (w <= 1366 || esIPadPro13({ ample: w, alt: h })) && w >= h;
+  const esEstretaAqui = w >= 1024 && (w <= 1366 || modelAqui) && w >= h;
   const paddingVerticalPanellPx = esEscriptoriAqui
     ? PADDING_VERTICAL_PANELL_ESCRIPTORI_PX
     : (esEstretaAqui ? PADDING_VERTICAL_PANELL_ESTRETA_PX : PADDING_VERTICAL_PANELL_PX);
@@ -219,9 +219,9 @@ export default function MegaMenuPanel({
   // doncs, 25; i com que abans ja n'hi havia 5, ara son 26.
   const alcadaGuard = useCallback((p1Bottom) => alcadaPanellMegaslide({
     p1ContentBottom: p1Bottom,
-    gap: P1_STRIPE_BOTTOM_GAP + (esIPadPro13({ ample: w, alt: h }) ? 26 : 0),
+    gap: P1_STRIPE_BOTTOM_GAP + (modelAqui ? 26 : 0),
     paddingVertical: paddingVerticalPanellPx,
-  }), [paddingVerticalPanellPx, w, h]);
+  }), [paddingVerticalPanellPx, w, h, modelAqui]);
 
   const viewport1Ref = useRef(null);
   const handlePortraitScroll1 = useCallback(() => {
@@ -521,7 +521,7 @@ export default function MegaMenuPanel({
                     // falta per fer-ne 20 exactes, com la p2. El panell creix i
                     // decreix amb el contingut (`p1ContentBottom` el mesura), o
                     // sigui que l'aire de baix no es mou.
-                    ...(esIPadPro13({ ample: w, alt: h }) ? { marginTop: '1.4px' } : null),
+                    ...(modelAqui ? { marginTop: '1.4px' } : null),
                     // A la VERTICAL, el contingut de debò de la pagina 1 queda
                     // AMAGAT i el que s'hi veu es la TAULA dibuixada (la
                     // mateixa que a la pagina 2). A la resta de formats no es

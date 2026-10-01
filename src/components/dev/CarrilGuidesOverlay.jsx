@@ -1,4 +1,4 @@
-import { carrilIPadPro13 } from '@/utils/layoutModel';
+import { carrilMegaslide } from '@/utils/layoutModel';
 import { useEffect, useState } from 'react';
 import DevPortal, { DEV_LAYER_Z } from '@/components/dev/DevPortal';
 
@@ -36,7 +36,7 @@ export default function CarrilGuidesOverlay({ enabled, onToggle }) {
   // EL CARRIL DEL MODEL, SI EN TE (03/10/2026). L'iPad Pro 13 apaïssat te el
   // seu (1100 px, vegeu `layoutModel`): les segones guies l'han d'ensenyar, que
   // son les que fa servir l'amo per comprovar que tot hi cau.
-  const carrilModel = carrilIPadPro13();
+  const carrilModel = carrilMegaslide();
   const ampleCarrilPagina = carrilModel != null ? `${carrilModel}px` : AMPLE_CARRIL_PAGINA_BASE;
   // EL COMMUTADOR, TAMBE AMB EL TECLAT (02/10/2026). La barra de botons nome s
   // surt a les rutes d'edicio, pero aquestes guies es poden encendre a qualsevol

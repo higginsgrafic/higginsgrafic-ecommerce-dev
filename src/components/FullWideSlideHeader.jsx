@@ -10,7 +10,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '@/utils/layoutMetrics';
-import { laneForViewport, carrilDeclarat, carrilIPadPro13, esIPadPro13 } from '@/utils/layoutModel';
+import { laneForViewport, carrilDeclarat, carrilMegaslide } from '@/utils/layoutModel';
 import { getLayoutViewportWidth } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
@@ -2563,7 +2563,7 @@ function FullWideSlideHeader({
         // amb el segon carril compartit li sobraven 218 px per banda. A la resta
         // de la banda apaïssada el carril de la pagina segueix sent
         // `min(939.2, 100vw - 80)`.
-        const carrilModel = carrilIPadPro13();
+        const carrilModel = carrilMegaslide();
         const carrilPagina = typeof window !== 'undefined'
           ? (carrilModel ?? Math.min(939.2, Math.max(0, window.innerWidth - 80)))
           : 0;

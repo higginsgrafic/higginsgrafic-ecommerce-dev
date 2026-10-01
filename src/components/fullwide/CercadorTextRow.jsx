@@ -16,7 +16,6 @@ import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibration
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 import { caminsSiluetes, precarregaSiluetesSamarreta } from './siluetesSamarreta.js';
 import { estilCaixaBloc, ALCADA_PASTILLA_SELECTOR_PX, COIX_ENLLAC_COLLECCIONS_PX } from './estilsBlocs.js';
-import { esIPadPro13 } from '../../utils/layoutModel.js';
 
 /**
  * CercadorTextRow

@@ -46,7 +46,7 @@ for (const v of VISTES) {
     const rd = (n) => Math.round(n * 10) / 10;
     const cossos = (el) => { const x = el?.getBoundingClientRect(); if (!x) return null; const l = x.left + cal.FRACCIO_MARGE_ESQUERRE_FRANJA * x.width; return [rd(l), rd(l + cal.FRACCIO_COSSOS_FRANJA * x.width)]; };
     return {
-      ipad: model.esIPadPro13(),
+      versio: model.versioMegaslide(),
       carril: getComputedStyle(document.documentElement).getPropertyValue('--hg-mega-w').trim(),
       escala: getComputedStyle(document.documentElement).getPropertyValue('--hg-escala-mega').trim(),
       panell: q(document.querySelector('[data-mega-panel-surface]')),
@@ -69,7 +69,7 @@ for (const v of VISTES) {
       fletxes: document.querySelectorAll('[data-fletxes-p1="1"]').length,
     };
   });
-  console.log(`${v.nom.padEnd(26)} ipad=${m.ipad ? 'SI' : 'no '} carril=${String(m.carril).padEnd(6)} esc=${String(m.escala).padEnd(7)} panell=${JSON.stringify(m.panell)} p1bloc=${JSON.stringify(m.p1bloc)} p2sel=${JSON.stringify(m.p2sel)} graella=${JSON.stringify(m.p2graella)} colors=${JSON.stringify(m.p2colors)} col=${JSON.stringify(m.p2col)} cintura=${JSON.stringify(m.p2franja)} cadenat=${JSON.stringify(m.cadenat)} icones=${JSON.stringify(m.icones)} fletxes=${m.fletxes}${errs.length ? ' ERR' : ''}`);
+  console.log(`${v.nom.padEnd(26)} versio=${String(m.versio || '-').padEnd(14)} carril=${String(m.carril).padEnd(6)} esc=${String(m.escala).padEnd(7)} panell=${JSON.stringify(m.panell)} p1bloc=${JSON.stringify(m.p1bloc)} p2sel=${JSON.stringify(m.p2sel)} graella=${JSON.stringify(m.p2graella)} colors=${JSON.stringify(m.p2colors)} col=${JSON.stringify(m.p2col)} cintura=${JSON.stringify(m.p2franja)} cadenat=${JSON.stringify(m.cadenat)} icones=${JSON.stringify(m.icones)} fletxes=${m.fletxes}${errs.length ? ' ERR' : ''}`);
   await ctx.close();
 }
 await b.close();

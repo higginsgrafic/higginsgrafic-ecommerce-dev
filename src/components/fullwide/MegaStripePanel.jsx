@@ -6,7 +6,7 @@ import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { esTauletaApaisada } from '../../utils/layoutMetrics.js';
-import { carrilIPadPro13, esIPadPro13 } from '../../utils/layoutModel.js';
+import { carrilMegaslide, paramsMegaslide, versioMegaslide } from '../../utils/layoutModel.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
@@ -502,10 +502,12 @@ function MegaStripePanel({
   // segueixen funcionant perque els seus gestors son a la filera i
   // l'esdeveniment hi puja. Nome s al model: a la resta de mides, igual que fins
   // ara.
-  const superficiesDeFranja = esCarrilPagina1024 && esIPadPro13();
-  // El carril de la pagina: el seu, si es l'iPad Pro 13 apaïssat (1000).
+  const paramsAquiMegaslide = paramsMegaslide();
+  const superficiesDeFranja = esCarrilPagina1024 && paramsAquiMegaslide != null;
+  // El carril de la pagina: el de la versio del model que li toca (1100 o 1200,
+  // vegeu `MEGASLIDE_VERSIONS` a `layoutModel`).
   const ampleCarrilPaginaP2 = esCarrilPagina1024
-    ? (carrilIPadPro13() ?? Math.min(939.2, window.innerWidth - 80))
+    ? (carrilMegaslide() ?? Math.min(939.2, window.innerWidth - 80))
     : 0;
   // LA STRIPE ACABA A 5 px DE LA COLUMNA (03/10/2026). En Marc: «La stripe de la
   // p2 ha d'acabar a 10 px de la columna de col·leccions», precisat amb «Per la
@@ -514,17 +516,15 @@ function MegaStripePanel({
   // `GRAELLA_COLUMNA_DRETA_CARRIL_PX` de 1350, o sigui que la cintura acaba
   // aquests 5 px a l'esquerra de la columna.
   //
-  // LA CONSTANT ES 3,6 I NO 5 perque la franja de la tauleta va un 0,2% mes
-  // petita (`scale(0.998)` a `MegaslidePagina2`), que en aquest carril fa ~1 px:
-  // amb 5, la cintura en quedava a 6 (mesurat, amb el carril de 1000).
-  //
-  // AMB EL CARRIL DE 1100 ES 3,6 (03/10/2026). En Marc: «Vull ampliar el carril a
-  // 1100 px»: la diferencia entre el carril i la columna creix mes que la
-  // constant, i amb 4 la cintura en quedava a 5,4 de la columna (mesurat). Amb
-  // 3,6 torna a quedar a 5,0 (cada unitat de la constant mou la cintura 1 px).
-  // Nome s al model: a la resta de la banda apaïssada el carril es el de sempre
-  // (939,2) i la constant hi segueix sent 4.
-  const AIRE_STRIPE_COLUMNA_PX = carrilIPadPro13() != null ? 3.6 : 4;
+  // LA CONSTANT DEPEN DEL CARRIL, o sigui que es DE CADA VERSIO i viu a
+  // `MEGASLIDE_VERSIONS` (`aireStripeColumna`). El cami, mesurat:
+  //   - amb el carril de 1000, 4 (amb 5 la cintura en quedava a 6: la franja de
+  //     la tauleta va un 0,2 % mes petita, `scale(0.998)` a `MegaslidePagina2`).
+  //   - amb el de 1100, 3,6 (amb 4 quedava a 5,4).
+  //   - amb el de 1200, 3,5 (amb 3,6 quedava a 4,9).
+  // Cada unitat de la constant mou la cintura 1 px. A la resta de la banda
+  // apaïssada, que no porta cap versio, la constant es 4.
+  const AIRE_STRIPE_COLUMNA_PX = paramsAquiMegaslide ? paramsAquiMegaslide.aireStripeColumna : 4;
   const ampleCossosP2 = ampleCarrilPaginaP2 > 0
     ? ampleCarrilPaginaP2 * (1 - GRAELLA_COLUMNA_DRETA_CARRIL_PX / 1350) - AIRE_STRIPE_COLUMNA_PX
     : 0;

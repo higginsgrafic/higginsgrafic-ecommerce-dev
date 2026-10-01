@@ -287,53 +287,97 @@ export function laneForViewport(vw = getLayoutViewportWidth()) {
 }
 
 /**
- * L'iPad Pro 13: la vista que es treballa a part (03/10/2026).
+ * LES DUES VERSIONS DEL MEGASLIDE DEL MODEL (04/10/2026).
  *
- * En Marc: «Comencem les adaptacions amb l'iPad Pro 13. Només treballarem sobre
- * aquesta vista. Cap altra s'ha de veure afectada». Es el primer model que
- * s'adapta a ma, i tot el que s'hi faci ha de quedar tancat aqui.
+ * En Marc: «La versio iPad Pro 13 actual es quedarà als altres grups. Cal
+ * canviar-li el nom, és clar. En farem una altra per a la mida de l'iPad Pro 13,
+ * 1376» i, en triar-ne el nom i l'abast, «megaslide 1100» i «Nome s 1376»; i
+ * «Ara vull que portis el megaslide de l'iPad Pro 13 fins a 1200. Nome s l'iPad
+ * Pro 13».
  *
- * LES DUES AMPLADES SON SEVES I DE NINGU MES. L'iPad Pro 13 fa 1032x1376 en
- * vertical i 1376x1032 en apaïssat (amplades CSS, vegeu
- * `scripts/mesura-formats.mjs`), i cap altre format de la llista fa 1032 ni
- * 1376: son les dues fronteres de tauleta que vam pujar el 02/10. La finestra
- * util es mes curta (el navegador se'n menja 72 i 78 px), pero l'amplada no
- * canvia, i per aixo la clau es l'amplada (amb 2 px de marge per si el
- * navegador arrodoneix) mes la classe de tauleta, que es qui diu l'orientacio.
+ * O sigui que hi ha DUES VERSIONS, i el nom de cadascuna es el seu carril:
+ *
+ *   - `megaslide-1100`: la versio de sempre, la que es va fer per a l'iPad Pro
+ *     13 i que ara es queda per als altres grups (1032 vertical, 1180 i 1200).
+ *     Carril 1100.
+ *   - `ipad-pro-13`: la versio NOVA, nome s per a la mida de l'iPad Pro 13
+ *     (1376). Carril 1200, que es el canvi que ha demanat l'amo.
+ *
+ * LES DUES SON COPIES: avui nome s es diferencien en el carril, i a partir d'aqui
+ * es poden divergir sense tocar-se. Per allo els parametres de cada versio viuen
+ * junts a `MEGASLIDE_VERSIONS` i qui els necessita els demana amb
+ * `paramsMegaslide()`.
+ *
+ * LES AMPLADES, PER AMPLADA I NO PER PARELLA (03/10/2026). En Marc: «Aplica el
+ * megaslide de l'iPad Pro 13 a 1180x820 i 1200x800» i, en veure que no sortia,
+ * «No veig cap canvi a 1180x820 ni a 1200x800»: una FINESTRA de 1180x820 dona un
+ * viewport de ~1180x742 (el navegador se'n menja ~78 px, com al model: 1032 ->
+ * 954) i la de 1200x800, ~1200x722. Lligar-ho a la parella exacta volia dir que
+ * qui redimensiona la finestra no veia mai el canvi, i per allo mana l'amplada
+ * (amb 2 px de marge per si el navegador arrodoneix) mes la classe de tauleta,
+ * que es qui diu l'orientacio.
  *
  * @param {{ample?: number, alt?: number}} [mides]
  * @returns {boolean}
  */
 export const IPAD_PRO_13_AMPLADES = [1032, 1376];
-// DUES AMPLADES MES PORTEN EL MATEIX MEGASLIDE (03/10/2026). En Marc: «Aplica el
-// megaslide de l'iPad Pro 13 a 1180x820 i 1200x800».
-//
-// ES PER AMPLADA, NO PER PARELLA (amplada I alcada) I AIXO ES IMPORTANT: una
-// FINESTRA de 1180x820 dona un viewport de ~1180x742 (el navegador se'n menja
-// ~78 px, com al model: 1032 -> 954) i el de 1200x800, ~1200x722. Si la vista
-// s'hi lliga per la parella exacta, qui redimensiona la finestra no veu mai el
-// canvi. Amb l'amplada, la finestra i el viewport exacte hi entren igual.
-//
-// L'iPad Air 11 apaïssat tambe fa 1180x820 de pantalla (o sigui ~1180x742 de
-// viewport) i tambe porta el megaslide del model: es la mateixa amplada i la
-// mateixa classe de tauleta.
-export const MEGASLIDE_MODEL_AMPLADES = [1180, 1200];
-export function esIPadPro13({ ample, alt } = {}) {
+export const MEGASLIDE_1100_AMPLADES = [1032, 1180, 1200];
+export const MEGASLIDE_VERSIONS = {
+  'megaslide-1100': {
+    nom: 'Megaslide 1100',
+    carril: 1100,
+    // Les amplades que la porten. La 1032 es la vertical de l'iPad Pro 13, que
+    // te el seu tauler de 992 i nome s hi rep la resta d'adaptacions del model.
+    amplades: MEGASLIDE_1100_AMPLADES,
+    // L'aire de la cintura a la columna (`AIRE_STRIPE_COLUMNA_PX`): la constant
+    // que fa que la cintura acabi a 5 px de la columna. Depen del carril, o
+    // sigui que es de cada versio.
+    aireStripeColumna: 3.6,
+  },
+  'ipad-pro-13': {
+    nom: 'iPad Pro 13',
+    // «Ara vull que portis el megaslide de l'iPad Pro 13 fins a 1200»: aquesta
+    // versio va amb el carril de 1200, nome s a la mida de l'iPad Pro 13.
+    carril: 1200,
+    amplades: [1376],
+    // 3,7 i no 3,6: amb el carril de 1200 la cintura quedava a 4,9 de la
+    // columna (mesurat) i amb 3,7 torna a quedar a 5,0. Cada unitat de la
+    // constant mou la cintura 1 px.
+    aireStripeColumna: 3.7,
+  },
+};
+
+/**
+ * Quina versio del megaslide li toca a aquesta vista, o `null` si no n'hi toca
+ * cap. Nome s miren les AMPLADES i la classe de tauleta (vegeu el bloc de dalt).
+ *
+ * @param {{ample?: number, alt?: number}} [mides]
+ * @returns {'megaslide-1100'|'ipad-pro-13'|null}
+ */
+export function versioMegaslide({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
   const es = deviceLayoutFromViewport(w, h);
+  if (!(es.isPortraitTablet || es.isLandscapeTablet)) return null;
   const marge = 2;
-  return [...IPAD_PRO_13_AMPLADES, ...MEGASLIDE_MODEL_AMPLADES].some((a) => Math.abs(w - a) <= marge)
-    && (es.isPortraitTablet || es.isLandscapeTablet);
+  const clau = Object.keys(MEGASLIDE_VERSIONS)
+    .find((k) => MEGASLIDE_VERSIONS[k].amplades.some((a) => Math.abs(w - a) <= marge));
+  return clau || null;
+}
+
+/** Els parametres de la versio que li toca a aquesta vista, o `null`. */
+export function paramsMegaslide(mides) {
+  const clau = versioMegaslide(mides);
+  return clau ? MEGASLIDE_VERSIONS[clau] : null;
 }
 
 /**
- * L'iPAD PRO 13, ESTRICTE (04/10/2026).
+ * L'iPAD PRO 13, COM A DISPOSITIU (04/10/2026).
  *
- * `esIPadPro13` tambe diu que si les amplades de 1180 i 1200, que porten el
- * megaslide del model pero NO son l'iPad Pro 13. Qui hagi de distingir el
- * DISPOSITIU —la hero, que a l'iPad Pro 13 va un 50 % mes alta (04/10/2026)— ha
- * de fer servir aquesta.
+ * `versioMegaslide` tambe diu que si les amplades de 1180 i 1200, que porten el
+ * megaslide 1100 pero NO son l'iPad Pro 13. Qui hagi de distingir el DISPOSITIU
+ * —la hero, que a l'iPad Pro 13 va un 50 % mes alta (04/10/2026)— ha de fer
+ * servir aquesta: les dues amplades del maquinari, 1032 i 1376.
  *
  * @param {{ample?: number, alt?: number}} [mides]
  * @returns {boolean}
@@ -348,25 +392,21 @@ export function esIPadPro13Estricte({ ample, alt } = {}) {
 }
 
 /**
- * EL CARRIL DE L'iPAD PRO 13 APAÏSSAT (03/10/2026).
+ * EL CARRIL D'AQUESTA VISTA, SI PORTa MEGASLIDE DEL MODEL (03/10/2026).
  *
- * En Marc: «Crea un segon carril per l'iPad Pro 13» i, quan se li van donar les
- * opcions, «el carril propi i una mica més ample (1000 px)». El model fa 1376 px
- * d'ample i amb el segon carril compartit (939,2) li sobraven 218 px per banda.
+ * El carril es el nom de la versio (1100 i 1200): el de la versio que li toca a
+ * la vista. Nome s a les vistes APAÏSSADES (la vertical te el seu tauler de 992 i
+ * es una altra feina) i mai no passa de la finestra menys 80 px, que es la regla
+ * del segon carril.
  *
- * I AMB 1100 (03/10/2026): en Marc: «Vull ampliar el carril a 1100 px». Surt de
- * la regla del segon carril (`min(1100, ample - 80)`): a 1376 dona 1100 i la
- * finestra en queda a 138 px per banda.
- *
- * El carril es propi del model: nome s el fa servir quan la finestra es l'iPad
- * Pro 13 APAÏSSAT (la vertical te el seu tauler de 992 i es una altra feina).
- * Mai no passa de la finestra menys 80 px, que es la regla del segon carril.
+ * @param {{ample?: number, alt?: number}} [mides]
+ * @returns {number|null}
  */
-export const CARRIL_IPAD_PRO_13_APAISSADA_PX = 1100;
-export function carrilIPadPro13({ ample, alt } = {}) {
+export function carrilMegaslide({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
-  if (!esIPadPro13({ ample: w, alt: h })) return null;
+  const params = paramsMegaslide({ ample: w, alt: h });
+  if (!params) return null;
   if (!deviceLayoutFromViewport(w, h).isLandscapeTablet) return null;
-  return Math.min(CARRIL_IPAD_PRO_13_APAISSADA_PX, Math.max(320, w - 80));
+  return Math.min(params.carril, Math.max(320, w - 80));
 }
