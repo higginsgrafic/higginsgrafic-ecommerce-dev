@@ -1,3 +1,4 @@
+/* global STEPS, INITIAL_STATE, PHASES, ACCEPTANCE */
 (function() {
   'use strict';
 
@@ -14,10 +15,10 @@
   try {
     const saved = JSON.parse(localStorage.getItem('pla-obertura-state') || '{}');
     Object.keys(saved).forEach(k => { if (state[k]) state[k] = saved[k]; });
-  } catch(e) {}
+  } catch(e) { /* buit a propòsit */ }
 
   function saveState() {
-    try { localStorage.setItem('pla-obertura-state', JSON.stringify(state)); } catch(e) {}
+    try { localStorage.setItem('pla-obertura-state', JSON.stringify(state)); } catch(e) { /* buit a propòsit */ }
   }
 
   function depsMet(step) {

@@ -1,7 +1,10 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-declare const Deno: any;
+declare const Deno: {
+  env: { get(key: string): string | undefined };
+  serve(handler: (req: Request) => Response | Promise<Response>): void;
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,7 +13,7 @@ const corsHeaders = {
 };
 
 const GELATO_PRODUCTS_API = 'https://product.gelatoapis.com/v3';
-const GELATO_ORDER_API = 'https://order.gelatoapis.com/v4';
+// GELATO_ORDER_API eliminat (02/10/2026): l'accio 'order' esta desactivada (D0).
 const GELATO_ECOMMERCE_API = 'https://ecommerce.gelatoapis.com/v1';
 
 // Actions that require admin authentication
@@ -91,7 +94,7 @@ Deno.serve(async (req: Request) => {
     }
 
     let gelatoUrl = '';
-    let gelatoOptions: RequestInit = {
+    const gelatoOptions: RequestInit = {
       headers: {
         'X-API-KEY': apiKey,
         'Content-Type': 'application/json'
@@ -107,16 +110,18 @@ Deno.serve(async (req: Request) => {
           ? `${GELATO_PRODUCTS_API}/catalogs/${catalogId}/products`
           : `${GELATO_PRODUCTS_API}/products`;
         break;
-      case 'product':
+      case 'product': {
         const productId = url.searchParams.get('productId');
         gelatoUrl = `${GELATO_PRODUCTS_API}/products/${productId}`;
         break;
-      case 'prices':
+      }
+      case 'prices': {
         const priceProductId = url.searchParams.get('productId');
         const currency = url.searchParams.get('currency') || 'EUR';
         const country = url.searchParams.get('country') || 'ES';
         gelatoUrl = `${GELATO_PRODUCTS_API}/products/${priceProductId}/prices?currency=${currency}&country=${country}`;
         break;
+      }
       case 'stores':
         gelatoUrl = `${GELATO_ECOMMERCE_API}/stores`;
         break;
@@ -132,17 +137,19 @@ Deno.serve(async (req: Request) => {
           gelatoUrl = `${gelatoUrl}?${qs.toString()}`;
         }
         break;
-      case 'store-product':
+      case 'store-product': {
         if (!storeId) {
           throw new Error('Store ID requerit per obtenir producte');
         }
         const storeProductId = url.searchParams.get('productId');
         gelatoUrl = `${GELATO_ECOMMERCE_API}/stores/${storeId}/products/${storeProductId}`;
         break;
-      case 'template':
+      }
+      case 'template': {
         const templateId = url.searchParams.get('templateId');
         gelatoUrl = `${GELATO_ECOMMERCE_API}/templates/${templateId}`;
         break;
+      }
       default:
         throw new Error(`Acció desconeguda: ${action}`);
     }
@@ -170,11 +177,11 @@ Deno.serve(async (req: Request) => {
         },
       },
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[gelato-proxy] Error:', error);
     return new Response(
       JSON.stringify({ 
-        error: error?.message,
+        error: error instanceof Error ? error.message : String(error),
         details: String(error)
       }),
       {

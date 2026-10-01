@@ -128,7 +128,7 @@ Deno.serve(async (req: Request) => {
       });
 
     if (uploadError) {
-      const e = uploadError as any;
+      const e = uploadError as { message?: string };
       return new Response(
         JSON.stringify({
           error: "Upload failed",

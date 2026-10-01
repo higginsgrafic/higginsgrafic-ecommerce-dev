@@ -6,7 +6,21 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'public', 'scripts', 'test-results', 'playwright-report'] },
+  {
+    ignores: [
+      'dist',
+      'dist-prod',
+      'node_modules',
+      'public',
+      'scripts',
+      'test-results',
+      'playwright-report',
+      // Higiene (02/10/2026): cachés i scratch locals que no s'han de lintar.
+      '.netlify',
+      '.tmp-swift',
+      '.freebuff',
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
@@ -72,5 +86,19 @@ export default tseslint.config(
       'react/prop-types': 'off',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
-  }
+  },
+  {
+    // (02/10/2026) Correus i informes: text en llengua natural. L'apostrof (')
+    // al JSX es legitim i el rule react/no-unescaped-entities hi fa soroll;
+    // escapar-los amb &apos; empitjoraria la llegibilitat del text. Es desactiva
+    // nome s per a aquests fitxers de prosa (no per als components de la botiga).
+    files: ['netlify/emails/**/*.jsx', 'docs/**/*.jsx'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    plugins: { react },
+    rules: { 'react/no-unescaped-entities': 'off' },
+  },
 );
