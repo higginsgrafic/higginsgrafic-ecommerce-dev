@@ -544,11 +544,18 @@ rutes **velles**. Diu `austen/it-is-a-truth-b-stripe.webp` quan el fitxer és a
 col·lecció i de tinta i el mapa no s'hi va actualitzar. Amb la cerca exacta, **cap dibuix de
 Quotes** agafava la seva mida i queien tots al 30 % de defecte, en comptes de 12,16 / 4,8 / 2,4.
 
-**La solució** (a `HeroInici`): es prova la ruta sencera, després el **nom del fitxer** i, si
-només hi és l'altra tinta, la **germana**. La mida només depèn del dibuix i no de la tinta: al
-mapa, `the-phoenix` té les dues entrades i són idèntiques (46,585 i 42,35). El nom és únic perquè
-porta la tinta (`-b-` / `-w-`). Verificat: els vuit dibuixos de Quotes del pla (les dues tintes)
-ara prenen la mida del mapa.
+**La solució** (a `HeroInici`): es prova la ruta sencera i, si no hi és, el **nom del fitxer**
+(els dibuixos es van moure a carpetes de col·lecció i de tinta i el nom és únic perquè porta la
+tinta: `-b-` / `-w-`). Verificat: els dibuixos de Quotes **en negre** del pla ara prenen la mida
+del mapa (12,16 / 4,8 / 2,4) en comptes del 30 %.
+
+**I LA TINTA GERMANA, FORA** (mateix dia). Es va provar de passar a l'altra tinta quan el dibuix
+només era al mapa en una —la mida només depèn del dibuix, i al mapa `the-phoenix` té les dues
+entrades idèntiques—, i en Marc ho va veure de seguida: «He vist un NX-01 blanc que s'ha
+desescalat». El NX-01 blanc, que queia al 30 % de defecte, va passar a agafar el 7 % del negre.
+Els dos fitxers són geomètricament idèntics (`256×94`, sense marge transparent), però la mida és
+una decisió de disseny de **cada tinta** i només la pot manar el mapa: la cerca torna a ser ruta →
+nom, i prou. Els dibuixos en blanc que no són al mapa es queden al 30 % de defecte, com abans.
 
 **La clau duplicada, fora** («Neteja-ho ara»): `austen/i-admire-and-love-you-b-stripe.webp` hi era
 dues vegades, amb `tauleta: 6` i amb `tauleta: 12,8`. En JavaScript guanyava la segona, o sigui
