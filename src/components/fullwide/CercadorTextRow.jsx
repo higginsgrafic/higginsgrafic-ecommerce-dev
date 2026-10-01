@@ -1657,7 +1657,15 @@ export function CercadorColleccionsColumna({
         // de les dues caixes es d'1 px interior (`border`).
         //   amplada de la caixa = 128,7 - 2 (vora) - 2 x 2,35 = 122,0
         //   alcada de la caixa  = franja - 2 x 3
-        padding: `${COIX_VERTICAL_PX}px ${COIX_LATERAL_PX}px`,
+        // LA PASTILLA TOCA LES VORES LATERALS DEL FONS, A L'iPAD PRO 13 (03/10/2026).
+        // En Marc: «El que és diferent no és la pastilla en si, si no la relacio de
+        // la pastilla amb el fons. Sobretot en els offsets» i, en triar, «els
+        // mateixos offsets que el selector: inset vertical i 0 lateral». Al
+        // selector la pastilla va a ras pels costats; a la columna hi havia el
+        // coixi lateral del contenidor (2 px).
+        padding: (esIPadPro13() && isLandscapeTablet)
+          ? `${COIX_VERTICAL_PX}px 0px`
+          : `${COIX_VERTICAL_PX}px ${COIX_LATERAL_PX}px`,
         overflow: 'hidden',
       }}
     >
@@ -1750,15 +1758,22 @@ export function CercadorColleccionsColumna({
               // la caixa com del selector blanc, son 1 px interior»), radi 3 i
               // l'ombra de la casa.
               backgroundColor: activa ? 'hsl(var(--grey-paper))' : 'transparent',
-              // SENSE CONTORN (02/10/2026): vora transparent, com a la franja.
-              border: '1px solid transparent',
+              // SENSE CONTORN (02/10/2026): vora transparent, com a la franja. I
+              // sense ni aixo a l'iPad Pro 13, que la pastilla del selector tampoc
+              // en porta.
+              border: (esIPadPro13() && isLandscapeTablet) ? 'none' : '1px solid transparent',
               borderRadius: '3px',
               ...(activa ? { boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } : null),
               // LA CAIXA DE L'ACTIU: el coixi el fa el CONTENIDOR (5,5 px
               // lateral i 2,8 px vertical), o sigui que la caixa fa 122,2 x
               // 22,6 px, que son les xifres que ha mesurat l'amo. Sense
               // `margin`: amb marge, l'amplada no quadra amb la de la columna.
-              margin: 0,
+              // L'INSET VERTICAL DE LA PASTILLA, EL MATEIX QUE EL DEL SELECTOR
+              // (03/10/2026). Al selector la pastilla blanca fa 28,59 dins d'una
+              // cel·la de 34,3, o sigui que entra 2,85 px per dalt i per baix. La
+              // cel·la de la columna no es toca: el que s'aprima es la caixa
+              // blanca.
+              margin: (esIPadPro13() && isLandscapeTablet) ? '2.85px 0' : 0,
               cursor: 'pointer',
               overflow: 'hidden',
             }}
