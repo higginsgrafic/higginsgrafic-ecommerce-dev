@@ -295,9 +295,18 @@ const FORMATS = [
   { id: 'desktop-1440',      nom: 'Portàtil 1440',          grup: 'Portàtil',         w: 1440, h: 900,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1440x900.webp' },
   { id: 'desktop-1366',      nom: 'Portàtil 1366',          grup: 'Portàtil',         w: 1366, h: 768,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1366x768.webp' },
   { id: 'desktop-1280',      nom: 'Portàtil 1280',          grup: 'Portàtil',         w: 1280, h: 720,  ct: 134, cb: 0,  img: '/browser-frames/desktop-chrome-1280x720.webp' },
+  // ELS DOS iPAD PRO 13 (02/10/2026). En Marc: «Em pregunto si no es podrien
+  // veure els formats tablet que tenim seleccionats com a tablet, no com a
+  // desktop petit» i tot seguit «On puc veure aquestes pantalles?»: son la
+  // tauleta mes gran de la llista (1032x1376 vertical i 1376x1032 apaïsada,
+  // vegeu `scripts/mesura-formats.mjs`) i des d'aquest canvi el model els dona
+  // la classe de tauleta. La finestra es `h - ct` (1304 i 954), com a la
+  // resta: el navegador tambe se'n menja.
+  { id: 'ipad-pro-13-landscape', nom: 'iPad Pro 13 apaïssada', grup: 'Tauleta apaïsada', w: 1376, h: 1032, ct: 78, cb: 0, img: null },
   { id: 'ipad-1180',         nom: 'iPad 10/11a',            grup: 'Tauleta apaïsada', w: 1180, h: 820,  ct: 78,  cb: 0,  img: null },
   { id: 'tabs9-plus',        nom: 'Galaxy Tab S9+',         grup: 'Tauleta apaïsada', w: 1200, h: 800,  ct: 78,  cb: 0,  img: null },
   { id: 'tablet-landscape',  nom: 'Tauleta apaïsada 1024',  grup: 'Tauleta apaïsada', w: 1024, h: 768,  ct: 78,  cb: 0,  img: '/browser-frames/tablet-landscape-safari.webp' },
+  { id: 'ipad-pro-13',       nom: 'iPad Pro 13 vertical',   grup: 'Tauleta vertical', w: 1032, h: 1376, ct: 72,  cb: 0,  img: null },
   { id: 'tablet-portrait',   nom: 'Tauleta vertical 768',   grup: 'Tauleta vertical', w: 768,  h: 1024, ct: 72,  cb: 0,  img: '/browser-frames/tablet-portrait-safari.webp' },
   { id: 'ipad-mini',         nom: 'iPad mini 6',            grup: 'Tauleta vertical', w: 744,  h: 1133, ct: 72,  cb: 0,  img: null },
   { id: 'tabs9',             nom: 'Galaxy Tab S9',          grup: 'Tauleta vertical', w: 712,  h: 1138, ct: 72,  cb: 0,  img: null },
