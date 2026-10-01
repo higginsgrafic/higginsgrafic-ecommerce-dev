@@ -261,8 +261,12 @@ export const HERO_DIBUIX_MIDA = {
   'austen/it-is-a-truth-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
   'austen/half-agony-half-hope-b-stripe.webp': { escriptori: 4.8, tauleta: 6 },
   'austen/unsociable-and-taciturn-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
-  'austen/i-admire-and-love-you-b-stripe.webp': { escriptori: 12.16, tauleta: 6 },
   'austen/you-have-bewitched-me-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
+  // LA CLAU DUPLICADA, FORA (04/10/2026). En Marc: «Neteja-ho ara». Hi havia
+  // `i-admire-and-love-you` DUES vegades: amb `tauleta: 6` i amb `tauleta: 12,8`.
+  // En JavaScript guanyava la segona, o sigui que el comportament no canvia; i
+  // 12,8 es tambe el que te la seva bessona `it-is-a-truth`, que fa el mateix
+  // 12,16 a escriptori. Es queda, doncs, la que ja manava.
   'austen/i-admire-and-love-you-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
   'austen/looking_for_my_darcy/color/solid/blue-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
   'austen/looking_for_my_darcy/color/solid/fuchsia-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
