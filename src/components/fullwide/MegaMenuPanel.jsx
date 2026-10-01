@@ -621,17 +621,14 @@ export default function MegaMenuPanel({
                           </div>
                         )}
                         /* Les fletxes, alineades verticalment amb el selector
-                           (el mateix centre vertical). */
+                           (el mateix centre vertical).
+                           A LES TAUETES NO HI HA FLETXES (02/10/2026). En Marc:
+                           «A les tablets no hi van fletxes»: aquesta composicio
+                           es la de la tauleta vertical i el carrusel s'hi mou
+                           amb el dit. Es deixa el lloc (la casella del mosaic no
+                           es mou) pero la botonera no s'hi munta. */
                         fletxes={(
-                          <div style={{ width: '75.9%', position: 'relative', top: '-7.6px' }}>
-                          {/* Les fletxes paginen la graella: setPaginaGraella mou
-                              la pagina de 7 dibuixos. */}
-                          <FirstContactDibuix09Buttons
-                            tileSize={96.8}
-                            onPrev={() => { touchMegaPublicActivity?.(); setPaginaGraella((v) => v - 1); }}
-                            onNext={() => { touchMegaPublicActivity?.(); setPaginaGraella((v) => v + 1); }}
-                          />
-                          </div>
+                          <div style={{ width: '75.9%', position: 'relative', top: '-7.6px' }} />
                         )}
                         selector={(
                           <div style={{ width: '90%' }}>

@@ -11,7 +11,7 @@ import { estilCaixaBlocAlcadaAuto } from './estilsBlocs.js';
 import { esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
-import { carrilPx, getBeltWidth, escalaMegaslide } from '../../utils/layoutMetrics.js';
+import { carrilPx, getBeltWidth, escalaMegaslide, esTauletaVertical, esTauletaApaisada } from '../../utils/layoutMetrics.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
@@ -407,6 +407,15 @@ function MegaStripePanelP1({
   // (`esBandaEstretaFranja`): es la MATEIXA que fa servir la pagina 2.
   const esEstenyFins1366 = typeof window !== 'undefined'
     && esBandaEstretaFranja({ ample: window.innerWidth, alt: window.innerHeight });
+
+  // A LES TAUETES NO HI HA FLETXES (02/10/2026). En Marc: «A les tablets no hi
+  // van fletxes»: es la mateixa regla que ja va fer treure les de 1024 («un
+  // dispositiu tàctil no necessita fletxes... Esborra les fletxes»), i val per
+  // a TOTES les tauletes, tambe les verticals (a 768 la filera de la capçalera
+  // no hi cap i el carrusel es mou amb el dit). La classe la diu el model.
+  const esTauleta = typeof window !== 'undefined'
+    && (esTauletaVertical({ ample: window.innerWidth, alt: window.innerHeight })
+      || esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight }));
 
   // LA COMPOSICIO DE LA PAGINA 1 A L'ESCRIPTORI (26/09/2026, B2 del bucle): la
   // graella de DUES FILERES intercalades (la MATEIXA peça que la pagina 2,
@@ -1134,18 +1143,21 @@ function MegaStripePanelP1({
                   // esquerra del carril de la pagina i el del selector a la dreta,
                   // i cadascun porta la seva caixa (fons, radi i ombra). A la
                   // resta, el quadrat conjunt de sempre.
-                  flexDirection: (esAjust1024P1 || esComposicioEstretaP1) ? 'row' : 'column',
+                  flexDirection: (esAjust1024P1 || esComposicioEstretaP1 || esTauleta) ? 'row' : 'column',
                   justifyContent: 'flex-end',
-                  alignItems: (esAjust1024P1 || esComposicioEstretaP1) ? 'stretch' : 'flex-end',
+                  alignItems: (esAjust1024P1 || esComposicioEstretaP1 || esTauleta) ? 'stretch' : 'flex-end',
                 }}>
-                {/* A 1024 NO HI HA FLETXES (02/10/2026). En Marc: «Me n'acabo
-                    d'adonar que un dispositiu tàctil no necessita fletxes...
-                    Esborra les fletxes». Aquesta es la composicio de la tauleta
-                    (1024-1366 apaissada), on el carrusel es mou amb el dit: el
-                    quadrat de les fletxes no s'hi munta i el selector queda sol a
-                    la vora dreta del carril de la pagina. A la resta de mides les
-                    fletxes es queden com estaven. */}
-                {!esAjust1024P1 ? (
+                {/* A LA TAUETA NO HI HA FLETXES (02/10/2026). En Marc: «A les
+                    tablets no hi van fletxes», que es la mateixa regla que ja
+                    va fer treure les de 1024 («Me n'acabo d'adonar que un
+                    dispositiu tàctil no necessita fletxes... Esborra les
+                    fletxes»). El comentari ja deia que aquesta es la composicio
+                    de la tauleta, pero la condicio nome s mirava el 1024
+                    (1000-1050): a la resta de la banda (1280, 1366 i 1376) el
+                    quadrat de les fletxes s'hi muntava igualment. Ara no es
+                    munta a TOTA la composicio estreta i el selector queda sol,
+                    ocupant el quadrat sencer, a la vora dreta del carril. */}
+                {!(esAjust1024P1 || esComposicioEstretaP1 || esTauleta) ? (
                 <div style={{
                   position: 'relative',
                   flex: esAjust1024P1 ? '0 0 auto' : '1 1 50%',
@@ -1178,10 +1190,12 @@ function MegaStripePanelP1({
                 />
                 </div>
                 ) : null}
-                {/* EL QUADRAT DE SOTA: els tres botons del selector. */}
+                {/* EL QUADRAT DE SOTA: els tres botons del selector. Sense
+                    fletxes (tota la composicio estreta) es queda amb el quadrat
+                    sencer: es l'unic fill de la filera. */}
                 <div style={{
                   position: 'relative',
-                  flex: esAjust1024P1 ? '0 0 auto' : '1 1 50%',
+                  flex: esAjust1024P1 ? '0 0 auto' : ((esComposicioEstretaP1 || esTauleta) ? '1 1 100%' : '1 1 50%'),
                   minHeight: 0,
                   width: esAjust1024P1 ? `${blocDretaPx}px` : '100%',
                   height: esAjust1024P1 ? `${blocDretaPx}px` : undefined,

@@ -19,7 +19,7 @@ import {
   touchMegaPublicActivity,
 } from './megaPublicSelectorState.js';
 import OptimizedImg from './OptimizedImg.jsx';
-import { carrilPx } from '../../utils/layoutMetrics.js';
+import { carrilPx, esTauletaVertical, esTauletaApaisada } from '../../utils/layoutMetrics.js';
 import {
   FirstContactDibuix00Buttons,
   FirstContactDibuix09Buttons,
@@ -61,6 +61,14 @@ function MegaColumn({
 }) {
   const tileSizeRef = useRef(null);
   const [tileSize, setTileSize] = useState(null);
+
+  // A LES TAUETES NO HI HA FLETXES (02/10/2026). En Marc: «A les tablets no hi
+  // van fletxes»: la casella de les fletxes no s'hi munta (la classe la diu el
+  // model). El LLOC de la casella es queda, perque el mosaic de la columna no
+  // es mogui.
+  const esTauleta = typeof window !== 'undefined'
+    && (esTauletaVertical({ ample: window.innerWidth, alt: window.innerHeight })
+      || esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight }));
   const humanInsideEnabled = Boolean(isHumanInside);
   const effectiveTileSize = megaTileSize || tileSize;
   const selectorTilePitchPx = (Number(effectiveTileSize) || 120) + 12;
@@ -1183,6 +1191,7 @@ function MegaColumn({
                   className={`relative z-40 ${compactLandscape ? 'mt-0' : 'mt-2'} ${thinSlideEnabled || pagingEnabled || (isHumanInside && onHumanPrev && onHumanNext) ? '' : 'opacity-30 pointer-events-none'}`}
                   aria-hidden={thinSlideEnabled || pagingEnabled || (isHumanInside && onHumanPrev && onHumanNext) ? undefined : true}
                 >
+                  {esTauleta ? null : (
                   <FirstContactDibuix09Buttons
                     tileSize={tileSize}
                     onPrev={() => {
@@ -1206,6 +1215,7 @@ function MegaColumn({
                       if (isHumanInside && onHumanNext) return onHumanNext();
                     }}
                   />
+                  )}
                 </div>
               ) : (
                 <button
