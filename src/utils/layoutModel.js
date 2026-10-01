@@ -328,6 +328,26 @@ export function esIPadPro13({ ample, alt } = {}) {
 }
 
 /**
+ * L'iPAD PRO 13, ESTRICTE (04/10/2026).
+ *
+ * `esIPadPro13` tambe diu que si les amplades de 1180 i 1200, que porten el
+ * megaslide del model pero NO son l'iPad Pro 13. Qui hagi de distingir el
+ * DISPOSITIU —la hero, que a l'iPad Pro 13 va un 50 % mes alta (04/10/2026)— ha
+ * de fer servir aquesta.
+ *
+ * @param {{ample?: number, alt?: number}} [mides]
+ * @returns {boolean}
+ */
+export function esIPadPro13Estricte({ ample, alt } = {}) {
+  const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
+  const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
+  const es = deviceLayoutFromViewport(w, h);
+  const marge = 2;
+  return IPAD_PRO_13_AMPLADES.some((a) => Math.abs(w - a) <= marge)
+    && (es.isPortraitTablet || es.isLandscapeTablet);
+}
+
+/**
  * EL CARRIL DE L'iPAD PRO 13 APAÏSSAT (03/10/2026).
  *
  * En Marc: «Crea un segon carril per l'iPad Pro 13» i, quan se li van donar les

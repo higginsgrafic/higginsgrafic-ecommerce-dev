@@ -3,7 +3,7 @@ import { Shuffle } from 'lucide-react';
 import { buildHeroStripePlan, DARK_COLORS } from '@/components/home/homeDrawings';
 import { CERCADOR_COLORS } from '@/data/collections';
 import useIsMobile from '@/hooks/useIsMobile';
-import { deviceLayoutFromViewport } from '@/utils/layoutModel';
+import { deviceLayoutFromViewport, esIPadPro13Estricte } from '@/utils/layoutModel';
 import { HERO_DIBUIX_MIDA, HERO_DIBUIX_MIDA_DEFECTE } from '@/config/iniciNou';
 import { MIDA_TAULETA_APAISADA_MAX, MIDA_TAULETA_VERTICAL_MAX } from '@/utils/layoutMetrics';
 
@@ -72,6 +72,22 @@ function HeroInici() {
   // la vista 1024 redueix el traking de les colleccions de la hero a la meitat»:
   // allo on els noms hi van justos, el `letterSpacing` passa de 0,18em a 0,09em.
   const esHeroTrackingMig = ampleFinestra > 0 && ampleFinestra <= MIDA_TAULETA_VERTICAL_MAX;
+  // LA MIDA DE LA HERO (04/10/2026). En Marc: «Ara, redueix la hero un 25 % a
+  // totes excepte a l'iPad Pro 13 que l'augmentaràs un 50 %».
+  //
+  // EL QUE ES MOU ES L'ALCADA, NO L'AMPLADA. L'amplada fa el carril des del
+  // canvi del 02/10 («Eixampla totes les hero fins al carril. Excepte la 1024»)
+  // i allo no es toca; el que l'amo troba gran o petit es l'alcada. El factor
+  // va a l'alcada de la caixa (a la formula curta de 1280/1366/1376) i a
+  // l'`aspect-ratio` de la resta, que es qui la fa; com que les franges i les
+  // samarretes es pinten amb `auto 100 %` de l'alcada de la franja, s'hi escalen
+  // soles.
+  //
+  // L'iPAD PRO 13 ES EL DISPOSITIU, no les quatre amplades del model: les de
+  // 1180 i 1200 porten el megaslide del model pero no son l'iPad Pro 13, i van
+  // amb el 25 % de menys com tothom.
+  const esIPadPro13Hero = esIPadPro13Estricte();
+  const factorHero = esIPadPro13Hero ? 1.5 : 0.75;
   const [plan, setPlan] = useState(() => buildHeroStripePlan());
   const franges = useMemo(() => plan, [plan]);
 
@@ -103,14 +119,20 @@ function HeroInici() {
           // A 1280 I 1366 LA SECCIO FA EL 75 % DEL CARRIL I L'ALCADA NO CANVIA
           // DE PROPORCIO. Sense l'`aspect-ratio`, l'alcada surt del 60 % del
           // carril (el 80 % de disseny ja reduit un 25 %) amb la proporcio
-          // 952/401, que es la de sempre.
+          // 952/401, que es la de sempre. El factor de la mida de la hero del
+          // 04/10/2026 multiplica aquest 0,6.
           ...(esHeroSeccioAmpla
             ? {
               width: '100%',
               aspectRatio: 'auto',
-              height: 'calc(var(--contingut-max, 1350px) * 0.6 * 401 / 952)',
+              height: `calc(var(--contingut-max, 1350px) * ${0.6 * factorHero} * 401 / 952)`,
             }
-            : null),
+            : {
+              // LA PROPORCIO DE LA CAIXA, AMB EL FACTOR DE LA HERO (04/10/2026):
+              // 401 es l'alcada de disseny (430 a la vertical) i el factor la
+              // deixa al 75 % (o al 150 % a l'iPad Pro 13).
+              aspectRatio: `952 / ${(esVertical ? 430 : 401) * factorHero}`,
+            }),
           display: 'flex',
           flexDirection: 'column',
           gap: '2px',
