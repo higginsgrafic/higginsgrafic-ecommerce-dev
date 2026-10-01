@@ -253,26 +253,37 @@ export const ICONA_ALCADA_FC_U = 99;
  * perque el dibuix quedi on toca.
  */
 export const HERO_DIBUIX_MIDA = {
+  // ELS DIBUIXOS DE FIRST CONTACT, AMB LES DUES TINTES (04/10/2026). En Marc:
+  // «Repassa tots els blancs» i, en triar, «1 [el valor del seu negre]. Tambe
+  // Quotes». El criteris es el que ja feia el `the-phoenix`: quan el blanc i el
+  // negre son el MATEIX dibuix (els fitxers son geometricament identics, mateixa
+  // mida i mateix marge), la tinta no canvia la mida.
   'first_contact/black/nx-01-b-stripe.webp': { escriptori: 7, tauleta: 7 },
+  'first_contact/white/nx-01-w-stripe.webp': { escriptori: 7, tauleta: 7 },
   'first_contact/black/ncc-1701-b-stripe.webp': { escriptori: 7, tauleta: 7 },
+  'first_contact/white/ncc-1701-w-stripe.webp': { escriptori: 7, tauleta: 7 },
   'first_contact/black/ncc-1701-d-b-stripe.webp': { escriptori: 3.5, tauleta: 3.5 },
-  'first_contact/white/the-phoenix-w-stripe.webp': { escriptori: 46.585, tauleta: 42.35 },
+  'first_contact/white/ncc-1701-d-w-stripe.webp': { escriptori: 3.5, tauleta: 3.5 },
   'first_contact/black/the-phoenix-b-stripe.webp': { escriptori: 46.585, tauleta: 42.35 },
-  'austen/it-is-a-truth-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
-  'austen/half-agony-half-hope-b-stripe.webp': { escriptori: 4.8, tauleta: 6 },
-  'austen/unsociable-and-taciturn-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
-  'austen/you-have-bewitched-me-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
-  // LA CLAU DUPLICADA, FORA (04/10/2026). En Marc: «Neteja-ho ara». Hi havia
-  // `i-admire-and-love-you` DUES vegades: amb `tauleta: 6` i amb `tauleta: 12,8`.
-  // En JavaScript guanyava la segona, o sigui que el comportament no canvia; i
-  // 12,8 es tambe el que te la seva bessona `it-is-a-truth`, que fa el mateix
-  // 12,16 a escriptori. Es queda, doncs, la que ja manava.
-  'austen/i-admire-and-love-you-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
+  'first_contact/white/the-phoenix-w-stripe.webp': { escriptori: 46.585, tauleta: 42.35 },
+  // LES CLAUS DE QUOTES, AMB LA RUTA BONA (04/10/2026). Eren `austen/<fitxer>`
+  // i els fitxers son a `austen/quotes/<tinta>/<fitxer>`: per allo cap dibuix de
+  // Quotes agafava la seva mida i tots queien al 30 % de defecte («Quotes i
+  // First Contact han tornat a petar»). I tambe s'hi afegeixen els blancs.
+  'austen/quotes/black/it-is-a-truth-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
+  'austen/quotes/white/it-is-a-truth-w-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
+  'austen/quotes/black/i-admire-and-love-you-b-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
+  'austen/quotes/white/i-admire-and-love-you-w-stripe.webp': { escriptori: 12.16, tauleta: 12.8 },
+  'austen/quotes/black/half-agony-half-hope-b-stripe.webp': { escriptori: 4.8, tauleta: 6 },
+  'austen/quotes/white/half-agony-half-hope-w-stripe.webp': { escriptori: 4.8, tauleta: 6 },
+  'austen/quotes/black/unsociable-and-taciturn-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
+  'austen/quotes/white/unsociable-and-taciturn-w-stripe.webp': { escriptori: 2.4, tauleta: 3 },
+  'austen/quotes/black/you-have-bewitched-me-b-stripe.webp': { escriptori: 2.4, tauleta: 3 },
+  'austen/quotes/white/you-have-bewitched-me-w-stripe.webp': { escriptori: 2.4, tauleta: 3 },
   'austen/looking_for_my_darcy/color/solid/blue-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
   'austen/looking_for_my_darcy/color/solid/fuchsia-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
   'austen/looking_for_my_darcy/color/solid/red-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
   'austen/looking_for_my_darcy/color/solid/yellow-solid-stripe.webp': { escriptori: 19, tauleta: 19 },
 };
-
 /** La mida per defecte del dibuix quan la seva imatge no es al mapa. */
 export const HERO_DIBUIX_MIDA_DEFECTE = 30;
