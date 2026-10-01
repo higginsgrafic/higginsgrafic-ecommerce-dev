@@ -232,6 +232,41 @@ I les desviacions que són de disseny: la graella de la p2 arrenca després del 
 (107 px), la columna de col·leccions acaba a la vora dreta del carril, i la cintura de la
 franja queda a 5 px de la columna.
 
+## 3septies. La columna de col·leccions a l'iPad Pro 13 apaïssat (03/10/2026)
+
+Tres coses que va demanar l'amo, totes sobre la columna de col·leccions del model:
+
+1. **L'ombra de la màniga, més fluixa**: «Rebaixa l'ombra de la màniga. Volem que hi
+   sigui, no que cridi l'atenció». Al model passa d'alfa 0,45 a 0,25 (la casa que la
+   pinta segueix amb 0,45).
+2. **La pastilla de l'actiu, més alta sense tocar la columna**: «Pots fer la pastilla més
+   alta sense modificar l'alçada de la columna?». L'alçada de la columna (221,7) no es
+   toca i la pastilla fa tota l'alçada de la seva cel·la (inset vertical 0); la relació
+   lateral és zero, la que va triar l'amo quan va dir «els mateixos offsets que el
+   selector: inset vertical i 0 lateral».
+3. **El clic als enllaços**: «Costa molt clicar els enllaços de Crosswords cap avall de la
+   columna de col·lecció». La causa no era cap `z-index` de la columna sinó la **caixa**
+   de la franja: la filera que arrossega la tira (`#stripe-guide-stripe-row`) demana el
+   clic amb `pointerEvents: 'auto'` i la seva caixa fa 93..1164, mentre que el que pinta
+   la franja (`data-stripe-visual-content`) va de 168 a 1090. Aquells 89 px de caixa
+   buida queien damunt de la columna i li prenien el clic des de CROSSWORDS cap avall.
+
+   Pujar la columna de `zIndex` no ho arregla (viu dins de l'embolcall de la filera, que
+   és a `zIndex: 3`, i el seu `zIndex` hi queda tancat), i posar la filera per sobre de la
+   franja **mou el dibuix** (19.081 px de diferència, amb la màniga passant per sota de la
+   columna), que és el que l'amo va descartar: «No pots posar la màniga sota la columna,
+   ho sento».
+
+   La solució és de superfície de clic i no de pintat: al model la filera deixa de demanar
+   el clic i el demana el dibuix de la franja, que és qui arriba fins on arriba la tira.
+   Cap capa no es mou, la màniga que cau damunt de la columna (1075..1090) segueix sent
+   seva, i la roda i l'arrossegament del pas continuen funcionant perquè els gestors són a
+   la filera i l'esdeveniment hi puja.
+
+Verificat a 1376 amb `deviceScaleFactor` 2: **9 enllaços x 5 punts = 45/45 clics**, la
+roda i l'arrossegament (touch sintètic) fan el pas igual que abans, cap error de pàgina, i
+la petjada de les 11 vistes (`scripts/_tmp-ipad13-abans-despres.mjs`) sense cap diferència.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
