@@ -492,11 +492,11 @@ export default function MegaslidePagina2({
           // alla mateix), o sigui que l'aire de dalt son aquests 20 px i el que
           // sobra del megaslide queda a sota. Amb el bloc mes alt que l'espai, el
           // `max(0, ...)` no hi cap i el bucle de sota ja el deixa arran.
-          // A L'iPAD PRO 13 APAÏSSAT, 40 px (03/10/2026). En Marc: «Deixa 20 px
-          // d'aire a sobre i a sota de la p1 i la p2» i tot seguit «Deixa 40 px
-          // d'aire sobre i sota la p1 i la p2»: alla el bloc arrenca a 40 px del
-          // bottom del header, i la p1 el segueix (va lligada a aquest bloc).
-          const aireDaltP2 = esIPadPro13() ? 40 : AIRE_DALT_BLOC_P2_PX;
+          // A L'iPAD PRO 13 APAÏSSAT, 20 px (03/10/2026). En Marc: «Deixa 20 px
+          // d'aire a sobre i a sota de la p1 i la p2», despres «Deixa 40 px d'aire
+          // sobre i sota la p1 i la p2» i finalment «redueix l'aire de dalt a
+          // 20 px»: alla el bloc arrenca a 20 px del bottom del header.
+          const aireDaltP2 = esIPadPro13() ? 20 : AIRE_DALT_BLOC_P2_PX;
           const aire = Math.max(0, Math.min(
             aireDaltP2,
             panelAlt - rBcn.height - alcadaFranja - rFranja.height - 2 * AIRE_FRANJA_COLLECCIONS_PX,

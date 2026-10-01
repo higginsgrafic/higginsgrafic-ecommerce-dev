@@ -512,13 +512,16 @@ export default function MegaMenuPanel({
               >
                 <div style={{ width: '25%', flexShrink: 0, display: 'block', height: '100%', position: 'relative', overflow: isPortraitTablet ? 'hidden' : 'visible' }}>
                   <div ref={viewport1Ref} data-mega-page-viewport="1" style={{
-                    // L'AIRE DE DALT DE LA P1, A 40 px (03/10/2026). En Marc:
-                    // «Deixa 40 px d'aire sobre i sota la p1 i la p2». El
-                    // contingut de la p1 (les caselles de la graella) queia a
-                    // 18,6 px del bottom del header, i aquests 21,4 px son el que
-                    // li falta. El panell creix amb el contingut (`p1ContentBottom`
-                    // el mesura), o sigui que l'aire de baix no es mou.
-                    ...(esIPadPro13({ ample: w, alt: h }) ? { marginTop: '21.4px' } : null),
+                    // L'AIRE DE DALT DE LA P1, A 20 px (03/10/2026). En Marc:
+                    // «Deixa 20 px d'aire a sobre i a sota de la p1 i la p2»,
+                    // «Deixa 40 px d'aire sobre i sota la p1 i la p2» i «redueix
+                    // l'aire de dalt a 20 px». El contingut de la p1 (les
+                    // caselles de la graella) cau a 18,6 px del bottom del header
+                    // pel seu compte, o sigui que aquests 1,4 px son el que li
+                    // falta per fer-ne 20 exactes, com la p2. El panell creix i
+                    // decreix amb el contingut (`p1ContentBottom` el mesura), o
+                    // sigui que l'aire de baix no es mou.
+                    ...(esIPadPro13({ ample: w, alt: h }) ? { marginTop: '1.4px' } : null),
                     // A la VERTICAL, el contingut de debò de la pagina 1 queda
                     // AMAGAT i el que s'hi veu es la TAULA dibuixada (la
                     // mateixa que a la pagina 2). A la resta de formats no es
