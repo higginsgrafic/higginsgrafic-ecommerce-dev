@@ -40,7 +40,7 @@ const r = await p.evaluate(() => {
     guiaMega: { esq: guia('[data-guia-carril="esq"]'), dret: guia('[data-guia-carril="dret"]') },
     guiaPagina: { esq: guia('[data-guia-carril-pagina="esq"]'), dret: guia('[data-guia-carril-pagina="dret"]') },
     panell: q('[data-mega-panel-surface]'),
-    bcn: q('[data-p2-color-selector] [data-stripe-buttonbar="bn"]', v2),
+    bcn: q('[data-p2-color-selector] [data-stripe-buttonbar="bn"], [data-p2-color-selector] [data-stripe-buttonbar="bn-p1"]', v2),
     banda: q('[data-colleccions-franja="1"]', v2),
     stripe: q('[data-stripe-visual-content="2"]', v2),
     enllacos: [...v2.querySelectorAll('[data-colleccions-targeta="1"]')].length,

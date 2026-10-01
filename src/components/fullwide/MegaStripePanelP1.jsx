@@ -593,8 +593,22 @@ function MegaStripePanelP1({
           // El desplacament es ABSOLUT (el que ja tenim mes el que falta): la
           // mesura del bloc ja porta el `transform` aplicat i, sense descomptar-lo,
           // el bucle anava derivant i el bloc marxava de la pantalla.
+          //
+          // I LA MESURA ES RELATIVA A LA PAGINA (02/10/2026). En Marc: «A 1024,
+          // quan clico un enllaç de la columna de col·leccions es barreja la p1
+          // amb la p2». El megaslide te TOTES les pagines al DOM i la de la p1
+          // viu desplaçada a l'esquerra (a 1024, x-1009) quan se'n veu una
+          // altra. Amb el `left` absolut el bucle hi sumava aquell
+          // desplaçament: el clic a la columna de la p2 torna a mesurar (el
+          // bucle depen de `active`) i el bloc de la p1 passava de x-41 a
+          // x839, o sigui que la graella intercalada de la p1 se n'anava a
+          // sobre de la p2 (mesurat: la finestra del carrusel de la p1, de
+          // x-838 a x42). Descomptant el desplaçament de la propia pagina, la
+          // correccio es la mateixa que amb la pagina a lloc.
+          const paginaP1 = bloc.closest('[data-mega-page-viewport="1"]');
+          const desplacPagina = paginaP1 ? paginaP1.getBoundingClientRect().left : 0;
           const dxAplicat = prevAjustRef.current?.dx ?? 0;
-          const dx = Math.round(dxAplicat + (esquerraPagina - bloc.getBoundingClientRect().left));
+          const dx = Math.round(dxAplicat + (esquerraPagina - (bloc.getBoundingClientRect().left - desplacPagina)));
           if (prev
             && Math.abs(prev.alcada - alcada) < 0.5
             && Math.abs(prev.dy - nouDy) < 0.5
