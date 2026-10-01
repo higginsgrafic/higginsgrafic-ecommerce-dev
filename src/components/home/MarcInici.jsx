@@ -73,23 +73,6 @@ const CADE_BAIXADA = 56;
  * a sota.
  */
 const CADENAT_BAIX_PX = 58;
-/**
- * ELS FORMATS DELS 8/10 (04/10/2026).
- *
- * En Marc: «Per tal de dimensionar correctament la hero a cada format podríem
- * dividir l'espai disponible, un cop obert el megaslide, en 6 parts i que les
- * franges de la samarreta ocupin els 4/6 centrals»; i, en concretar-ho, «prova amb
- * 8/10». Primer es va acotar als portatils de 720 («T'he dit que ho apliquessis a
- * 1200x720. Enlloc mes»), pero l'amo ho vol a TOT ARREU on el megaslide hi es:
- * «A tots els formats horitzontals, vols dir, oi?».
- *
- * O sigui: TOTS els formats HORITZONTALS de 768 en amunt (els mobils de costat
- * estret no tenen megaslide: `esMobilAqui` es `ample < 768`). Els VERTICALS es
- * queden com estaven, amb la seva proporcio i els seus aires.
- */
-const esHeroVuitDecimes = () => typeof window !== 'undefined'
-  && window.innerWidth >= 768
-  && window.innerWidth >= window.innerHeight;
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
 const FILES_MIN = 8;
 const FILES_MAX = 32;
@@ -132,6 +115,26 @@ function divisionsDeLaLinia(linia, capcalera, finestra) {
 
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
+  // LES MIDES DE LA HERO, FIXADES (04/10/2026). En Marc: «S'han de fixar les
+  // mides»: la hero fa els 8/10 de l'espai de sota la linia del megaslide, amb
+  // els DOS aires d'1/10, i aixo s'ha de saber ABANS del primer pintat.
+  //
+  // La linia surt de les MATEIXES rectes que l'estimacio (vegeu el bloc de
+  // dalt): la del panell segons l'amplada, mes la capcalera. Es FIXA: no depen
+  // de si el panell es obert ni de si la seva vora s'ha publicat.
+  const ampleVista = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const altVista = typeof window !== 'undefined' ? window.innerHeight : 0;
+  const esHoritzontal = ampleVista >= 768 && ampleVista >= altVista;
+  const alcadaPanellCss = ampleVista <= 1376
+    ? 'calc(0.2529 * var(--inici-nou-carril, 0px) + 5.3px)'
+    : 'calc(0.1775 * var(--inici-nou-carril, 0px) + 111.3px)';
+  const espaiHeroCss = `calc(100dvh - var(--appHeaderOffset, 0px) - ${alcadaPanellCss})`;
+  const varsHero = esHoritzontal
+    ? {
+      '--inici-hero-aire': `calc(${espaiHeroCss} / 10)`,
+      '--inici-hero-alcada': `calc(${espaiHeroCss} * 8 / 10)`,
+    }
+    : null;
   const zonaRef = useRef(null);
   // EL REPARTIMENT VIU A L'ESTAT, NO AL DOM.
   //
@@ -360,26 +363,17 @@ function MarcInici({ seccions }) {
         ? (ampleFinestra <= 1320 ? 0 : AIRE_BAIX_VIEWPORT_ESTRET_PX)
         : AIRE_BAIX_VIEWPORT_PX;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      // LA HERO, ALS 8/10, NOME S AL 1200x720 (04/10/2026). En Marc: «T'he dit
-      // que ho apliquessis a 1200x720. Enlloc mes»: en aquest format l'espai de
-      // sota la vora del panell es reparteix en desens (1/10 d'aire, 8/10 de
-      // franges, 1/10 d'aire) i la cel·la el publica com a `--inici-hero-alcada`.
-      // A la resta de formats tot queda com era.
-      //
-      // L'ESPAI ES COMPTA DES DEL BOTTOM DEL MEGASLIDE (04/10/2026). En Marc:
-      // «T'he dit que el cadenat ja no toca la hero. Ho has de calcular des del
-      // bottom del megaslide» i «El cadenat ara es a la dreta del carril. S'ha
-      // alliberat l'espai»: el cadenat no ocupa espai dins del carril, o sigui
-      // que el bottom del megaslide es la vora del panell i els 8/10 son EXACTES
-      // (1/10 d'aire, 8/10 de franges i 1/10 d'aire, simetrics).
-      const vuitDecimes = esHeroVuitDecimes();
-      const disponibleHero = Math.max(0, window.innerHeight - linia);
-      const aireHero = vuitDecimes ? disponibleHero / 10 : 0;
-      const alcadaHero = vuitDecimes ? (disponibleHero * 8) / 10 : 0;
-      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}|${baixAlViewport ? 1 : 0}|${aireBaix}|${Math.round(alcadaHero * 4) / 4}|${Math.round(aireHero * 4) / 4}`;
+      // LES MIDES DE LA HERO NO ES CALCULEN AQUI (04/10/2026). En Marc: «S'han
+      // de fixar les mides»: la hero no pot dependre de si el megaslide es obert
+      // o no, ni d'un efecte que arriba DESPRES del primer pintat (era el flaix
+      // del refresc: es pintava amb la mida vella —456,8 a 1376 i 178,9 a
+      // 1280x586— i tot seguit canviava). Ara surten d'un `calc` amb les
+      // MATEIXES rectes que l'estimacio de la linia, o sigui que el primer
+      // pintat ja es el bo i la mida no es mou mai. Vegeu `varsHero` al render.
+      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}|${baixAlViewport ? 1 : 0}|${aireBaix}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons, baixAlViewport, aireBaix, alcadaHero, aireHero });
+        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons, baixAlViewport, aireBaix });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -435,6 +429,7 @@ function MarcInici({ seccions }) {
           gap: 0,
           // Les dues xifres, tambe com a variables de CSS, perque el topall de
           // la caixa de la hero les pugui llegir.
+          ...varsHero,
           '--inici-bloc-mega': `${repartiment.blocMega ?? 0}px`,
           '--inici-bloc-pagina': `${repartiment.blocPagina ?? 0}px`,
           '--inici-frontera': `${repartiment.linia ?? 0}px`,
@@ -465,16 +460,16 @@ function MarcInici({ seccions }) {
             //
             // AL 1200x720 (04/10/2026) els dos aires son els seus desens i la
             // hero fa els 8/10: mana aixo i no el centratge de sempre.
-            paddingBlockStart: `${repartiment.alcadaHero ? (repartiment.aireHero ?? 0) : CADE_BAIXADA}px`,
-            ...(repartiment.alcadaHero ? { paddingBlockEnd: `${repartiment.aireHero ?? 0}px` } : null),
-            ...(repartiment.alcadaHero ? { '--inici-hero-alcada': `${repartiment.alcadaHero}px` } : null),
+            paddingBlockStart: esHoritzontal ? 'var(--inici-hero-aire, 0px)' : `${CADE_BAIXADA}px`,
+            ...(esHoritzontal ? { paddingBlockEnd: 'var(--inici-hero-aire, 0px)' } : null),
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             // A 1366 i 1280, alineada al fons del viewport; a l'escriptori, al
-            // fons pero amb els 50 px d'aire de sota; a la resta, centrada.
-            justifyContent: repartiment.alcadaHero
+            // fons pero amb els 50 px d'aire de sota; a la resta, centrada. Als
+            // horitzontals mana el repartiment en desens.
+            justifyContent: esHoritzontal
               ? 'flex-start'
               : ((repartiment.alFons || repartiment.baixAlViewport) ? 'flex-end' : 'center'),
             // L'AIRE DE SOTA LA HERO (28/09/2026): nome's a l'escriptori, i es
