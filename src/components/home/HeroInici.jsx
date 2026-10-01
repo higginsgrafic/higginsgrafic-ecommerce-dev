@@ -121,27 +121,17 @@ function HeroInici() {
           // carril (el 80 % de disseny ja reduit un 25 %) amb la proporcio
           // 952/401, que es la de sempre. El factor de la mida de la hero del
           // 04/10/2026 multiplica aquest 0,6.
-          //
-          // I DAMUNT DE TOT, L'ALCADA DE LA CELLLA (04/10/2026). En Marc: «podríem
-          // dividir l'espai disponible, un cop obert el megaslide, en 6 parts i
-          // que les franges de la samarreta ocupin els 4/6 centrals» i, en
-          // veure-ho, «Massa petit. Prova amb 6/8»: el marc (`MarcInici`)
-          // reparteix l'espai de sota el panell i en publica els 6/8 a
-          // `--inici-hero-alcada`. Quan hi es, mana; quan no (els mobils, que no
-          // tenen megaslide) queda la proporcio de sempre.
           ...(esHeroSeccioAmpla
             ? {
               width: '100%',
               aspectRatio: 'auto',
-              height: `var(--inici-hero-alcada, calc(var(--contingut-max, 1350px) * ${0.6 * factorHero} * 401 / 952))`,
+              height: `calc(var(--contingut-max, 1350px) * ${0.6 * factorHero} * 401 / 952)`,
             }
             : {
               // LA PROPORCIO DE LA CAIXA, AMB EL FACTOR DE LA HERO (04/10/2026):
               // 401 es l'alcada de disseny (430 a la vertical) i el factor la
-              // deixa al 75 % (o al 150 % a l'iPad Pro 13). Si el marc publica
-              // l'alcada dels 4/6, aixo no s'arriba a fer servir mai.
+              // deixa al 75 % (o al 150 % a l'iPad Pro 13).
               aspectRatio: `952 / ${(esVertical ? 430 : 401) * factorHero}`,
-              height: 'var(--inici-hero-alcada, auto)',
             }),
           display: 'flex',
           flexDirection: 'column',
