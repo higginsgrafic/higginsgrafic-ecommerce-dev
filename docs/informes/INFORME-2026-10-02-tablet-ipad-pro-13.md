@@ -426,35 +426,36 @@ i cap desbordament. I la resta no es mou: 1180, 1200 i 1032 segueixen amb el meg
 ell —1105 → 1205 d'ample i 418,9 → 456,8 d'alçada—. Si es vol que la hero es quedi a 1105, cal
 deslligar-la del carril.
 
-## 3septendecies. La hero, en vuitens (6/8) i l'aire de sota del megaslide 1100 (04/10/2026)
+## 3septendecies. La hero, en desens (8/10) i l'aire de sota del megaslide 1100 (04/10/2026)
 
-**La hero es reparteix en vuitens.** En Marc: «Per tal de dimensionar correctament la hero a
+**La hero es reparteix en desens.** En Marc: «Per tal de dimensionar correctament la hero a
 cada format podríem dividir l'espai disponible, un cop obert el megaslide, en 6 parts i que les
 franges de la samarreta ocupin els 4/6 centrals. Així, la hero es proporcionarà de forma natural
 i l'espai a sobre i a sota serà simètric»; en concretar-ho, «des del panell»; i, en veure-ho amb
-4/6, «Massa petit. Prova amb 6/8» i «Aplica els 6/8».
+4/6, «Massa petit. Prova amb 6/8», «Aplica els 6/8» i, amb el 6/8 posat, «prova amb 8/10».
 
-L'espai de sota la vora del panell es reparteix en **vuitens**: 1/8 d'aire, **6/8 de franges** i
-1/8 d'aire. Ho calcula `MarcInici` (que és qui reparteix la pàgina) i ho publica com a
+L'espai de sota la vora del panell es reparteix en **desens**: 1/10 d'aire, **8/10 de franges** i
+1/10 d'aire (amb el 6/8 era el 75 % i 1/8; amb el 4/6, el 66,7 % i 1/6). Ho calcula `MarcInici` (que és qui reparteix la pàgina) i ho publica com a
 `--inici-hero-alcada`; la caixa de la hero el llegeix. Sense megaslide (els mòbils) la variable
 no hi és i la caixa torna a la seva proporció. Això substitueix els aires de 50 px (escriptori) i
 25/0 px (els dos portàtils) del 28/09 i l'01/10, i també el topall.
 
-**El cadenat penja 58 px dins d'aquest espai.** Si el primer vuitè és més curt que això (a
-1280×720, que fa 586 de viewport, el vuitè en fa 36), els **dos** aires s'allarguen fins als 60 px
+**El cadenat penja 58 px dins d'aquest espai.** Si el primer desè és més curt que això (a
+1280×720, que fa 586 de viewport, el desè en fa 29), els **dos** aires s'allarguen fins als 60 px
 (58 del cadenat més 2) i la hero cedeix la diferència: l'alçada és `disponible − 2 × aire`, o
 sigui que els aires són **simètrics sempre**. Amb els 6/8 pelats el cadenat queia 1,2 px **dins**
-de la hero (mesurat).
+de la hero (mesurat). Per això el 1280×720, el 1200×800 i el 1024×690 no es mouen en passar de
+6/8 a 8/10: allà mana la guarda.
 
-| vista | alçada de la hero (aspecte) | aire dalt / baix |
+| vista | alçada (aspecte) | aire dalt / baix |
 |---|---|---|
-| 1920×1080 | 533,3 (2,2) | 88,8 / 88,9 |
-| 1440×900 | 441,8 (1,9) | 73,5 / 73,6 |
-| 1366×946 | 487,5 (1,9) | 81,3 / 81,3 |
+| 1920×1080 | 568,8 (2,0) | 71 / 71,1 |
+| 1440×900 | 469 (1,8) | 59,9 / 60 (cadenat 1,9 px per sobre) |
+| 1366×946 | 520 (1,8) | 65 / 65 |
 | 1200×800 | 349 (3,2) | 61,5 / 58,5 |
-| 1024×690 | 282 (3,3) | ~56 / ~56 |
-| 1376×954 | 444 (2,7) | 74,1 / 73,9 |
-| 1032×1304 | 477,8 (2,0) | 79,4 / 79,6 |
+| 1024×690 | 274 (3,4) | 60 / 60 |
+| 1376×954 | 472 (2,6) | 60,1 / 59,9 |
+| 1032×1304 | 509,6 (1,9) | 63,5 / 63,7 |
 | **1280×720 (586 de viewport)** | **170** | **60,8 / 59,3** (cadenat 2,8 px per sobre) |
 
 **L'aire de sota del megaslide 1100, de 40 a 20 px.** En Marc: «Fem un canvi al megaslide 1100.
