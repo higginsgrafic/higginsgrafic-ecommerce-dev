@@ -58,6 +58,29 @@ const AIRE_BAIX_VIEWPORT_ESTRET_PX = 25;
 const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null, alFons: false, baixAlViewport: false, aireBaix: AIRE_BAIX_VIEWPORT_PX };
 /** El que penja el cadenat del megaslide sota la seva linia. */
 const CADE_BAIXADA = 56;
+/**
+ * FINS ON ARRIBA EL CADENAT, des de la vora del panell (04/10/2026).
+ *
+ * `CADE_BAIXADA` es el desplacament del seu contenidor des de la linia; el que
+ * ocupa de debò (la caixa del cadenat, amb la vora del panell pel mig) son 58 px.
+ * Mesurat a 1920, 1440, 1366, 1280, 1200, 1024 i 1376: a tot arreu el cadenat
+ * acaba 58 px sota la vora del panell. Amb 2 px de marge, 60.
+ */
+const CADENAT_BAIX_PX = 60;
+/**
+ * EL FORMAT DELS 8/10 (04/10/2026). En Marc: «T'he dit que ho apliquessis a
+ * 1200x720. Enlloc mes»: l'unic format on la hero es reparteix en desens es el
+ * 1200x720.
+ *
+ * La FINESTRA de 1200x720 dona ~586 px de viewport (el navegador se'n menja
+ * ~134, com als altres portatils) i el VIEWPORT exacte en fa 720: tots dos hi
+ * entren. En queden fora el Galaxy Tab S9+ (1200x800, viewport 722) i el Model
+ * 1200x820 (viewport 742), que a 1200 d'ample no son aquest format.
+ */
+const esHeroVuitDecimes = () => typeof window !== 'undefined'
+  && Math.abs(window.innerWidth - 1200) <= 2
+  && window.innerHeight >= 570
+  && window.innerHeight <= 726;
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
 const FILES_MIN = 8;
 const FILES_MAX = 32;
@@ -313,10 +336,24 @@ function MarcInici({ seccions }) {
         ? (ampleFinestra <= 1320 ? 0 : AIRE_BAIX_VIEWPORT_ESTRET_PX)
         : AIRE_BAIX_VIEWPORT_PX;
       // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}|${baixAlViewport ? 1 : 0}|${aireBaix}`;
+      // LA HERO, ALS 8/10, NOME S AL 1200x720 (04/10/2026). En Marc: «T'he dit
+      // que ho apliquessis a 1200x720. Enlloc mes»: en aquest format l'espai de
+      // sota la vora del panell es reparteix en desens (1/10 d'aire, 8/10 de
+      // franges, 1/10 d'aire) i la cel·la el publica com a `--inici-hero-alcada`.
+      // A la resta de formats tot queda com era.
+      //
+      // EL CADENAT PENJA 58 px DINS D'AQUEST ESPAI: si el dese es mes curt que
+      // aixo (amb la finestra de 586 fa 25), els DOS aires s'allarguen fins als
+      // 60 px i la hero cedeix la diferencia, o sigui que els aires son
+      // SIMETRICS sempre.
+      const vuitDecimes = esHeroVuitDecimes();
+      const disponibleHero = Math.max(0, window.innerHeight - linia);
+      const aireHero = vuitDecimes ? Math.max(CADENAT_BAIX_PX, disponibleHero / 10) : 0;
+      const alcadaHero = vuitDecimes ? Math.max(0, disponibleHero - 2 * aireHero) : 0;
+      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}|${baixAlViewport ? 1 : 0}|${aireBaix}|${Math.round(alcadaHero * 4) / 4}|${Math.round(aireHero * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons, baixAlViewport, aireBaix });
+        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons, baixAlViewport, aireBaix, alcadaHero, aireHero });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -399,14 +436,21 @@ function MarcInici({ seccions }) {
             height: 'var(--inici-bloc-pagina, 0px)',
             // El cadenat del megaslide penja 56 px dins d'aquest bloc: la hero
             // es centra en el que queda DESPRES seu, no en el bloc sencer.
-            paddingBlockStart: `${CADE_BAIXADA}px`,
+            //
+            // AL 1200x720 (04/10/2026) els dos aires son els seus desens i la
+            // hero fa els 8/10: mana aixo i no el centratge de sempre.
+            paddingBlockStart: `${repartiment.alcadaHero ? (repartiment.aireHero ?? 0) : CADE_BAIXADA}px`,
+            ...(repartiment.alcadaHero ? { paddingBlockEnd: `${repartiment.aireHero ?? 0}px` } : null),
+            ...(repartiment.alcadaHero ? { '--inici-hero-alcada': `${repartiment.alcadaHero}px` } : null),
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             // A 1366 i 1280, alineada al fons del viewport; a l'escriptori, al
             // fons pero amb els 50 px d'aire de sota; a la resta, centrada.
-            justifyContent: (repartiment.alFons || repartiment.baixAlViewport) ? 'flex-end' : 'center',
+            justifyContent: repartiment.alcadaHero
+              ? 'flex-start'
+              : ((repartiment.alFons || repartiment.baixAlViewport) ? 'flex-end' : 'center'),
             // L'AIRE DE SOTA LA HERO (28/09/2026): nome's a l'escriptori, i es
             // el que fa que el seu baix caigui a 50 px del fons de la finestra,
             // com el bloc de la PDP. Amb `border-box` l'aire surt de l'alcada de

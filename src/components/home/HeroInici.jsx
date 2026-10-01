@@ -125,13 +125,17 @@ function HeroInici() {
             ? {
               width: '100%',
               aspectRatio: 'auto',
-              height: `calc(var(--contingut-max, 1350px) * ${0.6 * factorHero} * 401 / 952)`,
+              height: `var(--inici-hero-alcada, calc(var(--contingut-max, 1350px) * ${0.6 * factorHero} * 401 / 952))`,
             }
             : {
               // LA PROPORCIO DE LA CAIXA, AMB EL FACTOR DE LA HERO (04/10/2026):
               // 401 es l'alcada de disseny (430 a la vertical) i el factor la
               // deixa al 75 % (o al 150 % a l'iPad Pro 13).
               aspectRatio: `952 / ${(esVertical ? 430 : 401) * factorHero}`,
+              // AL 1200x720 L'ALCADA LA PUBLICA EL MARC (04/10/2026): els 8/10
+              // de l'espai de sota el panell. A la resta de formats la variable
+              // no hi es i mana la proporcio de sobre.
+              height: 'var(--inici-hero-alcada, auto)',
             }),
           display: 'flex',
           flexDirection: 'column',
