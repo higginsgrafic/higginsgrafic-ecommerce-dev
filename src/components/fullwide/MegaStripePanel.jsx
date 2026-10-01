@@ -6,7 +6,7 @@ import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { esTauletaApaisada } from '../../utils/layoutMetrics.js';
-import { carrilIPadPro13 } from '../../utils/layoutModel.js';
+import { carrilIPadPro13, esIPadPro13 } from '../../utils/layoutModel.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
@@ -489,6 +489,20 @@ function MegaStripePanel({
   // perque mitja composicio el fa servir, pero ara vol dir `isLandscapeTablet`.
   const esCarrilPagina1024 = typeof window !== 'undefined'
     && esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight });
+  // LA SUPERFICIE DE CLIC DE LA FRANJA, NOME S LA FRANJA (03/10/2026).
+  //
+  // En Marc: «Costa molt clicar els enllacos de Crosswords cap avall de la
+  // columna de colleccio». La filera que arrossega la tira
+  // (`#stripe-guide-stripe-row`) demana el clic amb `pointerEvents: 'auto'`, pero
+  // la SEVA CAIXA (93..1164 a 1376) es molt mes gran que el que pinta: el
+  // contingut de la franja (`data-stripe-visual-content`) va de 168 a 1090, o
+  // sigui que 89 px de caixa buida queien damunt de la columna i li prenien el
+  // clic. La maqueta no s'hi toca: nome s la superficie que rep el clic, que
+  // passa a ser la del dibuix (la franja i prou). L'arrossegament i la roda
+  // segueixen funcionant perque els seus gestors son a la filera i
+  // l'esdeveniment hi puja. Nome s al model: a la resta de mides, igual que fins
+  // ara.
+  const superficiesDeFranja = esCarrilPagina1024 && esIPadPro13();
   // El carril de la pagina: el seu, si es l'iPad Pro 13 apaïssat (1000).
   const ampleCarrilPaginaP2 = esCarrilPagina1024
     ? (carrilIPadPro13() ?? Math.min(939.2, window.innerWidth - 80))
@@ -868,7 +882,12 @@ function MegaStripePanel({
                 // tira, i la seva caixa (476x209, de y=236 a y=445 a 768) no
                 // arriba ni al selector (y=114..222) ni al cadenat (y=524..572),
                 // o sigui que pot tornar-lo a demanar sense tapar res.
-                pointerEvents: 'auto',
+                //
+                // AL MODEL, EL CLIC EL DEMANA EL DIBUIX I NO LA CAIXA
+                // (03/10/2026): la caixa de la filera es mes ampla que la franja
+                // i tapava els enllacos de la columna. Vegeu
+                // `superficiesDeFranja`.
+                pointerEvents: superficiesDeFranja ? 'none' : 'auto',
                 // CENTRADA SOBRE EL CARRIL, A MA, NO PEL `justify-content`.
                 //
                 // La filera es mes ampla que el carril (les manigues hi surten)
@@ -921,6 +940,11 @@ function MegaStripePanel({
                   height: '100%',
                   width: '100%',
                   display: 'block',
+                  // AL MODEL, AQUESTA ES LA SUPERFICIE DE CLIC DE LA FRANJA
+                  // (03/10/2026): la filera el deixa passar i el clic el rep el
+                  // dibuix, que es qui arriba fins on arriba la franja. L'ombra
+                  // de la màniga que cau damunt de la columna segueix sent seva.
+                  ...(superficiesDeFranja ? { pointerEvents: 'auto' } : null),
                   transformOrigin: 'top center',
                   // La franja NO s'ajusta a l'alcada de la finestra: fa el carril
                   // SEMPRE (vegeu MegaMenuPanel). Abans hi havia un factor

@@ -1463,6 +1463,13 @@ export function CercadorColleccionsColumna({
   //   alcada:  (247 - 2 - 2 x 2,8) / 9 - 2 x 2,8 = 22,6
   const COIX_LATERAL_PX = 2;
   const COIX_VERTICAL_PX = 2;
+  // L'INSET VERTICAL DE LA PASTILLA DE LA COLUMNA, A L'iPAD PRO 13 (03/10/2026).
+  // En Marc: «Pots fer la pastilla mes alta sense modificar l'alcada de la
+  // columna?»: l'alcada de la columna no es toca (va ancorada al bloc) i la
+  // pastilla fa tota l'alcada de la seva cel·la, com feia abans de posar-hi
+  // l'inset del selector. La relacio lateral (zero, la que va triar l'amo) es
+  // queda.
+  const INSET_PASTILLA_COLUMNA_PX = 0;
   // L'alcada de la caixa blanca (22,59 px a 1920: la xifra que ha mesurat
   // l'amo). La franja en fa 27 i el coixi vertical se'n menja 6.
   const ALCADA_CAIXA_PX = 22.59;
@@ -1651,6 +1658,14 @@ export function CercadorColleccionsColumna({
         border: (esIPadPro13() && isLandscapeTablet) ? 'none' : '1px solid hsl(var(--grey-line-strong))',
         borderRadius: (esIPadPro13() && isLandscapeTablet) ? '5.3px' : '6px',
         boxShadow: (esIPadPro13() && isLandscapeTablet) ? '0 1px 3px rgba(0, 0, 0, 0.12)' : undefined,
+        // ELS ENLLACOS I EL CLIC (03/10/2026). En Marc: «Costa molt clicar els
+        // enllacos de la columna de colleccio», precisat amb «de Crosswords cap
+        // avall». Qui prenia el clic era la CAIXA de la franja, que es mes ampla
+        // que el que pinta i arriba 89 px a dins de la columna; el arregla a
+        // `MegaStripePanel` (`superficiesDeFranja`), que al model deixa el clic
+        // al dibuix de la franja i prou. Aqui no s'hi fa res: pujar aquesta
+        // columna de zIndex no serviria, perque viu dins de l'embolcall de la
+        // filera (zIndex 3) i el seu zIndex queda tancat all dins.
         backgroundColor: 'hsl(var(--grey-paper-soft))',
         // EL COIXI DE LA COLUMNA (26/09/2026), amb les xifres de l'amo:
         // l'offset entre la caixa blanca i la columna es de 3 px, i el contorn
@@ -1700,7 +1715,10 @@ export function CercadorColleccionsColumna({
             style={{
               width: '100%',
               height: '100%',
-              backgroundColor: `rgba(0, 0, 0, ${OMBRA_MANIGA_ALFA})`,
+              // L'OMBRA DE LA MANIGA, MES FLUIXA A L'iPAD PRO 13 (03/10/2026). En
+              // Marc: «Rebaixa l'ombra de la maniga. Volem que hi sigui, no que
+              // cridi l'atencio»: la casa la pinta amb alfa 0,45; aqui va a 0,25.
+              backgroundColor: `rgba(0, 0, 0, ${(esIPadPro13() && isLandscapeTablet) ? 0.25 : OMBRA_MANIGA_ALFA})`,
               WebkitMaskImage: `url("${mascaraManiga}")`,
               maskImage: `url("${mascaraManiga}")`,
               WebkitMaskRepeat: 'no-repeat',
@@ -1773,7 +1791,7 @@ export function CercadorColleccionsColumna({
               // cel·la de 34,3, o sigui que entra 2,85 px per dalt i per baix. La
               // cel·la de la columna no es toca: el que s'aprima es la caixa
               // blanca.
-              margin: (esIPadPro13() && isLandscapeTablet) ? '2.85px 0' : 0,
+              margin: (esIPadPro13() && isLandscapeTablet) ? `${INSET_PASTILLA_COLUMNA_PX}px 0` : 0,
               cursor: 'pointer',
               overflow: 'hidden',
             }}
