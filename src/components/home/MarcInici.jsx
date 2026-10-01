@@ -45,19 +45,20 @@
  */
 import { useEffect, useRef, useState } from 'react';
 
-/** L'aire que ha de quedar sota la hero, fins al fons de la finestra (28/09/2026). */
-const AIRE_BAIX_VIEWPORT_PX = 50;
-/**
- * El mateix aire, a la banda dels portatils (1200-1366, que en la practica son
- * els 1280 i els 1366): 25 px (01/10/2026, ho ha demanat l'amo: «A 1280 i 1366,
- * passa-ho a 25 px»). Son les mides on l'espai es mes just.
- */
-const AIRE_BAIX_VIEWPORT_ESTRET_PX = 25;
-
 /** El repartiment inicial, abans del primer mesurament. */
-const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcada: null, alFons: false, baixAlViewport: false, aireBaix: AIRE_BAIX_VIEWPORT_PX };
+const REPARTIMENT_INICIAL = { blocMega: 0, blocPagina: 0, alcadaHero: 0, aireHero: 0 };
 /** El que penja el cadenat del megaslide sota la seva linia. */
 const CADE_BAIXADA = 56;
+/**
+ * FINS ON ARRIBA EL CADENAT, des de la vora del panell (04/10/2026).
+ *
+ * `CADE_BAIXADA` es el desplacament del seu contenidor des de la linia; el que
+ * ocupa de debò (la caixa del cadenat, amb la vora del panell pel mig) son 58 px
+ * i es el numero que ha de respectar l'aire de la hero. Mesurat a 1920, 1440,
+ * 1366, 1280, 1200, 1024 i 1376: a tot arreu el cadenat acaba 58 px sota la vora
+ * del panell. Amb 2 px de marge, 60.
+ */
+const CADENAT_BAIX_PX = 60;
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
 const FILES_MIN = 8;
 const FILES_MAX = 32;
@@ -193,14 +194,6 @@ function MarcInici({ seccions }) {
       // Al primer fotograma les peces encara no tenen mida. Es torna a provar
       // quan `ResizeObserver` les vegi canviar.
       if (zonaAlcada < 1 || icones < 1) return;
-      // L'ALCADA NATURAL de la caixa: l'amplada passada per la seva proporcio,
-      // menys les dues vores d'1 px que el `aspect-ratio` no compta. Es calcula
-      // i no es mesura: amb el topall posat, la mesura donaria l'alcada ja
-      // encongida i la correccio es tornaria a alimentar.
-      const ample = caixa.getBoundingClientRect().width;
-      const parts = (getComputedStyle(caixa).aspectRatio || '').split('/');
-      const r = parts.length === 2 ? parseFloat(parts[0]) / parseFloat(parts[1]) : 952 / 401;
-      const natural = Number.isFinite(r) && r > 0 ? Math.max(1, ample / r - 2) : 0;
       // ON CAU LA LINIA, DINS LA ZONA. La zona comença a dalt de tot del
       // contingut, i la linia del megaslide cau a dins seu (a 497 px a 1920).
       // Tot el que hi hagi per sobre de la linia queda sota el panell, i per
@@ -233,90 +226,54 @@ function MarcInici({ seccions }) {
       // quan la seva alcada escala amb la finestra; a 1024 i 1366 el panell
       // acaba una mica mes avall, i el bloc l'ha de cobrir.
       const blocMega = Math.max(megaFiles * fila, linia - capcalera);
-      // LA PAGINA DE SOTA es la resta. El CADENAT, pero, penja 56 px dins seu i
-      // per tant no es pot fer servir per centrar-hi la hero: el seu bloc es el
-      // que queda DESPRES del cadenat.
-      const disponible = Math.max(0, (window.innerHeight - capcalera) - blocMega);
-      // L'AMPLE DE LA FINESTRA, que decideix dues coses: si el baix de la hero ha
-      // de caure a 50 px del fons de la finestra (l'escriptori) i si toca
-      // enganxar-la al fons (els dos portatils).
-      const ampleFinestra = window.innerWidth;
-      // EL BAIX DE LA HERO, A 50 px DEL FONS DE LA FINESTRA (28/09/2026).
+      // L'ALCADA DE LA HERO I ELS SEUS AIRES (04/10/2026).
       //
-      // En Marc: «La pdp està situada a 50 px del bottom del viewport, si no
-      // recordo malament. Posa la hero a la mateixa posició». Es el MATEIX
-      // criteri que el bloc de la PDP a l'escriptori ample: alla, a 1920x946, el
-      // bloc acaba a 896 (946 − 50). Aqui qui deixa aquell aire es la cel·la de
-      // la pagina, i la hero s'hi alinea al fons.
+      // En Marc: «Per tal de dimensionar correctament la hero a cada format
+      // podríem dividir l'espai disponible, un cop obert el megaslide, en 6
+      // parts i que les franges de la samarreta ocupin els 4/6 centrals. Així,
+      // la hero es proporcionarà de forma natural i l'espai a sobre i a sota
+      // serà simètric» i, en concretar-ho, «des del panell» i «que es
+      // redimensioni amb els 4/6».
       //
-      // A TOT L'HORITZONTAL, SENSE CONDICIONS (01/10/2026). Ho ha demanat
-      // l'amo: «Ja que tenim espai, aprofitem per maquetar be la hero. Deixa la
-      // hero a 50 px del limit del viewport, com la desktop», i tot seguit, amb
-      // la finestra curta (1280x586, 1366x600): «A 1280 i 1366 no ha pujat».
+      // O sigui: l'espai de sota la vora del panell es reparteix en VUITENS, 1/8
+      // d'aire, 6/8 de franges i 1/8 d'aire. Quan el megaslide es obert mana
+      // aquest repartiment i no la proporcio de disseny (952/401): la cel·la
+      // publica l'alcada de la hero com a `--inici-hero-alcada` i la caixa la
+      // llegeix. Sense megaslide (els mobils) la variable no hi es i la caixa
+      // torna a la seva proporcio.
       //
-      // La guarda que hi havia (`disponible >= CADE_BAIXADA + natural + 50`)
-      // demanava lloc per al cadenat, la hero SENcera i els 50 px, i amb una
-      // finestra curta no es complia mai: la hero quedava enganxada al fons
-      // (0 px). Ara l'aire s'aplica sempre a l'horitzontal; si la hero no hi cap
-      // sencera, es la unica peca que cedeix (el seu `aspect-ratio` la fa mes
-      // baixa), que es el pacte que ja te el repartiment.
+      // EL REPARTIMENT ES 6/8 I NO 4/6 (04/10/2026). Es va muntar amb els 4/6
+      // centrals que va proposar l'amo i, en veure-ho, «Massa petit. Prova amb
+      // 6/8»: amb 6/8 la hero s'emporta el 75 % de l'espai (abans el 66,7 %) i
+      // els aires queden a 1/8 (abans 1/6).
       //
-      // LA CEL·LA NO CREIX PER AIXO: `blocPagina` es queda com era, perque fer
-      // créixer la cel·la 50 px va arribar a treure la taula per sota de la
-      // finestra (mesurat al mosaic a 1440x766: la hero acabava 23,2 px per
-      // sota del fons).
-      const baixAlViewport = !esVertical;
-      // LA MIDA DE LA CEL·LA NO CANVIA MAI PER AQUEST AIRE (28/09/2026).
+      // EL CADENAT PENJA 58 px DINS D'AQUEST ESPAI, i a sota seu hi ha d'anar la
+      // hero: si el primer vuite es mes curt que aixo (a 1280x720, que fa 586 de
+      // viewport, el vuite en fa 36), els DOS aires s'allarguen fins als 60 px
+      // (58 del cadenat mes 2 d'aire) i la hero cedeix el que calgui. Amb l'aire
+      // gran el repartiment queda exactament als 6/8; amb l'aire petit, els 6/8
+      // es queden curts pero SIMETRICS.
       //
-      // El primer intent va ser afegir l'aire a aquest minim, i era un error: quan
-      // la finestra es curta (o quan el megaslide encara no ha publicat la seva
-      // vora i la linia s'estima llarga) la cel·la creixia 50 px de mes i la
-      // taula s'escolava per sota del viewport —mesurat al mosaic a 1440x766: la
-      // hero acabava 23,2 px per sota del fons—. L'aire, doncs, surt de DINS de
-      // la cel·la (el coixi de sota), i nome's s'hi aplica si hi cap de sobres.
-      // Si no hi cap, tot queda exactament com estava.
-      const ambCadenat = CADE_BAIXADA + natural;
-      const encaixa = ambCadenat <= disponible;
-      // A LES DUES MIDES DE PORTATIL (1280 i 1366) la hero s'ALINEA AL FONS DEL
-      // VIEWPORT, tant si hi cap com si no:
+      // A 1280x720 la guarda amb els 6/8 pelats deixava el cadenat 1,2 px DINS de
+      // la hero (mesurat): per allo l'alcada es `disponible − 2 x aire` i no
+      // `6/8 x disponible`.
       //
-      //   - si hi cap (finestra alta), baixa fins al fons en comptes de quedar
-      //     centrada amb aire a sota;
-      //   - si no hi cap (finestra amb navegador), la cel·la es queda el que
-      //     queda de finestra i la hero hi acaba igualment, i el que sobra
-      //     marxa cap a dalt.
-      //
-      // A la resta de formats no es toca res.
-      //
-      // LA FRANJA, I NO DUES XIFRES EXACTES. Amb `=== 1366` allo no s'aplicava
-      // gairebe mai: en un Mac les finestres per defecte fan 1512, 1728 o 1440,
-      // i amb el DevTools acoblat al costat o amb la barra de desplaçament el
-      // viewport no fa la xifra rodona ni de bon tros. Amb la franja 1200-1366
-      // NOMES hi entren els 1280 i els 1366 (i el que hi ha entremig, que es el
-      // marge que cal perque en un Mac la finestra no cau mai exactament en
-      // aquelles dues xifres). En queden fora la tauleta de 1200 i la de 1024,
-      // que no es toquen, i l'escriptori de 1440 en amunt.
-      const alFons = ampleFinestra >= 1280 && ampleFinestra <= 1366;
-      const blocPagina = alFons ? disponible : Math.max(disponible, ambCadenat);
-      const alcada = natural;
-      // L'AIRE DE SOTA, PER BANDA (01/10/2026).
-      //
-      //   1366   25 px   (ho va demanar l'amo: «A 1280 i 1366, passa-ho a 25 px»)
-      //   1280    0 px   («Baixa 1280 fins on era al principi»: enganxada al
-      //                   fons del viewport, que es com estava abans)
-      //   resta  50 px   (l'aire de l'escriptori)
-      //
-      // El tall entre 1280 i 1366 el fem a 1320: la banda dels portatils es
-      // 1280-1366 i en un Mac la finestra no cau mai exactament en aquestes dues
-      // xifres, aixi que el que mana es de quin costat cau.
-      const aireBaix = alFons
-        ? (ampleFinestra <= 1320 ? 0 : AIRE_BAIX_VIEWPORT_ESTRET_PX)
-        : AIRE_BAIX_VIEWPORT_PX;
-      // El numero que decideix si ja hi som: si no s'ha mogut, s'atura.
-      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}|${baixAlViewport ? 1 : 0}|${aireBaix}`;
+      // Aixo substitueix els aires de 50 px (escriptori) i 25/0 px (els dos
+      // portatils) del 28/09 i l'01/10, i tambe el topall: la hero ja no es
+      // mesura amb la seva proporcio sino que fa els 4/6 que toquen.
+      const disponibleHero = Math.max(0, window.innerHeight - linia);
+      const aireHero = Math.max(CADENAT_BAIX_PX, disponibleHero / 8);
+      // AMB L'AIRE GRAN, AIXO ES EXACTAMENT 6/8 DEL DISPONIBLE (1/8 + 6/8 +
+      // 1/8 = 1). Amb l'aire forcada pels 56 px del cadenat, la hero cedeix la
+      // diferencia i els dos aires queden iguals.
+      const alcadaHero = Math.max(0, disponibleHero - 2 * aireHero);
+      // LA CEL·LA DE LA PAGINA ES TOT L'ESPAI DE SOTA EL PANELL: els dos
+      // vuitens d'aire i els sis de franges hi cauen a dins exactes.
+      const blocPagina = disponibleHero;
+      const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcadaHero * 4) / 4}|${Math.round(aireHero * 4) / 4}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons, baixAlViewport, aireBaix });
+      setRepartiment({ blocMega, blocPagina, alcadaHero, aireHero, finsLinia, linia });
       raf = requestAnimationFrame(reparteix);
     };
 
@@ -397,21 +354,17 @@ function MarcInici({ seccions }) {
           data-cella-de={segona.id}
           style={{
             height: 'var(--inici-bloc-pagina, 0px)',
-            // El cadenat del megaslide penja 56 px dins d'aquest bloc: la hero
-            // es centra en el que queda DESPRES seu, no en el bloc sencer.
-            paddingBlockStart: `${CADE_BAIXADA}px`,
+            // ELS DOS VUITENS D'AIRE (04/10/2026): el de dalt es menja el
+            // cadenat si el vuitè no hi arriba (vegeu el repartiment).
+            paddingBlockStart: `${repartiment.aireHero ?? 0}px`,
+            paddingBlockEnd: `${repartiment.aireHero ?? 0}px`,
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            // A 1366 i 1280, alineada al fons del viewport; a l'escriptori, al
-            // fons pero amb els 50 px d'aire de sota; a la resta, centrada.
-            justifyContent: (repartiment.alFons || repartiment.baixAlViewport) ? 'flex-end' : 'center',
-            // L'AIRE DE SOTA LA HERO (28/09/2026): nome's a l'escriptori, i es
-            // el que fa que el seu baix caigui a 50 px del fons de la finestra,
-            // com el bloc de la PDP. Amb `border-box` l'aire surt de l'alcada de
-            // la cel·la, o sigui que la hero no es mou de mida.
-            ...(repartiment.baixAlViewport ? { paddingBlockEnd: `${repartiment.aireBaix ?? AIRE_BAIX_VIEWPORT_PX}px` } : null),
+            justifyContent: 'flex-start',
+            // L'ALCADA DE LA HERO, publicada perque la caixa la llegeixi.
+            '--inici-hero-alcada': `${repartiment.alcadaHero ?? 0}px`,
           }}
         >
           {segona.node}
