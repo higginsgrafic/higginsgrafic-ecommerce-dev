@@ -8,6 +8,7 @@ import { lazy, Suspense, useRef, useEffect, useCallback, useState } from 'react'
 import MegaStripeBleedGuard from './MegaStripeBleedGuard.jsx';
 import MegaStripePanelP1 from './MegaStripePanelP1.jsx';
 import { alcadaPanellMegaslide } from '../../utils/mesuraMegaslide.js';
+import { esIPadPro13 } from '../../utils/layoutModel.js';
 import MegaslidePagina2 from '../megaslide/MegaslidePagina2.jsx';
 import {
   MARGE_EXTRA_ESCRIPTORI_PX,
@@ -166,8 +167,15 @@ export default function MegaMenuPanel({
   // servir tant la reserva d'alçada del panell com el càlcul de la guarda.
   const w = typeof window !== 'undefined' ? window.innerWidth : 0;
   const h = typeof window !== 'undefined' ? window.innerHeight : 0;
-  const esVerticalAqui = w >= 768 && w <= 1366 && h > w;
-  const esApaissadaAqui = w >= 768 && w <= 1366 && w >= h;
+  // L'iPAD PRO 13 TAMBÉ ÉS TAU LETA AQUÍ (03/10/2026). En Marc: «Deixa 20 px
+  // d'aire a sobre i a sota de la p1 i la p2». Aquestes bandes arribaven a 1366
+  // i el model (1376) hi queia com a ESCRIPTORI, amb els seus coixins (17,1 a
+  // dalt) i el marge extra: la p1 hi quedava amb 5 px d'aire a dalt i 35 a
+  // baix. Amb la clau del model, fa els coixins de la composicio estreta (32
+  // per banda) com a 1366.
+  const esIpad13Aqui = esIPadPro13({ ample: w, alt: h });
+  const esVerticalAqui = w >= 768 && (w <= 1366 || (esIpad13Aqui && h > w)) && h > w;
+  const esApaissadaAqui = w >= 768 && (w <= 1366 || esIpad13Aqui) && w >= h;
   const esMobilAqui = w < 768;
   const esEscriptoriAqui = !esVerticalAqui && !esApaissadaAqui && !esMobilAqui;
   // EL COIXI DE DALT DEL PANELL, RETALLAT A L'ESCRIPTORI (28/09/2026).
@@ -184,7 +192,13 @@ export default function MegaMenuPanel({
   // per aixo ho faig, perque la hero hi capiga be»: amb els 15 px d'aire de dalt
   // i els de baix, el bloc de la p2 queda amb 15 a cada banda. Les vistes
   // verticals i el mobil no s'hi toquen.
-  const esEstretaAqui = w >= 1024 && w <= 1366 && w >= h;
+  // LA COMPOSICIO ESTRETA TAMBÉ ÉS LA DE L'iPAD PRO 13 APAÏSSAT (03/10/2026). En
+  // Marc: «Deixa 20 px d'aire a sobre i a sota de la p1 i la p2». Aquest indici
+  // nome s arribava a 1366, i a 1376 el panell feia servir els coixins de
+  // l'escriptori (17,1 px a dalt): la p1 hi quedava amb 5 px d'aire en comptes
+  // dels 20 que li toquen. Amb la clau del model, el panell es comporta com a
+  // 1366 (32 px de coixi per banda) i la p1 hi torna a caure a 20.
+  const esEstretaAqui = w >= 1024 && (w <= 1366 || esIPadPro13({ ample: w, alt: h })) && w >= h;
   const paddingVerticalPanellPx = esEscriptoriAqui
     ? PADDING_VERTICAL_PANELL_ESCRIPTORI_PX
     : (esEstretaAqui ? PADDING_VERTICAL_PANELL_ESTRETA_PX : PADDING_VERTICAL_PANELL_PX);
@@ -199,11 +213,14 @@ export default function MegaMenuPanel({
   // contingut (que fa que la mesura de la pagina 1 sigui 20 px mes gran). Si
   // s'hi sumessin tambe aqui, es comptarien DUES vegades i el panell creixeria
   // 40 px en comptes de 20.
+  // L'AIRE DE BAIX, A 20 px A L'iPAD PRO 13 (03/10/2026). En Marc: «Deixa 20 px
+  // d'aire a sobre i a sota de la p1 i la p2»: al model el cul de la franja
+  // queda 20 px per sobre del final del megaslide (a la resta, 15).
   const alcadaGuard = useCallback((p1Bottom) => alcadaPanellMegaslide({
     p1ContentBottom: p1Bottom,
-    gap: P1_STRIPE_BOTTOM_GAP,
+    gap: P1_STRIPE_BOTTOM_GAP + (esIPadPro13({ ample: w, alt: h }) ? 5 : 0),
     paddingVertical: paddingVerticalPanellPx,
-  }), [paddingVerticalPanellPx]);
+  }), [paddingVerticalPanellPx, w, h]);
 
   const viewport1Ref = useRef(null);
   const handlePortraitScroll1 = useCallback(() => {

@@ -16,7 +16,7 @@ import {
 } from './geometriaMegaslide.js';
 import { COIX_ENLLAC_COLLECCIONS_PX } from '../fullwide/estilsBlocs.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
-import { carrilIPadPro13 } from '../../utils/layoutModel.js';
+import { carrilIPadPro13, esIPadPro13 } from '../../utils/layoutModel.js';
 import { SelectorQuadratPagina1, PastillaBlancaPagina1 } from '../fullwide/BlocDretaPagina1.jsx';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
@@ -492,8 +492,12 @@ export default function MegaslidePagina2({
           // alla mateix), o sigui que l'aire de dalt son aquests 20 px i el que
           // sobra del megaslide queda a sota. Amb el bloc mes alt que l'espai, el
           // `max(0, ...)` no hi cap i el bucle de sota ja el deixa arran.
+          // A L'iPAD PRO 13 APAÏSSAT, 20 px (03/10/2026). En Marc: «Deixa 20 px
+          // d'aire a sobre i a sota de la p1 i la p2»: alla el bloc arrenca a 20
+          // px del bottom del header, com la p1.
+          const aireDaltP2 = esIPadPro13() ? 20 : AIRE_DALT_BLOC_P2_PX;
           const aire = Math.max(0, Math.min(
-            AIRE_DALT_BLOC_P2_PX,
+            aireDaltP2,
             panelAlt - rBcn.height - alcadaFranja - rFranja.height - 2 * AIRE_FRANJA_COLLECCIONS_PX,
           ));
           objectiuTop = panelTop + aire - topBcn;
