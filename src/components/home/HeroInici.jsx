@@ -46,8 +46,7 @@ const HERO_MOCKUP_PUJADA_PCT = HERO_MOCKUP_MARGE_DALT * HERO_MOCKUP_ESCALA * 100
  *
  * `HERO_DIBUIX_MIDA` te les claus amb les rutes velles (vegeu la capa del
  * dibuix); amb el nom sol, la mida afinada torna a arribar al dibuix encara que
- * la carpeta hagi canviat. El nom es unic perque porta la tinta (`-b-` / `-w-`),
- * i qui busca tambe prova la tinta germana.
+ * la carpeta hagi canviat. El nom es unic perque porta la tinta (`-b-` / `-w-`).
  */
 const HERO_DIBUIX_MIDA_PER_NOM = Object.fromEntries(
   Object.entries(HERO_DIBUIX_MIDA).map(([clau, mida]) => [clau.split('/').pop(), mida]),
@@ -304,16 +303,15 @@ function HeroInici() {
                       // FITXER, que es unic (porta la tinta: `-b-` o `-w-`).
                       const fitxer = (band.overlaySrc || '').split('/images_stripe/')[1] || '';
                       const nom = fitxer.split('/').pop();
-                      // I SI NOMES HI ES L'ALTRA TINTA, LA SEVA. La mida nome s
-                      // depen del DIBUIX, no de la tinta: el `the-phoenix` te
-                      // les dues entrades al mapa i son identiques (46,585 i
-                      // 42,35). Els dibuixos de Quotes nome s hi son en negre.
-                      const bessona = nom.includes('-b-stripe')
-                        ? nom.replace('-b-stripe', '-w-stripe')
-                        : nom.replace('-w-stripe', '-b-stripe');
+                      // NOME S LA RUTA I EL NOM. NO es passa a l'altra tinta
+                      // (04/10/2026): en Marc va veure «un NX-01 blanc que s'ha
+                      // desescalat», i era aixo — el blanc, que queia al 30 % de
+                      // defecte, passava a agafar el 7 % del negre. Encara que
+                      // els dos fitxers son geometricament identics (256x94,
+                      // sense marge), la mida es una decisio de disseny de cada
+                      // tinta i nome s la pot manar el mapa.
                       const mida = HERO_DIBUIX_MIDA[fitxer]
-                        || HERO_DIBUIX_MIDA_PER_NOM[nom]
-                        || HERO_DIBUIX_MIDA_PER_NOM[bessona];
+                        || HERO_DIBUIX_MIDA_PER_NOM[nom];
                       if (!mida) return HERO_DIBUIX_MIDA_DEFECTE;
                       return esTauleta ? mida.tauleta : mida.escriptori;
                     })()}%`,
