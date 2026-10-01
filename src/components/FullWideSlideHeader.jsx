@@ -42,6 +42,9 @@ import { MARGE_DALT_BLOC_FRANJA_PX } from './megaslide/geometriaMegaslide.js';
 
 /** Les subcolleccions d'AUSTEN que existeixen (les mateixes claus que el
  *  filtre `AUSTEN_SUB_PREFIXES`, que viu dins del component). */
+/** El tauler de la tauleta vertical (el mateix numero que `layoutModel`). */
+const BELT_TABLET_VERTICAL_PX = 992;
+
 const SUBS_AUSTEN = new Set(['pemberley', 'keep_calm', 'quotes', 'crosswords', 'looking_for_my_darcy']);
 
 /**
@@ -2534,7 +2537,7 @@ function FullWideSlideHeader({
         const carril = carrilDeclarat({ ample: vp, alt: window.innerHeight || 0 });
         if (carril) root.style.setProperty('--carril', `${carril}px`);
         else root.style.removeProperty('--carril');
-        const beltTauleta = Math.min(992, Math.max(320, vp - 32));
+        const beltTauleta = Math.min(BELT_TABLET_VERTICAL_PX, Math.max(320, vp - 32));
         // EL SEGON CARRIL A LA TAUETA APAÏSSADA (02/10/2026). En Marc: «I no se
         // li pot fer un segon carril a aquest, també?» i, quan se li va dir que
         // la diferència era la mateixa a 1280, 1366 i 1376, «Tota la banda de
@@ -2560,7 +2563,7 @@ function FullWideSlideHeader({
           && carrilPagina > 0;
         const beltFinal = usaCarrilPagina
           ? Math.round(carrilPagina)
-          : (carril ?? (isPortraitTablet ? 992 : (isLandscapeTablet ? beltTauleta : beltWidth)));
+          : (carril ?? (isPortraitTablet ? BELT_TABLET_VERTICAL_PX : (isLandscapeTablet ? beltTauleta : beltWidth)));
         root.style.setProperty('--hg-mega-w', `${beltFinal}px`);
         // Quan el carril te una amplada propia (tauleta: 992) la seva posicio
         // tambe: CENTRAT a l'espai de maquetacio. Abans aixo ho deia `belt.left`
@@ -2626,10 +2629,13 @@ function FullWideSlideHeader({
         // entre el carril nou i el declarat (vegeu `usaCarrilPagina`): aixi la
         // composicio que ja hi havia queda escalada al carril nou, sense
         // canviar-hi res de lloc.
-        const escalaTauletaApaissada = (usaCarrilPagina && carril)
-          ? +(beltFinal / carril).toFixed(4)
-          : 1;
-        root.style.setProperty('--hg-escala-mega', String((isPortraitTablet || isLandscapeTablet) ? escalaTauletaApaissada : escalaMegaslide(beltWidth)));
+        // A L'APAÏSSADA L'ESCALA TORNA A SER 1 (02/10/2026). La composició del
+        // 1024 te els seus numeros de disseny i el carril de la pagina; la
+        // vertical tambe (el seu tauler). Pendent: el tauler de la vertical fa
+        // 992 i a un iPad de 768 la columna de colleccions de la p2 hi cau
+        // fora; la taula es pinta a amplada fixa i no segueix ni el carril ni
+        // l'escala (mesurat: els enllacos, a x914 en una finestra de 753).
+        root.style.setProperty('--hg-escala-mega', String((isPortraitTablet || isLandscapeTablet) ? 1 : escalaMegaslide(beltWidth)));
       } catch {
         // ignore
       }

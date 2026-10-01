@@ -1844,9 +1844,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
   // col·leccions s'ha de convertir en una columna (a la dreta)»: alla la
   // composicio es la de sempre (la columna de la dreta, com a 1440/1920) i la
   // franja de sota les barres nome's queda per a 1280-1366.
-  const esColumna1024 = typeof window !== 'undefined'
-    && window.innerWidth >= 1000 && window.innerWidth <= 1050
-    && window.innerWidth >= window.innerHeight;
+  // LA COLUMNA DE COLLECCIONS ES DE TOTES LES TAUETES APAISSADES (02/10/2026).
+  // En Marc: «La p2 està tallada. Falta la columna de col·leccions» i «A totes
+  // excepte les desktop»: a la resta de la banda hi sortia la tira.
+  const esColumna1024 = isLandscapeTablet;
   const composicioFranja = composicioEstreta && !esColumna1024;
   const [mesures, setMesures] = useState({
     midesGraella: null,

@@ -168,9 +168,15 @@ export default function MegaslidePagina2({
   // samarretes) en surt. El contenidor va centrat a la FINESTRA, com la resta
   // d'aquella composicio: la filera es centra sobre l'amplada de maquetacio del
   // cos, que reserva la barra, i aixo son uns px de desplacament.
-  const esCarrilPagina1024 = typeof window !== 'undefined'
-    && window.innerWidth >= 1000 && window.innerWidth <= 1050
-    && window.innerWidth >= window.innerHeight;
+  // LA COMPOSICIO DE 1024 ES LA DE TOTES LES TAUETES (02/10/2026). En Marc:
+  // «La p2 està tallada. Falta la columna de col·leccions» i, quan se li va
+  // preguntar a quines mides, «A totes excepte les desktop»: a l'apaïssada hi
+  // sortia la tira de colleccions (una columna truncada) i a la vertical la
+  // columna cau fora de la finestra. El carril de la pagina ja es el segon
+  // carril a tota la banda, o sigui que la composicio que hi mana es la de
+  // 1024, amb la columna a la dreta. El nom es queda perque mitja composicio
+  // el fa servir, pero ara vol dir `isLandscapeTablet`.
+  const esCarrilPagina1024 = typeof window !== 'undefined' && isLandscapeTablet;
   // LA FRANJA DE COLLECCIONS NOME'S QUEDA A 1280-1366 (02/10/2026): a 1024 els
   // enllacos son la columna de la dreta (vegeu `CercadorTextRow`), o sigui que
   // tot el que a la composicio estreta es feia «al voltant de la franja» (el seu

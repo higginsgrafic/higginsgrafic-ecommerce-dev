@@ -256,9 +256,11 @@ function MegaStripePanelP1({
   // veure afectat. Redueix la graella intercalada un 25 % i augmenta la stripe un
   // 25 %». Nome's alla: la resta de mides no s'hi toquen. Es calcula aqui dalt
   // perque la franja (l'hook de sota) ja en depen.
+  // LA COMPOSICIO DE 1024 ES LA DE TOTES LES TAUETES APAISSADES (02/10/2026).
+  // En Marc: «La p2 està tallada. Falta la columna de col·leccions» i «A totes
+  // excepte les desktop». El nom es queda perque mitja composicio el fa servir.
   const esAjust1024P1 = typeof window !== 'undefined'
-    && window.innerWidth >= 1000 && window.innerWidth <= 1050
-    && window.innerWidth >= window.innerHeight;
+    && esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight });
   // A 1024, LA STRIPE FA EL CARRIL DE LA PAGINA (02/10/2026). En Marc: «Acaba
   // d'alinear la stripe p1 a la mida del segon carril». El segon carril es el de
   // la pagina —`min(939.2px, 100vw - 80px)`, el del header, la hero, el bloc de

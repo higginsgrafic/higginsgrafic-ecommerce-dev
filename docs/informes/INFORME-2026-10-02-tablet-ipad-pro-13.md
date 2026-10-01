@@ -152,6 +152,33 @@ Mesurat (`scripts/_tmp-fletxes-tablet.mjs`), comptant botons visibles amb `aria-
 
 Cap error de consola a cap de les nou mides i `vite build` correcte.
 
+
+## 3quater. La composició del 1024, a totes les tauletes (02/10/2026)
+
+Després del segon carril, en Marc va veure la p2 tallada i sense la columna de
+col·leccions, i ho va tancar: «S'ha d'aplicar la 1024 a totes les tablets. Demà farem les
+adaptacions per models».
+
+Fet a l'**apaïssada** (era el que es podia fer sense tocar cap tauler): els tres predicats
+que obrien la composició del 1024 (`esCarrilPagina1024` a `MegaslidePagina2`,
+`esAjust1024P1` a `MegaStripePanelP1` i `esColumna1024` a `CercadorTextRow`) ja no miren
+la finestra 1000-1050 sinó la classe del model (`isLandscapeTablet`), i l'escala de la
+tauleta torna a ser 1 perquè la composició del 1024 porta els seus números de disseny i el
+carril de la pàgina.
+
+Mesurat: la composició surt **idèntica a la del 1024, centrada al carril** —
+`selector 42/120/170/213/218` i `graella 149/227/277/320/325` amb el carril a
+`605/939` segons la mida, o sigui el mateix desplaçament relatiu (171 px) a 1024, 1180,
+1280, 1366 i 1376 — amb la **columna de col·leccions dins la finestra a totes**
+(9/9 enllaços), sense fletxes, i el 1024 i els escriptoris (1440, 1920) exactament com
+estaven.
+
+**Pendent (demà, per models): la tauleta VERTICAL.** El seu tauler fa 992 i es pinta a
+amplada fixa, o sigui que no segueix ni el carril ni l'escala: a un iPad de 768 la
+columna de col·leccions de la p2 cau a x914 en una finestra de 753. Cal adaptar el tauler
+(millor per model, com ha dit l'amo) abans de canviar-li el carril; el que s'hi va provar
+(min(992, vp−32) i escala proporcional) no hi fa res perquè la taula no en depèn.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
