@@ -77,10 +77,17 @@ const CADENAT_BAIX_PX = 60;
  * entren. En queden fora el Galaxy Tab S9+ (1200x800, viewport 722) i el Model
  * 1200x820 (viewport 742), que a 1200 d'ample no son aquest format.
  */
-const esHeroVuitDecimes = () => typeof window !== 'undefined'
-  && Math.abs(window.innerWidth - 1200) <= 2
-  && window.innerHeight >= 570
-  && window.innerHeight <= 726;
+const esHeroVuitDecimes = () => {
+  if (typeof window === 'undefined') return false;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  if (Math.abs(w - 1200) > 2) return false;
+  // Les DUES alcades possibles del format: 586 amb la finestra (el navegador
+  // se'n menja 134, com a tots els portatils) i 720 amb el viewport exacte. La
+  // resta d'alcades a 1200 d'ample NO son aquest format: el Galaxy Tab S9+ fa
+  // 722 de viewport, el Model 1200x820 en fa 742 i el mateix aparell, 800.
+  return (h >= 570 && h <= 600) || (h >= 706 && h <= 720);
+};
 /** Files, com a molt i com a minim, quan es busquen les divisions. */
 const FILES_MIN = 8;
 const FILES_MAX = 32;
