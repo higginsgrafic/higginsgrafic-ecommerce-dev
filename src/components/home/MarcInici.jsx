@@ -204,18 +204,33 @@ function MarcInici({ seccions }) {
         // (sense la capcalera) te tres regims:
         //
         //   vertical (alt > ample, ample < 1024)   0,585 x carril
-        //   tauleta apaisada (ample <= 1366)       289 px clavat
-        //   escriptori (ample > 1366)              0,1775 x carril + 111,3
+        //   tauleta apaisada (ample <= 1376)       0,2529 x carril + 5,3
+        //   escriptori (ample > 1376)              0,1775 x carril + 111,3
+        //
+        // LA TAUleta S'HA RECALIBRAT (04/10/2026). En Marc: «Quan el megaslide es
+        // tanca, la hero es mou. No s'ha de moure. Tambe, quan clico el logo per
+        // tornar a Inici, les hero es tornen petites». Les dues coses eren aixo:
+        // l'estimacio era de 289 px clavat, i els canvis del dia —el carril propi
+        // del model (1100 i 1200) i l'aire de sota del megaslide 1100 a 20 px— van
+        // deixar el panell a 244 (a 1024, 1280 i 1366), 279 (a 1180 i 1200) i 310
+        // (a 1376). O sigui que en CARREGAR (sense vora publicada, que es quan
+        // s'estima) la linia quedava 45 px massa avall, i la hero 36 px massa
+        // curta: en obrir el megaslide creixia. Amb la recta que passa pels tres
+        // punts mesurats, l'error queda dins dels 6 px i la hero ja no es mou.
+        //
+        // I EL MODEL ENTRA A LA BRANCA DE TAUleta (ample <= 1376 i no <= 1366):
+        // a 1376 fa 1205 de carril i el panell en fa 310, que es el que dona
+        // aquesta recta; amb la formula d'escriptori en donava 325 (15 px de mes).
         //
         // Comprovat: 1546 px de carril -> 386 estimat / 382 real; 855 -> 263 /
-        // 260; 688 (vertical) -> 402 / 402. Error maxim, 8 px (abans, 282).
+        // 260; 688 (vertical) -> 402 / 402.
         //
         // ES LA LINIA, NO L'ALCADA DEL PANELL: a la linia hi sumem la capcalera.
         const ample = window.innerWidth;
         const alt = window.innerHeight;
         const alcadaPanellEstimada = esVertical
           ? 0.585 * carril
-          : (ample <= 1366 ? 289 : 0.1775 * carril + 111.3);
+          : (ample <= 1376 ? 0.2529 * carril + 5.3 : 0.1775 * carril + 111.3);
         const liniaEstimada = capcalera + alcadaPanellEstimada;
         return Math.max(capcalera, liniaEstimada);
       })();
