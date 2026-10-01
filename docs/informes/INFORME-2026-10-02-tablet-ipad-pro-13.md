@@ -371,6 +371,29 @@ que un editor»): `Model 1180×780` i `Model 1200×820` a `FORMATS` de
 (78), o sigui que la finestra que ensenyen és **1180x702** i **1200x742** (totes dues amb el
 megaslide del model).
 
+## 3quindecies. La mida de la hero: -25 % a tot arreu, +50 % a l'iPad Pro 13 (04/10/2026)
+
+En Marc: «Ara, redueix la hero un 25 % a totes excepte a l'iPad Pro 13 que l'augmentaràs un
+50 %». El que es mou és l'**alçada**, no l'amplada: l'amplada fa el carril des del canvi del
+02/10 («Eixampla totes les hero fins al carril. Excepte la 1024») i allò no es toca. El factor va
+a l'alçada de la fórmula curta de 1280/1366/1376 i a l'`aspect-ratio` de la resta; com que les
+franges i les samarretes es pinten amb `auto 100 %` de l'alçada de la franja, s'hi escalen soles.
+
+| vista | abans | després |
+|---|---|---|
+| 1920 | 1148 × 483,5 | 1148 × 362,7 |
+| 1440 | 860 × 362,2 | 860 × 271,7 |
+| 1366 i 1280 | 944 × 238,6 | 944 × 178,9 |
+| 1200 i 1180×820 | 1105 × 465,4 | 1105 × 349,1 |
+| 1024 | 944 × 397,6 | 944 × 298,2 |
+| **iPad Pro 13 apaïssat (1376)** | 1105 × 279,3 | **1105 × 418,9** |
+| **iPad Pro 13 vertical (1032)** | 944 × 426,4 | **944 × 639,6** |
+
+L'iPad Pro 13 és el **dispositiu**, no les quatre amplades del model: 1180 i 1200 porten el
+megaslide del model però no són l'iPad Pro 13, i van amb el 25 % de menys com tothom. Per
+distingir-ho, `layoutModel` té `esIPadPro13Estricte` (1032 i 1376), que és el que fa servir la
+hero.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
