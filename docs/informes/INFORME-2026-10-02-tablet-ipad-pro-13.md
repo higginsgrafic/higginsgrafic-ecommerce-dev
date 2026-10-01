@@ -463,6 +463,32 @@ cadenat queia 1,2 px **dins** de la hero (mesurat).
 | 1376×954 | 456,8 (2,6) | 50 px de sota |
 | 1032×1304 | 639,6 (1,5) | com sempre |
 
+## 3duodevicies. El marge invisible de la samarreta de la hero (04/10/2026)
+
+En Marc: «la samarreta no està posada com a mi m'agradaria. A la primera franja hi ha aire per
+sobre de la imatge i a la cinquena n'hi ha per sota. La samarreta hauria d'omplir les franges
+completament, si no, tinc una mesura que he de tenir en compte, però que no veig».
+
+**La mesura que no es veu és el marge transparent del mockup**: el dibuix de la samarreta no
+arriba a les vores del fitxer (800×800). Mesurat amb l'alfa de les imatges que fa servir el pla
+(`mockup-gildan-t-shirt-*.webp`, que comparteixen plantilla): **18 px per dalt (2,25 %)** i
+**33 px per baix (4,13 %)**. L'ice-grey en fa 20 i 36, o sigui que entre colors hi ha ±0,25 %,
+menys d'1 px quan la franja en fa 90.
+
+**La correcció**: la capa de cada franja s'escala perquè el *dibuix* ompli la capa
+(`1 / (1 − 0,0225 − 0,0413) = 1,0682`) i es puja el seu marge de dalt, ja escalat
+(`0,0225 × 1,0682 = 2,40 %`). Va a les **dues** capes —la samarreta i el dibuix de la
+col·lecció— perquè el dibuix no es mogui del pit: com que la transformació és la mateixa, la
+relació entre les dues es conserva.
+
+Mesurat al DOM: `matrix(1.06815, 0, 0, 1.06815, 0, -378.09)` a la cinquena franja
+(−(4 × 20 %) − 2,40 % de 458,8 = −378,07). Amb això el dibuix arriba a la vora de dalt i a la de
+baix: l'aire de la primera i de la cinquena franja és zero.
+
+**Si algun dia canvien els mockups** (altres colors, una altra plantilla), el marge s'ha de
+tornar a mesurar: n'hi ha prou de carregar la imatge en un canvas i buscar la primera i l'última
+fila amb alfa.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
