@@ -394,6 +394,38 @@ megaslide del model però no són l'iPad Pro 13, i van amb el 25 % de menys com 
 distingir-ho, `layoutModel` té `esIPadPro13Estricte` (1032 i 1376), que és el que fa servir la
 hero.
 
+## 3sedecies. Les dues versions del megaslide (04/10/2026)
+
+En Marc: «La versió iPad Pro 13 actual es quedarà als altres grups. Cal canviar-li el nom, és
+clar. En farem una altra per a la mida de l'iPad Pro 13, 1376»; en triar-ne el nom i l'abast,
+«megaslide 1100» i «Només 1376»; i «Ara vull que portis el megaslide de l'iPad Pro 13 fins a
+1200. Només l'iPad Pro 13».
+
+A `layoutModel` hi ha ara **`MEGASLIDE_VERSIONS`**, i el nom de cada versió és el seu carril:
+
+| versió | carril | amplades | aire de la cintura |
+|---|---|---|---|
+| `megaslide-1100` | 1100 | 1032 (vertical), 1180, 1200 | 3,6 |
+| `ipad-pro-13` | **1200** | **1376** | 3,7 |
+
+Les dues són **còpies** —només es diferencien en el carril i en l'aire de la cintura— i a partir
+d'aquí es poden divergir sense tocar-se. `versioMegaslide()`, `paramsMegaslide()` i
+`carrilMegaslide()` substitueixen `esIPadPro13()` i `carrilIPadPro13()`, i els sis components que
+els feien servir ara llegeixen la versió. `esIPadPro13Estricte()` es queda per al **dispositiu**
+(la hero, que hi va un 50 % més alta).
+
+**La cintura torna a 5,0 a les dues versions**: l'aire és de cada versió (`aireStripeColumna`),
+3,6 amb el carril de 1100 i 3,7 amb el de 1200 (amb 3,6 quedava a 4,9).
+
+Mesurat a 1376 amb la versió nova: carril **1200** (88 px per banda), escala **1,2777**, panell
+53..362, cadenat 369,5..420, cintura a 5,0 px de la columna, **45/45 clics**, cap error de pàgina
+i cap desbordament. I la resta no es mou: 1180, 1200 i 1032 segueixen amb el megaslide 1100
+(carril 1100), i la petjada de les 13 vistes només canvia a la línia de l'iPad Pro 13 apaïssat.
+
+**Una conseqüència**: la hero de l'iPad Pro 13 comparteix el carril de la pàgina i creix amb
+ell —1105 → 1205 d'ample i 418,9 → 456,8 d'alçada—. Si es vol que la hero es quedi a 1105, cal
+deslligar-la del carril.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
