@@ -3884,7 +3884,13 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
                 width: CADENAT_AMPLADA_PX,
                 height: 'auto',
                 display: 'block',
-                filter: 'drop-shadow(0 5px 6px rgba(0, 0, 0, 0.18))',
+                // L'OMBRA, NOMES CAP AVALL (03/10/2026). En Marc: «No vull que
+                // es vegi l'ombra per la part de dalt. Vull que la pastilla
+                // tingui continuitat amb el fons». Amb `0 5px 6px` l'halo de la
+                // difuminacio arribava 1 px per sobre de la placa i s'hi veia;
+                // amb el desplacament mes gran que el difuminat (6 i 6) no hi
+                // arriba i l'ombra nomes surt cap avall.
+                filter: 'drop-shadow(0 6px 6px rgba(0, 0, 0, 0.18))',
               }}
             />
             {/* EL CADENAT, INJECTAT (02/10/2026, ho va demanar l'amo: «Trec el
