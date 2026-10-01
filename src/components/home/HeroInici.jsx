@@ -41,6 +41,18 @@ const HERO_MOCKUP_MARGE_BAIX = 0.0413;
 const HERO_MOCKUP_ESCALA = 1 / (1 - HERO_MOCKUP_MARGE_DALT - HERO_MOCKUP_MARGE_BAIX);
 const HERO_MOCKUP_PUJADA_PCT = HERO_MOCKUP_MARGE_DALT * HERO_MOCKUP_ESCALA * 100;
 
+/**
+ * EL MATEIX MAPA, PER NOM DE FITXER (04/10/2026).
+ *
+ * `HERO_DIBUIX_MIDA` te les claus amb les rutes velles (vegeu la capa del
+ * dibuix); amb el nom sol, la mida afinada torna a arribar al dibuix encara que
+ * la carpeta hagi canviat. El nom es unic perque porta la tinta (`-b-` / `-w-`),
+ * i qui busca tambe prova la tinta germana.
+ */
+const HERO_DIBUIX_MIDA_PER_NOM = Object.fromEntries(
+  Object.entries(HERO_DIBUIX_MIDA).map(([clau, mida]) => [clau.split('/').pop(), mida]),
+);
+
 /** El color de cada samarreta, de la taula canonica del lloc. */
 const HEX_SAMARRETA = Object.fromEntries(CERCADOR_COLORS.map((c) => [c.slug, c.hex]));
 
@@ -277,9 +289,31 @@ function HeroInici() {
                     height: 'calc(500% + 10px)',
                     backgroundImage: `url(${band.overlaySrc})`,
                     backgroundSize: `auto ${(() => {
-                      // La clau es el final de la ruta de la imatge.
+                      // LA CLAU ES LA RUTA, PERO AMB XARXA (04/10/2026).
+                      //
+                      // En Marc: «Quotes i First Contact han tornat a petar».
+                      // El mapa `HERO_DIBUIX_MIDA` te les claus amb les rutes
+                      // VELLES: diu `austen/it-is-a-truth-b-stripe.webp` quan el
+                      // fitxer es a `austen/quotes/black/it-is-a-truth-b-stripe
+                      // .webp` (els dibuixos es van reorganitzar en carpetes de
+                      // colleccio i de tinta i el mapa no s'hi va actualitzar).
+                      // Amb la cerca exacta, els dibuixos de Quotes NO agafaven
+                      // la mida afinada i queien al 30 % de defecte.
+                      //
+                      // Ara es prova la ruta sencera i, si no hi es, el NOM DEL
+                      // FITXER, que es unic (porta la tinta: `-b-` o `-w-`).
                       const fitxer = (band.overlaySrc || '').split('/images_stripe/')[1] || '';
-                      const mida = HERO_DIBUIX_MIDA[fitxer];
+                      const nom = fitxer.split('/').pop();
+                      // I SI NOMES HI ES L'ALTRA TINTA, LA SEVA. La mida nome s
+                      // depen del DIBUIX, no de la tinta: el `the-phoenix` te
+                      // les dues entrades al mapa i son identiques (46,585 i
+                      // 42,35). Els dibuixos de Quotes nome s hi son en negre.
+                      const bessona = nom.includes('-b-stripe')
+                        ? nom.replace('-b-stripe', '-w-stripe')
+                        : nom.replace('-w-stripe', '-b-stripe');
+                      const mida = HERO_DIBUIX_MIDA[fitxer]
+                        || HERO_DIBUIX_MIDA_PER_NOM[nom]
+                        || HERO_DIBUIX_MIDA_PER_NOM[bessona];
                       if (!mida) return HERO_DIBUIX_MIDA_DEFECTE;
                       return esTauleta ? mida.tauleta : mida.escriptori;
                     })()}%`,
