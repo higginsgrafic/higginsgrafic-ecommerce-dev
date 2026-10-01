@@ -1133,6 +1133,12 @@ export const PAGINA1_AMPLADA_BLOC_DRETA_PX = 128.7;
 //     tambe se n'endu una mica).
 //   - `OMBRA_MANIGA_OFFSET`: el desplacament de la llum, en px.
 export const OMBRA_MANIGA_ALFA = 0.45;
+// L'OMBRA DE LA COLUMNA DE COLLECCIONS, MES FLUIXA (03/10/2026). En Marc:
+// «Rebaixa l'ombra de la maniga. Volem que hi sigui, no que cridi l'atencio» i,
+// quan se li va oferir d'estendre-ho, «Tota la columna amb l'estil del model».
+// El bloc de la dreta de la p1 es queda amb la de sempre (0,45) i la columna de
+// colleccions va a 0,25 a tot el lloc.
+export const OMBRA_MANIGA_ALFA_COLUMNA = 0.25;
 export const OMBRA_MANIGA_BLUR_PX = 4;
 export const OMBRA_MANIGA_OFFSET = { x: 1, y: 3 };
 

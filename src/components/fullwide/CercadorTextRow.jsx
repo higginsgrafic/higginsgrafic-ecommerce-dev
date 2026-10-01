@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA_COLUMNA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -1463,13 +1463,6 @@ export function CercadorColleccionsColumna({
   //   alcada:  (247 - 2 - 2 x 2,8) / 9 - 2 x 2,8 = 22,6
   const COIX_LATERAL_PX = 2;
   const COIX_VERTICAL_PX = 2;
-  // L'INSET VERTICAL DE LA PASTILLA DE LA COLUMNA, A L'iPAD PRO 13 (03/10/2026).
-  // En Marc: «Pots fer la pastilla mes alta sense modificar l'alcada de la
-  // columna?»: l'alcada de la columna no es toca (va ancorada al bloc) i la
-  // pastilla fa tota l'alcada de la seva cel·la, com feia abans de posar-hi
-  // l'inset del selector. La relacio lateral (zero, la que va triar l'amo) es
-  // queda.
-  const INSET_PASTILLA_COLUMNA_PX = 0;
   // L'alcada de la caixa blanca (22,59 px a 1920: la xifra que ha mesurat
   // l'amo). La franja en fa 27 i el coixi vertical se'n menja 6.
   const ALCADA_CAIXA_PX = 22.59;
@@ -1645,19 +1638,17 @@ export function CercadorColleccionsColumna({
         // radi exterior 6 px, caixa de 128 x 247 px i caixa blanca de 122 x
         // 22,59. Amb 1 px de vora i 5,5 px de coixi lateral, la caixa blanca fa
         // exactament 122,2 px d'ample (128 - 2 - 11).
-        // LA CAIXA DE SEMPRE (02/10/2026). Aquesta columna nome s viu FORA de la
-        // composicio estreta (a 1024-1366 els enllacos son la franja), i allo es
-        // l'unic que l'amo vol amb el contorn recuperat: «Recupera el contorn a
-        // les versions 1920/1440».
-        // EL MATEIX ESTIL QUE EL SELECTOR, A L'iPAD PRO 13 APAÏSSAT (03/10/2026).
-        // En Marc: «Fes la columna de colleccions del mateix estil que el
-        // selector». Al model el selector es el quadrat de la p1: radi de 5,3,
-        // ombra suau de 0 1px 3px i SENSE contorn; la columna portava el radi de
-        // 6 i el contorn d'1 px de la seva versio d'escriptori. A la resta de
-        // mides es queda com estava.
-        border: (esIPadPro13() && isLandscapeTablet) ? 'none' : '1px solid hsl(var(--grey-line-strong))',
-        borderRadius: (esIPadPro13() && isLandscapeTablet) ? '5.3px' : '6px',
-        boxShadow: (esIPadPro13() && isLandscapeTablet) ? '0 1px 3px rgba(0, 0, 0, 0.12)' : undefined,
+        // EL MATEIX ESTIL QUE EL SELECTOR, A TOT EL LLOC (03/10/2026). En Marc:
+        // «Fes la columna de colleccions del mateix estil que el selector» i,
+        // despres, quan se li va oferir d'estendre-ho de l'iPad Pro 13 a la resta
+        // del site, «Tota la columna amb l'estil del model». L'estil es el del
+        // selector quadrat de la p1: radi de 5,3, ombra suau de 0 1px 3px i SENSE
+        // contorn. Fins avui la columna portava el radi de 6 i el contorn d'1 px
+        // de la seva versio d'escriptori (que l'amo havia demanat recuperar el
+        // 02/10 per al 1920 i el 1440, i que aquest canvi retira).
+        border: 'none',
+        borderRadius: '5.3px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
         // ELS ENLLACOS I EL CLIC (03/10/2026). En Marc: «Costa molt clicar els
         // enllacos de la columna de colleccio», precisat amb «de Crosswords cap
         // avall». Qui prenia el clic era la CAIXA de la franja, que es mes ampla
@@ -1672,15 +1663,14 @@ export function CercadorColleccionsColumna({
         // de les dues caixes es d'1 px interior (`border`).
         //   amplada de la caixa = 128,7 - 2 (vora) - 2 x 2,35 = 122,0
         //   alcada de la caixa  = franja - 2 x 3
-        // LA PASTILLA TOCA LES VORES LATERALS DEL FONS, A L'iPAD PRO 13 (03/10/2026).
-        // En Marc: «El que és diferent no és la pastilla en si, si no la relacio de
-        // la pastilla amb el fons. Sobretot en els offsets» i, en triar, «els
+        // LA PASTILLA TOCA LES VORES LATERALS DEL FONS (03/10/2026). En Marc:
+        // «El que és diferent no és la pastilla en si, si no la relacio de la
+        // pastilla amb el fons. Sobretot en els offsets» i, en triar, «els
         // mateixos offsets que el selector: inset vertical i 0 lateral». Al
         // selector la pastilla va a ras pels costats; a la columna hi havia el
-        // coixi lateral del contenidor (2 px).
-        padding: (esIPadPro13() && isLandscapeTablet)
-          ? `${COIX_VERTICAL_PX}px 0px`
-          : `${COIX_VERTICAL_PX}px ${COIX_LATERAL_PX}px`,
+        // coixi lateral del contenidor (2 px), que aquest canvi treu a tot el
+        // lloc. El coixi vertical es queda.
+        padding: `${COIX_VERTICAL_PX}px 0px`,
         overflow: 'hidden',
       }}
     >
@@ -1715,10 +1705,13 @@ export function CercadorColleccionsColumna({
             style={{
               width: '100%',
               height: '100%',
-              // L'OMBRA DE LA MANIGA, MES FLUIXA A L'iPAD PRO 13 (03/10/2026). En
-              // Marc: «Rebaixa l'ombra de la maniga. Volem que hi sigui, no que
-              // cridi l'atencio»: la casa la pinta amb alfa 0,45; aqui va a 0,25.
-              backgroundColor: `rgba(0, 0, 0, ${(esIPadPro13() && isLandscapeTablet) ? 0.25 : OMBRA_MANIGA_ALFA})`,
+              // L'OMBRA DE LA MANIGA, MES FLUIXA (03/10/2026). En Marc: «Rebaixa
+              // l'ombra de la maniga. Volem que hi sigui, no que cridi
+              // l'atencio»: el bloc de la dreta de la p1 la pinta amb alfa 0,45
+              // (`OMBRA_MANIGA_ALFA`) i la columna de colleccions va a 0,25
+              // (`OMBRA_MANIGA_ALFA_COLUMNA`), a tot el lloc des del 03/10/2026
+              // («Tota la columna amb l'estil del model»).
+              backgroundColor: `rgba(0, 0, 0, ${OMBRA_MANIGA_ALFA_COLUMNA})`,
               WebkitMaskImage: `url("${mascaraManiga}")`,
               maskImage: `url("${mascaraManiga}")`,
               WebkitMaskRepeat: 'no-repeat',
@@ -1776,22 +1769,23 @@ export function CercadorColleccionsColumna({
               // la caixa com del selector blanc, son 1 px interior»), radi 3 i
               // l'ombra de la casa.
               backgroundColor: activa ? 'hsl(var(--grey-paper))' : 'transparent',
-              // SENSE CONTORN (02/10/2026): vora transparent, com a la franja. I
-              // sense ni aixo a l'iPad Pro 13, que la pastilla del selector tampoc
-              // en porta.
-              border: (esIPadPro13() && isLandscapeTablet) ? 'none' : '1px solid transparent',
+              // SENSE CONTORN (02/10/2026): vora transparent, com a la franja; i
+              // sense ni aixo a tot el lloc des del 03/10/2026, que la pastilla
+              // del selector tampoc no en porta.
+              border: 'none',
               borderRadius: '3px',
               ...(activa ? { boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } : null),
               // LA CAIXA DE L'ACTIU: el coixi el fa el CONTENIDOR (5,5 px
               // lateral i 2,8 px vertical), o sigui que la caixa fa 122,2 x
               // 22,6 px, que son les xifres que ha mesurat l'amo. Sense
               // `margin`: amb marge, l'amplada no quadra amb la de la columna.
-              // L'INSET VERTICAL DE LA PASTILLA, EL MATEIX QUE EL DEL SELECTOR
-              // (03/10/2026). Al selector la pastilla blanca fa 28,59 dins d'una
-              // cel·la de 34,3, o sigui que entra 2,85 px per dalt i per baix. La
-              // cel·la de la columna no es toca: el que s'aprima es la caixa
-              // blanca.
-              margin: (esIPadPro13() && isLandscapeTablet) ? `${INSET_PASTILLA_COLUMNA_PX}px 0` : 0,
+              // LA PASTILLA, MES ALTA (03/10/2026). En Marc: «Pots fer la
+              // pastilla mes alta sense modificar l'alcada de la columna?»: sense
+              // marge vertical la caixa blanca fa tota l'alcada de la seva cel·la,
+              // i l'alcada de la columna no es toca. Abans hi havia els 2,85 px de
+              // l'inset del selector, que el 03/10/2026 s'han estes a tot el lloc
+              // («Tota la columna amb l'estil del model»).
+              margin: 0,
               cursor: 'pointer',
               overflow: 'hidden',
             }}
