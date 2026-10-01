@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Shuffle } from 'lucide-react';
 import { buildHeroStripePlan, DARK_COLORS } from '@/components/home/homeDrawings';
 import { CERCADOR_COLORS } from '@/data/collections';
@@ -25,6 +25,17 @@ import { MIDA_TAULETA_APAISADA_MAX, MIDA_TAULETA_VERTICAL_MAX } from '@/utils/la
  * seu marge de dalt, ja escalat (0,0225 x 1,0682 = 2,40 %). Va a les DUES capes
  * (la samarreta i el dibuix) perque el dibuix no es mogui del pit.
  */
+/**
+ * ON CAU LA CINTURA DE LA SAMARRETA, DINS DE LA IMATGE (04/10/2026).
+ *
+ * En Marc: «Centra la icona shuffle entre la cintura de la imatge de la
+ * samarreta i el cadenat. En X». La cintura es la vora DRETA DEL COS de la
+ * samarreta, i dins del mockup (800x800, la mateixa plantilla que els marges) es
+ * a 0,775 de l'amplada. Mesurat amb l'alfa, per franges: la 1 (espatlles) 0,911,
+ * la 2 (manigues) 0,959, la 3 0,834, la 4 0,774 i la 5 (baix) 0,779.
+ */
+const HERO_MOCKUP_CINTURA_DRETA = 0.775;
+
 const HERO_MOCKUP_MARGE_DALT = 0.0225;
 const HERO_MOCKUP_MARGE_BAIX = 0.0413;
 const HERO_MOCKUP_ESCALA = 1 / (1 - HERO_MOCKUP_MARGE_DALT - HERO_MOCKUP_MARGE_BAIX);
@@ -112,6 +123,36 @@ function HeroInici() {
   const esIPadPro13Hero = esIPadPro13Estricte();
   const factorHero = esIPadPro13Hero ? 1.5 : 0.75;
   const [plan, setPlan] = useState(() => buildHeroStripePlan());
+  const botoBarrejaRef = useRef(null);
+  // LA ICONA DE BARREJAR, CENTRADA ENTRE LA CINTURA I EL CADENAT (04/10/2026).
+  //
+  // En Marc: «Centra la icona shuffle entre la cintura de la imatge de la
+  // samarreta i el cadenat. En X». Es calcula i no s'escriu: l'amplada de la
+  // imatge depen de l'alcada de la hero (el mockup es quadrat i es pinta amb
+  // `auto 100 %` de la capa, que fa l'alcada del rectangle mes els 2 px del
+  // darrer gap) i la posicio del cadenat, de la disposicio.
+  useLayoutEffect(() => {
+    const boto = botoBarrejaRef.current;
+    const caixa = boto && boto.closest('[data-hero-caixa="1"]');
+    if (!boto || !caixa) return undefined;
+    const calcula = () => {
+      const c = caixa.getBoundingClientRect();
+      const ampleImatge = (c.height + 2) * HERO_MOCKUP_ESCALA;
+      const cintura = (c.width - ampleImatge) / 2 + HERO_MOCKUP_CINTURA_DRETA * ampleImatge;
+      const cad = document.querySelector('img[src*="cadenat"]');
+      const cadEsq = cad ? cad.getBoundingClientRect().left - c.left : c.width - 48;
+      boto.style.left = `${Math.round((cintura + cadEsq) / 2 - boto.offsetWidth / 2)}px`;
+      boto.style.right = 'auto';
+    };
+    calcula();
+    const obs = new ResizeObserver(calcula);
+    obs.observe(caixa);
+    window.addEventListener('resize', calcula);
+    return () => {
+      obs.disconnect();
+      window.removeEventListener('resize', calcula);
+    };
+  }, []);
   const franges = useMemo(() => plan, [plan]);
 
   return (
@@ -280,12 +321,14 @@ function HeroInici() {
         {/* EL BOTO DE BARREJAR, DINS de la caixa: si va a l'envolcall, que
             no esta posicionat, cau a la pagina i queda fora de la hero. */}
         <button
+        ref={botoBarrejaRef}
         type="button"
         onClick={() => setPlan(buildHeroStripePlan())}
         aria-label="Barreja samarretes i dibuixos"
         style={{
           position: 'absolute',
           top: '50%',
+          // La X la calcula l'efecte de dalt; aixo es nome s el punt de partida.
           right: '32px',
           transform: 'translateY(-50%)',
           zIndex: 10,
