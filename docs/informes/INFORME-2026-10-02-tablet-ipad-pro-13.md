@@ -616,6 +616,44 @@ la fórmula d'escriptori, que li donava 325 en comptes de 310).
 I els quatre estats (càrrega neta, obert, **tancat** i **logo**) donen la mateixa alçada de hero:
 a 1376, 473,6 als quatre; a 1280×586, 232 als quatre.
 
+## 3septendecies. Les mides de la hero, fixades (04/10/2026)
+
+En Marc: «Ara, quan tanques el megaslide, es manté. Però quan refresques torna a ser petit. S'han
+de fixar les mides».
+
+**El flaix**: en refrescar, la hero es pintava amb la mida **vella** (el seu `aspect-ratio` o la
+fórmula curta) i només després, quan l'efecte de `MarcInici` publicava `--inici-hero-alcada`,
+passava a la bona. Mesurat: a 1376 es veia **456,8** i tot seguit **473,6**; a 1280×586, **178,9**
+i tot seguit **232**.
+
+**Ara les mides surten del CSS**: el render de `MarcInici` publica `--inici-hero-alcada` i
+`--inici-hero-aire` amb un `calc` que fa servir les **mateixes rectes** que l'estimació de la
+línia (la del panell segons l'amplada, més la capçalera), o sigui que el **primer pintat ja és el
+bo** i la mida no depèn ni del megaslide ni d'un efecte. L'efecte només calcula el repartiment de
+les cel·les.
+
+Verificat, alçada de la hero als **quatre estats** (càrrega neta, obert, tancat i refresc), que
+ara és la mateixa a tot arreu:
+
+| vista | alçada (als quatre estats) |
+|---|---|
+| 1920×1080 | 570,3 |
+| 1440×900 | 467,2 |
+| 1366×946 | 520 |
+| 1280×586 | 232 |
+| 1200×800 · 1180×820 | 370,6 · 386,6 |
+| 1024×690 | 315,2 |
+| 1376×954 | 473,6 |
+| 1032×1304 (vertical) | 639,6 |
+| 768×952 (vertical) | 234,8 |
+
+I en la línia de temps ja no hi ha cap salt: a 1376, 473,6 des del primer moment.
+
+**Pendent**: la *posició* de la hero en els VERTICALS encara es mou una mica en obrir el
+megaslide (a 1032 vertical, 57 px; a la resta d'horitzontals, 5,5 px o menys), perquè el
+repartiment de les cel·les sí que fa servir la vora publicada. Si molesta, s'ha de recalibrar
+també l'estimació del vertical (avui `0,585 × carril`, i a 1032 el real és `0,620 × carril`).
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
