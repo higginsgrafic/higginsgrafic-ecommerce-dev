@@ -562,9 +562,30 @@ dues vegades, amb `tauleta: 6` i amb `tauleta: 12,8`. En JavaScript guanyava la 
 que el comportament no canvia; i 12,8 és també el que té la seva bessona `it-is-a-truth`, que fa
 el mateix 12,16 a escriptori. El mapa queda amb 14 entrades i cap duplicada.
 
+**Els blancs, repassats** («Repassa tots els blancs» i, en triar, «1 [el valor del seu negre].
+També Quotes»). Al pla hi ha 46 dibuixos en blanc i només un —el `the-phoenix`— tenia mida. Dels
+46, nou tenen parella negra afinada, i en tots nou els fitxers són **geomètricament idèntics**:
+és el criteri que el propi `the-phoenix` ja aplicava (la mateixa mida a les dues tintes). S'hi
+afegeixen doncs vuit entrades noves al mapa amb el valor del seu negre:
+
+| dibuix | mida (escriptori / tauleta) | fitxers |
+|---|---|---|
+| `nx-01` | 7 / 7 | 256×94 = 256×94 |
+| `ncc-1701` | 7 / 7 | 256×58 = 256×58 |
+| `ncc-1701-d` | 3,5 / 3,5 | 256×24 = 256×24 |
+| `it-is-a-truth` | 12,16 / 12,8 | 800×400 = 800×400 |
+| `i-admire-and-love-you` | 12,16 / 12,8 | 800×400 = 800×400 |
+| `half-agony-half-hope` | 4,8 / 6 | 800×155 = 800×155 |
+| `unsociable-and-taciturn` | 2,4 / 3 | 800×61 = 800×61 |
+| `you-have-bewitched-me` | 2,4 / 3 | 800×61 = 800×61 |
+
+I les **claus de Quotes passen a la ruta bona**: eren `austen/<fitxer>` i els fitxers són a
+`austen/quotes/<tinta>/<fitxer>` — la causa de fons del «Quotes ha tornat a petar». El mapa queda
+amb 22 entrades, cap duplicada, i les nou parelles amb el mateix valor.
+
 **Pendent** (no tocat): els altres dibuixos de First Contact (`vulcans-end`, `plasma-escape`,
-`dj-vader`, `r2d2-quote`, `pont-del-diable`…) no són al mapa i van amb el 30 % de defecte. Si
-algun surt malament, cal la seva mida.
+`dj-vader`, `r2d2-quote`, `pont-del-diable`…) no són al mapa i van amb el 30 % de defecte, igual
+que els altres 37 blancs sense parella afinada. Si algun surt malament, cal la seva mida.
 
 ## 4. El que queda (i no s'ha tocat)
 
