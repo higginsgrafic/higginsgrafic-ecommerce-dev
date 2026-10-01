@@ -297,6 +297,28 @@ clic de la franja (`superficiesDeFranja` a `MegaStripePanel`) avui només val pe
 És una línia (`esCarrilPagina1024` en comptes de `esCarrilPagina1024 && esIPadPro13()`) i
 no mou cap píxel.
 
+## 3nonies. El carril del model, a 1100 px (03/10/2026)
+
+En Marc: «Vull ampliar el carril a 1100 px». Es el carril **propi** del model
+(`CARRIL_IPAD_PRO_13_APAISSADA_PX`, `layoutModel`): el segon carril compartit de les
+tauletes (939,2) no s'ha tocat.
+
+- Carril **1100** i escala **1,1712** (`1100 / 939,2`). Amb 1376 de finestra queden 138 px
+  per banda i la composició s'hi escala tota: el selector de la p2 fa 113 (era 103), la
+  graella i les barres 841,4, la franja 1014,6 d'ample pintat, i el cadenat i les icones del
+  header queden a ras de la vora dreta del carril (1237,5 de 1238).
+- **Cap altra peça moguda a cap altra vista**: la petjada de les 11 vistes només canvia a la
+  línia de l'iPad Pro 13 apaïssat.
+- **Els aires que l'amo va fixar es mantenen**: 20 px de dalt a la p2, 20 px de gap entre el
+  selector i la franja a la p1, i ~40,5 px per sota de les dues franges.
+- **La cintura torna a 5,0 px de la columna.** Amb el carril més ample, la diferència entre
+  carril i columna creix més que la constant i la cintura en quedava a 5,4:
+  `AIRE_STRIPE_COLUMNA_PX` passa de 4 a **3,6** només al model (a la resta de la banda
+  apaïssada segueix amb 4, i el seu carril és el de sempre).
+
+Verificat: 9 enllaços de la columna × 5 punts = **45/45 clics**, cap error de pàgina i cap
+desbordament horitzontal.
+
 ## 4. El que queda (i no s'ha tocat)
 
 **Galaxy Tab S9 (533) i Galaxy Tab S9+ (584)**: avui són mòbil i, si fossin tauleta
