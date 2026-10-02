@@ -1377,7 +1377,16 @@ export default function MegaslidePagina2({
             // franja de colleccions amb FIRST CONTACT actiu. El contenidor es
             // queda l'ample de disseny, que sempre es mes ample.
             width: carrilPx(midaSelectorP2),
-            height: carrilPx(midaSelectorP2),
+            // EL SELECTOR, DE L'ALCADA DE DUES FILES (05/10/2026). En Marc: «Fes
+            // el selector de l'alçada de dues files. Comprimeix b/c/n perquè hi
+            // càpiga»: als portatils la graella fa una fila de `dibuix x 1,5` i el
+            // selector fa DUES files (`3 x dibuix`), amb les tres caselles b/c/n
+            // comprimides. A la resta, el quadrat de sempre.
+            height: esPortatilP2
+              ? (mesuraGraellaP2?.dibuix != null
+                ? `${3 * mesuraGraellaP2.dibuix}px`
+                : carrilPx(3 * midaDibuix(isPortraitTablet, isLandscapeTablet)))
+              : carrilPx(midaSelectorP2),
             zIndex: 4,
             display: 'flex',
             alignItems: 'center',
