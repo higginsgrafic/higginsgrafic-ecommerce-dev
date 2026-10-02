@@ -188,7 +188,7 @@ function xCarrilMegaslide() {
   return declarat ? declarat.x : 0;
 }
 
-export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaPx = 0, centreAlContenidor = false) {
+export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaPx = 0, centreAlContenidor = false, ancoratEsquerra = false) {
   const [estat, setEstat] = useState({ factor: 1, centre: 0 });
 
   useLayoutEffect(() => {
@@ -242,7 +242,18 @@ export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaP
       // es mesura des de la vora esquerra del carril del megaslide: es
       // descompta.
       const ampleImatge = ampleCarrilPaginaPx / FRACCIO_COSSOS_FRANJA;
-      const carrilEsq = (window.innerWidth - ampleCarrilPaginaPx) / 2;
+      // ANCORAT A L'ESQUERRA (05/10/2026). En Marc: «Redueix la stripe, per la
+      // dreta, blocant l'esquerra, fins que coincideixi amb la dreta de la
+      // graella». Amb `ancoratEsquerra` l'objectiu no es centra a la finestra:
+      // arrenca a la vora esquerra del CARRIL (la mateixa que la graella), i la
+      // dreta cau on li toca per la seva amplada.
+      // I LA MITAD DE LA DIFERENCIA ENTRE LA FINESTRA I LA MAQUETACIO: el
+      // carril es mesura amb `window.innerWidth` i l'element viu a l'amplada de
+      // maquetacio (que reserva la barra); sense aixo l'objectiu cau 8 px a
+      // l'esquerra de la graella (mesurat a 1280).
+      const carrilEsq = ancoratEsquerra
+        ? xCarrilMegaslide() + (window.innerWidth - getLayoutViewportWidth()) / 2
+        : (window.innerWidth - ampleCarrilPaginaPx) / 2;
       // DOS CASOS, I PER QUE (02/10/2026):
       //
       //   - LA PAGINA 1 (`centreAlContenidor` fals): la filera viu DINS del carril
@@ -289,7 +300,7 @@ export default function useEscalaFranjaCarril(filaRef, actiu, ampleCarrilPaginaP
       if (observadorEstil) observadorEstil.disconnect();
       window.removeEventListener('resize', mesura);
     };
-  }, [filaRef, actiu, ampleCarrilPaginaPx, centreAlContenidor]);
+  }, [filaRef, actiu, ampleCarrilPaginaPx, centreAlContenidor, ancoratEsquerra]);
 
   // Quan no s'hi aplica (la vista vertical), no es toca res: es fa aqui i no
   // dins de l'efecte, que no ha de cridar `setState`.

@@ -308,7 +308,7 @@ function MegaStripePanelP1({
   // La franja s'ha de quedar dins del carril amb les manigues a fora (com a la
   // pagina 2: les dues pagines han de quadrar). Vegeu l'hook: a la fila unica
   // l'objectiu es l'amplada de la graella.
-  const { factor: factorCarrilFranjaBase, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, esFilaUnicaAviat ? ampleGraellaP1 : ampleCarrilPaginaP1);
+  const { factor: factorCarrilFranjaBase, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, esFilaUnicaAviat ? ampleGraellaP1 : ampleCarrilPaginaP1, false, esFilaUnicaAviat);
   const [pageLift, setPageLift] = useState(0);
   // EL SCROLL DE LA FRANJA DE LA P1 (28/09/2026). En Marc: «Aplica-li un scroll
   // als dibuixos de la franja. Com que a la franja de p1 nome's es mostra un
@@ -1017,9 +1017,13 @@ function MegaStripePanelP1({
                   // coixi de l'esquerra), o sigui que el desplacament va 10 px mes
                   // enlla d'on va el bloc perque el RETALL caigui a la vora del
                   // carril.
-                  // AMB UNA SOLA FILA NO HI HA DESPLACAMENT (05/10/2026): la
-                  // graella arrenca a la vora esquerra del carril.
-                  ...(!esFilaUnicaP1 && alcadaBlocEstretaP1 ? { transform: `translateX(${alcadaBlocEstretaP1.dx - 10}px)` } : null),
+                  // LA GRAELLA, A LA VORA ESQUERRA DEL CARRIL (05/10/2026). En
+                  // Marc: «Alinea la graella a l'esquerra del carril, ara no hi
+                  // es». El desplacament `dx` es el que porta les peces del
+                  // panell a la vora del carril; a la fila unica no hi ha el
+                  // coixi de 10 px, o sigui que el desplacament es `dx` sencer
+                  // (abans era `dx - 10` per compensar aquell coixi).
+                  ...(alcadaBlocEstretaP1 ? { transform: `translateX(${alcadaBlocEstretaP1.dx - (esFilaUnicaP1 ? 0 : 10)}px)` } : null),
                 } : null),
               }}>
                 <GraellaDuesFileresPagina1
