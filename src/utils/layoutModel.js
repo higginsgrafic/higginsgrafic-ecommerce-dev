@@ -31,16 +31,18 @@ import {
 // peces del megaslide i el header, i la mateixa finestra no pot tenir dues
 // classes. Aqui nome's s'importen (vegeu el comentari d'alla).
 /**
- * L'ALÇADA DE LA CAPÇALERA: EL LOGO MÉS 10 px D'AIRE A DALT I A BAIX (24/09/2026).
+ * L'ALÇADA DE LA CAPÇALERA: EL LOGO MÉS 20 px D'AIRE A DALT I A BAIX (04/10/2026).
  *
- * L'amo ho va demanar així. El logo fa 32 px, o sigui que la fila fa **52**:
- * abans en feia 80 i el logo hi nedava amb 24 px d'aire per banda.
+ * L'amo ho va demanar dues vegades: el 24/09 amb 10 px per banda, i el 04/10
+ * («Dona-li 10 px d'aire al header, per sobre i per sota») amb 10 mes, o sigui
+ * 20. El logo fa 32 px, aixi que la fila fa **72** (abans 52, i abans d'aixo 80,
+ * amb el logo nedant-hi amb 24 px per banda).
  */
-const ALCADA_CAPCALERA_ESCRIPTORI = 52;
-const ALCADA_CAPCALERA_MOBIL = 52;
+const ALCADA_CAPCALERA_ESCRIPTORI = 72;
+const ALCADA_CAPCALERA_MOBIL = 72;
 /**
- * La capçalera de DUES FILES de la tauleta vertical: els 52 px de la fila del
- * logo i les icones + 62 px la fila del menu de colleccions. Son **114**.
+ * La capçalera de DUES FILES de la tauleta vertical: els 72 px de la fila del
+ * logo i les icones + 62 px la fila del menu de colleccions. Son **134**.
  *
  * PER QUE ES UNA CONSTANT I NO ES MESURA. Amb 116 (una versio anterior) el
  * layout reservava 7 px menys del que la capçalera ocupa de veritat, i els
@@ -49,7 +51,7 @@ const ALCADA_CAPCALERA_MOBIL = 52;
  * —el panell arrenca on acaba la capçalera—, així que la pagina i el panell han
  * de començar al mateix lloc.
  */
-const ALCADA_CAPCALERA_TAULETA_VERTICAL = 114;
+const ALCADA_CAPCALERA_TAULETA_VERTICAL = 134;
 
 /**
  * Classificació del dispositiu a partir de les mides de la finestra.

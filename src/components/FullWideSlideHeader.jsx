@@ -3498,7 +3498,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           aria-label="Administració"
           title="Administració"
           className="absolute inline-flex items-center justify-center rounded text-foreground transition-colors hover:bg-ink-pure/5 hover:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style={{ left: 0, top: 0, width: '28px', height: 'var(--capcalera-fila, 52px)', zIndex: 10002 }}
+          style={{ left: 0, top: 0, width: '28px', height: 'var(--capcalera-fila, 72px)', zIndex: 10002 }}
         >
           <LayoutDashboard className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />
         </Link>
@@ -3517,13 +3517,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       >
         <div
           data-capcalera-fila="1"
-          className="flex h-[52px] items-center gap-3"
+          className="flex h-[72px] items-center gap-3"
           style={{
-            // LA FILA FA EL LOGO (32 px) MÉS 10 px D'AIRE A DALT I A BAIX = 52.
-            // Abans en feia 80 i el logo hi nedava amb 24 px per banda.
+            // LA FILA FA EL LOGO (32 px) MÉS 20 px D'AIRE A DALT I A BAIX = 72
+            // (04/10/2026: «Dona-li 10 px d'aire al header, per sobre i per
+            // sota», 10 mes dels que ja hi havia). Abans en feia 80 i el logo hi
+            // nedava amb 24 px per banda.
             // A la vertical el separador ha de quedar AL MIG de l'espai que
-            // ocupen les dues capçaleres (114 px): 52 px a dalt i 62 a baix.
-            height: isPortraitTablet ? '52px' : undefined,
+            // ocupen les dues capçaleres (134 px): 72 px a dalt i 62 a baix.
+            height: isPortraitTablet ? '72px' : undefined,
             // La capçalera viu al MATEIX carril que el megaslide i les bandes
             // (70,3vw, centrat): a 1440 el marc del lloc feia 1350 px i el
             // carril 1013, i el logo quedava 128 px a l'esquerra del contingut
