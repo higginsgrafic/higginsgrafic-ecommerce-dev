@@ -84,6 +84,28 @@ export const HERO_ALCADA = 401;
 export const HERO_ALCADA_VERTICAL = 430;
 
 /**
+ * L'ESPAI DE LES ICONES DE COLLECCIO, EN PX (04/10/2026).
+ *
+ * En Marc: «Li donem un espai a les icones de colleccio i que la hero s'encaixi
+ * a sota i prou». Es l'unic que la pagina li dona a aquesta fila: abans les
+ * icones es repartien el tros de dalt amb la hero consultant la linia del
+ * megaslide, i tot plegat es movia cada cop que el panell s'obria, es tancava o
+ * acabava de carregar.
+ *
+ * Els 140 px es trien amb la fila mesurada al davant: fa entre 28 i 60 px a tots
+ * els formats, o sigui que queden entre 40 i 56 px d'aire a cada banda.
+ */
+export const ESPAI_ICONES_PX = 140;
+
+/**
+ * L'AIRE DE LA HERO, EN PX (04/10/2026): el mateix a dalt i a baix, a tot
+ * arreu. Abans hi havia un aire diferent per a cada banda de formats (25 px als
+ * portatils, 50 a l'escriptori, els desens del megaslide a la resta); amb la
+ * base simple n'hi ha un de sol.
+ */
+export const AIRE_HERO_PX = 40;
+
+/**
  * L'AIRE DE LA HERO, com a fraccio de l'AMPLE DEL CARRIL (el total, els dos
  * costats junts).
  *
