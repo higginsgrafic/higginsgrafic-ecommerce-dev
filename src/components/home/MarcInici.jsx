@@ -35,7 +35,7 @@
  * referencia per mesurar i per diagnosticar: cap `calc` d'aquest projecte no la
  * fa servir, i els guions de mesura la llegeixen per comparar.
  */
-import { espaiMegaslideCss, AIRE_HERO_PX } from '@/config/iniciNou';
+import { espaiMegaslideCss, FACTOR_HERO_ESPAI } from '@/config/iniciNou';
 
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
@@ -54,10 +54,12 @@ function MarcInici({ seccions }) {
   // hero sortis centrada a l'espai que queda entre el megaslide i el bottom del
   // viewport» i «no volem la sensacio de no tenir espai per posar les coses».
   const espaiHeroCss = `calc(100dvh - var(--appHeaderOffset, 0px) - ${espaiMegaslide})`;
-  // EL QUE HI CAP A LA HERO: l'espai fins al fons del viewport menys l'aire de
-  // cada banda. Nome's es un TOPALL: la hero fa la seva mida de disseny i, si no
-  // hi cap (finestra curta), s'hi encongeix proporcionalment (ho fa `HeroInici`).
-  const heroDisponibleCss = `calc(${espaiHeroCss} - ${AIRE_HERO_PX * 2}px)`;
+  // LA MIDA DE LA HERO: l'espai per un factor, el mateix a totes les vistes. Amb
+  // el factor a 1 va encaixada a zero (toca la banda i el fons) i el que en
+  // sobra, quan se'n treu, es reparteix entre les dues bandes.
+  const alcadaHeroCss = `calc(${espaiHeroCss} * ${FACTOR_HERO_ESPAI})`;
+  // Nome's a l'horitzontal: a la vertical la hero te la seva propia mida.
+  const esHoritzontal = ampleVista >= 768 && ampleVista >= altVista;
   return (
     <>
       <div
@@ -71,10 +73,11 @@ function MarcInici({ seccions }) {
           // LES DUES XIFRES DE LA PAGINA, publicades com a variables perque les
           // pugui llegir qui les hagi de menester (i els guions de mesura).
           '--inici-espai-icones': espaiMegaslide,
-          // L'AIRE DE LA HERO I EL QUE HI CAP: la hero fa la seva mida de
-          // disseny i nome's s'encongeix si no hi cap.
-          '--inici-hero-aire': `${AIRE_HERO_PX}px`,
-          '--inici-hero-espai': heroDisponibleCss,
+          // LA MIDA DE LA HERO, publicada: es l'espai per el factor, i la fan
+          // servir les peces de dins seu (el mockup, els dibuixos, el shuffle).
+          ...(esHoritzontal ? { '--inici-hero-alcada': alcadaHeroCss } : null),
+          // L'AIRE QUE EN SURT, tambe publicat (es el que reparteix el centratge).
+          '--inici-hero-aire': `calc(${espaiHeroCss} * ${((1 - FACTOR_HERO_ESPAI) / 2).toFixed(4)})`,
           // LA FRONTERA DE LA PAGINA: on s'acaben les icones i comença la hero.
           // Es una referencia propia de la pagina; no te res a veure amb la
           // linia del megaslide.
@@ -96,18 +99,14 @@ function MarcInici({ seccions }) {
         >
           {primera.node}
         </div>
-        {/* LA HERO, AMB LA SEVA MIDA, JUST A SOTA LA BANDA.
-            La cel·la s'ajusta a la hero (mes l'aire) i nome's arriba fins al fons
-            del viewport si la hero es tan alta: aixi la pagina flueix i les
-            galeries amb les TDP entren a la primera pantalla. */}
+        {/* LA HERO, CENTRADA AL QUE QUEDA FINS AL FONS DE LA FINESTRA. */}
         <div
           data-cella="2"
           data-cella-de={segona.id}
           style={{
+            height: espaiHeroCss,
             flex: '0 0 auto',
-            paddingBlock: `${AIRE_HERO_PX}px`,
             boxSizing: 'border-box',
-            maxHeight: espaiHeroCss,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
