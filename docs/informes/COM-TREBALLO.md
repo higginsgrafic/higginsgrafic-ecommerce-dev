@@ -275,3 +275,17 @@ casa, el carril s'ha emportat més hores que cap altra cosa.
 *Escrit el 25/09/2026, després d'una sessió llarga en què el carril, el rail i
 el bloc de la TDP van fer ballar més del que tocava. Si alguna cosa d'aquí deixa
 de ser certa, es canvia el mateix dia.*
+
+---
+
+## Termes tècnics: no es tradueixen (05/10/2026)
+
+En Marc: «No tradueixis els termes tècnics. Aixo hauria d'estar a la memoria».
+
+Els termes tecnics es queden **exactament com els fa servir l'amo**, sense
+traduir-los ni buscar-hi equivalents: `stripe`, `hero`, `mockup`, `slider`,
+`grid`, `desktop`, `tablet`, `selector`, `carril`, `graella`, `fletxes`,
+`fila`... Nome s es tradueix si el propi amo ho demana. Mai no s'ha de dir «la
+franja» quan ell diu «la stripe» (ni al reves), ni canviar `desktop` per
+`escriptori` en un text que ell llegira, encara que al codi hi hagi les dues
+formes.
