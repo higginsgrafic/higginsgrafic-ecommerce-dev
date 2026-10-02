@@ -12,15 +12,15 @@ import { composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, getBeltWidth, escalaMegaslide, esTauletaVertical, esTauletaApaisada } from '../../utils/layoutMetrics.js';
-import { carrilMegaslide, CARRIL_MEGASLIDE_939_PX } from '../../utils/layoutModel.js';
+import { carrilMegaslide, paramsMegaslide, CARRIL_MEGASLIDE_939_PX } from '../../utils/layoutModel.js';
 
 /**
  * L'AIRE ENTRE EL SELECTOR I LA STRIPE A L'iPAD PRO 13 APAÏSSAT (03/10/2026).
  *
  * En Marc: «Deixa 20 px de gap entre la stripe i el selector». A la resta de la
- * composicio estreta en son 10 (`PAGINA1_AIRE_SOTA_BLOC_1024_PX`).
+ * composicio estreta en son 10 (`PAGINA1_AIRE_SOTA_BLOC_1024_PX`). Des del
+ * 05/10/2026 el valor el declara la variant (`aireSotaBloc`), no la mida.
  */
-const AIRE_SOTA_BLOC_IPAD13_PX = 20;
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import {
@@ -599,7 +599,7 @@ function MegaStripePanelP1({
           // que va demanar el 02/10: «Alinea el top de les samarretes a 10 px del
           // bottom del selector»). El megaslide creix el que calgui.
           ? +((bloc.getBoundingClientRect().bottom
-            + (carrilMegaslide() != null ? AIRE_SOTA_BLOC_IPAD13_PX : PAGINA1_AIRE_SOTA_BLOC_1024_PX))
+            + (paramsMegaslide()?.aireSotaBloc ?? PAGINA1_AIRE_SOTA_BLOC_1024_PX))
             - f1.getBoundingClientRect().top).toFixed(1)
           : +(f2.getBoundingClientRect().top - f1.getBoundingClientRect().top).toFixed(1);
         setAlcadaBlocEstretaP1((prev) => {

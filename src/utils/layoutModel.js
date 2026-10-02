@@ -346,6 +346,36 @@ export const MEGASLIDE_1100_AMPLADES = [1032, 1180, 1200];
  */
 export const CARRIL_MEGASLIDE_939_PX = 939;
 export const MEGASLIDE_VERSIONS = {
+  // LA VARIANT 939, DECLARADA (05/10/2026). En Marc: «la meva idea es que totes
+  // els megaslides siguin iguals i tinguin variacions. No un megaslide per cada
+  // versio. [...] Pero seran variacions i no construccions noves».
+  //
+  // Fins ara la 939 no era cap versio: era el fallback que cada component es
+  // feia quan `carrilMegaslide()` tornava null. Ara es una variant mes, amb els
+  // SEUS numeros, i els components ja no han d'endevinar la banda.
+  'megaslide-939': {
+    nom: 'Megaslide 939',
+    carril: CARRIL_MEGASLIDE_939_PX,
+    // Es tria per la CLASSE i la banda (`versioMegaslide`), no per una llista
+    // d'amplades: es la variant dels apaissats de mes de 1050 px.
+    amplades: [],
+    // Els valors son els que aquesta banda ja tenia pels seus propis fallbacks:
+    // declarar-los no mou res (mesurat a 1366: 0 px).
+    aireStripeColumna: 4,
+    extraAireSota: 0,
+    // L'aire de sota el bloc de la p1 (`MegaStripePanelP1`) i el de dalt del
+    // bloc de la p2 (`MegaslidePagina2`). Eren 10 i 15 en aquesta banda i 20 i
+    // 20 a la 1100: fins ara els components ho endevinaven amb un `!= null`; ara
+    // ho diu la variant.
+    aireSotaBloc: 10,
+    aireDaltBlocP2: 15,
+    // L'aire de dalt de la p1 (`MegaMenuPanel`): els 1,4 px que falten per fer
+    // els 20 px del disseny. Aquesta banda no els porta.
+    margeTopBlocP1: 0,
+    // La composicio de la construccio unica que li toca: la del model, la
+    // mateixa que la 1100 i la 1200 (vegeu `composicioMegaslide`).
+    composicio: 'estreta',
+  },
   'megaslide-1100': {
     nom: 'Megaslide 1100',
     carril: 1100,
@@ -361,6 +391,10 @@ export const MEGASLIDE_VERSIONS = {
     // al `P1_STRIPE_BOTTOM_GAP` de `MegaMenuPanel` per fer la guarda de l'alcada:
     // amb 26 l'aire de sota fa 40,5 px i amb 6 en fa 20,5 (mesurat).
     extraAireSota: 6,
+    aireSotaBloc: 20,
+    aireDaltBlocP2: 20,
+    margeTopBlocP1: 1.4,
+    composicio: 'estreta',
   },
   // LA VERSIO DE L'ESCRIPTORI (04/10/2026). En Marc: «Vull provar una cosa al
   // desktop. Crec que em carregare el carril original. Canvia el megaslide de la
@@ -381,6 +415,10 @@ export const MEGASLIDE_VERSIONS = {
     amplades: [],
     aireStripeColumna: 3.7,
     extraAireSota: 0,
+    aireSotaBloc: 20,
+    aireDaltBlocP2: 20,
+    margeTopBlocP1: 1.4,
+    composicio: 'estreta',
   },
   'ipad-pro-13': {
     nom: 'iPad Pro 13',
@@ -394,6 +432,10 @@ export const MEGASLIDE_VERSIONS = {
     aireStripeColumna: 3.7,
     // L'aire de sota el panell es queda als 40 px de sempre.
     extraAireSota: 26,
+    aireSotaBloc: 20,
+    aireDaltBlocP2: 20,
+    margeTopBlocP1: 1.4,
+    composicio: 'estreta',
   },
 };
 
@@ -407,8 +449,13 @@ export const MEGASLIDE_VERSIONS = {
  * A L'ESCRIPTORI, LA CLASSE (04/10/2026): en Marc vol provar-hi el carril de
  * 1200, i alla la versio es tria per `isDesktop`, no per amplada.
  *
+ * I LA RESTA D'APAISSATS SON LA 939 (05/10/2026): els de mes de 1050 px que no
+ * porten cap versio per amplada (l'iPad Air 13 de 1366 i els de 1133, 1194...).
+ * El tall dels 1050 es el mateix que fa servir el header per al carril de la
+ * pagina: per sota seu mana l'ajust de 1024, que es una altra feina.
+ *
  * @param {{ample?: number, alt?: number}} [mides]
- * @returns {'megaslide-1100'|'megaslide-1200'|'ipad-pro-13'|null}
+ * @returns {'megaslide-939'|'megaslide-1100'|'megaslide-1200'|'ipad-pro-13'|null}
  */
 export function versioMegaslide({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
@@ -419,7 +466,9 @@ export function versioMegaslide({ ample, alt } = {}) {
   const marge = 2;
   const clau = Object.keys(MEGASLIDE_VERSIONS)
     .find((k) => MEGASLIDE_VERSIONS[k].amplades.some((a) => Math.abs(w - a) <= marge));
-  return clau || null;
+  if (clau) return clau;
+  if (es.isLandscapeTablet && w > 1050) return 'megaslide-939';
+  return null;
 }
 
 /** Els parametres de la versio que li toca a aquesta vista, o `null`. */

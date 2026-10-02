@@ -554,7 +554,7 @@ export default function MegaMenuPanel({
                     // falta per fer-ne 20 exactes, com la p2. El panell creix i
                     // decreix amb el contingut (`p1ContentBottom` el mesura), o
                     // sigui que l'aire de baix no es mou.
-                    ...(modelAqui ? { marginTop: '1.4px' } : null),
+                    ...(modelAqui?.margeTopBlocP1 ? { marginTop: `${modelAqui.margeTopBlocP1}px` } : null),
                     // A la VERTICAL, el contingut de debò de la pagina 1 queda
                     // AMAGAT i el que s'hi veu es la TAULA dibuixada (la
                     // mateixa que a la pagina 2). A la resta de formats no es

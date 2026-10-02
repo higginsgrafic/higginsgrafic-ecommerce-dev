@@ -27,9 +27,8 @@
  * desquadrar mai mes.
  */
 
-import { carrilDeclarat, laneForViewport } from '../../utils/layoutModel';
+import { carrilDeclarat, laneForViewport, carrilMegaslide, paramsMegaslide } from '../../utils/layoutModel';
 import { MEGASLIDE_REFERENCIA_PX, escalaMegaslide, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics';
-import { carrilMegaslide } from '../../utils/layoutModel';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide';
 
 /**
@@ -886,17 +885,27 @@ export function esComposicioEstretaMegaslide({ ample, isLandscapeTablet = false 
  *
  * Nome's s'aplica quan hi ha versio: sense versio (null), tot queda com era.
  *
+ * LA COMPOSICIO ES DE LA VARIANT, NO DEL NUMERO DEL CARRIL (05/10/2026). Amb la
+ * 939 declarada (`MEGASLIDE_VERSIONS`), passar-li el carril com si fos una
+ * amplada deixava de quadrar: 939 < 1024 i la variant 939 hauria caigut a la
+ * composicio ample. Ara cada versio declara la seva composicio (`composicio`) i
+ * qui no en te cap segueix decidint per la finestra, com sempre.
+ *
  * @param {object} o
  * @param {boolean} [o.isLandscapeTablet]
  * @returns {boolean}
  */
 export function composicioMegaslide({ isLandscapeTablet = false } = {}) {
+  const params = paramsMegaslide();
+  // NOME S ON LA VISTA ES APAISSADA O ESCRIPTORI. La versio tambe es tria a la
+  // vertical de 1032 (megaslide-1100), i alla qui mana es el seu tauler de 992,
+  // no la composicio del model: el `carrilMegaslide()` es qui ho diu (a la
+  // vertical torna null).
+  const potManar = isLandscapeTablet || carrilMegaslide() != null;
+  if (potManar && params?.composicio === 'estreta') return true;
+  if (potManar && params?.composicio === 'ample') return false;
   const ample = typeof window !== 'undefined' ? window.innerWidth : 0;
-  const carril = carrilMegaslide({ ample });
-  return esComposicioEstretaMegaslide({
-    ample: carril != null ? carril : ample,
-    isLandscapeTablet: isLandscapeTablet || carril != null,
-  });
+  return esComposicioEstretaMegaslide({ ample, isLandscapeTablet });
 }
 
 /**

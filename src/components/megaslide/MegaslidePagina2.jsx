@@ -491,7 +491,7 @@ export default function MegaslidePagina2({
           // d'aire a sobre i a sota de la p1 i la p2», despres «Deixa 40 px d'aire
           // sobre i sota la p1 i la p2» i finalment «redueix l'aire de dalt a
           // 20 px»: alla el bloc arrenca a 20 px del bottom del header.
-          const aireDaltP2 = paramsMegaslide() ? 20 : AIRE_DALT_BLOC_P2_PX;
+          const aireDaltP2 = paramsMegaslide()?.aireDaltBlocP2 ?? AIRE_DALT_BLOC_P2_PX;
           const aire = Math.max(0, Math.min(
             aireDaltP2,
             panelAlt - rBcn.height - alcadaFranja - rFranja.height - 2 * AIRE_FRANJA_COLLECCIONS_PX,
