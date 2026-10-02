@@ -48,7 +48,10 @@ const mesura = () => {
   const mz = pel('Mazinger-Z');
   const ncc = pel('NCC-1701');
   const cg = cg0;
-  const sel = arrel.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn"]');
+  // EL SELECTOR DE LA P2 ES EL QUADRAT DE LA P1 (05/10/2026): `bn-p1`. El
+  // rectangle (`bn`) es conserva a la taula vertical, pero aqui es busca el de la
+  // filera.
+  const sel = arrel.querySelector('[data-p2-color-selector] [data-stripe-buttonbar="bn-p1"], [data-p2-color-selector] [data-stripe-buttonbar="bn"]');
   const carrusel = arrel.querySelector('[data-carrusel="1"]');
   const retall = carrusel ? carrusel.firstElementChild : null;
   const tira = retall ? retall.firstElementChild : null;

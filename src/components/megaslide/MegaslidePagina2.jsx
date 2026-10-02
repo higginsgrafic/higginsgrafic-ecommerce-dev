@@ -1375,11 +1375,13 @@ export default function MegaslidePagina2({
             {/* AQUEST EMBOLCALL TAMBE ES PLE (129,4 x 129,4) i taparia el
                 carrusel: no rep clics. Els rep la pastilla, que es qui es veu. */}
             <div style={{ width: '100%', height: '100%', pointerEvents: 'none', transform: `translateY(${topVisualAlignmentY + selectorCentratgeY}px)` }}>
-              {esCarrilPagina1024 ? (
-                /* LA MATEIXA PECA QUE EL SELECTOR DE LA P1 (02/10/2026): el
-                   quadrat amb el fons, el radi i l'ombra, la pastilla blanca a
-                   la casella triada i els tres enllacos de text. */
-                <div style={{
+              {/* LA MATEIXA PECA QUE EL SELECTOR DE LA P1 (02/10/2026): el
+                  quadrat amb el fons, el radi i l'ombra, la pastilla blanca a
+                  la casella triada i els tres enllacos de text. EL SELECTOR DE
+                  LA P2 ES SEMPRE EL QUADRAT DE LA P1 (05/10/2026): abans el
+                  rectangle era nome's per a la resta de vistes, i en Marc l'ha
+                  fet quadrat a totes. */}
+              <div style={{
                   position: 'relative',
                   width: '100%',
                   height: '100%',
@@ -1406,38 +1408,6 @@ export default function MegaslidePagina2({
                     onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
                   />
                 </div>
-              ) : (
-              <FirstContactDibuix00Buttons
-                // EL SELECTOR DE LA PAGINA 2 ES RECTANGLE (26/09/2026): el bloc
-                // de BLANC/COLOR/NEGRE es compartit amb la pagina 1, que el vol
-                // quadrat, i per aixo la forma s'hi passa (vegeu
-                // `FirstContactDibuix00Buttons`). Aqui torna a ser el de sempre:
-                // la meitat d'amplada i el doble d'alçada.
-                //
-                // I A 1024 TORNA A SER QUADRAT (02/10/2026). En Marc: «el selector
-                // b/c/n serà un quadrat com a la p1 (a l'esquerra)»: alla el
-                // selector de la p1 es un quadrat i el de la p2 ha de fer el
-                // mateix, amb les tres caselles apilades.
-                format={esCarrilPagina1024 ? 'square' : 'rectangle'}
-                // LA CAIXA, CLAVADA AMB LA PASTILLA DE LA FRANJA (02/10/2026):
-                // l'amplada surt de la primera casa de la franja (vegeu
-                // `ampleCaixaBcnPx`) i l'alçada es queda la de disseny (el doble
-                // de l'amplada de disseny, que es el que feia l'aspecte 1/2).
-                // A 1024 el quadrat fa el costat del contenidor
-                // (`carrilPx(bnSliderSize)`).
-                ampladaPx={esCarrilPagina1024
-                  ? carrilPx(bnSliderSize)
-                  : (ampleCaixaBcnPx != null ? `${ampleCaixaBcnPx}px` : null)}
-                alcadaPx={carrilPx(bnSliderSize)}
-                onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
-                onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
-                onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
-                showWhite={stripeVariantVisibility?.white !== false}
-                showBlack={stripeVariantVisibility?.black !== false}
-                showMulti={stripeVariantVisibility?.color !== false}
-                selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
-              />
-              )}
             </div>
           </div>
         ) : null}

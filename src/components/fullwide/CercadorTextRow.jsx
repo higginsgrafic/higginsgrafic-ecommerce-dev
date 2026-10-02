@@ -502,7 +502,7 @@ export function CercadorDibuixosGraella({
   // `alcadaFila * 2` hi caben les dues files i el seu buit, i la fila de dalt
   // no hi toca la vora.
   const alcadaCarrusel = carrusel
-    ? (Number.isFinite(alcadaCarruselPx) && alcadaCarruselPx > 0 ? alcadaCarruselPx : alcadaFila * 2)
+    ? (Number.isFinite(alcadaCarruselPx) && alcadaCarruselPx > 0 ? alcadaCarruselPx : (filaUnica ? alcadaFila : alcadaFila * 2))
     : 0;
   // Una peça per clic de fletxa (mig pas: les peces van mig pas una de l'altra).
   const unPas = filaUnica ? pas : pas / 2;
@@ -1902,6 +1902,17 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
   // excepte les desktop»: a la resta de la banda hi sortia la tira.
   const esColumna1024 = isLandscapeTablet;
   const composicioFranja = composicioEstreta && !esColumna1024;
+  // LA GRAELLA DE LA P2, D'UNA SOLA FILA ALS PORTATILS DE 1200 A 1366
+  // (05/10/2026). En Marc: «Fes la graella de la p2 com la de la p1»: la p1 hi
+  // va d'una sola fila (vegeu `MegaStripePanelP1`), i la p2 fa el mateix, dins
+  // l'amplada que te el seu carrusel (no s'estira: nome's passa a una fila).
+  // La classe la diu el model (`isDesktop`), com a la p1: les banderes
+  // `isPortraitTablet`/`isLandscapeTablet` arriben CERTES als escriptoris per la
+  // regla vella de `MegaMenuPanel` i enganyaven la condicio.
+  const esFilaUnicaP2 = composicioEstreta
+    && typeof window !== 'undefined'
+    && deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isDesktop
+    && window.innerWidth >= 1200 && window.innerWidth <= 1366;
   const [mesures, setMesures] = useState({
     midesGraella: null,
     margesEnllacos: { dalt: 0, baix: 0 },
@@ -2398,8 +2409,10 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           items={items}
           dibuixPx={dibuixPx}
           gapH={gapH}
-          gapV={gapV}
+          gapV={esFilaUnicaP2 ? 0 : gapV}
           numColumns={numColumns}
+          // UNA SOLA FILA ALS PORTATILS DE 1200 A 1366 (05/10/2026), com la p1.
+          filaUnica={esFilaUnicaP2}
           midaSelector={midaSelector}
           reservaDreta={reservaDreta}
           carrusel
