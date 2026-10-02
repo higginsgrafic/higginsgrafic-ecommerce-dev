@@ -304,7 +304,16 @@ function MegaStripePanelP1({
     && window.innerWidth >= 1200 && window.innerWidth <= 1366;
   const blocDretaAviat = pagina1BlocDretaPx(escalaCarrilAviat) * (esComposicioEstretaP1 ? 0.75 : 1);
   const gapDretaAviat = PAGINA1_GAP_DRETA_PX * escalaCarrilAviat;
-  const ampleGraellaP1 = ampleCarrilPaginaP1 - blocDretaAviat - (esEscriptoriAviat ? blocDretaAviat + gapDretaAviat : 0);
+  // LA GRAELLA ARRIBA FINS AL SELECTOR (05/10/2026). En Marc: «Allarga la
+  // graella fins el selector». A la fila unica nome s hi ha la columna de la
+  // dreta (les fletxes de l'esquerra no s'hi munten), o sigui que de carril
+  // nome s se n'ha de descomptar ella: la vora dreta de la graella cau on
+  // arrenca el selector.
+  // ...amb el seu GAP de 10 px (05/10/2026): «Allarga la graella fins el
+  // selector» i, precisant, «10 px de gap». El selector queda a 10 px de la
+  // vora dreta de la graella.
+  const ampleGraellaP1 = ampleCarrilPaginaP1 - blocDretaAviat - gapDretaAviat
+    - (esEscriptoriAviat && !esFilaUnicaAviat ? blocDretaAviat + gapDretaAviat : 0);
   // La franja s'ha de quedar dins del carril amb les manigues a fora (com a la
   // pagina 2: les dues pagines han de quadrar). Vegeu l'hook: a la fila unica
   // l'objectiu es l'amplada de la graella.

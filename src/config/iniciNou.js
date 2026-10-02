@@ -145,9 +145,9 @@ export function espaiMegaslideCss(ample, alt) {
   // ELS PORTATILS DE 1200 A 1366 (05/10/2026). Són els de la graella d'una sola
   // fila i la columna de fletxes+selector: amb el carril de 1000 el megaslide hi
   // fa 238 px i, amb la stripe retallada a la dreta de la graella, la vora real
-  // es 311. La banda es 239: `0,05 x carril + 189`.
+  // es 321. La banda es 249: `0,05 x carril + 199`.
   if (ample >= 1200 && ample <= 1366) {
-    return 'calc(0.05 * var(--inici-nou-carril, 0px) + 189px)';
+    return 'calc(0.05 * var(--inici-nou-carril, 0px) + 199px)';
   }
   return 'calc(0.05 * var(--inici-nou-carril, 0px) + 224px)';
 }
