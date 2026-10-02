@@ -84,26 +84,35 @@ export const HERO_ALCADA = 401;
 export const HERO_ALCADA_VERTICAL = 430;
 
 /**
- * L'ESPAI DE LES ICONES DE COLLECCIO, EN PX (04/10/2026).
+ * L'ESPAI DEL MEGASLIDE: LA BANDA DE LES ICONES, EN CSS (04/10/2026).
  *
- * En Marc: «Li donem un espai a les icones de colleccio i que la hero s'encaixi
- * a sota i prou». Es l'unic que la pagina li dona a aquesta fila: abans les
- * icones es repartien el tros de dalt amb la hero consultant la linia del
- * megaslide, i tot plegat es movia cada cop que el panell s'obria, es tancava o
- * acabava de carregar.
+ * En Marc: «1024 i 1280 no arriben a dalt» i «1376 i 1920 s'amaguen sota el
+ * megaslide». La banda ha de fer EXACTAMENT el que fa el megaslide: si es queda
+ * curta, la hero no arriba a tocar-lo i queda un buit; si es queda llarga, el
+ * panell tapa la part de dalt de la hero.
  *
- * LA MIDA, TRIADA AMB EL MEGASLIDE MESURAT AL DAVANT (04/10/2026). «Hem de fer
- * l'espai de les icones mes gros perque la hero baixi»: la banda fa el que ocupa
- * el megaslide quan s'obre, i aixi obrir-lo la omple i la hero no es mou.
- * Mesurat (amplada x alcada de finestra): 316 px a 1920x946, 258 a 1440x766, 309
- * a 1376x954, 243 a 1366x634, 1280x586 i 1024x690, i 278 a 1200x586 i 1180x702.
- * 280 els encaixa tots.
+ * Aquestes son les rectes que ho declaren, les mateixes que la calibracio de la
+ * linia (mesurades amb `scripts/_tmp-divisions.mjs`). Donen l'alcada del panell
+ * amb menys de 6 px d'error a tots els formats:
  *
- * ES UN NUMERO TRIAT, NO LLEGIT. El megaslide no hi entra: nome's va servir per
- * decidir-lo. Si demà el panell fa una altra alcada, aquesta xifra es revisa a
- * ma i prou; res no la recalcula ni la persegueix.
+ *   vertical (alt > ample)                 0,585 x carril
+ *   tauleta apaissada (ample <= 1376)      0,2529 x carril + 5,3
+ *   escriptori (ample > 1376)              0,1775 x carril + 111,3
+ *
+ * ES DECLARAT, NO MESURAT. El carril es una variable de CSS que ja hi es al
+ * primer pintat, i res no llegeix la vora del panell ni el seu estat: per aixo
+ * la pagina no es mou quan el megaslide s'obre o es tanca. El megaslide no mana:
+ * nome's hi coincideix.
  */
-export const ESPAI_ICONES_PX = 280;
+export function espaiMegaslideCss(ample, alt) {
+  // VERTICAL: qualsevol finestra mes alta que ampla. El tall era `ample < 1024`,
+  // i la tauleta vertical de 1032 (iPad Pro 13) no hi entrava: la banda li
+  // quedava a 244 px quan el panell en fa 615, i el megaslide se li tirava a
+  // sobre. Mesurat: la recta vertical dona 580 i el panell en fa 615.
+  if (alt > ample) return 'calc(0.585 * var(--inici-nou-carril, 0px))';
+  if (ample <= 1376) return 'calc(0.2529 * var(--inici-nou-carril, 0px) + 5.3px)';
+  return 'calc(0.1775 * var(--inici-nou-carril, 0px) + 111.3px)';
+}
 
 /**
  * LA MIDA DE LA HERO, COM A FRACCIO DE L'ESPAI (04/10/2026).
@@ -120,7 +129,7 @@ export const ESPAI_ICONES_PX = 280;
  * El que sobra es reparteix a parts iguals entre dalt i baix (la hero va
  * centrada), o sigui que l'aire es `(1 - factor) / 2` de l'espai a cada banda.
  */
-export const FACTOR_HERO_ESPAI = 1;
+export const FACTOR_HERO_ESPAI = 0.8;
 
 /**
  * L'AIRE DE LA HERO, com a fraccio de l'AMPLE DEL CARRIL (el total, els dos

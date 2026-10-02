@@ -35,12 +35,16 @@
  * referencia per mesurar i per diagnosticar: cap `calc` d'aquest projecte no la
  * fa servir, i els guions de mesura la llegeixen per comparar.
  */
-import { ESPAI_ICONES_PX, FACTOR_HERO_ESPAI } from '@/config/iniciNou';
+import { espaiMegaslideCss, FACTOR_HERO_ESPAI } from '@/config/iniciNou';
 
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
   const ampleVista = typeof window !== 'undefined' ? window.innerWidth : 0;
   const altVista = typeof window !== 'undefined' ? window.innerHeight : 0;
+  // LA BANDA DE LES ICONES FA EL QUE FA EL MEGASLIDE (vegeu
+  // `espaiMegaslideCss`): aixi la hero arrenca exactament on acaba el panell,
+  // sense buit ni tapa. Es declarat amb el carril, no mesurat.
+  const espaiMegaslide = espaiMegaslideCss(ampleVista, altVista);
   // L'ESPAI DE LA HERO: del final de la banda de les icones (que es on acaba el
   // megaslide quan s'obre) fins al fons del viewport. Dins seu la hero va
   // CENTRADA, i si no hi cap s'encongeix proporcionalment (vegeu `HeroInici`).
@@ -49,7 +53,7 @@ function MarcInici({ seccions }) {
   // d'una estructura autoregulable, com es una taula, era per garantir que la
   // hero sortis centrada a l'espai que queda entre el megaslide i el bottom del
   // viewport» i «no volem la sensacio de no tenir espai per posar les coses».
-  const espaiHeroCss = `calc(100dvh - var(--appHeaderOffset, 0px) - ${ESPAI_ICONES_PX}px)`;
+  const espaiHeroCss = `calc(100dvh - var(--appHeaderOffset, 0px) - ${espaiMegaslide})`;
   // LA MIDA DE LA HERO: l'espai per un factor, el mateix a totes les vistes. Amb
   // el factor a 1 va encaixada a zero (toca la banda i el fons) i el que en
   // sobra, quan se'n treu, es reparteix entre les dues bandes.
@@ -68,7 +72,7 @@ function MarcInici({ seccions }) {
           gap: 0,
           // LES DUES XIFRES DE LA PAGINA, publicades com a variables perque les
           // pugui llegir qui les hagi de menester (i els guions de mesura).
-          '--inici-espai-icones': `${ESPAI_ICONES_PX}px`,
+          '--inici-espai-icones': espaiMegaslide,
           // LA MIDA DE LA HERO, publicada: es l'espai per el factor, i la fan
           // servir les peces de dins seu (el mockup, els dibuixos, el shuffle).
           ...(esHoritzontal ? { '--inici-hero-alcada': alcadaHeroCss } : null),
@@ -77,7 +81,7 @@ function MarcInici({ seccions }) {
           // LA FRONTERA DE LA PAGINA: on s'acaben les icones i comença la hero.
           // Es una referencia propia de la pagina; no te res a veure amb la
           // linia del megaslide.
-          '--inici-frontera': `${ESPAI_ICONES_PX}px`,
+          '--inici-frontera': espaiMegaslide,
         }}
       >
         {/* L'ESPAI DE LES ICONES DE COLLECCIO: el seu, declarat. */}
@@ -85,7 +89,7 @@ function MarcInici({ seccions }) {
           data-cella="1"
           data-cella-de={primera.id}
           style={{
-            height: `${ESPAI_ICONES_PX}px`,
+            height: espaiMegaslide,
             flex: '0 0 auto',
             display: 'flex',
             flexDirection: 'column',
