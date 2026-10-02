@@ -135,19 +135,11 @@ export function espaiMegaslideCss(ample, alt) {
   // coixi de la capcalera). La recta que passa pels dos punts es
   // 0,05 x carril + 224, i els deixa a 0,25 px. Es la MATEIXA per a tots els
   // escriptoris: el carril ja els distingeix.
-  // ELS PORTATILS DE 1200 A 1366, AMB LA MATEIXA RECTA QUE LA RESTA (05/10/2026).
-  // La graella hi va d'una sola fila (vegeu `MegaStripePanelP1`), pero el
-  // selector i les fletxes es queden a la mida de sempre —en Marc: «no podem
-  // ajuntar les coses perque no ve gens be per a llegir-les»— i son ells qui
-  // manen l'alcada de la filera: el panell torna a fer 278/283 i la banda, per
-  // tant, es la mateixa que a la resta d'escriptoris (mesurat: vora 351 amb el
-  // carril de 1105 i 356 amb el de 1205, o sigui delta 0).
-  // ELS PORTATILS DE 1200 A 1366 (05/10/2026). Són els de la graella d'una sola
-  // fila i la columna de fletxes+selector: amb el carril de 1000 el megaslide hi
-  // fa 238 px i, amb la stripe retallada a la dreta de la graella, la vora real
-  // es 311. La banda es 239: `0,05 x carril + 189`.
+  // ELS PORTATILS DE 1200 A 1366, AMB LA VARIANT 1000 (05/10/2026). Amb el
+  // carril de 1000 el megaslide hi fa 261 px, o sigui que la vora real es 334 i
+  // la banda 262 (descomptant-hi els 72 de la capcalera): `0,05 x carril + 212`.
   if (ample >= 1200 && ample <= 1366) {
-    return 'calc(0.05 * var(--inici-nou-carril, 0px) + 189px)';
+    return 'calc(0.05 * var(--inici-nou-carril, 0px) + 212px)';
   }
   return 'calc(0.05 * var(--inici-nou-carril, 0px) + 224px)';
 }

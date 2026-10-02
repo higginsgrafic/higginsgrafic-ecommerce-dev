@@ -97,11 +97,6 @@ export default function GraellaDuesFileresPagina1({
   /** La graella, en bloc, centrada al selector (a 1024). Vegeu
    *  `CercadorDibuixosGraella`. */
   centraFilesEnBloc = false,
-  /** UNA SOLA FILA I ELS DIBUIXOS UN 10 % MES GROSSOS (05/10/2026). En Marc,
-   *  dels portatils de 1200 a 1366: «La hero es molt petita. Em pregunto si no
-   *  es podria transformar la graella intercalada en una sola fila. Amb els
-   *  dibuixos un 10% mes grossos». */
-  unaFila = false,
 }) {
   // LA PECA, EL MES GRAN POSSIBLE FINS A LA DE LA PAGINA 2 (45 unitats). Amb
   // poques peces (7 a FIRST CONTACT) el carril en dona per a mes, i la de la
@@ -113,7 +108,7 @@ export default function GraellaDuesFileresPagina1({
   // carrusel naixia amb alcada 0 (mesurat: `carrusel 1025,5x0` i el retall
   // `1025,5x0`).
   const escalaNumerica = Number.isFinite(escala) && escala > 0 ? escala : 1;
-  const dibuixPx = COSTAT_PECA_PAGINA1_PX * escalaNumerica * (unaFila ? 1.1 : 1);
+  const dibuixPx = COSTAT_PECA_PAGINA1_PX * escalaNumerica;
 
   return (
     <div
@@ -148,7 +143,7 @@ export default function GraellaDuesFileresPagina1({
         items={items}
         dibuixPx={dibuixPx}
         gapH={GAP_PECA_PAGINA1_PX * escalaNumerica}
-        gapV={unaFila ? 0 : GAP_FILES_PAGINA1_PX * escalaNumerica}
+        gapV={GAP_FILES_PAGINA1_PX * escalaNumerica}
         // L'ALCADA DE LA FINESTRA DEL CARRUSEL, EN NUMERO. Els dibuixos van
         // absoluts dins la tira i el contenidor no en treu cap alcada: el
         // calcul (dues files) la dona, pero aqui el que mana es l'alcada del
@@ -156,9 +151,6 @@ export default function GraellaDuesFileresPagina1({
         // i les fletxes. El pare la passa feta.
         alcadaCarruselPx={alcadaCarruselPx}
         centraFilesEnBloc={centraFilesEnBloc}
-        // UNA FILA: totes les peces a la de dalt i a un pas sencer.
-        filaUnica={unaFila}
-        numColumns={unaFila ? items.length : undefined}
         midaSelector={midaSelector}
         reservaDreta={0}
         carrusel

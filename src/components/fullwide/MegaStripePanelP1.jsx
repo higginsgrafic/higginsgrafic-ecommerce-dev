@@ -5,7 +5,7 @@ import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { computeStripeTileOverlaySrcs } from '../../utils/resolveStripeTile.js';
 import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
-import GraellaDuesFileresPagina1, { COSTAT_PECA_PAGINA1_PX } from './GraellaDuesFileresPagina1.jsx';
+import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
 import { SelectorQuadratPagina1, FletxesQuadratPagina1, PastillaBlancaPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
 import { estilCaixaBlocAlcadaAuto } from './estilsBlocs.js';
 import { composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
@@ -285,30 +285,9 @@ function MegaStripePanelP1({
   const ampleCarrilPaginaP1 = esComposicioEstretaP1
     ? (carrilMegaslide() ?? Math.min(CARRIL_MEGASLIDE_939_PX, window.innerWidth - 80))
     : 0;
-  // LA STRIPE, DE L'AMPLADA DE LA GRAELLA (05/10/2026). En Marc: «Redueixes la
-  // stripe per la dreta fins que coincideixi amb la dreta de la graella». Amb
-  // l'objectiu mes estret els cossos s'encongeixen i la stripe baixa.
-  //
-  // Es calcula aqui dalt perque el ganxo de la franja (la linia de sota) ja en
-  // depen i les peces de la filera es declaren mes avall (`escalaCarril`,
-  // `blocDretaPx` i `gapDretaPx` fan el mateix calcul).
-  const escalaCarrilAviat = (isPortraitTablet || isLandscapeTablet || esComposicioEstretaP1)
-    ? 1
-    : escalaMegaslide(getBeltWidth(typeof window !== 'undefined' ? window.innerWidth : 1920));
-  const esEscriptoriAviat = esComposicioEstretaP1
-    && typeof window !== 'undefined'
-    && !esTauletaVertical({ ample: window.innerWidth, alt: window.innerHeight })
-    && !esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight });
-  const esFilaUnicaAviat = esEscriptoriAviat
-    && typeof window !== 'undefined'
-    && window.innerWidth >= 1200 && window.innerWidth <= 1366;
-  const blocDretaAviat = pagina1BlocDretaPx(escalaCarrilAviat) * (esComposicioEstretaP1 ? 0.75 : 1);
-  const gapDretaAviat = PAGINA1_GAP_DRETA_PX * escalaCarrilAviat;
-  const ampleGraellaP1 = ampleCarrilPaginaP1 - blocDretaAviat - (esEscriptoriAviat ? blocDretaAviat + gapDretaAviat : 0);
   // La franja s'ha de quedar dins del carril amb les manigues a fora (com a la
-  // pagina 2: les dues pagines han de quadrar). Vegeu l'hook: a la fila unica
-  // l'objectiu es l'amplada de la graella.
-  const { factor: factorCarrilFranjaBase, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, esFilaUnicaAviat ? ampleGraellaP1 : ampleCarrilPaginaP1);
+  // pagina 2: les dues pagines han de quadrar). Vegeu l'hook.
+  const { factor: factorCarrilFranjaBase, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, ampleCarrilPaginaP1);
   const [pageLift, setPageLift] = useState(0);
   // EL SCROLL DE LA FRANJA DE LA P1 (28/09/2026). En Marc: «Aplica-li un scroll
   // als dibuixos de la franja. Com que a la franja de p1 nome's es mostra un
@@ -460,16 +439,6 @@ function MegaStripePanelP1({
   // de tauleta), no les banderes `isPortraitTablet`/`isLandscapeTablet`: als
   // escriptoris aquestes arriben certes per la regla vella de `MegaMenuPanel`.
   const esEscriptoriP1 = esComposicioEstretaP1 && !esTauleta;
-  // LA FILA UNICA DELS PORTATILS DE 1200 A 1366 (05/10/2026). En Marc: «Hi ha
-  // tres formats que no em convencen. De 1200-1366. La hero es molt petita. Em
-  // pregunto si no es podria transformar la graella intercalada en una sola
-  // fila. Amb els dibuixos un 10% mes grossos i les fletxes i el selector
-  // adaptats a aquesta mida». Nome s aquests tres (1200x586, 1280x666 i
-  // 1366x634): les tauletes de la mateixa amplada i els escriptoris grans es
-  // queden amb les dues files.
-  const esFilaUnicaP1 = esEscriptoriP1
-    && typeof window !== 'undefined'
-    && window.innerWidth >= 1200 && window.innerWidth <= 1366;
 
   // LA COMPOSICIO DE LA PAGINA 1 A L'ESCRIPTORI (26/09/2026, B2 del bucle): la
   // graella de DUES FILERES intercalades (la MATEIXA peça que la pagina 2,
@@ -594,14 +563,6 @@ function MegaStripePanelP1({
   // `blocDretaPx`: declarats despres, el lint hi veia un us abans de la
   // declaracio.
   const escalaBlocDreta = esComposicioEstretaP1 ? 0.75 : 1;
-  // LA FILA UNICA: L'ALCADA DE LA GRAELLA, NOME S. En Marc: «Encara que siguin
-  // aparells amb ratoli no podem ajuntar les coses perque no ve gens be per a
-  // llegir-les. Mantingues els quadrats del selector i les fletxes a escala
-  // normal (normal per a un dispositiu amb ratoli). Els dos quadrats marcaran
-  // l'espai disponible entre ells. La graella s'hi adaptara». O sigui que el
-  // selector i les fletxes es queden a la mida de sempre i la fila unica es
-  // nome s la de la graella.
-  const costatFilaUnicaPx = COSTAT_PECA_PAGINA1_PX * escalaCarril * escalaBlocDreta * 1.1;
   const blocDretaPx = pagina1BlocDretaPx(escalaCarril) * escalaBlocDreta;
   const columnaDretaPx = pagina1ColumnaDretaPx(escalaCarril) * escalaBlocDreta;
   // EL BLOC DE LA P1: UN QUADRAT, MIG PER A LES FLETXES I MIG PER AL SELECTOR
@@ -970,7 +931,7 @@ function MegaStripePanelP1({
                   p1». Es la MATEIXA peça que hi havia al bloc de la dreta (les
                   dues fletxes apilades, ‹ a dalt i › a baix) i mou la graella
                   amb el MATEIX pas publicat (`stepperP1`), com alla. */}
-              {esEscriptoriP1 && !esFilaUnicaP1 ? (
+              {esEscriptoriP1 ? (
                 <div style={{
                   position: 'relative',
                   flex: '0 0 auto',
@@ -1009,10 +970,7 @@ function MegaStripePanelP1({
                   // px»). El coixi de l'esquerra es compensa amb el desplacament.
                   // El bloc de fletxes de l'esquerra tambe hi es: la graella
                   // li deixa el seu costat mes el seu gap (05/10/2026).
-                  // L'amplada de la graella: el carril menys els dos quadrats
-                  // i els seus gaps (05/10/2026). Es el MATEIX numero que se li
-                  // passa a la stripe com a objectiu.
-                  width: `${ampleGraellaP1}px`,
+                  width: `${ampleCarrilPaginaP1 - blocDretaPx - (esEscriptoriP1 ? blocDretaPx + gapDretaPx : 0)}px`,
                   // El retall arrenca 10 px endins de la caixa de la graella (el
                   // coixi de l'esquerra), o sigui que el desplacament va 10 px mes
                   // enlla d'on va el bloc perque el RETALL caigui a la vora del
@@ -1026,8 +984,7 @@ function MegaStripePanelP1({
                   activeCollection={active}
                   activeSubcollection={austenSubcollection}
                   escala={esComposicioEstretaP1 ? escalaCarril * 0.75 : escalaCarril}
-                  unaFila={esFilaUnicaP1}
-                  alcadaCarruselPx={esFilaUnicaP1 ? costatFilaUnicaPx : alcadaFileraPx}
+                  alcadaCarruselPx={alcadaFileraPx}
                   centraFilesEnBloc={esComposicioEstretaP1}
                   midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
                   onSelectGroup={(collection, subcollection, firstStripeItem) => {
@@ -1272,9 +1229,9 @@ function MegaStripePanelP1({
                   // esquerra del carril de la pagina i el del selector a la dreta,
                   // i cadascun porta la seva caixa (fons, radi i ombra). A la
                   // resta, el quadrat conjunt de sempre.
-                  flexDirection: esFilaUnicaP1 ? 'column' : ((esComposicioEstretaP1 || esTauleta) ? 'row' : 'column'),
-                  justifyContent: esFilaUnicaP1 ? 'flex-start' : 'flex-end',
-                  alignItems: esFilaUnicaP1 ? 'flex-end' : ((esComposicioEstretaP1 || esTauleta) ? 'stretch' : 'flex-end'),
+                  flexDirection: (esComposicioEstretaP1 || esComposicioEstretaP1 || esTauleta) ? 'row' : 'column',
+                  justifyContent: 'flex-end',
+                  alignItems: (esComposicioEstretaP1 || esComposicioEstretaP1 || esTauleta) ? 'stretch' : 'flex-end',
                 }}>
                 {/* A LA TAUETA NO HI HA FLETXES (02/10/2026). En Marc: «A les
                     tablets no hi van fletxes», que es la mateixa regla que ja
@@ -1286,13 +1243,13 @@ function MegaStripePanelP1({
                     quadrat de les fletxes s'hi muntava igualment. Ara no es
                     munta a TOTA la composicio estreta i el selector queda sol,
                     ocupant el quadrat sencer, a la vora dreta del carril. */}
-                {(esFilaUnicaP1 || !(esComposicioEstretaP1 || esTauleta)) ? (
+                {!(esComposicioEstretaP1 || esComposicioEstretaP1 || esTauleta) ? (
                 <div style={{
                   position: 'relative',
-                  flex: esFilaUnicaP1 ? '1 1 50%' : (esComposicioEstretaP1 ? '0 0 auto' : '1 1 50%'),
+                  flex: esComposicioEstretaP1 ? '0 0 auto' : '1 1 50%',
                   minHeight: 0,
-                  width: (esFilaUnicaP1 || esComposicioEstretaP1) ? `${blocDretaPx}px` : '100%',
-                  height: esFilaUnicaP1 ? undefined : (esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined),
+                  width: esComposicioEstretaP1 ? `${blocDretaPx}px` : '100%',
+                  height: esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined,
                   // LA CAIXA DE CADA PECA: fons, radi i ombra propis.
                   ...(esComposicioEstretaP1
                     ? {
@@ -1324,10 +1281,10 @@ function MegaStripePanelP1({
                     sencer: es l'unic fill de la filera. */}
                 <div style={{
                   position: 'relative',
-                  flex: esFilaUnicaP1 ? '1 1 50%' : (esComposicioEstretaP1 ? '0 0 auto' : ((esComposicioEstretaP1 || esTauleta) ? '1 1 100%' : '1 1 50%')),
+                  flex: esComposicioEstretaP1 ? '0 0 auto' : ((esComposicioEstretaP1 || esTauleta) ? '1 1 100%' : '1 1 50%'),
                   minHeight: 0,
-                  width: (esFilaUnicaP1 || esComposicioEstretaP1) ? `${blocDretaPx}px` : '100%',
-                  height: esFilaUnicaP1 ? undefined : (esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined),
+                  width: esComposicioEstretaP1 ? `${blocDretaPx}px` : '100%',
+                  height: esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined,
                   // El bloc es transparent i deixa passar els clics; el quadrat
                   // del selector els ha de rebre (05/10/2026).
                   ...(esComposicioEstretaP1 ? { pointerEvents: 'auto' } : null),
