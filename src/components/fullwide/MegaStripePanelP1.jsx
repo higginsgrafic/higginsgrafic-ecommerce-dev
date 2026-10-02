@@ -914,6 +914,14 @@ function MegaStripePanelP1({
                 alignItems: esComposicioEstretaP1 ? 'center' : 'flex-start',
                 width: '100%',
                 ...(esComposicioEstretaP1 ? { height: `${blocDretaPx}px` } : null),
+                // LA FILERA, PER DAMUNT DE LA FRANJA (05/10/2026). En Marc: «A
+                // totes les vistes els clics de la fila de la graella estan
+                // capturats per alguna cosa». La caixa de la franja de
+                // samarretes es mes alta que les seves samarretes (porta els
+                // coixins) i arriba a la filera: com que va DESPRES al DOM,
+                // guanyava el clic. La filera mana i la franja queda per sota
+                // (els seus gestos, a la part de sota, no es toquen).
+                ...(esComposicioEstretaP1 ? { zIndex: 5 } : null),
                 marginTop: `${topFileraPx}px`,
               }}
             >
@@ -1035,6 +1043,12 @@ function MegaStripePanelP1({
                   // passa per damunt, a la vora dreta del carril de la pagina (el
                   // desplacament `dx` el porta alla, com abans).
                   ...(esComposicioEstretaP1 ? { position: 'absolute', left: 0, top: 0 } : { position: 'relative' }),
+                  // EL BLOC ES TRANSPARENT I FA EL CARRIL SENCER (05/10/2026): a
+                  // la composicio estreta es una capa absoluta sobre tota la
+                  // filera i, amb `pointerEvents` automatic, capturava els clics
+                  // de la graella i de les fletxes. Qui els ha de rebre es el
+                  // selector, que va dins i ja porta `auto`.
+                  ...(esComposicioEstretaP1 ? { pointerEvents: 'none' } : null),
                   // A 1024, el bloc es desplac, a la dreta del carril de la pagina.
                   ...((esComposicioEstretaP1 && alcadaBlocEstretaP1) ? { transform: `translateX(${alcadaBlocEstretaP1.dx}px)` } : null),
                   // EL BLOC, SENSE CAPA PROPRIA, PER SOTA DE LA FRANJA (28/09/2026).
@@ -1182,6 +1196,16 @@ function MegaStripePanelP1({
                   zIndex: 6,
                   height: '100%',
                   width: '100%',
+                  // LA CAPA NO ES MENJA ELS CLICS DEL QUE TE A SOTA (05/10/2026).
+                  // En Marc: «A totes les vistes els clics de la fila de la
+                  // graella estan capturats per alguna cosa. Les fletxes, la
+                  // graella i el selector. Nome s a la p1». Aquesta capa fa
+                  // `inset: 0` sobre el BLOC, i a la composicio estreta el bloc
+                  // es el CARRIL SENCER (1200 px): amb `pointerEvents` automatic
+                  // cobria la graella de dibuixos (que es fora del bloc) i tambe
+                  // l'espai de les fletxes. Nome s els botons del selector han de
+                  // rebre clics, i ells ja porten `pointerEvents: 'auto'`.
+                  pointerEvents: 'none',
                   display: 'flex',
                   // EN DUES COLUMNES NOME'S A LA COMPOSICIO ESTRETA (02/10/2026).
                   // En Marc: «Fes les fletxes en mig quadrat i el selector a
@@ -1261,6 +1285,9 @@ function MegaStripePanelP1({
                   minHeight: 0,
                   width: esComposicioEstretaP1 ? `${blocDretaPx}px` : '100%',
                   height: esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined,
+                  // El bloc es transparent i deixa passar els clics; el quadrat
+                  // del selector els ha de rebre (05/10/2026).
+                  ...(esComposicioEstretaP1 ? { pointerEvents: 'auto' } : null),
                   // LA CAIXA DE CADA PECA: fons, radi i ombra propis.
                   ...(esComposicioEstretaP1
                     ? {
