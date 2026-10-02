@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from '@react-email/components';
 import { EmailLayout } from '../components/EmailLayout.jsx';
 

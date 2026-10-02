@@ -1,3 +1,4 @@
+import React from 'react';
 import { Html, Head, Body, Img, Link } from '@react-email/components';
 
 // El logo del correu viu a la pròpia botiga (a `public/emails/assets/`).

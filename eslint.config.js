@@ -101,4 +101,20 @@ export default tseslint.config(
     plugins: { react },
     rules: { 'react/no-unescaped-entities': 'off' },
   },
+  {
+    // (04/10/2026) ELS CORREUS ES COMPILEN EN JSX CLASSIC. Netlify empaqueta les
+    // funcions de servidor amb esbuild i, com que no hi ha cap tsconfig amb
+    // `jsx: react-jsx` a l'abast d'aquests fitxers, el JSX surt amb
+    // `React.createElement`: cada .jsx ha d'importar React. La config general fa
+    // servir el runtime AUTOMATIC (`react.configs['jsx-runtime']`, vegeu la regla
+    // de dalt), que desactiva aquestes dues regles, i per allo la neteja del codi
+    // mort va poder treure els imports: el paquet compilava i petava en enviar.
+    // Amb aquestes dues regles, l'eslint ho torna a exigir.
+    files: ['netlify/emails/**/*.jsx'],
+    plugins: { react },
+    rules: {
+      'react/react-in-jsx-scope': 'error',
+      'react/jsx-uses-react': 'error',
+    },
+  },
 );

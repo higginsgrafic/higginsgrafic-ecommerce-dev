@@ -1,3 +1,4 @@
+import React from 'react';
 import { EmailLayout } from '../components/EmailLayout.jsx';
 
 export function ContactReceivedEmail({ data = {} }) {
