@@ -274,6 +274,7 @@ function MegaStripePanelP1({
   // banda apaisada (02/10/2026, «La p2 està tallada. Falta la columna de
   // col·leccions»): ara el nom diu el que es.
   const esComposicioEstretaP1 = composicioMegaslide({ isLandscapeTablet });
+
   // A 1024, LA STRIPE FA EL CARRIL DE LA PAGINA (02/10/2026). En Marc: «Acaba
   // d'alinear la stripe p1 a la mida del segon carril». El segon carril es el de
   // la pagina —`min(939px, 100vw - 80px)`, el del header, la hero, el bloc de
@@ -432,6 +433,12 @@ function MegaStripePanelP1({
   const esTauleta = typeof window !== 'undefined'
     && (esTauletaVertical({ ample: window.innerWidth, alt: window.innerHeight })
       || esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight }));
+  // LES VERSIONS NO TACTILS (05/10/2026). En Marc: «A les versions no tactils:
+  // desktop i portatils, afegeix-los unes fletxes al cantó esquerre de la
+  // graella de dibuixos. A la p1». La classe la diu el model (les dues classes
+  // de tauleta), no les banderes `isPortraitTablet`/`isLandscapeTablet`: als
+  // escriptoris aquestes arriben certes per la regla vella de `MegaMenuPanel`.
+  const esEscriptoriP1 = esComposicioEstretaP1 && !esTauleta;
 
   // LA COMPOSICIO DE LA PAGINA 1 A L'ESCRIPTORI (26/09/2026, B2 del bucle): la
   // graella de DUES FILERES intercalades (la MATEIXA peça que la pagina 2,
@@ -910,6 +917,26 @@ function MegaStripePanelP1({
                 marginTop: `${topFileraPx}px`,
               }}
             >
+              {/* LES FLETXES, A L'ESQUERRA DE LA GRAELLA (05/10/2026). En Marc:
+                  «A les versions no tactils: desktop i portatils, afegeix-los
+                  unes fletxes al cantó esquerre de la graella de dibuixos. A la
+                  p1». Es la MATEIXA peça que hi havia al bloc de la dreta (les
+                  dues fletxes apilades, ‹ a dalt i › a baix) i mou la graella
+                  amb el MATEIX pas publicat (`stepperP1`), com alla. */}
+              {esEscriptoriP1 ? (
+                <div style={{
+                  position: 'relative',
+                  flex: '0 0 auto',
+                  width: `${blocDretaPx}px`,
+                  marginRight: `${gapDretaPx}px`,
+                }}>
+                  <FletxesQuadratPagina1
+                    omple
+                    onPrev={() => stepperP1?.(1)}
+                    onNext={() => stepperP1?.(-1)}
+                  />
+                </div>
+              ) : null}
               {/* EL VIEWPORT DE LA GRAELLA, DE LA VORA ESQUERRA DEL CARRIL DE LA
                   PAGINA FINS AL SELECTOR (02/10/2026). En Marc: «Obre el viewport
                   de la graella fins a la part esquerra del segon carril i fins al
@@ -928,7 +955,9 @@ function MegaStripePanelP1({
                   // la vora esquerra del carril de la pagina fins a 10 px ABANS del
                   // selector (en Marc: «Fes-li un marge al cantó del selector, 10
                   // px»). El coixi de l'esquerra es compensa amb el desplacament.
-                  width: `${ampleCarrilPaginaP1 - blocDretaPx}px`,
+                  // El bloc de fletxes de l'esquerra tambe hi es: la graella
+                  // li deixa el seu costat mes el seu gap (05/10/2026).
+                  width: `${ampleCarrilPaginaP1 - blocDretaPx - (esEscriptoriP1 ? blocDretaPx + gapDretaPx : 0)}px`,
                   // El retall arrenca 10 px endins de la caixa de la graella (el
                   // coixi de l'esquerra), o sigui que el desplacament va 10 px mes
                   // enlla d'on va el bloc perque el RETALL caigui a la vora del

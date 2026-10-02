@@ -12,6 +12,7 @@ import {
 // de geometria declarada del megaslide.
 import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA_COLUMNA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
+import { deviceLayoutFromViewport } from '../../utils/layoutModel.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
 import { caminsSiluetes, precarregaSiluetesSamarreta } from './siluetesSamarreta.js';
@@ -388,6 +389,24 @@ export function dibuixosGraella16x4() {
 }
 
 /** La GRAELLA DE DIBUIXOS 16x4 de la pagina 2 (una casella per dibuix). */
+/**
+ * LES FLETXES DEL CARRUSEL, TAMBE A LES VERSIONS NO TACTILS (05/10/2026).
+ *
+ * En Marc: «A les versions no tactils: desktop i portatils, afegeix-los unes
+ * fletxes al cantó esquerre de la graella de dibuixos» (a la p1) i «A la p2 les
+ * poses a la dreta de la graella. Just abans de la columna de colleccions».
+ *
+ * Qui ho decidia era `!isPortraitTablet && !isLandscapeTablet`, i als
+ * escriptoris aquestes dues banderes arriben CERTES per la regla vella de
+ * `MegaMenuPanel` (`w <= 1366 || modelAqui`): per aixo alla no hi sortien. La
+ * classe del model es qui ho diu, com a la resta de la composicio.
+ */
+function carruselAmbFletxes({ isPortraitTablet = false, isLandscapeTablet = false } = {}) {
+  if (typeof window === 'undefined') return false;
+  const esEscriptori = deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isDesktop;
+  return esEscriptori || (!isPortraitTablet && !isLandscapeTablet);
+}
+
 export function CercadorDibuixosGraella({
   // EL REF DE LA CAIXA QUE ES MOU (EL RETALL DEL CARRUSEL). Qui el posa el pot
   // passar per mesurar-la de fora (la filera de la pagina 2 ho fa); si no
@@ -513,7 +532,8 @@ export function CercadorDibuixosGraella({
   const [desplacGest, setDesplacGest] = useState(0);
   const arrossegant = useRef(null);
   const haArrossegat = useRef(false);
-  const ambFletxes = carrusel && !isPortraitTablet && !isLandscapeTablet && !senseFletxes;
+  const ambFletxes = carrusel && !senseFletxes
+    && carruselAmbFletxes({ isPortraitTablet, isLandscapeTablet });
   // LA FUNCIO DE PAS, PUBLICADA (27/09/2026). Les fletxes del bloc de la dreta
   // de la pagina 1 son FORA d'aquesta graella: en comptes de portar un estat
   // propi, en reben aquesta i criden el MATEIX `setDesplacGest` que les fletxes
@@ -2223,7 +2243,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // tots dos acabin on comencen les fletxes. Es calcula UNA vegada aqui (les
     // fletxes son al desktop i a la tauleta apaisada, no a la vertical) i el
     // fan servir els dos.
-    const reservaDreta = (!isPortraitTablet && !isLandscapeTablet)
+    const reservaDreta = carruselAmbFletxes({ isPortraitTablet, isLandscapeTablet })
       ? `calc(${carrilPx(midaSelector / 2)} + ${carrilPx(10)})`
       : 0;
     // LA COMPOSICIO ESTRETA FA TOT EL CARRIL (02/10/2026).
