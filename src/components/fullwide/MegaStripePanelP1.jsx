@@ -5,7 +5,7 @@ import ClicAreaOverlayP1 from './ClicAreaOverlayP1.jsx';
 import { CERCADOR_COLORS } from './CercadorTopBar.jsx';
 import { computeStripeTileOverlaySrcs } from '../../utils/resolveStripeTile.js';
 import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
-import GraellaDuesFileresPagina1, { COSTAT_PECA_PAGINA1_PX } from './GraellaDuesFileresPagina1.jsx';
+import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
 import { SelectorQuadratPagina1, FletxesQuadratPagina1, PastillaBlancaPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
 import { estilCaixaBlocAlcadaAuto } from './estilsBlocs.js';
 import { composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
@@ -439,16 +439,6 @@ function MegaStripePanelP1({
   // de tauleta), no les banderes `isPortraitTablet`/`isLandscapeTablet`: als
   // escriptoris aquestes arriben certes per la regla vella de `MegaMenuPanel`.
   const esEscriptoriP1 = esComposicioEstretaP1 && !esTauleta;
-  // LA FILA UNICA DELS PORTATILS DE 1200 A 1366 (05/10/2026). En Marc: «Hi ha
-  // tres formats que no em convencen. De 1200-1366. La hero es molt petita. Em
-  // pregunto si no es podria transformar la graella intercalada en una sola
-  // fila. Amb els dibuixos un 10% mes grossos i les fletxes i el selector
-  // adaptats a aquesta mida». Nome s aquests tres (1200x586, 1280x666 i
-  // 1366x634): les tauletes de la mateixa amplada i els escriptoris grans es
-  // queden amb les dues files.
-  const esFilaUnicaP1 = esEscriptoriP1
-    && typeof window !== 'undefined'
-    && window.innerWidth >= 1200 && window.innerWidth <= 1366;
 
   // LA COMPOSICIO DE LA PAGINA 1 A L'ESCRIPTORI (26/09/2026, B2 del bucle): la
   // graella de DUES FILERES intercalades (la MATEIXA peça que la pagina 2,
@@ -573,14 +563,6 @@ function MegaStripePanelP1({
   // `blocDretaPx`: declarats despres, el lint hi veia un us abans de la
   // declaracio.
   const escalaBlocDreta = esComposicioEstretaP1 ? 0.75 : 1;
-  // LA FILA UNICA: L'ALCADA DE LA GRAELLA, NOME S. En Marc: «Encara que siguin
-  // aparells amb ratoli no podem ajuntar les coses perque no ve gens be per a
-  // llegir-les. Mantingues els quadrats del selector i les fletxes a escala
-  // normal (normal per a un dispositiu amb ratoli). Els dos quadrats marcaran
-  // l'espai disponible entre ells. La graella s'hi adaptara». O sigui que el
-  // selector i les fletxes es queden a la mida de sempre i la fila unica es
-  // nome s la de la graella.
-  const costatFilaUnicaPx = COSTAT_PECA_PAGINA1_PX * escalaCarril * escalaBlocDreta * 1.1;
   const blocDretaPx = pagina1BlocDretaPx(escalaCarril) * escalaBlocDreta;
   const columnaDretaPx = pagina1ColumnaDretaPx(escalaCarril) * escalaBlocDreta;
   // EL BLOC DE LA P1: UN QUADRAT, MIG PER A LES FLETXES I MIG PER AL SELECTOR
@@ -1002,8 +984,7 @@ function MegaStripePanelP1({
                   activeCollection={active}
                   activeSubcollection={austenSubcollection}
                   escala={esComposicioEstretaP1 ? escalaCarril * 0.75 : escalaCarril}
-                  unaFila={esFilaUnicaP1}
-                  alcadaCarruselPx={esFilaUnicaP1 ? costatFilaUnicaPx : alcadaFileraPx}
+                  alcadaCarruselPx={alcadaFileraPx}
                   centraFilesEnBloc={esComposicioEstretaP1}
                   midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
                   onSelectGroup={(collection, subcollection, firstStripeItem) => {
