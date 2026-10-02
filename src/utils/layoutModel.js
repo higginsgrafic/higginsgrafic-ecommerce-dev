@@ -328,6 +328,23 @@ export function laneForViewport(vw = getLayoutViewportWidth()) {
  */
 export const IPAD_PRO_13_AMPLADES = [1032, 1376];
 export const MEGASLIDE_1100_AMPLADES = [1032, 1180, 1200];
+
+/**
+ * LA LLARGADA 939 (05/10/2026).
+ *
+ * En Marc: «Avui tanim la 900 (confirma'm la mida per posar-li el nom correcte),
+ * la 1100 i la 1200. Pero seran variacions i no construccions noves». La que ell
+ * en deia «la 900» es aquesta: 939 px, el carril de la banda estreta de paisatge
+ * (l'iPad Air 13 de 1366 i els apaissats de 1051 a 1366), que fins ara s'escrivia
+ * `939,2` escampat pels components. Amb la 1100 i la 1200, doncs, nome s hi ha
+ * TRES llargades en us.
+ *
+ * Els enters son una premisa de treball seva: «Fes servir nombres enters. Evita
+ * els decimals. No aporten res, visualment parlant, i nome s compliquen les mides
+ * (a mi)». Aquest es el valor unic dels components que dibuixen aquest carril; la
+ * resta de decimals de geometria que venen del disseny de 1350 es queden com son.
+ */
+export const CARRIL_MEGASLIDE_939_PX = 939;
 export const MEGASLIDE_VERSIONS = {
   'megaslide-1100': {
     nom: 'Megaslide 1100',

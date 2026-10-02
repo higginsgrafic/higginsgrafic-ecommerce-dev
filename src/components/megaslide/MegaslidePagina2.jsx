@@ -16,7 +16,7 @@ import {
 } from './geometriaMegaslide.js';
 import { COIX_ENLLAC_COLLECCIONS_PX } from '../fullwide/estilsBlocs.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
-import { carrilMegaslide, paramsMegaslide } from '../../utils/layoutModel.js';
+import { carrilMegaslide, paramsMegaslide, CARRIL_MEGASLIDE_939_PX } from '../../utils/layoutModel.js';
 import { SelectorQuadratPagina1, PastillaBlancaPagina1 } from '../fullwide/BlocDretaPagina1.jsx';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
@@ -180,7 +180,7 @@ export default function MegaslidePagina2({
   const esComposicioFranja = esComposicioEstreta && !esCarrilPagina1024;
   // El carril de la pagina: el seu, si es l'iPad Pro 13 apaïssat (1100).
   const ampleCarrilPaginaP2 = esCarrilPagina1024
-    ? (carrilMegaslide() ?? Math.min(939.2, window.innerWidth - 80))
+    ? (carrilMegaslide() ?? Math.min(CARRIL_MEGASLIDE_939_PX, window.innerWidth - 80))
     : 0;
   // EL SELECTOR B/C/N DE 1024 ES EL DE LA P1 (02/10/2026). En Marc: «Fes el
   // selector b/c/n del mateix estil que el de la p1»: mateixa peca (el quadrat

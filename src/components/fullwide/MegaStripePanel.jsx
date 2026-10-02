@@ -5,7 +5,7 @@ import ClicAreaOverlay from './ClicAreaOverlay.jsx';
 import { VEL_SAMARRETA_BUIDA_ALFA_BLANCA } from '../../config/stripeCalibrationsVertical';
 import { carrilPx } from '../../utils/layoutMetrics.js';
 import { esTauletaApaisada } from '../../utils/layoutMetrics.js';
-import { carrilMegaslide, paramsMegaslide } from '../../utils/layoutModel.js';
+import { carrilMegaslide, paramsMegaslide, CARRIL_MEGASLIDE_939_PX } from '../../utils/layoutModel.js';
 import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } from './siluetesSamarreta.js';
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
@@ -497,7 +497,7 @@ function MegaStripePanel({
   // El carril de la pagina: el de la versio del model que li toca (1100 o 1200,
   // vegeu `MEGASLIDE_VERSIONS` a `layoutModel`).
   const ampleCarrilPaginaP2 = esCarrilPagina1024
-    ? (carrilMegaslide() ?? Math.min(939.2, window.innerWidth - 80))
+    ? (carrilMegaslide() ?? Math.min(CARRIL_MEGASLIDE_939_PX, window.innerWidth - 80))
     : 0;
   // LA STRIPE ACABA A 5 px DE LA COLUMNA (03/10/2026). En Marc: «La stripe de la
   // p2 ha d'acabar a 10 px de la columna de col·leccions», precisat amb «Per la

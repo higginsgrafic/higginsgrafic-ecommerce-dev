@@ -10,7 +10,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { getGildan64000Catalog } from '../utils/placeholders.js';
 import { AUSTEN_QUOTES_ASSETS, resolveAustenQuoteAssetId, resolveAustenQuoteOriginalFromPath } from '../utils/austenQuotesAssets.js';
 import { clampNumber, escalaMegaslide, MEGASLIDE_REFERENCIA_PX, carrilPx, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '@/utils/layoutMetrics';
-import { laneForViewport, carrilDeclarat, carrilMegaslide } from '@/utils/layoutModel';
+import { laneForViewport, carrilDeclarat, carrilMegaslide, CARRIL_MEGASLIDE_939_PX } from '@/utils/layoutModel';
 import { getLayoutViewportWidth } from '@/utils/layoutMetrics';
 import {
   FIRST_CONTACT_MEDIA,
@@ -43,8 +43,9 @@ import { MARGE_DALT_BLOC_FRANJA_PX } from './megaslide/geometriaMegaslide.js';
  *  filtre `AUSTEN_SUB_PREFIXES`, que viu dins del component). */
 /** El tauler de la tauleta vertical (el mateix numero que `layoutModel`). */
 const BELT_TABLET_VERTICAL_PX = 992;
-/** El carril de la pagina (el segon carril): `min(939.2px, 100vw - 80px)`. */
-const CARRIL_PAGINA_PX = 939.2;
+/** El carril de la pagina (el segon carril): `min(939px, 100vw - 80px)`, la
+ *  llargada «939» del megaslide (vegeu `CARRIL_MEGASLIDE_939_PX`). */
+const CARRIL_PAGINA_PX = CARRIL_MEGASLIDE_939_PX;
 
 const SUBS_AUSTEN = new Set(['pemberley', 'keep_calm', 'quotes', 'crosswords', 'looking_for_my_darcy']);
 
@@ -128,7 +129,7 @@ function FullWideSlideHeader({
     && window.innerWidth >= window.innerHeight;
   // A 1024 (l'ajust de la pagina 1) EL CARRIL DE LA PAGINA ES EL QUE MANA
   // (02/10/2026). En Marc: «Alinea el cadenat a la dreta del segon carril». El
-  // segon carril es `min(939.2px, 100vw - 80px)` centrat: el del header, la
+  // segon carril es `min(939px, 100vw - 80px)` centrat: el del header, la
   // hero, el bloc de la p1 i les segones guies verdes. A la resta de mides el
   // cadenat segueix a la dreta del carril del megaslide, que es la vora del
   // panell.
@@ -2639,7 +2640,7 @@ function FullWideSlideHeader({
         // la diferència era la mateixa a 1280, 1366 i 1376, «Tota la banda de
         // tauleta apaïssada».
         //
-        // El carril de la pàgina és `min(939.2px, 100vw - 80px)` (el del
+        // El carril de la pàgina és `min(939px, 100vw - 80px)` (el del
         // header, la hero i les segones guies verdes) i el megaslide hi anava
         // estret: 759 a 1280, 811 a 1366 i 817 a 1376 (el 3/5 declarat). Ara
         // també l'agafa, amb la composició que ja tenia escalada al carril nou:
@@ -2656,10 +2657,10 @@ function FullWideSlideHeader({
         // 1100 px», que és el valor d'avui (`layoutModel`). El model fa 1376 i
         // amb el segon carril compartit li sobraven 218 px per banda. A la resta
         // de la banda apaïssada el carril de la pagina segueix sent
-        // `min(939.2, 100vw - 80)`.
+        // `min(939, 100vw - 80)`.
         const carrilModel = carrilMegaslide();
         const carrilPagina = typeof window !== 'undefined'
-          ? (carrilModel ?? Math.min(939.2, Math.max(0, window.innerWidth - 80)))
+          ? (carrilModel ?? Math.min(CARRIL_PAGINA_PX, Math.max(0, window.innerWidth - 80)))
           : 0;
         // A TOTA LA BANDA APAÏSSADA, TAMBÉ LES ESTRETES (03/10/2026). Abans
         // nome's a partir de 1050 i les tauletes de 853, 934 i 981 es quedaven
@@ -2695,7 +2696,7 @@ function FullWideSlideHeader({
         // CENTRAT A LA FINESTRA, COM LES GUIES I COM LA P1/P2 (03/10/2026). En
         // Marc: «Assegura't que totes les vistes estan ben alineades amb el segon
         // carril». El segon carril de les guies (`data-guia-carril-pagina`) es
-        // `min(939.2px, 100vw - 80px)` centrat, i la p1 i la p2 el centren amb
+        // `min(939px, 100vw - 80px)` centrat, i la p1 i la p2 el centren amb
         // `window.innerWidth`; aqui es feia amb l'amplada de MAQUETACIO (que
         // reserva la barra de desplacament), i sortien 7,4 px de diferencia amb
         // les guies i amb el bloc de la p1 (mesurat a 1024, 1180, 1280, 1366,
@@ -3596,9 +3597,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // (02/10/2026). En Marc: «No es podria fer més ample la distància
             // entre el logo i la icona d'usuari, a la vista 1024?». Fins ara
             // agafava el carril del megaslide (605 px a 1024) i el segon header en
-            // fa 939,2: el logo i la icona quedaven molt mes junts que els
+            // fa 939: el logo i la icona quedaven molt mes junts que els
             // enllacos de sota. Amb el mateix carril, tot alinea.
-            width: esCarrilHeaderAmpliat ? 'min(939.2px, calc(100vw - 80px))' : 'var(--hg-mega-w, 70.3vw)',
+            width: esCarrilHeaderAmpliat ? `min(${CARRIL_PAGINA_PX}px, calc(100vw - 80px))` : 'var(--hg-mega-w, 70.3vw)',
             // CENTRAT A LA FINESTRA TAMBE A 1024 (02/10/2026). En Marc: «El
             // header, centra el header». Amb el carril del segon header (939,2)
             // la fila ha d'anar centrada com alla; el `--hg-mega-x` es la x del
@@ -3930,8 +3931,8 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // `esDobleHeader`): es queda amb el marc del lloc (vegeu el primer).
             // El MATEIX carril que el primer header i que la taula vertical
             // (vegeu el comentari de la fila de dalt): el nav s'hi centra.
-            width: 'min(939.2px, calc(100vw - 80px))',
-            marginLeft: 'calc((100vw - min(939.2px, 100vw - 80px)) / 2 - var(--rulerInset, 0px))',
+            width: `min(${CARRIL_PAGINA_PX}px, calc(100vw - 80px))`,
+            marginLeft: `calc((100vw - min(${CARRIL_PAGINA_PX}px, 100vw - 80px)) / 2 - var(--rulerInset, 0px))`,
             borderTop: '1px solid hsl(var(--grey-line))',
             // Els 62 px que queden dels 114, amb el contingut centrat.
             height: '62px',
@@ -4015,7 +4016,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             //
             // A 1024, LA DRETA DEL SEGON CARRIL (02/10/2026). En Marc: «Alinea
             // el cadenat a la dreta del segon carril»: alla el carril de la
-            // pagina es `min(939.2px, 100vw - 80px)` (el del header, la hero i
+            // pagina es `min(939px, 100vw - 80px)` (el del header, la hero i
             // el bloc de la p1), i es alla on acaba la vora del panell.
             //
             // AMB `100vw` I NO AMB `50%` (02/10/2026): el carril del megaslide
@@ -4024,7 +4025,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // es el que fan servir les segones guies. Amb `50%` el cadenat queia
             // 7,5 px a l'esquerra de la vora del carril a 1024 (mesurat).
             left: esCarrilPagina1024
-              ? `calc((100vw + min(939.2px, calc(100vw - 80px))) / 2 - ${CADENAT_AMPLADA_PX / 2}px)`
+              ? `calc((100vw + min(${CARRIL_PAGINA_PX}px, calc(100vw - 80px))) / 2 - ${CADENAT_AMPLADA_PX / 2}px)`
               : `calc(50% + var(--hg-mega-w, 0px) / 2 - ${CADENAT_AMPLADA_PX / 2}px)`,
             // El cadenat surt de sota el panell (vegeu mega-cadenat-surt) i
             // queda just a sota del separador.

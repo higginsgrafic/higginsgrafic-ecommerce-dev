@@ -12,7 +12,7 @@ import { composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, getBeltWidth, escalaMegaslide, esTauletaVertical, esTauletaApaisada } from '../../utils/layoutMetrics.js';
-import { carrilMegaslide } from '../../utils/layoutModel.js';
+import { carrilMegaslide, CARRIL_MEGASLIDE_939_PX } from '../../utils/layoutModel.js';
 
 /**
  * L'AIRE ENTRE EL SELECTOR I LA STRIPE A L'iPAD PRO 13 APAÏSSAT (03/10/2026).
@@ -269,13 +269,13 @@ function MegaStripePanelP1({
     && esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight });
   // A 1024, LA STRIPE FA EL CARRIL DE LA PAGINA (02/10/2026). En Marc: «Acaba
   // d'alinear la stripe p1 a la mida del segon carril». El segon carril es el de
-  // la pagina —`min(939.2px, 100vw - 80px)`, el del header, la hero, el bloc de
+  // la pagina —`min(939px, 100vw - 80px)`, el del header, la hero, el bloc de
   // la dreta i les segones guies verdes— i es el MATEIX calcul que fa l'estil del
   // bloc. Nome's te valor a 1024: a la resta de mides la franja va amb el carril
   // del megaslide, com sempre.
   // El carril de la pagina: el seu, si es l'iPad Pro 13 apaïssat (1000).
   const ampleCarrilPaginaP1 = esAjust1024P1
-    ? (carrilMegaslide() ?? Math.min(939.2, window.innerWidth - 80))
+    ? (carrilMegaslide() ?? Math.min(CARRIL_MEGASLIDE_939_PX, window.innerWidth - 80))
     : 0;
   // La franja s'ha de quedar dins del carril amb les manigues a fora (com a la
   // pagina 2: les dues pagines han de quadrar). Vegeu l'hook.
@@ -610,7 +610,7 @@ function MegaStripePanelP1({
           // «Alinea el quadrat a la dreta del carril» i, en dir-li que el carril
           // de la pagina es mes ample que el del megaslide, «Sí».
           // El carril de la pagina: el seu, si es l'iPad Pro 13 apaïssat (1000).
-          const amplePagina = carrilMegaslide() ?? Math.min(939.2, window.innerWidth - 80);
+          const amplePagina = carrilMegaslide() ?? Math.min(CARRIL_MEGASLIDE_939_PX, window.innerWidth - 80);
           const esquerraPagina = (window.innerWidth - amplePagina) / 2;
           // El desplacament es ABSOLUT (el que ja tenim mes el que falta): la
           // mesura del bloc ja porta el `transform` aplicat i, sense descomptar-lo,
@@ -979,7 +979,7 @@ function MegaStripePanelP1({
                   // L'iPad Pro 13 apaïssat té el seu carril (1000) i el bloc hi fa
                   // el carril sencer; a la resta, el segon carril de sempre.
                   width: esAjust1024P1
-                    ? (carrilMegaslide() != null ? `${ampleCarrilPaginaP1}px` : 'min(939.2px, calc(100vw - 80px))')
+                    ? (carrilMegaslide() != null ? `${ampleCarrilPaginaP1}px` : `min(${CARRIL_MEGASLIDE_939_PX}px, calc(100vw - 80px))`)
                     : `${blocDretaPx}px`,
                   minWidth: 0,
                   // A 1024 EL BLOC SURT DEL FLUX (02/10/2026). El bloc fa tot el
