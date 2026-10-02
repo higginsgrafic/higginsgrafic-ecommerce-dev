@@ -135,6 +135,12 @@ export function espaiMegaslideCss(ample, alt) {
   // coixi de la capcalera). La recta que passa pels dos punts es
   // 0,05 x carril + 224, i els deixa a 0,25 px. Es la MATEIXA per a tots els
   // escriptoris: el carril ja els distingeix.
+  // ELS PORTATILS DE 1200 A 1366, AMB LA VARIANT 1000 (05/10/2026). Amb el
+  // carril de 1000 el megaslide hi fa 261 px, o sigui que la vora real es 334 i
+  // la banda 262 (descomptant-hi els 72 de la capcalera): `0,05 x carril + 212`.
+  if (ample >= 1200 && ample <= 1366) {
+    return 'calc(0.05 * var(--inici-nou-carril, 0px) + 212px)';
+  }
   return 'calc(0.05 * var(--inici-nou-carril, 0px) + 224px)';
 }
 

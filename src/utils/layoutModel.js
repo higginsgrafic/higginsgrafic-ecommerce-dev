@@ -356,6 +356,24 @@ export const CARRIL_MEGASLIDE_939_PX = 939;
  */
 export const MIDA_PORTATIL_1100_MAX_PX = 1280;
 export const MEGASLIDE_VERSIONS = {
+  // LA VARIANT 1000 DELS PORTATILS (05/10/2026). En Marc: «I si reduim el
+  // carril d'aquests portatils, de 1100 a 1000?». Es la variant dels
+  // escriptoris de 1200 a 1366 (1200x586, 1280x666 i 1366x634): amb el carril
+  // de 1000 el megaslide hi fa 261 px als tres i la hero guanya alcada.
+  //
+  // Els aires son els de la banda estreta (els mateixos que la 939); el que
+  // canvia es el carril, que es el que estira la stripe i les peces.
+  'megaslide-1000': {
+    nom: 'Megaslide 1000',
+    carril: 1000,
+    amplades: [],
+    aireStripeColumna: 4,
+    extraAireSota: 0,
+    aireSotaBloc: 20,
+    aireDaltBlocP2: 20,
+    margeTopBlocP1: 1.4,
+    composicio: 'estreta',
+  },
   // LA VARIANT 939, DECLARADA (05/10/2026). En Marc: «la meva idea es que totes
   // els megaslides siguin iguals i tinguin variacions. No un megaslide per cada
   // versio. [...] Pero seran variacions i no construccions noves».
@@ -473,7 +491,11 @@ export function versioMegaslide({ ample, alt } = {}) {
   const es = deviceLayoutFromViewport(w, h);
   // EL PORTATIL DE 1280, AMB LA 1100 (05/10/2026): vegeu
   // `MIDA_PORTATIL_1100_MAX_PX`. La resta d'escriptoris, amb la 1200.
-  if (es.isDesktop) return w <= MIDA_PORTATIL_1100_MAX_PX ? 'megaslide-1100' : 'megaslide-1200';
+  if (es.isDesktop) {
+    // ELS PORTATILS DE 1200 A 1366, AMB LA 1000 (05/10/2026).
+    if (w >= 1200 && w <= 1366) return 'megaslide-1000';
+    return w <= MIDA_PORTATIL_1100_MAX_PX ? 'megaslide-1100' : 'megaslide-1200';
+  }
   if (!(es.isPortraitTablet || es.isLandscapeTablet)) return null;
   const marge = 2;
   const clau = Object.keys(MEGASLIDE_VERSIONS)
