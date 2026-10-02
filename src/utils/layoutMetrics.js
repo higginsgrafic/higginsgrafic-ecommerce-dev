@@ -231,6 +231,17 @@ export const ALCADA_TAULETA_APAISADA_MAX = 1100;
  */
 export const MIDA_TAULETA_APAISADA_GRAN_MIN = 1200;
 export const ALCADA_TAULETA_APAISADA_GRAN_MIN = 900;
+/**
+ * EL TALL D'ALCADA DELS 1200 EXACTES (05/10/2026).
+ *
+ * En Marc: «He oblidat 1200x720. Tambe ha de canviar com les desktop». Aquella
+ * amplada la porten el portatil de 1200x720 (que ensenya 1200x586: vegeu
+ * `public/browser-overlay.html`) i les tauletes del model (1200x742 del Model
+ * 1200x820 i 1200x722 del Galaxy Tab S9+). Amb el tall de 900 les dues
+ * tauletes hi passaven per portatils; amb 700 el portatil queda a sota (586) i
+ * les dues tauletes a sobre (722 i 742).
+ */
+export const ALCADA_PORTATIL_1200_MAX_PX = 700;
 
 /**
  * Tauleta apaïsada i tauleta vertical: NOMES amb mides, mai amb el touch.
@@ -245,9 +256,14 @@ export function esTauletaApaisada({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
   // A LA BANDA DE LES GRANS, A MES, L'ALÇADA: si no, el 1280x666 d'un portatil
-  // passaria per tauleta.
-  const aLaBandaDeLesGrans = w > MIDA_TAULETA_APAISADA_GRAN_MIN
-    && h < ALCADA_TAULETA_APAISADA_GRAN_MIN;
+  // passaria per tauleta. I a 1200 exactes el tall es mes baix, perque aquella
+  // amplada la porten el portatil de 1200x720 i les tauletes del model (vegeu
+  // `ALCADA_PORTATIL_1200_MAX_PX`).
+  const tallAlcada = w > MIDA_TAULETA_APAISADA_GRAN_MIN
+    ? ALCADA_TAULETA_APAISADA_GRAN_MIN
+    : ALCADA_PORTATIL_1200_MAX_PX;
+  const aLaBandaDeLesGrans = w >= MIDA_TAULETA_APAISADA_GRAN_MIN
+    && h < tallAlcada;
   return w >= MIDA_TAULETA_APAISADA_MIN
     && w <= MIDA_TAULETA_APAISADA_MAX
     && h < w && h > 0

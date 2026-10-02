@@ -139,6 +139,14 @@ describe('la classificació de dispositiu', () => {
     // Els models, per sota de 1200, no es toquen.
     expect(classeDe(1180, 742)).toBe('tauleta apaissada');
     expect(classeDe(1200, 742)).toBe('tauleta apaissada');
+    // A 1200 EXACTES, EL TALL D'ALCADA ES MES BAIX (05/10/2026). En Marc: «He
+    // oblidat 1200x720. Tambe ha de canviar com les desktop»: aquell format es
+    // el portatil de 1200x720 (que ensenya 1200x586) i tambe hi ha les tauletes
+    // del model (1200x742 i 1200x722), o sigui que aqui mana l'alcada.
+    expect(classeDe(1200, 586)).toBe('escriptori');
+    expect(classeDe(1200, 666)).toBe('escriptori');
+    expect(classeDe(1200, 700)).toBe('tauleta apaissada');
+    expect(classeDe(1200, 722)).toBe('tauleta apaissada');
     // L'alcada de 1100 separa tauleta apaissada de monitor.
     expect(classeDe(1200, 1100)).toBe('tauleta apaissada');
     expect(classeDe(1200, 1101)).toBe('escriptori');
