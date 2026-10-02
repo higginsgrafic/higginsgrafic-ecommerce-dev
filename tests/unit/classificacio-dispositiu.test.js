@@ -58,7 +58,9 @@ const FORMATS = [
   ['iPad Air 11', 820, 1108, 'tauleta vertical'],
   ['iPad Pro 11', 834, 1122, 'tauleta vertical'],
   ['iPad Air 13', 1024, 1294, 'tauleta vertical'],
-  ['iPad Pro 13', 1032, 1304, 'escriptori'],
+  // (04/10/2026) Actualitzat al PLA del 02/10: els dos maxims son 1032 i 1376
+  // i els dos iPad Pro 13 son tauleta (vertical i apaissada).
+  ['iPad Pro 13', 1032, 1304, 'tauleta vertical'],
   // Tauletes, apaïsat
   ['Galaxy Tab S9 apaïsada', 853, 455, 'tauleta apaissada'],
   ['Galaxy Tab S9+ apaïsada', 934, 506, 'tauleta apaissada'],
@@ -70,7 +72,7 @@ const FORMATS = [
   ['iPad Air 11 apaïsada', 1180, 742, 'tauleta apaissada'],
   ['iPad Pro 11 apaïsada', 1194, 756, 'tauleta apaissada'],
   ['iPad Air 13 apaïsada', 1366, 946, 'tauleta apaissada'],
-  ['iPad Pro 13 apaïsada', 1376, 954, 'escriptori'],
+  ['iPad Pro 13 apaïsada', 1376, 954, 'tauleta apaissada'],
   // Portàtils i escriptori
   ['Portàtil 1280', 1280, 666, 'tauleta apaissada'],
   ['Portàtil 1366', 1366, 634, 'tauleta apaissada'],
@@ -114,9 +116,14 @@ describe('la classificació de dispositiu', () => {
     expect(classeDe(600, 900)).toBe('tauleta vertical');
     expect(classeDe(768, 400)).toBe('tauleta apaissada');
     expect(classeDe(1024, 1300)).toBe('tauleta vertical');
-    expect(classeDe(1025, 1300)).toBe('escriptori');
+    // (04/10/2026) La frontera es 1032/1033, no 1024/1025: el maxim de tauleta
+    // vertical es 1032 des del 02/10 (PLA §1.2).
+    expect(classeDe(1032, 1300)).toBe('tauleta vertical');
+    expect(classeDe(1033, 1300)).toBe('escriptori');
+    // (04/10/2026) El maxim de tauleta apaissada es 1376 des del 02/10, no 1366.
     expect(classeDe(1366, 800)).toBe('tauleta apaissada');
-    expect(classeDe(1367, 800)).toBe('escriptori');
+    expect(classeDe(1376, 800)).toBe('tauleta apaissada');
+    expect(classeDe(1377, 800)).toBe('escriptori');
     // L'alcada de 1100 separa tauleta apaissada de monitor.
     expect(classeDe(1200, 1100)).toBe('tauleta apaissada');
     expect(classeDe(1200, 1101)).toBe('escriptori');

@@ -24,7 +24,14 @@ describe('els dibuixos de la franja', () => {
     // Des del 26/09/2026 les entrades de la banda (189 de 224) ja no son al
     // mapa: les serveix la regla declarada. Si algu n'hi torna a posar una,
     // aquesta prova ho diu.
-    const dins = entrades.filter((e) => e.renderitzada >= 70 && e.renderitzada <= 90);
+    // (04/10/2026) UNA ENTRADA A LA BANDA NOME S ES REDUNDANT SI NO PORTa RES.
+    // La regla cobreix l'ESCALA, pero no el desplacament: una entrada amb
+    // `dx`/`dy` calibrats i escala de banda es una EXCEPCIO legitima (la regla
+    // deixaria el dibuix a (0,0)). El filtre els separa; abans es comptaven tots
+    // i la prova era vermella per sis entrades dels textos de Quotes, que hi son
+    // pels seus offsets (0,5 i 17,25).
+    const dins = entrades.filter((e) => e.renderitzada >= 70 && e.renderitzada <= 90
+      && Number(e.dx) === 0 && Number(e.dy) === 0);
     console.log(`entrades al mapa: ${entrades.length}; de la banda base: ${dins.length}`);
     for (const e of dins) console.log(`  TORNA A LA BANDA ${e.url} scale ${e.scale} -> ${e.renderitzada.toFixed(1)}`);
     expect(dins.length).toBe(0);
