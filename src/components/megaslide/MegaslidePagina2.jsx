@@ -513,10 +513,13 @@ export default function MegaslidePagina2({
           objectiuTop = panelTop + aire - topBcn
             // EL BLOC, AL TOP DE LA COLUMNA DE COLLECCIONS (05/10/2026). En Marc:
             // «Alinea el selector i la graella de dibuixos al top de la columna de
-            // colleccions»: als portatils de 1200-1366 la columna de la p2 baixa
-            // 18 px per fer la mateixa alcada que el bloc de la p1, i el selector
-            // i la graella (que hi arrenquen al mateix top) la segueixen.
-            + (esPortatilP2 ? 18 : 0);
+            // colleccions» i «L'alçada de la columna de col·leccions ha de ser la
+            // mateixa que la columna fletxes+selector de la p1». El bloc de la p1
+            // fa 170 px (91..261); el selector de la p2, un cop fet de dues files
+            // (f275041d), deixa mes aire per sobre (l'`aire` passa de 0 a 20) i el
+            // bloc baixa 20 px: el +18 d'abans ha de ser -2 perque la columna torni
+            // a quedar clavada al bloc de la p1.
+            + (esPortatilP2 ? -2 : 0);
         }
       }
       //    (Amb el selector, el centratge del selector tambe mou el seu top i
