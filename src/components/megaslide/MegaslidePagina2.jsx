@@ -188,7 +188,12 @@ export default function MegaslidePagina2({
   // mida, que a 1024 es `pagina1BlocDretaPx(1) * 0,75` (96,5), com el bloc de la
   // dreta de la pagina 1.
   const costatSelectorP1 = pagina1BlocDretaPx(1) * 0.75;
-  const midaSelectorP2 = esCarrilPagina1024 ? costatSelectorP1 : bnSliderSize;
+  // LA MIDA DEL SELECTOR ES DE LA COMPOSICIO, NO DE LA CLASSE (05/10/2026). Els
+  // escriptoris tambe porten la composicio estreta (carril 1200, com l'iPad Pro
+  // 13) i amb `esCarrilPagina1024` (= isLandscapeTablet) es quedaven amb el
+  // selector vell: 86 px a 1920 contra els 123 de 1376, amb el mateix carril
+  // (mesurat). A la resta de vistes, res no canvia.
+  const midaSelectorP2 = esComposicioEstreta ? costatSelectorP1 : bnSliderSize;
   // La pastilla, a la casella del variant triat: el mateix ordre que la p1.
   const ORDRE_BCN = ['white', 'color', 'black'];
   const variantBcn = active === 'the_human_inside' ? humanInsideVariant : firstContactVariant;

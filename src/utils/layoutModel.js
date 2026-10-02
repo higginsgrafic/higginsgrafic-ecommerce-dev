@@ -345,6 +345,16 @@ export const MEGASLIDE_1100_AMPLADES = [1032, 1180, 1200];
  * resta de decimals de geometria que venen del disseny de 1350 es queden com son.
  */
 export const CARRIL_MEGASLIDE_939_PX = 939;
+
+/**
+ * EL PORTATIL DE 1280 NO VOL LA 1200 (05/10/2026).
+ *
+ * En Marc: «Al portatil de 1280 posa-li el megaslide de 1100. Amb el de 1200 la
+ * hero queda, gairebe, de la mateixa mida que les samarretes de la stripe». Es
+ * l'unic escriptori que baixa de versio: la resta (1366, 1440, 1512, 1920,
+ * 2560...) es queden amb la 1200, que es la prova que va demanar el 04/10.
+ */
+export const MIDA_PORTATIL_1100_MAX_PX = 1280;
 export const MEGASLIDE_VERSIONS = {
   // LA VARIANT 939, DECLARADA (05/10/2026). En Marc: «la meva idea es que totes
   // els megaslides siguin iguals i tinguin variacions. No un megaslide per cada
@@ -461,7 +471,9 @@ export function versioMegaslide({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
   const es = deviceLayoutFromViewport(w, h);
-  if (es.isDesktop) return 'megaslide-1200';
+  // EL PORTATIL DE 1280, AMB LA 1100 (05/10/2026): vegeu
+  // `MIDA_PORTATIL_1100_MAX_PX`. La resta d'escriptoris, amb la 1200.
+  if (es.isDesktop) return w <= MIDA_PORTATIL_1100_MAX_PX ? 'megaslide-1100' : 'megaslide-1200';
   if (!(es.isPortraitTablet || es.isLandscapeTablet)) return null;
   const marge = 2;
   const clau = Object.keys(MEGASLIDE_VERSIONS)

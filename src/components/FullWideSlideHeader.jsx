@@ -2775,9 +2775,18 @@ function FullWideSlideHeader({
         const escalaCarrilPagina = (usaCarrilPagina && CARRIL_PAGINA_PX > 0)
           ? +(beltFinal / CARRIL_PAGINA_PX).toFixed(4)
           : 1;
+        // L'ESCRIPTORI AMB VERSIO, AMB L'ESCALA DE LA COMPOSICIO (05/10/2026).
+        // En Marc: «les p2 de 1280-1920 no estan ben muntades. El selector es
+        // mes petit del que hauria de ser». Amb el mateix carril que l'iPad Pro
+        // 13 (1200) l'escriptori hi posava `escalaMegaslide(beltFinal)` (=
+        // carril/1350 = 0,8889) i les peces hi sortien un 30 % mes petites que
+        // a 1376 (el selector de la p2: 86 px a 1920 contra 123 a 1376,
+        // mesurat). Amb versio, l'escala es la de la composicio, com a les
+        // tauletes.
+        const escalaDelModel = carrilModel != null ? +(beltFinal / CARRIL_PAGINA_PX).toFixed(4) : null;
         root.style.setProperty(
           '--hg-escala-mega',
-          String((isPortraitTablet || isLandscapeTablet) ? (carrilModel != null ? escalaCarrilPagina : Math.min(1, escalaCarrilPagina)) : escalaMegaslide(beltFinal)),
+          String((isPortraitTablet || isLandscapeTablet) ? (escalaDelModel ?? Math.min(1, escalaCarrilPagina)) : (escalaDelModel ?? escalaMegaslide(beltFinal))),
         );
       } catch {
         // ignore
