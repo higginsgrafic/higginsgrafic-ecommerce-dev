@@ -1,4 +1,3 @@
-import { carrilPx } from '../../utils/layoutMetrics.js';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ALCADA_PASTILLA_SELECTOR_PX } from './estilsBlocs.js';
 import useDeviceLayout from '@/hooks/useDeviceLayout';
@@ -208,8 +207,13 @@ export function SelectorQuadratPagina1({
             <span
               className="font-oswald"
               style={{
-                fontSize: `max(10px, ${carrilPx(13.5)})`,
-                fontWeight: 400,
+                // EL TEXT, COM EL DE LA COLUMNA DE COLLECCIONS (05/10/2026). En
+                // Marc: «Fes el text del selector com el de la columna de
+                // col·leccions»: la mateixa mida (0,85vw entre 8,5 i 13,5 px) i
+                // els mateixos pesos (l'activa en regular 400, la resta en
+                // Extra Light 200), com a `CercadorTextRow`.
+                fontSize: 'clamp(8.5px, 0.85vw, 13.5px)',
+                fontWeight: selectedKey === btn.key ? 400 : 200,
                 textTransform: 'uppercase',
                 color: desactivat ? 'hsl(var(--grey-muted))' : (selectedKey === btn.key ? 'hsl(var(--grey-ink-strong))' : 'hsl(var(--grey-ink-soft))'),
                 pointerEvents: 'none',
