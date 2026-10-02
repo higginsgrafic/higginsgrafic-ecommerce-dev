@@ -16,6 +16,7 @@ import {
   AJUST_BAIX_BLOC_FRANJA_PX,
   finestraCosVel,
   GRAELLA_COLUMNA_DRETA_CARRIL_PX,
+  composicioMegaslide,
 } from '../megaslide/geometriaMegaslide.js';
 import {
   areesClicAmpla,
@@ -479,6 +480,13 @@ function MegaStripePanel({
   // perque mitja composicio el fa servir, pero ara vol dir `isLandscapeTablet`.
   const esCarrilPagina1024 = typeof window !== 'undefined'
     && esTauletaApaisada({ ample: window.innerWidth, alt: window.innerHeight });
+  // LA FRANJA S'ESCALA AL CARRIL TAMBE A L'ESCRIPTORI (05/10/2026). En Marc: «A
+  // la 1280, la stripe p2 aixafa la columna de colleccions». La composicio
+  // estreta tambe es dels escriptoris (carril 1100 o 1200): si l'escala de la
+  // franja nome s'activa a la classe de tauleta, a l'escriptori la franja es
+  // queda amb la mida de disseny i, amb el carril de 1100, passa per sobre de
+  // la columna (mesurat a 1280: 1148 px de franja en un carril de 1100).
+  const esComposicioEstretaP2 = composicioMegaslide({ isLandscapeTablet: esCarrilPagina1024 });
   // LA SUPERFICIE DE CLIC DE LA FRANJA, NOME S LA FRANJA (03/10/2026).
   //
   // En Marc: «Costa molt clicar els enllacos de Crosswords cap avall de la
@@ -496,7 +504,7 @@ function MegaStripePanel({
   const superficiesDeFranja = esCarrilPagina1024 && paramsAquiMegaslide != null;
   // El carril de la pagina: el de la versio del model que li toca (1100 o 1200,
   // vegeu `MEGASLIDE_VERSIONS` a `layoutModel`).
-  const ampleCarrilPaginaP2 = esCarrilPagina1024
+  const ampleCarrilPaginaP2 = esComposicioEstretaP2
     ? (carrilMegaslide() ?? Math.min(CARRIL_MEGASLIDE_939_PX, window.innerWidth - 80))
     : 0;
   // LA STRIPE ACABA A 5 px DE LA COLUMNA (03/10/2026). En Marc: «La stripe de la
@@ -518,7 +526,7 @@ function MegaStripePanel({
   const ampleCossosP2 = ampleCarrilPaginaP2 > 0
     ? ampleCarrilPaginaP2 * (1 - GRAELLA_COLUMNA_DRETA_CARRIL_PX / 1350) - AIRE_STRIPE_COLUMNA_PX
     : 0;
-  const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, ampleCossosP2, esCarrilPagina1024);
+  const { factor: factorCarrilFranja, centre: centreCarrilFranja } = useEscalaFranjaCarril(filaFranjaRef, ajustFranjaCarril, ampleCossosP2, esComposicioEstretaP2);
   // A la vista vertical la franja son DUES fileres de 7: les 14 posicions de
   // la mascara es reparteixen 7 a dalt i 7 a baix (a l'apaisada van en una
   // sola filera).
