@@ -92,10 +92,18 @@ export const HERO_ALCADA_VERTICAL = 430;
  * megaslide, i tot plegat es movia cada cop que el panell s'obria, es tancava o
  * acabava de carregar.
  *
- * Els 140 px es trien amb la fila mesurada al davant: fa entre 28 i 60 px a tots
- * els formats, o sigui que queden entre 40 i 56 px d'aire a cada banda.
+ * LA MIDA, TRIADA AMB EL MEGASLIDE MESURAT AL DAVANT (04/10/2026). «Hem de fer
+ * l'espai de les icones mes gros perque la hero baixi»: la banda fa el que ocupa
+ * el megaslide quan s'obre, i aixi obrir-lo la omple i la hero no es mou.
+ * Mesurat (amplada x alcada de finestra): 316 px a 1920x946, 258 a 1440x766, 309
+ * a 1376x954, 243 a 1366x634, 1280x586 i 1024x690, i 278 a 1200x586 i 1180x702.
+ * 280 els encaixa tots.
+ *
+ * ES UN NUMERO TRIAT, NO LLEGIT. El megaslide no hi entra: nome's va servir per
+ * decidir-lo. Si demà el panell fa una altra alcada, aquesta xifra es revisa a
+ * ma i prou; res no la recalcula ni la persegueix.
  */
-export const ESPAI_ICONES_PX = 140;
+export const ESPAI_ICONES_PX = 280;
 
 /**
  * L'AIRE DE LA HERO, EN PX (04/10/2026): el mateix a dalt i a baix, a tot
