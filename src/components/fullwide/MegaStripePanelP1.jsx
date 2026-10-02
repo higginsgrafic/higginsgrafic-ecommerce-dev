@@ -573,13 +573,15 @@ function MegaStripePanelP1({
   // `blocDretaPx`: declarats despres, el lint hi veia un us abans de la
   // declaracio.
   const escalaBlocDreta = esComposicioEstretaP1 ? 0.75 : 1;
-  // LA FILA UNICA: EL SELECTOR I LES FLETXES FAN L'ALCADA DE LA FILA. La peca
-  // fa `COSTAT_PECA_PAGINA1_PX` per l'escala del bloc (0,75 a la composicio
-  // estreta) i un 10 % mes; sense `gapV`, l'alcada de la fila es la de la peca.
+  // LA FILA UNICA: L'ALCADA DE LA GRAELLA, NOME S. En Marc: «Encara que siguin
+  // aparells amb ratoli no podem ajuntar les coses perque no ve gens be per a
+  // llegir-les. Mantingues els quadrats del selector i les fletxes a escala
+  // normal (normal per a un dispositiu amb ratoli). Els dos quadrats marcaran
+  // l'espai disponible entre ells. La graella s'hi adaptara». O sigui que el
+  // selector i les fletxes es queden a la mida de sempre i la fila unica es
+  // nome s la de la graella.
   const costatFilaUnicaPx = COSTAT_PECA_PAGINA1_PX * escalaCarril * escalaBlocDreta * 1.1;
-  const blocDretaPx = esFilaUnicaP1
-    ? costatFilaUnicaPx
-    : pagina1BlocDretaPx(escalaCarril) * escalaBlocDreta;
+  const blocDretaPx = pagina1BlocDretaPx(escalaCarril) * escalaBlocDreta;
   const columnaDretaPx = pagina1ColumnaDretaPx(escalaCarril) * escalaBlocDreta;
   // EL BLOC DE LA P1: UN QUADRAT, MIG PER A LES FLETXES I MIG PER AL SELECTOR
   // (02/10/2026).

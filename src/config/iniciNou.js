@@ -135,16 +135,13 @@ export function espaiMegaslideCss(ample, alt) {
   // coixi de la capcalera). La recta que passa pels dos punts es
   // 0,05 x carril + 224, i els deixa a 0,25 px. Es la MATEIXA per a tots els
   // escriptoris: el carril ja els distingeix.
-  // I ELS PORTATILS DE 1200 A 1366, AMB LA GRAELLA D'UNA FILA (05/10/2026).
-  // En Marc: «Hi ha tres formats que no em convencen. De 1200-1366. La hero es
-  // molt petita. Em pregunto si no es podria transformar la graella intercalada
-  // en una sola fila». Amb una sola fila el panell baixa 54 px (278 -> 224 a
-  // 1200 i 1280, 283 -> 229 a 1366) i la banda ha de baixar amb ell: la vora
-  // real es 297 amb el carril de 1105 i 302 amb el de 1205, i la recta que hi
-  // passa es `0,05 x carril + 170`.
-  if (ample >= 1200 && ample <= 1366) {
-    return 'calc(0.05 * var(--inici-nou-carril, 0px) + 170px)';
-  }
+  // ELS PORTATILS DE 1200 A 1366, AMB LA MATEIXA RECTA QUE LA RESTA (05/10/2026).
+  // La graella hi va d'una sola fila (vegeu `MegaStripePanelP1`), pero el
+  // selector i les fletxes es queden a la mida de sempre —en Marc: «no podem
+  // ajuntar les coses perque no ve gens be per a llegir-les»— i son ells qui
+  // manen l'alcada de la filera: el panell torna a fer 278/283 i la banda, per
+  // tant, es la mateixa que a la resta d'escriptoris (mesurat: vora 351 amb el
+  // carril de 1105 i 356 amb el de 1205, o sigui delta 0).
   return 'calc(0.05 * var(--inici-nou-carril, 0px) + 224px)';
 }
 
