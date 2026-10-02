@@ -88,6 +88,13 @@ const ERROR_FILES_PX = 1;
 const DIVISIONS_BAIX = 20;
 const DIVISIONS_HERO = 16;
 const DIVISIONS_AIRE = 2;
+/**
+ * FINS ON POT ARRIBAR LA `k`, que son les divisions que tapa el megaslide. Amb
+ * 80 el megaslide pot ocupar com a molt el 80% de la taula: mes enlla la hero
+ * quedaria massa curta i el que ha de manar es el megaslide (vegeu el bloc).
+ */
+const DIVISIONS_MIN_K = 1;
+const DIVISIONS_MAX_K = 80;
 
 /**
  * SI EL NAVEGADOR SAP FER `round()` A CSS. La taula de divisions es calcula tota
@@ -178,7 +185,12 @@ function MarcInici({ seccions }) {
     ? {
       // LES DIVISIONS DEL MEGASLIDE: la `k`. Es publica sense unitat perque la
       // fan servir les divisions de sota (`calc(var(--inici-hero-k) + 20)`).
-      '--inici-hero-k': `round(nearest, ${DIVISIONS_BAIX} * ${alcadaPanellCss} / (${espaiTaulaCss} - ${alcadaPanellCss}), 1)`,
+      // EL LLINDAR (04/10/2026). `k` surt d'una divisio, i si el megaslide no
+      // cap a l'espai (una finestra molt curta) la divisio pot sortir negativa o
+      // enorme: amb k=-517 la divisio es negativa i la hero desapareix, i amb
+      // k=1220 la hero fa 3 px. El llindar la deixa sempre entre el 16% i el 76%
+      // de l'espai; si el megaslide no hi cap, el bloc creix i mana ell.
+      '--inici-hero-k': `max(${DIVISIONS_MIN_K}, min(${DIVISIONS_MAX_K}, round(nearest, ${DIVISIONS_BAIX} * ${alcadaPanellCss} / (${espaiTaulaCss} - ${alcadaPanellCss}), 1)))`,
       '--inici-hero-divisions': `calc(var(--inici-hero-k) + ${DIVISIONS_BAIX})`,
       '--inici-hero-divisio': `calc(${espaiTaulaCss} / var(--inici-hero-divisions))`,
       '--inici-hero-aire': `calc(var(--inici-hero-divisio) * ${DIVISIONS_AIRE})`,
