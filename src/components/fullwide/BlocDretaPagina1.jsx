@@ -2,7 +2,7 @@ import { carrilPx } from '../../utils/layoutMetrics.js';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ALCADA_PASTILLA_SELECTOR_PX } from './estilsBlocs.js';
 import useDeviceLayout from '@/hooks/useDeviceLayout';
-import { esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
+import { composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 
 /**
  * EL BLOC DE LA DRETA DE LA PAGINA 1 (26/09/2026)
@@ -75,10 +75,7 @@ export function PastillaBlancaPagina1({ topPct, alcadaPct = 100 / 3, inset = 5 }
   // coixi a cada costat i amb l'alcada declarada; a 1920/1440 tot queda com era
   // («Tot això que hem fet no ha d'afectar les vistes 1920 i 1440»).
   const { isLandscapeTablet } = useDeviceLayout();
-  const composicioEstreta = esComposicioEstretaMegaslide({
-    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
-    isLandscapeTablet,
-  });
+  const composicioEstreta = composicioMegaslide({ isLandscapeTablet: isLandscapeTablet });
   // LA PASTILLA, D'AMPLADA DE TOTA LA SEVA COLUMNA A LA COMPOSICIO ESTRETA
   // (02/10/2026). En Marc: «Que la pastilla del selector ocupi el seu mig quadrat
   // d'amplada»: alla el selector i les fletxes van en dues columnes i la pastilla
@@ -156,10 +153,7 @@ export function SelectorQuadratPagina1({
   const slotPct = 100 / ORDRE.length;
   // Vegeu `PastillaBlancaPagina1`: la composicio estreta nome s mana a 1024-1366.
   const { isLandscapeTablet: esApaissadaP1 } = useDeviceLayout();
-  const esComposicioEstreta = esComposicioEstretaMegaslide({
-    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
-    isLandscapeTablet: esApaissadaP1,
-  });
+  const esComposicioEstreta = composicioMegaslide({ isLandscapeTablet: esApaissadaP1 });
   const selectedKey = buttons.some((b) => b.key === selectedVariant) ? selectedVariant : 'color';
   const getTopPct = (key) => ORDRE.indexOf(key) * slotPct;
   const sliderTopPct = getTopPct(selectedKey);

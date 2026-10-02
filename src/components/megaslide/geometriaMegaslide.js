@@ -29,6 +29,7 @@
 
 import { carrilDeclarat, laneForViewport } from '../../utils/layoutModel';
 import { MEGASLIDE_REFERENCIA_PX, escalaMegaslide, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics';
+import { carrilMegaslide } from '../../utils/layoutModel';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide';
 
 /**
@@ -867,6 +868,35 @@ export function esComposicioEstretaMegaslide({ ample, isLandscapeTablet = false 
     && Number.isFinite(ample)
     && ample >= COMPOSICIO_ESTRETA_MIN_PX
     && ample <= COMPOSICIO_ESTRETA_MAX_PX;
+}
+
+/**
+ * LA COMPOSICIO ESTRETA, PER L'AMPLADA DEL MEGASLIDE (04/10/2026).
+ *
+ * En Marc: «Posa el megaslide 1200 a les desktop», i en veure la primera versio
+ * «A 1920 i 1440 hi ha el megaslide antic a 1200. Aixo no es el que t'he
+ * demanat».
+ *
+ * El motiu: `esComposicioEstretaMegaslide` decidia per l'AMPLADA DE LA FINESTRA
+ * (1024-1376), i a 1920 i 1440 la finestra no hi entra encara que el megaslide
+ * hi arribi amb el carril de 1200. Qui ha de manar es el CARRIL DEL MEGASLIDE:
+ * el model esta dissenyat per a un carril de 1024 a 1376, i si la versio n'hi
+ * porta un (1100 o 1200), la composicio bona es la del model sigui quina sigui
+ * la finestra.
+ *
+ * Nome's s'aplica quan hi ha versio: sense versio (null), tot queda com era.
+ *
+ * @param {object} o
+ * @param {boolean} [o.isLandscapeTablet]
+ * @returns {boolean}
+ */
+export function composicioMegaslide({ isLandscapeTablet = false } = {}) {
+  const ample = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const carril = carrilMegaslide({ ample });
+  return esComposicioEstretaMegaslide({
+    ample: carril != null ? carril : ample,
+    isLandscapeTablet: isLandscapeTablet || carril != null,
+  });
 }
 
 /**

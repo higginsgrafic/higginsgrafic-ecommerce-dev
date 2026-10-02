@@ -11,7 +11,7 @@ import {
   buscaGrupActiuFranja,
   desplacamentGrupActiuFranja,
   AIRE_FRANJA_COLLECCIONS_PX,
-  esComposicioEstretaMegaslide,
+  composicioMegaslide, esComposicioEstretaMegaslide,
   pagina1BlocDretaPx,
 } from './geometriaMegaslide.js';
 import { COIX_ENLLAC_COLLECCIONS_PX } from '../fullwide/estilsBlocs.js';
@@ -154,10 +154,7 @@ export default function MegaslidePagina2({
   // LA COMPOSICIO ESTRETA (1024-1366, 02/10/2026): alla els enllacos de
   // colleccions son una franja sota la tira de colors i el bloc sencer es mou
   // perque els seus dos aires facin 5 px (vegeu el bucle d'alineacio).
-  const esComposicioEstreta = esComposicioEstretaMegaslide({
-    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
-    isLandscapeTablet,
-  });
+  const esComposicioEstreta = composicioMegaslide({ isLandscapeTablet: isLandscapeTablet });
   // LA PAGINA 2 DE 1024, AL SEGON CARRIL (02/10/2026). En Marc: «Ara hem de fer
   // la p2 de la 1024» i «La stripe ha de ser de la mida del segon carril, com la
   // p1»: alla el contenidor de la pagina fa el carril de la pagina

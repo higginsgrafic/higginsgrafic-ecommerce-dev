@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA_COLUMNA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA_COLUMNA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
 import { FirstContactDibuix09Buttons } from './firstContactPanels.jsx';
@@ -1867,10 +1867,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
   // col·locar la franja de colleccions) i la branca `compact` (per fer la
   // graella, la tira de colors i la franja de vora a vora). Vegeu les constants
   // de sobre.
-  const composicioEstreta = esComposicioEstretaMegaslide({
-    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
-    isLandscapeTablet,
-  });
+  const composicioEstreta = composicioMegaslide({ isLandscapeTablet: isLandscapeTablet });
   // A 1024, ELS ENLLACOS SON UNA COLUMNA (02/10/2026). En Marc: «la tira de
   // col·leccions s'ha de convertir en una columna (a la dreta)»: alla la
   // composicio es la de sempre (la columna de la dreta, com a 1440/1920) i la

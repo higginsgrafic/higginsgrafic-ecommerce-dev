@@ -8,7 +8,7 @@ import { dibuixosGraella16x4 } from './CercadorTextRow.jsx';
 import GraellaDuesFileresPagina1 from './GraellaDuesFileresPagina1.jsx';
 import { SelectorQuadratPagina1, FletxesQuadratPagina1, PastillaBlancaPagina1, MIDA_BLOC_DRETA_PAGINA1_PX } from './BlocDretaPagina1.jsx';
 import { estilCaixaBlocAlcadaAuto } from './estilsBlocs.js';
-import { esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
+import { composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
 import { carrilPx, getBeltWidth, escalaMegaslide, esTauletaVertical, esTauletaApaisada } from '../../utils/layoutMetrics.js';
@@ -521,10 +521,7 @@ function MegaStripePanelP1({
   // LA COMPOSICIO ESTRETA (1024-1366): nome s alla la caixa del bloc va sense
   // fons, sense contorn i sense ombra; a 1920/1440 es la de sempre («Recupera el
   // contorn a les versions 1920/1440»).
-  const esComposicioEstretaP1 = esComposicioEstretaMegaslide({
-    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
-    isLandscapeTablet,
-  });
+  const esComposicioEstretaP1 = composicioMegaslide({ isLandscapeTablet: isLandscapeTablet });
   // LA FRANJA, FINS A L'AMPLADA DEL CARRIL DE LA PAGINA (02/10/2026). En Marc:
   // «Augmenta la stripe fins que encaixi a l'amplada del carril» i, tot seguit,
   // «Acaba d'alinear la stripe p1 a la mida del segon carril»: a 1024 el carril

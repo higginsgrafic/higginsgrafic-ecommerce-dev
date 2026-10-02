@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import OptimizedImg from './OptimizedImg.jsx';
 import { estilCaixaBloc, ALCADA_PASTILLA_SELECTOR_PX } from './estilsBlocs.js';
 import useDeviceLayout from '@/hooks/useDeviceLayout';
-import { esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
+import { composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { tshirtSrc } from '@/utils/placeholders';
 
 /**
@@ -128,10 +128,7 @@ export function FirstContactDibuix00Buttons({
   // aquest component te un retorn anticipat mes avall (`if (!buttons.length)`) i
   // un hook desprès d'un retorn es un hook condicional.
   const { isLandscapeTablet: esApaissada } = useDeviceLayout();
-  const composicioEstreta = esComposicioEstretaMegaslide({
-    ample: typeof window !== 'undefined' ? window.innerWidth : 0,
-    isLandscapeTablet: esApaissada,
-  });
+  const composicioEstreta = composicioMegaslide({ isLandscapeTablet: esApaissada });
   const coixiCostat = sliderSideInset ?? (composicioEstreta ? 10 : sliderInset);
 
   // Els noms dels acabats són els catalans (Blanc/Color/Negre) i es mostren en
