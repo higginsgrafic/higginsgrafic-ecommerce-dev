@@ -79,6 +79,33 @@ const FILES_MAX = 32;
 const ERROR_FILES_PX = 1;
 
 /**
+ * LA TAULA DE DIVISIONS (04/10/2026). En Marc: «que sigui la 20. 16/2».
+ *
+ * Les divisions que queden del megaslide fins al bottom del viewport son una
+ * decisio de disseny (20), i dins seu la hero s'endu els seus 8/10 (16) amb
+ * l'1/10 d'aire a cada banda (2). 2 + 16 + 2 = 20.
+ */
+const DIVISIONS_BAIX = 20;
+const DIVISIONS_HERO = 16;
+const DIVISIONS_AIRE = 2;
+
+/**
+ * SI EL NAVEGADOR SAP FER `round()` A CSS. La taula de divisions es calcula tota
+ * amb `calc` i `round` perque el carril de la capcalera nome's existeix com a
+ * variable de CSS i la mida de la hero s'ha de saber al primer pintat. Als
+ * navegadors que no ho saben, la hero es queda amb la formula de sempre.
+ */
+function suportaRoundCss() {
+  try {
+    return typeof CSS !== 'undefined'
+      && typeof CSS.supports === 'function'
+      && CSS.supports('width', 'round(nearest, 3.2px, 1px)');
+  } catch {
+    return false;
+  }
+}
+
+/**
  * LES DIVISIONS DEL TROS DE DALT, CALCULADES.
  *
  * NO son un numero fix. La part que ocupa el megaslide depen de l'alcada de la
@@ -114,13 +141,30 @@ function divisionsDeLaLinia(linia, capcalera, finestra) {
 
 function MarcInici({ seccions }) {
   const [primera, segona, ...resta] = seccions;
-  // LES MIDES DE LA HERO, FIXADES (04/10/2026). En Marc: «S'han de fixar les
-  // mides»: la hero fa els 8/10 de l'espai de sota la linia del megaslide, amb
-  // els DOS aires d'1/10, i aixo s'ha de saber ABANS del primer pintat.
+  // LA TAULA DE DIVISIONS (04/10/2026). En Marc: «Calculem les divisions des del
+  // bottom del viewport fins al bottom del header. Quantes divisions? Tantes com
+  // calguin perque un dels tops o bottoms de la taula encaixin amb el final del
+  // megaslide (encara que no sigui al px). A partir d'aquell punt sabras fins on
+  // arriba el megaslide i podras centrar la hero amb les divisions que et quedin
+  // del megaslide fins a baix de tot.» I, triat per ell: «que sigui la 20. 16/2».
   //
-  // La linia surt de les MATEIXES rectes que l'estimacio (vegeu el bloc de
-  // dalt): la del panell segons l'amplada, mes la capcalera. Es FIXA: no depen
-  // de si el panell es obert ni de si la seva vora s'ha publicat.
+  // L'ESPAI DE LA TAULA es del bottom de la capcalera al bottom del viewport:
+  // `100dvh - --appHeaderOffset`. El megaslide no hi entra com a mesura: nome's
+  // tria QUINA DIVISIO es el seu final. Quantes divisions queden sota seu es una
+  // decisio de disseny —20— i la divisio on cau el seu final es la `k` mes
+  // propera:
+  //
+  //     k = round(nearest, 20 * P / (S - P), 1)      N = k + 20
+  //
+  // D'aqui surt tot: la divisio fa `S / N`, l'aire de la hero 2 divisions i la
+  // hero 16, o sigui 2 + 16 + 2 = 20, que son els seus 8/10 amb l'1/10 a cada
+  // banda, ara en divisions senceres.
+  //
+  // TOT AMB `calc` I `round` DE CSS. El carril i l'offset de capcalera nome's
+  // existeixen com a variables de CSS (el carril es publica mesurat), i per aixo
+  // el calcul no es fa a JS: el primer pintat ja te la mida bona i la hero no es
+  // mou mai, ni en obrir el megaslide ni en refrescar. Als navegadors sense
+  // `round` (antics) es queda la formula de sempre.
   const ampleVista = typeof window !== 'undefined' ? window.innerWidth : 0;
   const altVista = typeof window !== 'undefined' ? window.innerHeight : 0;
   const esHoritzontal = ampleVista >= 768 && ampleVista >= altVista;
@@ -128,12 +172,25 @@ function MarcInici({ seccions }) {
     ? 'calc(0.2529 * var(--inici-nou-carril, 0px) + 5.3px)'
     : 'calc(0.1775 * var(--inici-nou-carril, 0px) + 111.3px)';
   const espaiHeroCss = `calc(100dvh - var(--appHeaderOffset, 0px) - ${alcadaPanellCss})`;
-  const varsHero = esHoritzontal
+  const espaiTaulaCss = 'calc(100dvh - var(--appHeaderOffset, 0px))';
+  const ambTaula = esHoritzontal && suportaRoundCss();
+  const varsHero = ambTaula
     ? {
-      '--inici-hero-aire': `calc(${espaiHeroCss} / 10)`,
-      '--inici-hero-alcada': `calc(${espaiHeroCss} * 8 / 10)`,
+      // LES DIVISIONS DEL MEGASLIDE: la `k`. Es publica sense unitat perque la
+      // fan servir les divisions de sota (`calc(var(--inici-hero-k) + 20)`).
+      '--inici-hero-k': `round(nearest, ${DIVISIONS_BAIX} * ${alcadaPanellCss} / (${espaiTaulaCss} - ${alcadaPanellCss}), 1)`,
+      '--inici-hero-divisions': `calc(var(--inici-hero-k) + ${DIVISIONS_BAIX})`,
+      '--inici-hero-divisio': `calc(${espaiTaulaCss} / var(--inici-hero-divisions))`,
+      '--inici-hero-aire': `calc(var(--inici-hero-divisio) * ${DIVISIONS_AIRE})`,
+      '--inici-hero-alcada': `calc(var(--inici-hero-divisio) * ${DIVISIONS_HERO})`,
     }
-    : null;
+    : (esHoritzontal
+      ? {
+        // SENSE `round` (navegadors antics): els 8/10 de sempre, amb el seu 1/10.
+        '--inici-hero-aire': `calc(${espaiHeroCss} / 10)`,
+        '--inici-hero-alcada': `calc(${espaiHeroCss} * 8 / 10)`,
+      }
+      : null);
   const zonaRef = useRef(null);
   // EL REPARTIMENT VIU A L'ESTAT, NO AL DOM.
   //
@@ -236,8 +293,24 @@ function MarcInici({ seccions }) {
         const liniaEstimada = capcalera + alcadaPanellEstimada;
         return Math.max(capcalera, liniaEstimada);
       })();
+      // LA TAULA DE DIVISIONS MANA (04/10/2026). Si el render n'ha publicat (i
+      // nome's ho fa a l'horitzontal i amb `round`), la linia del megaslide es
+      // la DIVISIO que li toca, i el seu bloc hi cau exactament a sobre: les
+      // mateixes `k` i divisio que fan servir les mides de la hero, llegides
+      // d'aqui perque no es puguin desquadrar mai.
+      const taula = (() => {
+        // Nome's a l'horitzontal, que es on el render publica les divisions.
+        if (!(window.innerWidth >= 768 && window.innerWidth >= window.innerHeight)) return null;
+        cala.style.width = 'calc(var(--inici-hero-k, 0) * 1px)';
+        const k = parseFloat(getComputedStyle(cala).width) || 0;
+        cala.style.width = 'var(--inici-hero-divisio, 0px)';
+        const divisio = parseFloat(getComputedStyle(cala).width) || 0;
+        if (k <= 0 || divisio <= 0) return null;
+        return { blocMega: k * divisio, linia: capcalera + k * divisio };
+      })();
+      const liniaTaula = taula ? taula.linia : linia;
       // L'ALCADA DE LA ZONA: la finestra menys la linia del megaslide.
-      const zonaAlcada = window.innerHeight - linia;
+      const zonaAlcada = window.innerHeight - liniaTaula;
       const icones = franja.getBoundingClientRect().height;
       // Al primer fotograma les peces encara no tenen mida. Es torna a provar
       // quan `ResizeObserver` les vegi canviar.
@@ -255,7 +328,7 @@ function MarcInici({ seccions }) {
       // Tot el que hi hagi per sobre de la linia queda sota el panell, i per
       // tant el primer que s'hi ha de posar es aquest tros.
       const zonaRect = zona.getBoundingClientRect();
-      const finsLinia = Math.max(0, linia - zonaRect.top);
+      const finsLinia = Math.max(0, liniaTaula - zonaRect.top);
       // DUES PAGINES, UNA SOLA MESURA.
       //
       // La graella de files serveix per mesurar alhora el megaslide i la
@@ -275,13 +348,17 @@ function MarcInici({ seccions }) {
       // frontera del model i la del megaslide coincideixen.
       // LES DIVISIONS, de la geometria d'ara: depenen de l'alcada de la finestra
       // (barra dev i navegador inclosos).
-      const { k: megaFiles, N: total } = divisionsDeLaLinia(linia, capcalera, window.innerHeight);
+      // LES DIVISIONS: amb taula, el bloc del megaslide es la divisio `k` (i el
+      // de la pagina les 20 que queden, que es el que fa que la hero hi encaixi
+      // amb els seus 2 + 16 + 2). Sense taula (vertical o navegador sense
+      // `round`), la cerca de sempre.
+      const { k: megaFiles, N: total } = divisionsDeLaLinia(liniaTaula, capcalera, window.innerHeight);
       const fila = (window.innerHeight - capcalera) / total;
       // EL BLOC DEL MEGASLIDE ES LA SEVA AREA: les 11 files, i com a minim la
       // seva vora de veritat. Les 11 files nomes coincideixen amb el separador
       // quan la seva alcada escala amb la finestra; a 1024 i 1366 el panell
       // acaba una mica mes avall, i el bloc l'ha de cobrir.
-      const blocMega = Math.max(megaFiles * fila, linia - capcalera);
+      const blocMega = taula ? taula.blocMega : Math.max(megaFiles * fila, liniaTaula - capcalera);
       // LA PAGINA DE SOTA es la resta. El CADENAT, pero, penja 56 px dins seu i
       // per tant no es pot fer servir per centrar-hi la hero: el seu bloc es el
       // que queda DESPRES del cadenat.
@@ -372,7 +449,7 @@ function MarcInici({ seccions }) {
       const ara = `${Math.round(blocMega * 4) / 4}|${Math.round(blocPagina * 4) / 4}|${Math.round(alcada * 4) / 4}|${alFons ? 1 : 0}|${baixAlViewport ? 1 : 0}|${aireBaix}`;
       if (ara === anterior) return;
       anterior = ara;
-        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia, alFons, baixAlViewport, aireBaix });
+        setRepartiment({ blocMega, blocPagina, alcada, finsLinia, linia: liniaTaula, alFons, baixAlViewport, aireBaix });
       raf = requestAnimationFrame(reparteix);
     };
 
