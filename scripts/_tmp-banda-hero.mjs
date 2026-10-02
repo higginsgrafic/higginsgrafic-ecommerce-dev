@@ -33,7 +33,7 @@ for (const v of VISTES) {
   const m = await p.evaluate(async () => {
     const model = await import('/src/utils/layoutModel.js');
     const cl = model.deviceLayoutFromViewport(window.innerWidth, window.innerHeight);
-    const classe = cl.isMobil ? 'mobil' : cl.isPortraitTablet ? 'vertical' : cl.isLandscapeTablet ? 'apaissada' : 'escriptori';
+    const classe = cl.isMobile ? 'mobil' : cl.isPortraitTablet ? 'vertical' : cl.isLandscapeTablet ? 'apaissada' : 'escriptori';
     const cs = getComputedStyle(document.documentElement);
     const n = (s) => { const x = parseFloat(s); return Number.isFinite(x) ? x : null; };
     const r = (el) => { if (!el) return null; const x = el.getBoundingClientRect(); return { top: Math.round(x.top), h: Math.round(x.height) }; };
@@ -44,6 +44,8 @@ for (const v of VISTES) {
     const hero = document.querySelector('[data-hero-caixa="1"]');
     return {
       classe,
+      teTaula: !!document.querySelector('[data-taula-inici="1"]'),
+      teHeroCaixa: !!document.querySelector('[data-hero-caixa="1"]'),
       versio: model.versioMegaslide(),
       carrilMega: n(cs.getPropertyValue('--hg-mega-w')),
       carrilPagina: n(cs.getPropertyValue('--inici-nou-carril')),
@@ -59,7 +61,7 @@ for (const v of VISTES) {
     };
   });
   const delta = (m.cella2Top != null && m.vora != null) ? Math.round((m.cella2Top - m.vora) * 10) / 10 : null;
-  console.log(`${v.n.padEnd(17)} ${m.classe.padEnd(11)} ${String(m.versio || '-').padEnd(14)} carrilMega=${String(m.carrilMega).padEnd(6)} carrilPagina=${String(m.carrilPagina).padEnd(6)} banda=${String(m.banda).padEnd(5)} megaAlcada=${String(m.mega?.h).padEnd(5)} delta=${String(delta).padEnd(6)} cella2Top=${String(m.cella2Top).padEnd(6)} vora=${String(m.vora).padEnd(6)} espaiHero=${String(m.espaiHero).padEnd(5)} hero=${JSON.stringify(m.hero)} heroDeclarat=${m.heroDeclarat}`);
+  console.log(`${v.n.padEnd(17)} ${m.classe.padEnd(11)} ${String(m.versio || '-').padEnd(14)} carrilMega=${String(m.carrilMega).padEnd(6)} carrilPagina=${String(m.carrilPagina).padEnd(6)} taula=${String(m.teTaula).padEnd(5)} banda=${String(m.banda).padEnd(5)} megaAlcada=${String(m.mega?.h).padEnd(5)} delta=${String(delta).padEnd(6)} cella2Top=${String(m.cella2Top).padEnd(6)} vora=${String(m.vora).padEnd(6)} espaiHero=${String(m.espaiHero).padEnd(5)} hero=${JSON.stringify(m.hero)} heroDeclarat=${m.heroDeclarat}`);
   await ctx.close();
 }
 await b.close();

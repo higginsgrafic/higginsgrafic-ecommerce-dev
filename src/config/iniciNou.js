@@ -123,10 +123,19 @@ export function espaiMegaslideCss(ample, alt) {
   if (layout.isLandscapeTablet) {
     return 'calc(0.2529 * var(--inici-nou-carril, 0px) + 5.3px)';
   }
-  if (ample <= 1366) {
-    return 'calc(0.2115 * var(--inici-nou-carril, 0px) + 61.4px)';
-  }
-  return 'calc(0.1775 * var(--inici-nou-carril, 0px) + 111.3px)';
+  // L'ESCRIPTORI, RECALCULAT AMB EL MEGASLIDE NOU (05/10/2026). En Marc:
+  // «Torna a recalcular les heros». Les dues rectes velles (0,2115x+61,4 per
+  // sota de 1366 i 0,1775x+111,3 per sobre) estaven calibrades amb el megaslide
+  // vell, quan l'escriptori no muntava la composicio del model: la banda hi
+  // quedava 16 px massa alta a 1280 i 32/41 px a 1366/1440/1512/1920/2560.
+  //
+  // Amb el megaslide nou (composicio del model, carril 1100 al portatil de 1280
+  // i 1200 a la resta) la vora real es 279 px amb el carril de 1105 i 284 amb el
+  // de 1205 (mesurat amb `_tmp-banda-hero.mjs`: la vora del panell menys el
+  // coixi de la capcalera). La recta que passa pels dos punts es
+  // 0,05 x carril + 224, i els deixa a 0,25 px. Es la MATEIXA per a tots els
+  // escriptoris: el carril ja els distingeix.
+  return 'calc(0.05 * var(--inici-nou-carril, 0px) + 224px)';
 }
 
 /**
