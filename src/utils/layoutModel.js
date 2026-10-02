@@ -345,6 +345,26 @@ export const MEGASLIDE_VERSIONS = {
     // amb 26 l'aire de sota fa 40,5 px i amb 6 en fa 20,5 (mesurat).
     extraAireSota: 6,
   },
+  // LA VERSIO DE L'ESCRIPTORI (04/10/2026). En Marc: «Vull provar una cosa al
+  // desktop. Crec que em carregare el carril original. Canvia el megaslide de la
+  // desktop pel megaslide 1200». Es una PROVA: l'escriptori deixa el carril
+  // proporcional (3/5 de la finestra: 1143 a 1920, 855 a 1440) i passa a tenir
+  // el carril fix de 1200, com l'iPad Pro 13.
+  //
+  // Nomes canvia el CARRIL: `aireStripeColumna` es posa al valor del carril de
+  // 1200 (3,7, vegeu la versio de l'iPad Pro 13) i l'aire de sota es queda al
+  // que te l'escriptori avui (0), perque la prova es vegi neta.
+  //
+  // `amplades: []` es volgut: aquesta versio NO es tria per amplada com les de
+  // tauleta, sino per la CLASSE (`isDesktop`), i una llista buida fa que el
+  // bucle de les tauletes no la trobi mai.
+  'megaslide-1200': {
+    nom: 'Megaslide 1200',
+    carril: 1200,
+    amplades: [],
+    aireStripeColumna: 3.7,
+    extraAireSota: 0,
+  },
   'ipad-pro-13': {
     nom: 'iPad Pro 13',
     // «Ara vull que portis el megaslide de l'iPad Pro 13 fins a 1200»: aquesta
@@ -362,15 +382,22 @@ export const MEGASLIDE_VERSIONS = {
 
 /**
  * Quina versio del megaslide li toca a aquesta vista, o `null` si no n'hi toca
- * cap. Nome s miren les AMPLADES i la classe de tauleta (vegeu el bloc de dalt).
+ * cap.
+ *
+ * A LES TAU LETES es miren les AMPLADES (i nome s elles): la 1032, 1180 i 1200
+ * porten el megaslide 1100 i la 1376 l'iPad Pro 13.
+ *
+ * A L'ESCRIPTORI, LA CLASSE (04/10/2026): en Marc vol provar-hi el carril de
+ * 1200, i alla la versio es tria per `isDesktop`, no per amplada.
  *
  * @param {{ample?: number, alt?: number}} [mides]
- * @returns {'megaslide-1100'|'ipad-pro-13'|null}
+ * @returns {'megaslide-1100'|'megaslide-1200'|'ipad-pro-13'|null}
  */
 export function versioMegaslide({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
   const es = deviceLayoutFromViewport(w, h);
+  if (es.isDesktop) return 'megaslide-1200';
   if (!(es.isPortraitTablet || es.isLandscapeTablet)) return null;
   const marge = 2;
   const clau = Object.keys(MEGASLIDE_VERSIONS)
@@ -420,6 +447,9 @@ export function carrilMegaslide({ ample, alt } = {}) {
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
   const params = paramsMegaslide({ ample: w, alt: h });
   if (!params) return null;
-  if (!deviceLayoutFromViewport(w, h).isLandscapeTablet) return null;
+  const es = deviceLayoutFromViewport(w, h);
+  // A L'ESCRIPTORI TAMBE (04/10/2026). En Marc vol provar-hi el carril de 1200,
+  // i aquesta funcio nome's el deixava passar a les tauletes apaissades.
+  if (!es.isLandscapeTablet && !es.isDesktop) return null;
   return Math.min(params.carril, Math.max(320, w - 80));
 }

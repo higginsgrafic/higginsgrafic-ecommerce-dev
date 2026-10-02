@@ -2671,9 +2671,20 @@ function FullWideSlideHeader({
           && typeof window !== 'undefined'
           && (window.innerWidth < 1000 || window.innerWidth > 1050)
           && carrilPagina > 0;
+        // EL CARRIL DE LA VERSIO, TAMB'E A L'ESCRIPTORI (04/10/2026). En Marc:
+        // «Canvia el megaslide de la desktop pel megaslide 1200». Si la versio en
+        // te (la de l'escriptori en te, 1200), mana ella; si no, el carril de
+        // sempre: la finestra (3/5) o el de la tauleta.
+        // NOME'S A L'ESCRIPTORI: a les tauletes mana el que hi havia (el `carril`
+        // de la casa o el seu propi), i a la vertical tambe.
+        const carrilDeLaVersio = !isPortraitTablet && !isLandscapeTablet && carrilModel != null
+          ? Math.round(carrilModel)
+          : null;
         const beltFinal = usaCarrilPagina
           ? Math.round(carrilPagina)
-          : (carril ?? (isPortraitTablet ? BELT_TABLET_VERTICAL_PX : (isLandscapeTablet ? beltTauleta : beltWidth)));
+          : (carrilDeLaVersio ?? carril ?? (isPortraitTablet
+            ? BELT_TABLET_VERTICAL_PX
+            : (isLandscapeTablet ? beltTauleta : beltWidth)));
         root.style.setProperty('--hg-mega-w', `${beltFinal}px`);
         // Quan el carril te una amplada propia (tauleta: 992) la seva posicio
         // tambe: CENTRAT a l'espai de maquetacio. Abans aixo ho deia `belt.left`
@@ -2765,7 +2776,7 @@ function FullWideSlideHeader({
           : 1;
         root.style.setProperty(
           '--hg-escala-mega',
-          String((isPortraitTablet || isLandscapeTablet) ? (carrilModel != null ? escalaCarrilPagina : Math.min(1, escalaCarrilPagina)) : escalaMegaslide(beltWidth)),
+          String((isPortraitTablet || isLandscapeTablet) ? (carrilModel != null ? escalaCarrilPagina : Math.min(1, escalaCarrilPagina)) : escalaMegaslide(beltFinal)),
         );
       } catch {
         // ignore
@@ -3478,6 +3489,17 @@ function FullWideSlideHeader({
 
   const canUseDom = typeof document !== 'undefined';
 
+
+  // LA PROVA DE L'ESCRIPTORI (04/10/2026). En Marc vol veure-hi «el megaslide
+  // 1200». La versio nome's porta el carril i dues constants; la COMPOSICIO la
+  // tria la classe de dispositiu, i a l'escriptori es la de sempre. Amb aixo, i
+  // nome's per aixo, el megaslide de l'escriptori es compon com el de la tauleta
+  // (el que hi ha a 1180 i 1200) pero amb el carril de la versio.
+  //
+  // ES UNA PROVA I ES POT TREURE: la resta de la capcalera (el carril, el nav,
+  // les icones) continua llegint `isLandscapeTablet` de debò.
+  const tracteMegaslideTauleta = isLandscapeTablet
+    || (!isPortraitTablet && !isLandscapeTablet && carrilMegaslide() != null);
 
   return (
     <header
@@ -4203,7 +4225,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         acordioExpandedPage4={acordioExpandedPage4}
         setAcordioExpandedPage4={setAcordioExpandedPage4}
         isPortraitTablet={isPortraitTablet}
-        isLandscapeTablet={isLandscapeTablet}
+        isLandscapeTablet={tracteMegaslideTauleta}
       />
       ) : null}
 
