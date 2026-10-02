@@ -110,26 +110,54 @@ console.log('🎯 About to render React app...');
 
 window.__GRAFIC_REACT_MOUNTED__ = false;
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <TooltipProvider delayDuration={200} skipDelayDuration={0}>
-    <AuthProvider>
-      <GridDebugProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <ProductProvider>
-              <ToastProvider>
-                <App />
-                <BranchBadge />
-              </ToastProvider>
-            </ProductProvider>
-          </WishlistProvider>
-        </CartProvider>
-      </GridDebugProvider>
-    </AuthProvider>
-    </TooltipProvider>
-  </BrowserRouter>
-);
+/**
+ * EL `#root` POT NO HI SER QUAN TOCA MUNTAR (04/10/2026).
+ *
+ * En Marc: «A 1376 i a 1280 no es veu la hero», amb una captura de l'overlay
+ * d'error on es llegia `createRoot(...): Target container is not a DOM element`.
+ * La pagina havia petat en carregar, i sense aplicacio no hi ha hero: no era
+ * cap problema de la hero ni del megaslide. Passa quan aquest modul s'executa
+ * abans que el `#root` del cos hi sigui (una recarrega a mitges del servidor de
+ * desenvolupament, o una vista del mosaic que es queda a mig muntar i no es
+ * torna a carregar mai).
+ *
+ * Amb aquesta espera, el muntatge no peta: si el document encara s'esta llegint
+ * s'espera el `DOMContentLoaded`, i si el `#root` no hi es de cap manera es diu
+ * amb l'overlay en comptes de morir amb una excepcio de React.
+ */
+function muntaAplicacio() {
+  const contenidor = document.getElementById('root');
+  if (!contenidor) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', muntaAplicacio, { once: true });
+      return;
+    }
+    showFatalOverlay('createRoot', { message: "No hi ha cap element #root on muntar l'aplicacio." });
+    return;
+  }
+  ReactDOM.createRoot(contenidor).render(
+    <BrowserRouter>
+      <TooltipProvider delayDuration={200} skipDelayDuration={0}>
+      <AuthProvider>
+        <GridDebugProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <ProductProvider>
+                <ToastProvider>
+                  <App />
+                  <BranchBadge />
+                </ToastProvider>
+              </ProductProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </GridDebugProvider>
+      </AuthProvider>
+      </TooltipProvider>
+    </BrowserRouter>
+  );
+}
+
+muntaAplicacio();
 
 window.__GRAFIC_REACT_MOUNTED__ = true;
 
