@@ -130,21 +130,21 @@ export function espaiMegaslideCss(ample, alt) {
 }
 
 /**
- * LA MIDA DE LA HERO, COM A FRACCIO DE L'ESPAI (04/10/2026).
+ * L'AIRE DE LA HERO, EN PX (04/10/2026).
  *
- * En Marc: «Encaixa la hero a zero a dalt i a baix i l'anem reduint fins que
- * sigui la mida bona. Aixi partim de la mateixa proporcio a cada vista».
+ * La hero fa LA SEVA MIDA (la del seu disseny: el carril amb la seva proporcio,
+ * que es declara a `HeroInici.jsx`), i aquest es l'aire que li queda a dalt i a
+ * baix. Es el mateix a tot arreu.
  *
- * L'ESPai es el tros de sota la banda de les icones (que es on acaba el
- * megaslide quan s'obre) fins al fons del viewport. Amb el factor a 1 la hero hi
- * va ENCAIXADA: toca la banda per dalt i el fons per baix, i no hi ha aire. A
- * partir d'aqui es redueix fins que quedi be, i com que el factor es el mateix a
- * totes les vistes, la hero ocupa SEMPRE la mateixa fraccio de pantalla.
- *
- * El que sobra es reparteix a parts iguals entre dalt i baix (la hero va
- * centrada), o sigui que l'aire es `(1 - factor) / 2` de l'espai a cada banda.
+ * PER QUE NO ES L'ESPAI. Es va provar de fer-la `espai x factor` (encaixada a
+ * zero i reduint-la): a una finestra alta aixo la estirava molt mes del seu
+ * disseny —a 1512x858 la caixa feia 411,5 px quan el dibuix en demana 304,5, i
+ * la samarreta sortia deformada— i, com que la cel·la arribava fins al fons del
+ * viewport, les galeries amb les TDP començaven exactament al plec («les tdp
+ * queden molt avall»). Amb la mida propia i la cel·la ajustada, la pagina
+ * flueix i les TDP entren a la primera pantalla.
  */
-export const FACTOR_HERO_ESPAI = 0.8;
+export const AIRE_HERO_PX = 40;
 
 /**
  * L'AIRE DE LA HERO, com a fraccio de l'AMPLE DEL CARRIL (el total, els dos

@@ -4,7 +4,7 @@ import { buildHeroStripePlan, DARK_COLORS } from '@/components/home/homeDrawings
 import { CERCADOR_COLORS } from '@/data/collections';
 import useIsMobile from '@/hooks/useIsMobile';
 import { deviceLayoutFromViewport, esIPadPro13Estricte } from '@/utils/layoutModel';
-import { HERO_DIBUIX_MIDA, HERO_DIBUIX_MIDA_DEFECTE } from '@/config/iniciNou';
+import { HERO_ALCADA, HERO_ALCADA_VERTICAL, HERO_AMPLADA, HERO_DIBUIX_MIDA, HERO_DIBUIX_MIDA_DEFECTE } from '@/config/iniciNou';
 import { MIDA_TAULETA_APAISADA_MAX, MIDA_TAULETA_VERTICAL_MAX } from '@/utils/layoutMetrics';
 
 /**
@@ -133,6 +133,12 @@ function HeroInici() {
   // amb el 25 % de menys com tothom.
   const esIPadPro13Hero = esIPadPro13Estricte();
   const factorHero = esIPadPro13Hero ? 1.5 : 0.75;
+  // LA PROPORCIO DE LA CAIXA, PER PODER-LA ENCONGIR SENSE DEFORMAR-LA
+  // (04/10/2026): es la mateixa que fan l'`aspect-ratio` i la formula curta de
+  // 1280/1366/1376. El marc publica el que hi cap (`--inici-hero-espai`), i si
+  // la hero no hi cap s'encongeix amb les dues mides alhora.
+  const alcadaCaixaPerAmplada = ((esHeroSeccioAmpla ? 0.6 : 1)
+    * (esVertical ? HERO_ALCADA_VERTICAL : HERO_ALCADA) * factorHero) / HERO_AMPLADA;
   const [plan, setPlan] = useState(() => buildHeroStripePlan());
   const botoBarrejaRef = useRef(null);
   // LA ICONA DE BARREJAR, CENTRADA ENTRE LA CINTURA I EL CADENAT (04/10/2026).
@@ -184,6 +190,9 @@ function HeroInici() {
         // carril i ara totes les vistes apaissades fan el carril. Nome's els
         // mobils de costat estret (vertical i < 768) es queden amb el seu aire.
         paddingInline: (esVertical || esApaissada || ampleFinestra >= 768) ? 0 : '20%',
+        // SI NO HI CAP, S'ENCONGEIX PROPORCIONALMENT (la mateixa alcada i la
+        // mateixa amplada alhora, o sigui que la samarreta no es deforma).
+        maxWidth: `calc(var(--inici-hero-espai, 100vw) / ${alcadaCaixaPerAmplada.toFixed(4)})`,
       }}
     >
       <div
@@ -212,6 +221,8 @@ function HeroInici() {
               // no hi es i mana la proporcio de sobre.
               height: 'var(--inici-hero-alcada, auto)',
             }),
+          // LA CAIXA NO POT SER MES ALTA QUE L'ESPAI QUE LI DONEN.
+          maxHeight: 'var(--inici-hero-espai, none)',
           display: 'flex',
           flexDirection: 'column',
           gap: '2px',
