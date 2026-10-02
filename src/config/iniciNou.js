@@ -143,11 +143,13 @@ export function espaiMegaslideCss(ample, alt) {
   // tant, es la mateixa que a la resta d'escriptoris (mesurat: vora 351 amb el
   // carril de 1105 i 356 amb el de 1205, o sigui delta 0).
   // ELS PORTATILS DE 1200 A 1366 (05/10/2026). Són els de la graella d'una sola
-  // fila i la columna de fletxes+selector: amb el carril de 1000 el megaslide hi
-  // fa 238 px i, amb la stripe retallada a la dreta de la graella, la vora real
-  // es 321. La banda es 249: `0,05 x carril + 199`.
+  // fila i la columna de fletxes+selector. Amb el bloc fletxes+selector estirat
+  // fins al bottom de la stripe (i la stripe, al bottom del selector: vegeu
+  // `MegaStripePanelP1`), el panell es queda mes curt: la vora real passa de 321
+  // a 275 (mesurat a 1280). La banda baixa els mateixos 46 px: de 249 a 203, o
+  // sigui `0,05 x carril + 153`.
   if (ample >= 1200 && ample <= 1366) {
-    return 'calc(0.05 * var(--inici-nou-carril, 0px) + 199px)';
+    return 'calc(0.05 * var(--inici-nou-carril, 0px) + 153px)';
   }
   return 'calc(0.05 * var(--inici-nou-carril, 0px) + 224px)';
 }

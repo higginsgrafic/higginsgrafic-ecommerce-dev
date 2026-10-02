@@ -11,7 +11,7 @@ import { estilCaixaBlocAlcadaAuto } from './estilsBlocs.js';
 import { composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { VECTOR_FRANJA_SAMARRETES, VECTOR_FRANJA_SAMARRETES_01, VECTOR_FRANJA_VIEWBOX, VECTOR_FRANJA_VIEWBOX_OBERT, VECTOR_FRANJA_CONTINGUT } from '../../config/vectorFranja.js';
 import { desplacamentFranjaEscriptori } from '../../utils/mesuraMegaslide.js';
-import { carrilPx, getBeltWidth, escalaMegaslide, esTauletaVertical, esTauletaApaisada } from '../../utils/layoutMetrics.js';
+import { carrilPx, getBeltWidth, getLayoutViewportWidth, escalaMegaslide, esTauletaVertical, esTauletaApaisada } from '../../utils/layoutMetrics.js';
 import { carrilMegaslide, paramsMegaslide, CARRIL_MEGASLIDE_939_PX } from '../../utils/layoutModel.js';
 
 /**
@@ -480,6 +480,15 @@ function MegaStripePanelP1({
     && typeof window !== 'undefined'
     && window.innerWidth >= 1200 && window.innerWidth <= 1366;
 
+  // EL MIG MARGE FINESTRA/MAQUETACIO (05/10/2026). El carril (--hg-mega-w) es
+  // centra a la FINESTRA, pero el contingut viu a l'amplada de MAQUETACIO (sense
+  // la barra de desplacament): la meitat d'aquesta barra es el que cal descomptar
+  // perque la graella i el bloc de la fila unica caiguin a la vora del carril
+  // (el MATEIX descompte que fa `useEscalaFranjaCarril` amb `ancoratEsquerra`).
+  const compensacioBarraPx = typeof window !== 'undefined'
+    ? (window.innerWidth - getLayoutViewportWidth()) / 2
+    : 0;
+
   // LA COMPOSICIO DE LA PAGINA 1 A L'ESCRIPTORI (26/09/2026, B2 del bucle): la
   // graella de DUES FILERES intercalades (la MATEIXA peça que la pagina 2,
   // `GraellaDuesFileresPagina1`) a l'esquerra del carril i el bloc de la dreta
@@ -628,7 +637,12 @@ function MegaStripePanelP1({
   const [alcadaBlocEstretaP1, setAlcadaBlocEstretaP1] = useState(null);
   const prevAjustRef = useRef(null);
   useLayoutEffect(() => {
-    if (!esComposicioEstretaP1) return undefined;
+    // A LA FILA UNICA EL BLOC S'ESTIRA AMB EL FLEX (05/10/2026), o sigui que no
+    // li cal ni l'alcada quadrada, ni el desplacament `dx`, ni el `dy` que posa
+    // la franja 20 px sota el bloc: aquell `dy` depen del bottom del bloc i, amb
+    // el bloc estirant-se, es retroalimentaria (mesurat: el bloc creixia fins a
+    // 629 px). La franja de la fila unica es queda al top de la seva filera.
+    if (!esComposicioEstretaP1 || esFilaUnicaP1) return undefined;
     let frame = 0;
     const mesura = () => {
       cancelAnimationFrame(frame);
@@ -715,7 +729,7 @@ function MegaStripePanelP1({
       window.clearTimeout(t2);
       window.removeEventListener('resize', mesura);
     };
-  }, [esComposicioEstretaP1, active, blocDretaPx]);
+  }, [esComposicioEstretaP1, esFilaUnicaP1, active, blocDretaPx]);
   // ELS NUMEROS DE LA COMPOSICIO VIUEN A `geometriaMegaslide.js` (B4): aqui
   // nome's es passen a px amb l'escala del carril.
   // (L'`escalaBlocDreta`, el `blocDretaPx` i el `columnaDretaPx` es calculen
@@ -786,9 +800,15 @@ function MegaStripePanelP1({
       // franja i el pageLift) mesurat des del capdamunt del panell: el pare
       // el fa servir per retallar l'alçada de la pàgina 1 sense números màgics.
       if (typeof onP1ContentBottomChange === 'function') {
-        const stripeContent = root.querySelector('[data-stripe-visual-content="1"]');
-        if (stripeContent) {
-          const bottom = stripeContent.getBoundingClientRect().bottom - panel.getBoundingClientRect().top;
+        // A LA FILA UNICA EL BLOC S'ESTIRA FINS AL BOTTOM DE LA STRIPE
+        // (05/10/2026) i es l'element mes baix (el selector hi arriba): el
+        // bottom del contingut es el SEU, no el de les samarretes (que queden
+        // dins de la filera de la stripe). A la resta, com sempre.
+        const bottomEl = esFilaUnicaP1
+          ? root.querySelector('[data-bloc-dreta-p1="1"]')
+          : root.querySelector('[data-stripe-visual-content="1"]');
+        if (bottomEl) {
+          const bottom = bottomEl.getBoundingClientRect().bottom - panel.getBoundingClientRect().top;
           if (Number.isFinite(bottom) && bottom > 0) onP1ContentBottomChange(bottom);
         }
       }
@@ -810,7 +830,7 @@ function MegaStripePanelP1({
       observer?.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [active, isPortraitTablet, isLandscapeTablet, megaTileSize, onP1ContentBottomChange, onPageLiftChange, pageLift]);
+  }, [active, isPortraitTablet, isLandscapeTablet, megaTileSize, esFilaUnicaP1, onP1ContentBottomChange, onPageLiftChange, pageLift]);
 
   useEffect(() => {
     const handler = (ev) => {
@@ -876,1159 +896,1211 @@ function MegaStripePanelP1({
     }} />
   );
 
+  // EL BLOC DE LA DRETA, EXTRET DE LA FILERA (05/10/2026). A la fila unica
+  // surt de la filera i es munta com a germa del conjunt [filera + stripe]
+  // (vegeu el `return`): aixi agafa l'alcada exacta del conjunt, sense mesurar.
+  const blocDretaNode = (
+  <div
+    ref={blocDretaRef}
+    data-bloc-dreta-p1="1"
+    style={{
+      flex: '0 0 auto',
+      // L'iPad Pro 13 apaïssat té el seu carril (1000) i el bloc hi fa
+      // el carril sencer; a la resta, el segon carril de sempre.
+      width: esFilaUnicaP1
+        ? `${blocDretaPx}px`
+        : (esComposicioEstretaP1
+          ? (carrilMegaslide() != null ? `${ampleCarrilPaginaP1}px` : `min(${CARRIL_MEGASLIDE_939_PX}px, calc(100vw - 80px))`)
+          : `${blocDretaPx}px`),
+      minWidth: 0,
+      // A 1024 EL BLOC SURT DEL FLUX (02/10/2026). El bloc fa tot el
+      // carril de la pagina (939,2) i, com a fill flexible, deixava la
+      // GRAELLA INTERCALADA amb amplada ZERO (el pare fa 605): en Marc:
+      // «On és la graella intercalada? No l'aveig». Amb el bloc
+      // absolut, la graella es queda tota la filera (605) i el bloc hi
+      // passa per damunt, a la vora dreta del carril de la pagina (el
+      // desplacament `dx` el porta alla, com abans).
+      ...(esComposicioEstretaP1 && !esFilaUnicaP1 ? { position: 'absolute', left: 0, top: 0 } : { position: 'relative' }),
+      // EL BLOC ES TRANSPARENT I FA EL CARRIL SENCER (05/10/2026): a
+      // la composicio estreta es una capa absoluta sobre tota la
+      // filera i, amb `pointerEvents` automatic, capturava els clics
+      // de la graella i de les fletxes. Qui els ha de rebre es el
+      // selector, que va dins i ja porta `auto`.
+      ...(esComposicioEstretaP1 ? { pointerEvents: 'none' } : null),
+      // A 1024, el bloc es desplac, a la dreta del carril de la pagina.
+      ...(esFilaUnicaP1
+        ? { transform: `translateX(${compensacioBarraPx}px)` }
+        : ((esComposicioEstretaP1 && alcadaBlocEstretaP1) ? { transform: `translateX(${alcadaBlocEstretaP1.dx}px)` } : null)),
+      // EL BLOC, SENSE CAPA PROPRIA, PER SOTA DE LA FRANJA (28/09/2026).
+      //
+      // En Marc: «La franja continua per sota del bloc» i «Encara no.
+      // Queda per sobre». El bloc i la franja son dins del MATEIX
+      // contenidor, i el contingut de la franja es DESPRES del bloc al
+      // DOM: sense capa propia (`zIndex: auto`) la franja hi pinta per
+      // damunt i la samarreta tapa la caixa. Amb `zIndex: 3` (el de la
+      // columna de la p2) el bloc guanyava i tapava la maniga: la
+      // columna de la p2 pot anar a 3 perque alla la franja te una capa
+      // propia (4) dins del seu propi apilat.
+      // EL BLOC SON DUES BOTONERES QUADRADES APILADES (28/09/2026).
+      // En Marc: «El bloc es un grup de tres botons + un grup de 2
+      // botons, tots en vertical [...] son dues botoneres quadrades
+      // apilades l'una sobre l'altra». Cada quadrat fa el costat del bloc
+      // (128,9 a 1920) i el `marginBottom` negatiu compensa el que
+      // creix, perque la filera no s'allargui i la franja no es mogui.
+      // EL SELECTOR I LES FLETXES, QUADRATS (02/10/2026). En Marc:
+      // «Fes que el selector i les fletxes comparteixin quadrat». A
+      // 1920 el bloc ja fa els dos quadrats (256,6 = 2 x 128,3); a
+      // 1024-1366 l'alcada sortia del bottom de la franja (223,6) i
+      // cada botonera quedava 128,7 x 111,8, mes baixa que ampla.
+      // Amb l'ajust el bloc fa els DOS quadrats sencers i el
+      // `marginBottom` negatiu compensa el que creix, perque la
+      // filera no s'allargui i la franja no es mogui.
+      ...((((alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)) != null && !esFilaUnicaP1) ? {
+        height: `${(alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)}px`,
+        marginBottom: `${-(((alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)) - columnaDretaPx * 3)}px`,
+      } : null),
+      // LES FLETXES A DALT I EL SELECTOR A SOTA, A LA DRETA (28/09/2026).
+      // El bloc es ample com la columna de la p2 (130 de disseny) perque
+      // la maniga de l'ultima samarreta hi arribi; el selector i les
+      // fletxes van a la dreta i el buit de l'esquerra es on cau l'ombra.
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'flex-end',
+    }}
+  >
+    {/* LA CAIXA (LA VORA I L'OMBRA DE LA MANIGA), PER SOTA DE LA
+        FRANJA. Te una capa propia a zIndex 0: es la que ha de quedar
+        sota la samarreta perque l'ombra no hi caigui a sobre. */}
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: 'none',
+        ...estilCaixaBlocAlcadaAuto(esComposicioEstretaP1),
+        // A 1024 la caixa gran no pinta: cada peca porta la seva.
+        ...(esComposicioEstretaP1 ? { backgroundColor: 'transparent', boxShadow: 'none' } : null),
+        // EL FONS DEL QUADRAT DEL SELECTOR I LES FLETXES (02/10/2026).
+        // En Marc: «Posa-li el fons al quadrat amb el selector i les
+        // fletxes». A la composicio estreta la caixa va sense fons
+        // (nomes radi i retall), i el quadrat nou —el selector i les
+        // fletxes en dues columnes— quedava invisible sobre el paper:
+        // se li posa el mateix fons que a la resta de caixes. Sense
+        // vora ni ombra, que allo no ho ha demanat.
+        //
+        // A 1024, AIXÒ NO ES PINTA (02/10/2026). En Marc: «Pero ara hi
+        // ha les fletxes i els enllacos del selector dins de la
+        // mateixa franja i jo els vull separats». A 1024 el bloc fa
+        // TOT el carril (939,2) i te les dues peces a les vorades: el
+        // fons d'aquesta capa les unia amb una franja comuna de 939 px.
+        // Alla el fons el porten les DUES PECES, cadascuna a la seva
+        // caixa (vegeu els quadrats de sota): la capa del bloc nome's
+        // queda el radi i el retall.
+        ...((esComposicioEstretaP1 && !esComposicioEstretaP1) ? { backgroundColor: 'hsl(var(--grey-paper-soft))' } : null),
+      }}
+    >
+    {/* LA PASTILLA BLANCA DEL SELECTOR, PER SOTA DE L'OMBRA (28/09/2026).
+        En Marc: «A la p2, la pastilla blanca passa per sota de
+        l'ombra, no nome's de la samarreta. A la p1 has aconseguit
+        posar la pastilla per sota de la samarreta, pero no per sota
+        de l'ombra» i «Et puc suggerir que imitis el que has fet a la
+        p2?».
+
+        A la p2 la caixa blanca de la colleccio activa es `static` i
+        el seu fons es pinta ABANS que l'ombra (que es `absolute` amb
+        `z-index: 0`): l'ombra hi cau a sobre. Aqui es fa el mateix
+        dins d'aquesta capa: la pastilla es posicionada i SENSE
+        `z-index`, i va ABANS de l'ombra al DOM, o sigui que l'ombra
+        guanya i li passa per damunt.
+
+        L'embolcall reserva el REQUADRE DEL SELECTOR: la meitat de
+        baix del bloc, que es exactament on cau el selector quadrat
+        (les dues botoneres son `flex: 1 1 50%`). Amb els MATEIXOS
+        numeros de dins del selector, la pastilla cau al mateix lloc
+        de sempre (mesurat a 1920: x1400,3..1519 · y259..291,8).
+
+        Els BOTONS no es toquen: son a la capa de dalt (`zIndex: 6`),
+        que es la que impedeix que la franja se'ls mengi els clics.
+        Purament decorativa (`pointerEvents: none`). */}
+    {!esComposicioEstretaP1 ? capaPastillaBlancaP1 : null}
+    {!esComposicioEstretaP1 && ombraManigaP1 && mascaraManigaP1 ? (
+      <div
+        data-maniga-ombra-p1="1"
+        style={{
+          position: 'absolute',
+          left: `${ombraManigaP1.left}px`,
+          top: `${ombraManigaP1.top}px`,
+          width: `${ombraManigaP1.width}px`,
+          height: `${ombraManigaP1.height}px`,
+          pointerEvents: 'none',
+          zIndex: 0,
+          // L'OMBRA DE LA MANIGA, REFORÇADA (28/09/2026). En Marc: «A
+          // la maniga dreta de la p1, dona-li una miqueta mes de
+          // forca». Els numeros son declarats
+          // (`OMBRA_MANIGA_*`, geometriaMegaslide.js) i els MATEIXOS
+          // que la columna de la p2.
+          filter: `blur(${OMBRA_MANIGA_BLUR_PX}px)`,
+          transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
+        }}
+      >
+        {capaDifosaOmbraManigaP1}
+      </div>
+    ) : null}
+    </div>
+    {/* ELS BOTONS, EN UNA CAPA PROPIA PER DAMUNT DE LA FRANJA.
+        DUES BOTONERES QUADRADES APILADES: el quadrat de les fletxes a
+        DALT i els tres botons del selector a SOTA (28/09/2026, ho va
+        demanar en Marc: «Intercanvia les posicions del selector i les
+        fletxes»). Es van intercanviar les DUES PECES de debo, no
+        nome's el que s'hi pinta: el quadrat de les fletxes passa de
+        la meitat de baix a la de dalt. Els dos quadrats fan el
+        MATEIX (128,7 x 128,3 a 1920), o sigui que l'alcada del bloc,
+        la de la filera i la de la franja no es mouen.
+        PER QUE UNA CAPA A PART (28/09/2026). En Marc: «Alguna cosa
+        captura els clics del selector». La franja va a zIndex 4 i la
+        SEVA capa (amb el coixi de -40 px) arriba fins a x1524, o sigui
+        que cobreix tot el bloc; els seus fills (el vel a z10 i el
+        dibuix a z12) apilen DINS seu i guanyen a qualsevol zIndex que
+        es posi al bloc. Amb les fletxes a baix no es notava (queien
+        per sota del top de la franja, 226,6), pero amb el selector a
+        la meitat de baix la franja se li menjava els clics.
+        Amb la caixa i els botons en DUES capes, cada cosa va on toca:
+        la caixa (vora + ombra) per sota de la samarreta, com sempre, i
+        els botons per damunt (zIndex 6, un punt mes que el 4 de la
+        franja). */}
+    <div style={{
+      position: 'absolute',
+      inset: 0,
+      zIndex: 6,
+      height: '100%',
+      width: '100%',
+      // LA CAPA NO ES MENJA ELS CLICS DEL QUE TE A SOTA (05/10/2026).
+      // En Marc: «A totes les vistes els clics de la fila de la
+      // graella estan capturats per alguna cosa. Les fletxes, la
+      // graella i el selector. Nome s a la p1». Aquesta capa fa
+      // `inset: 0` sobre el BLOC, i a la composicio estreta el bloc
+      // es el CARRIL SENCER (1200 px): amb `pointerEvents` automatic
+      // cobria la graella de dibuixos (que es fora del bloc) i tambe
+      // l'espai de les fletxes. Nome s els botons del selector han de
+      // rebre clics, i ells ja porten `pointerEvents: 'auto'`.
+      pointerEvents: 'none',
+      display: 'flex',
+      // EN DUES COLUMNES NOME'S A LA COMPOSICIO ESTRETA (02/10/2026).
+      // En Marc: «Fes les fletxes en mig quadrat i el selector a
+      // l'altre mig quadrat», «En dues columnes» i, en veure que allo
+      // tambe passava a 1920/1440, «A les vistes 1920 i 1440 el
+      // selector i les fletxes han d'estar una sota l'altra ocupant tot
+      // el seu quadrat»: a 1024-1366 van en dues columnes i a la resta
+      // apilats, com sempre.
+      // A 1024, DOS QUADRATS APILATS (02/10/2026). En Marc: «Divideix el
+      // quadrat de les fletxes/selector. Fes una mitosi i converteix-lo
+      // en dos quadrats de la mateixa mida»: el bloc fa dos costats
+      // d'alcada i cada botonera un quadrat sencer. A la resta de la
+      // composicio estreta es queden en dues columnes.
+      // EL QUADRAT CONJUNT (02/10/2026). En Marc: «Reverteix fins al
+      // quadrat conjunt»: un sol quadrat amb les fletxes i el selector
+      // a dins (dues columnes a la composicio estreta, apilats a la
+      // resta), com estava abans de la mitosi.
+      // DUES PECES DIFERENTS (02/10/2026). En Marc: «Pots separar les
+      // fletxes del selector en dues peces diferents?»: a 1024 son DOS
+      // quadrats de 96,5 independents, el de les fletxes a la vora
+      // esquerra del carril de la pagina i el del selector a la dreta,
+      // i cadascun porta la seva caixa (fons, radi i ombra). A la
+      // resta, el quadrat conjunt de sempre.
+      flexDirection: esFilaUnicaP1 ? 'column' : ((esComposicioEstretaP1 || esTauleta) ? 'row' : 'column'),
+      justifyContent: esFilaUnicaP1 ? 'flex-start' : 'flex-end',
+      alignItems: esFilaUnicaP1 ? 'flex-end' : ((esComposicioEstretaP1 || esTauleta) ? 'stretch' : 'flex-end'),
+    }}>
+    {/* A LA TAUETA NO HI HA FLETXES (02/10/2026). En Marc: «A les
+        tablets no hi van fletxes», que es la mateixa regla que ja
+        va fer treure les de 1024 («Me n'acabo d'adonar que un
+        dispositiu tàctil no necessita fletxes... Esborra les
+        fletxes»). El comentari ja deia que aquesta es la composicio
+        de la tauleta, pero la condicio nome s mirava el 1024
+        (1000-1050): a la resta de la banda (1280, 1366 i 1376) el
+        quadrat de les fletxes s'hi muntava igualment. Ara no es
+        munta a TOTA la composicio estreta i el selector queda sol,
+        ocupant el quadrat sencer, a la vora dreta del carril. */}
+    {(esFilaUnicaP1 || !(esComposicioEstretaP1 || esTauleta)) ? (
+    <div style={{
+      position: 'relative',
+      flex: esFilaUnicaP1 ? '1 1 50%' : (esComposicioEstretaP1 ? '0 0 auto' : '1 1 50%'),
+      minHeight: 0,
+      width: (esFilaUnicaP1 || esComposicioEstretaP1) ? `${blocDretaPx}px` : '100%',
+      height: esFilaUnicaP1 ? undefined : (esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined),
+      // LA CAIXA DE CADA PECA: fons, radi i ombra propis.
+      ...(esComposicioEstretaP1
+        ? {
+          backgroundColor: 'hsl(var(--grey-paper-soft))',
+          borderRadius: '5.3px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+          overflow: 'hidden',
+        }
+        : null),
+    }}>
+    <FletxesQuadratPagina1
+      omple
+      // LA DIRECCIO DE LES FLETXES, INVERTIDA (28/09/2026). En Marc: «El
+      // moviment de la graella amb les fletxes ha de ser al reves». El
+      // carrusel es pinta amb `translateX(-desplacEf)`, o sigui que
+      // SUMAR a `desplacGest` mou les peces cap a l'ESQUERRA: amb la
+      // fletxa de la DRETA («Següent») la graella ha d'AVANÇAR (cap a
+      // l'esquerra) i amb la de l'ESQUERRA («Anterior») ha de RECULAR.
+      // Es el MATEIX criteri que la botonera de la p2 (vegeu
+      // CercadorTextRow), on la fletxa de dalt avança i la de baix
+      // recula; alla tambe es va haver d'invertir.
+      onPrev={() => stepperP1?.(1)}
+      onNext={() => stepperP1?.(-1)}
+    />
+    </div>
+    ) : null}
+    {/* EL QUADRAT DE SOTA: els tres botons del selector. Sense
+        fletxes (tota la composicio estreta) es queda amb el quadrat
+        sencer: es l'unic fill de la filera. */}
+    <div style={{
+      position: 'relative',
+      flex: esFilaUnicaP1 ? '1 1 50%' : (esComposicioEstretaP1 ? '0 0 auto' : ((esComposicioEstretaP1 || esTauleta) ? '1 1 100%' : '1 1 50%')),
+      minHeight: 0,
+      width: (esFilaUnicaP1 || esComposicioEstretaP1) ? `${blocDretaPx}px` : '100%',
+      height: esFilaUnicaP1 ? undefined : (esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined),
+      // El bloc es transparent i deixa passar els clics; el quadrat
+      // del selector els ha de rebre (05/10/2026).
+      ...(esComposicioEstretaP1 ? { pointerEvents: 'auto' } : null),
+      // LA CAIXA DE CADA PECA: fons, radi i ombra propis.
+      ...(esComposicioEstretaP1
+        ? {
+          backgroundColor: 'hsl(var(--grey-paper-soft))',
+          borderRadius: '5.3px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+          overflow: 'hidden',
+        }
+        : null),
+    }}>
+    {esComposicioEstretaP1 ? capaPastillaBlancaP1 : null}
+    {/* L'OMBRA DE LA MANIGA, AMB LA PEÇA DEL SELECTOR (02/10/2026).
+        En Marc: «Pero ara hi ha les fletxes i els enllacos del
+        selector dins de la mateixa franja i jo els vull separats» i
+        «que l'ombra de la maniga vagi amb la peça del selector, que
+        es on toca». A 1024 l'ombra NO es munta a la capa de la caixa
+        del bloc (una capa de 939 px que hi pintava una franja
+        comuna): es munta AQUI, dins de la peça del selector, i es la
+        mateixa peça qui la retalla (`overflow: hidden`). Com que la
+        mesura (`ombraManigaP1`) es fa contra el bloc, se li
+        descompta el que la peça te a la seva esquerra (el bloc menys
+        la peça: la peça va a la vora dreta). */}
+    {esComposicioEstretaP1 && ombraManigaP1 && mascaraManigaP1 ? (
+      <div
+        data-maniga-ombra-p1="1"
+        style={{
+          position: 'absolute',
+          left: `${ombraManigaP1.left - (ampleCarrilPaginaP1 - blocDretaPx)}px`,
+          top: `${ombraManigaP1.top}px`,
+          width: `${ombraManigaP1.width}px`,
+          height: `${ombraManigaP1.height}px`,
+          pointerEvents: 'none',
+          zIndex: 0,
+          // Els MATEIXOS numeros declarats que la columna de la p2
+          // (`OMBRA_MANIGA_*`, geometriaMegaslide.js).
+          filter: `blur(${OMBRA_MANIGA_BLUR_PX}px)`,
+          transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
+        }}
+      >
+        {capaDifosaOmbraManigaP1}
+      </div>
+    ) : null}
+    <SelectorQuadratPagina1
+      dinsBloc
+      omple
+      format="square"
+      // LA PASTILLA LA PINTA LA CAPA DE LA CAIXA (28/09/2026), perque
+      // ha de quedar per sota de l'ombra de la maniga. Aqui nome's
+      // queden els tres botons i el seu text, que han de seguir per
+      // damunt de la franja.
+      mostraPastilla={false}
+      showWhite={stripeVariantVisibility?.white !== false}
+      showBlack={stripeVariantVisibility?.black !== false}
+      showMulti={stripeVariantVisibility?.color !== false}
+      selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
+      onWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
+      onBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
+      onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
+    />
+    </div>
+    </div>
+  </div>
+  );
+
+  // LA GRAELLA I EL SEU BLOC DE LA DRETA (grid), com a node per poder muntar-lo
+  // dins del flex de la fila unica sense duplicar-lo.
+  const gridNode = (
+  <div
+    // SENSE `z-10` (28/09/2026). La filera (la graella i el bloc de la dreta) anava
+    // a zIndex 10 i per aixo la caixa del bloc tapava la maniga de la franja:
+    // tota la filera pintava per damunt. En Marc: «Es veu la caixa per sobre».
+    // Sense capa propia, la franja (que ve DESPRES al DOM) hi pinta per damunt,
+    // com a la p2.
+    className="relative grid grid-cols-1 gap-10"
+    style={{
+      // LA GRAELLA DE DUES FILERES I EL BLOC DE LA DRETA (26/09/2026,
+      // B2). A l'escriptori i a la tauleta apaisada la composicio es:
+      //
+      //   [ graella ................. ] 10 [ selector ]
+      //                                     [ fletxes  ]
+      //   [ franja de samarretes (amplada del carril) ]
+      //
+      // La graella arrenca a la vora esquerra del carril (x381) i el bloc
+      // de la dreta acaba a la dreta (x1524). La feina la fan
+      // `GraellaDuesFileresPagina1` (la MATEIXA graella de la pagina 2,
+      // amb la peça de 45 unitats) i `BlocDretaPagina1` (selector
+      // quadrat + fletxes quadrades).
+      //
+      // A la vista VERTICAL (tauleta vertical) es queda la malla de nou
+      // columnes de sempre: alla la graella viu a la taula.
+      transform: isPortraitTablet ? 'scale(var(--hgGridFitScale, 0.94))' : undefined,
+      transformOrigin: 'top center',
+      visibility: reserveGridSpace ? 'hidden' : undefined,
+      pointerEvents: reserveGridSpace ? 'none' : undefined,
+    }}
+    aria-hidden={reserveGridSpace ? true : undefined}
+  >
+    {isPortraitTablet ? (resolvedMega[active] || []).map((col, idx) => (
+      <MegaColumn
+        key={`${active}-${idx}`}
+        title={col.title}
+        isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'miscellania'}
+        isHumanInside={active === 'the_human_inside'}
+        collectionId={active}
+        disableMulti={active === 'austen' && austenSelectedDisableMulti}
+        stripeVariantVisibility={stripeVariantVisibility}
+        megaTileSelectorParams={megaTileSelectorParams}
+        onStartSelectorDrag={onStartSelectorDrag}
+        megaTileSize={megaTileSize}
+        compactLandscape={compactLandscape}
+        hideLabels
+        hideSelectorBackground
+        humanInsideVariant={humanInsideVariant}
+        items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
+        row={true}
+        firstContactVariant={firstContactVariant}
+        onFirstContactWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
+        onFirstContactBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
+        onFirstContactMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
+        onHumanWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }}
+        onHumanBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }}
+        onHumanMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }}
+        onHumanPrev={() => setThinStartIndex((v) => v - 1)}
+        onHumanNext={() => setThinStartIndex((v) => v + 1)}
+        onSelectItem={(it) => {
+          setStripeOverlayOverrideActive(false);
+          if (active === 'first_contact') setFirstContactSelectedItem(it);
+          else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
+          else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
+          if (typeof onShirtClick === 'function') onShirtClick(active, it);
+        }}
+      />
+    )) : (
+      <div
+        data-filera-p1="1"
+        style={{
+          position: 'relative',
+          display: 'flex',
+          // LES DUES FILERES DE LA GRAELLA, CENTRADES AL SELECTOR
+          // (02/10/2026). En Marc: «Centra les dues files al selector». A
+          // 1024 la filera fa l'alcada del bloc (el quadrat del selector) i
+          // la graella, que es una mica mes alta (les dues fileres i el seu
+          // buit), hi queda centrada; a la resta es queda com estava.
+          // LA GRAELLA, AL TOP DEL CONJUNT FLETXES+SELECTOR (05/10/2026).
+          // En Marc: «Alinea la graella al top del conjunt fletxes+selector»:
+          // a la fila unica la graella no es centra dins la filera (quedava
+          // 27 px mes avall que el bloc), sino que arrenca a la mateixa vora.
+          alignItems: esFilaUnicaP1 ? 'flex-start' : (esComposicioEstretaP1 ? 'center' : 'flex-start'),
+          width: '100%',
+          ...(esComposicioEstretaP1 && !esFilaUnicaP1 ? { height: `${blocDretaPx}px` } : null),
+          // LA FILERA, PER DAMUNT DE LA FRANJA (05/10/2026). En Marc: «A
+          // totes les vistes els clics de la fila de la graella estan
+          // capturats per alguna cosa». La caixa de la franja de
+          // samarretes es mes alta que les seves samarretes (porta els
+          // coixins) i arriba a la filera: com que va DESPRES al DOM,
+          // guanyava el clic. La filera mana i la franja queda per sota
+          // (els seus gestos, a la part de sota, no es toquen).
+          ...(esComposicioEstretaP1 ? { zIndex: 5 } : null),
+          marginTop: esFilaUnicaP1 ? 0 : `${topFileraPx}px`,
+          // LA FILERA, A LA VORA DEL CARRIL (05/10/2026). A la fila unica la
+          // graella no porta el desplacament `dx` (que el calculava el bucle del
+          // bloc); el mig marge finestra/maquetacio es descompta aqui, al pare.
+          ...(esFilaUnicaP1 ? { transform: `translateX(${compensacioBarraPx}px)` } : null),
+        }}
+      >
+        {/* LES FLETXES, A L'ESQUERRA DE LA GRAELLA (05/10/2026). En Marc:
+            «A les versions no tactils: desktop i portatils, afegeix-los
+            unes fletxes al cantó esquerre de la graella de dibuixos. A la
+            p1». Es la MATEIXA peça que hi havia al bloc de la dreta (les
+            dues fletxes apilades, ‹ a dalt i › a baix) i mou la graella
+            amb el MATEIX pas publicat (`stepperP1`), com alla. */}
+        {esEscriptoriP1 && !esFilaUnicaP1 ? (
+          <div style={{
+            position: 'relative',
+            flex: '0 0 auto',
+            // L'ALCADA, DECLARADA (05/10/2026). En Marc: «en els espais que
+            // has deixat per posar-hi les fletxes no hi ha fletxes»: la
+            // peça va amb `omple` (`h-full w-full`), i sense alcada al
+            // pare la caixa feia 97x0 i els dos botons tambe (mesurat).
+            width: `${blocDretaPx}px`,
+            height: `${blocDretaPx}px`,
+            marginRight: `${gapDretaPx}px`,
+          }}>
+            <FletxesQuadratPagina1
+              omple
+              onPrev={() => stepperP1?.(1)}
+              onNext={() => stepperP1?.(-1)}
+            />
+          </div>
+        ) : null}
+        {/* EL VIEWPORT DE LA GRAELLA, DE LA VORA ESQUERRA DEL CARRIL DE LA
+            PAGINA FINS AL SELECTOR (02/10/2026). En Marc: «Obre el viewport
+            de la graella fins a la part esquerra del segon carril i fins al
+            selector». A 1024 la graella no viu al carril del megaslide
+            (605): el seu retall arrenca a la vora esquerra del carril de la
+            pagina i s'acaba on arrenca el selector, i el porta alla el
+            MATEIX desplacament que el bloc (`dx`). A la resta de mides, com
+            sempre. */}
+        <div style={{
+          flex: esComposicioEstretaP1 ? '0 0 auto' : '1 1 0%',
+          minWidth: 0,
+          marginRight: esComposicioEstretaP1 ? 0 : `${gapDretaPx}px`,
+          ...(esComposicioEstretaP1 ? {
+            // L'amplada de la CAIXA de la graella: el retall (el viewport)
+            // mes el coixi de 10 px que porta a l'esquerra. El viewport va de
+            // la vora esquerra del carril de la pagina fins a 10 px ABANS del
+            // selector (en Marc: «Fes-li un marge al cantó del selector, 10
+            // px»). El coixi de l'esquerra es compensa amb el desplacament.
+            // El bloc de fletxes de l'esquerra tambe hi es: la graella
+            // li deixa el seu costat mes el seu gap (05/10/2026).
+            // L'amplada de la graella: el carril menys els dos quadrats
+            // i els seus gaps (05/10/2026). Es el MATEIX numero que se li
+            // passa a la stripe com a objectiu.
+            width: `${ampleGraellaP1}px`,
+            // El retall arrenca 10 px endins de la caixa de la graella (el
+            // coixi de l'esquerra), o sigui que el desplacament va 10 px mes
+            // enlla d'on va el bloc perque el RETALL caigui a la vora del
+            // carril.
+            // LA GRAELLA, A LA VORA ESQUERRA DEL CARRIL (05/10/2026). En
+            // Marc: «Alinea la graella a l'esquerra del carril, ara no hi
+            // es». El desplacament `dx` es el que porta les peces del
+            // panell a la vora del carril; a la fila unica no hi ha el
+            // coixi de 10 px, o sigui que el desplacament es `dx` sencer
+            // (abans era `dx - 10` per compensar aquell coixi).
+            ...(alcadaBlocEstretaP1 && !esFilaUnicaP1 ? { transform: `translateX(${alcadaBlocEstretaP1.dx - 10}px)` } : null),
+          } : null),
+        }}>
+          <GraellaDuesFileresPagina1
+            items={itemsGraella}
+            onStepper={setStepperP1}
+            activeCollection={active}
+            activeSubcollection={austenSubcollection}
+            escala={esComposicioEstretaP1 ? escalaCarril * 0.75 : escalaCarril}
+            unaFila={esFilaUnicaP1}
+            alcadaCarruselPx={esFilaUnicaP1 ? costatFilaUnicaPx : alcadaFileraPx}
+            centraFilesEnBloc={esComposicioEstretaP1}
+            midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
+            onSelectGroup={(collection, subcollection, firstStripeItem) => {
+              // EL CLIC TRIa EL DIBUIX I EL MOSTRA (28/09/2026). En Marc:
+              // «El clic obre la pdp, pero no mostra el dibuix a la franja
+              // ni a la graella»: el clic ha de deixar triat aquell dibuix
+              // (amb la seva colleccio activa, perque la graella i la franja
+              // l'ensenyin) i NO ha d'obrir la fitxa del producte. La PDP
+              // s'obre des de les samarretes de la franja, com a la p2.
+              if (collection !== active) setActive?.(collection);
+              // LA SUBCALLECCIO, DESADA AL CLIC (28/09/2026). En Marc: «Quan
+              // cliques un dibuix d'Austen, activa totes les col·leccions
+              // d'Austen»: la graella passava `subcollection` i algu no el
+              // desava enlloc. Es el MATEIX cami que la pagina 2 (vegeu
+              // `onSelectGroup` de `MegaslidePagina2`).
+              if (collection === 'austen') setAustenSubcollection?.(subcollection || null);
+              else setAustenSubcollection?.(null);
+              setStripeOverlayOverrideActive(false);
+              if (firstStripeItem) {
+                if (collection === 'first_contact') setFirstContactSelectedItem(firstStripeItem);
+                else if (collection === 'the_human_inside') setHumanInsideSelectedItem(firstStripeItem);
+                else setSelectedItemByCollection((prev) => ({ ...prev, [collection]: firstStripeItem }));
+              }
+            }}
+          />
+        </div>
+        {/* EL BLOC DE LA DRETA, COM EL DE LA PAGINA 2 (28/09/2026).
+
+            En Marc: «Fes el bloc de la mateixa mida del bloc de la p2 i amb
+            el selector (tambe de la mateixa mida que el p2) i les fletxes
+            centrades al quadrat que et quedarà per haver redimensionat el
+            selector» i «i les fletxes sota del selector, no al costat».
+
+            El bloc fa `blocDretaPx` d'ample (59,5 px a 1920, la meitat del
+            contenidor del selector de la p2): a dalt hi va el quadrat de
+            les fletxes (59,5 x 59,5) i a sota el selector (59,5 x 119, la
+            forma `rectangle` de la p2), tots dos a la DRETA. La caixa i
+            l'ombra les duu el bloc sencer (vegeu
+            `ESTIL_CAIXA_BLOC_ALCADA_AUTO`). */}
+        {esFilaUnicaP1 ? null : blocDretaNode}
+      </div>
+    )}
+  </div>
+  );
+
+  // LA STRIPE, com a node (idem).
+  const stripeNode = (
+  <div
+    // LA FRANJA PER DAMUNT DEL BLOC DE LA DRETA (28/09/2026). En Marc:
+    // «L'ombra de la maniga ha d'estar sota la maniga, no a sobre». El bloc
+    // porta dins l'ombra (la silueta de l'ultima casa, difosa) i, si el
+    // bloc va per damunt de la franja, l'ombra cau SOBRE la samarreta. Amb
+    // la franja a zIndex 4 (el MATEIX que a la p2), la samarreta tapa l'ombra i
+    // nome's se'n veu la part que cau dins del bloc, com a la pagina 2 (alla la franja es a
+    // zIndex 4 i la columna a 3).
+    className="relative"
+    style={{
+      // LA FRANJA, PER DAMUNT DEL BLOC (zIndex 4, com a la p2).
+      zIndex: 4,
+      // A la franja estreta (768-1366) la pàgina ja té els seus propis
+      // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
+      //
+      // A LA VISTA VERTICAL TAMPOCO (28/09/2026). `ajustFranjaPx` es un
+      // calibratge d'ESCRIPTORI: son els 73,4 px que la franja de la p1
+      // puja per caure a la mateixa alcada que la de la p2 a 1920. A la
+      // vertical la franja viu dins d'un embolcall escalat (2,177) i allo
+      // es converteix en 73,4 x 2,177 = 159,8 px: la franja se n'anava
+      // 160 px enlaire i trepitjava la filera de la graella de dibuixos.
+      // Es el que feia que la p1 vertical no quadres amb la referencia
+      // bona del 23/09, on aquest ajust encara no existia.
+      marginTop: esFilaUnicaP1
+        ? '13px'
+        : (compactLandscape
+          ? '16px'
+          : (isPortraitTablet ? `${stripeRowPadPx}px` : `calc(${stripeRowPadPx}px - ${ajustFranjaPx}px)`)),
+      paddingBottom: esFilaUnicaP1 ? '0px' : (compactLandscape ? '8px' : `${stripeRowPadPx}px`),
+      paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
+      paddingRight: `${stripeRowPadXPx?.right || 0}px`,
+      // La franja estreta (768-1366) no ha de pujar: el belt s'ha
+      // encongit, la graella de colors ha quedat 17 px més curta i
+      // aquests -15 px la partien en dues meitats (els cercles a dalt i
+      // el COLOR/NEGRE dins de les samarretes). Ha de coincidir amb el
+      // mateix ajust de MegaStripePanel (pàgina 2).
+      transform: (compactLandscape || esEstenyFins1366) ? 'none' : 'translateY(-15px)',
+    }}
+  >
+    <div
+      className="w-full bg-transparent"
+      // EL CENTRE ES EL DEL CARRIL, NO EL DEL CONTINGUT.
+      //
+      // El panell porta un coixi lateral (`stripeRowPadXPx`) i el
+      // centratge es feia sobre el CONTINGUT (el carril menys els
+      // coixins): si els dos coixins no son iguals —o si un navegador els
+      // aplica diferent— el centre se'n va. Aqui el coixi es descompta
+      // NEGATIU a l'embolcall, de manera que l'embolcall fa exactament el
+      // carril i el 50% de la filera es el centre del carril, a tothom.
+      style={{ width: 'auto', marginLeft: `-${stripeRowPadXPx?.left || 0}px`, marginRight: `-${stripeRowPadXPx?.right || 0}px` }}
+    >
+
+      <div
+        id="stripe-guide-stripe-row-p1"
+        ref={(el) => {
+          filaFranjaRef.current = el;
+          refGestosFranja(el);
+        }}
+        className="relative inline-block"
+        style={{
+          height: carrilPx(stripePreviewHPx),
+          width: 'auto',
+          // CENTRADA SOBRE EL CARRIL, A MA, NO PEL `justify-content`.
+          //
+          // La filera es mes ampla que el carril (les manigues hi surten)
+          // i amb `w-full flex justify-center` el centratge depenia del
+          // navegador: quan l'element desborda el contenidor, Chromium el
+          // centra pero FIREFOX L'ALINEA A L'INICI. Amb la franja
+          // desbordant, allo la desplaçava a la dreta (mesurat a la
+          // captura de l'amo del 24/09 a les 23:47: els cossos començaven
+          // a 459,5 en comptes de 381). Amb `left: 50%` i
+          // `translateX(-50%)` el centre es el del contenidor de
+          // maquetacio (el carril menys els coixins, que son iguals), a
+          // tots els navegadors.
+          // El centre, a mig cami entre la vora esquerra del carril i la
+          // dreta de les fletxes: aixi la cintura de la primera samarreta
+          // cau a la vora esquerra del carril i la de l'ultima a la guia
+          // de les fletxes. Sense fletxes (tauletes) el centre es el del
+          // carril, que es com estava.
+          // ENCAIXADA A L'AMPLADA DEL CARRIL (02/10/2026). En Marc: «Ara
+          // encaixa la stripe p1 a l'amplada del carril». El contenidor
+          // d'aquesta filera ja fa exactament el carril, o sigui que a la
+          // composicio estreta n'hi ha prou de no centrar-la i donar-li
+          // l'aspecte del full: la franja va de vora a vora del carril i
+          // l'alcada en surt sola (811 x 86,9 a 1366 en lloc de 713,9 x
+          // 76,5). A la resta de mides, com sempre.
+          left: centreCarrilFranja === null ? '50%' : `${centreCarrilFranja}px`,
+          transform: 'translateX(-50%)',
+          // La filera NO s'ha d'encongir per encabir-se al contenidor: la
+          // franja te una mida de disseny i es escala amb `transform`
+          // (com la de la pagina 2, que ja no s'encongia). Sense aixo, a
+          // 1280-1440 la franja de la pagina 1 quedava mes estreta que la
+          // de la pagina 2 (820 contra 1017 px) i les dues pagines no
+          // quadraven.
+          flexShrink: 0,
+          // EL DESCENS DE LA CAIXA INLINE-BLOCK (05/10/2026). A la fila unica la
+          // filera de la franja es una caixa `inline-block` dins d'una columna
+          // flex, i el seu line box hi afegia ~6 px de descens per sota: amb
+          // `verticalAlign: 'top'` la caixa fa exactament la seva alcada i el
+          // bloc de la dreta (que s'estira al conjunt) cau al bottom de la stripe.
+          ...(esFilaUnicaP1 ? { verticalAlign: 'top' } : null),
+        }}
+      >
+        {stripeOverlayDebug && stripeOverlayLoadState !== 'ok' ? (
+          <div
+            className="absolute left-2 top-2"
+            style={{
+              zIndex: 100,
+              pointerEvents: 'none',
+              fontSize: 11,
+              lineHeight: 1.2,
+              padding: '6px 8px',
+              borderRadius: 8,
+              background: 'rgba(255, 80, 80, 0.92)',
+              color: 'hsl(var(--grey-paper))',
+              maxWidth: 420,
+              wordBreak: 'break-all',
+            }}
+          >
+            {stripeOverlayLoadState === 'no-src'
+              ? 'overlay: no src'
+              : (stripeOverlayLoadState === 'loading'
+                  ? 'overlay: loading...'
+                  : `overlay: failed (${resolvedOverlaySrc || 'empty'})`)}
+          </div>
+        ) : null}
+
+        <div
+          className="relative"
+          data-stripe-visual-content="1"
+          style={{
+            // LA FILA UNICA: LA STRIPE, AL BOTTOM DEL SELECTOR (05/10/2026).
+            // En Marc: «Alinea la stripe al bottom del selector». La caixa de la
+            // stripe fa l'alcada de la filera (115) i la samarreta, escalada
+            // (factorCarrilFranja, ~0,87) i pujada 10 px (la banda estreta), en
+            // queda 100 d'alta: perque el seu cul caigui al cul de la filera (que
+            // es el del selector), la baixem 115 - 100 + 10 = 25 px.
+            ...(esFilaUnicaP1
+              ? { marginTop: '25px' }
+              : ((esComposicioEstretaP1 && alcadaBlocEstretaP1) ? { marginTop: `${alcadaBlocEstretaP1.dy}px` } : null)),
+            height: '100%',
+            width: '100%',
+            display: 'block',
+            transformOrigin: 'top center',
+            // A l'apaisada pugem la stripe 10px (les samarretes). El
+            // desplaçament va amb la resta de la seva posicio, que ve de
+            // les variables de calibracio.
+            // La franja NO s'ajusta a l'alcada de la finestra: fa el carril
+            // SEMPRE (vegeu MegaMenuPanel). Ha de coincidir amb
+            // MegaStripePanel (pagina 2).
+            // El desplaçament (i la resta de la posició) ve de les
+            // variables de calibracio i NO s'escala: el `translate` va
+            // abans de l'`scale`, o sigui en px del pare. El que s'escala
+            // es la mida de la filera (`stripePreviewHPx`), i l'escala que
+            // la porta al carril la calcula `useEscalaFranjaCarril` (les
+            // manigues hi queden a fora, a la mida del dibuix).
+            // EL LLOC DE LA FRANJA DE LA P2 (02/10/2026): a 1024-1366 la
+            // franja de la p1 ha de caure on cau la de la p2 dins de la
+            // seva pagina. El desplacament va ABANS del `translate` i de
+            // l'`scale` de sempre, o sigui en px del pare.
+            transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja}))`,
+            isolation: 'isolate',
+          }}
+        >
+          {stripeOverlayDebug ? (
+            <div
+              className="absolute inset-0 flex"
+              style={{
+                pointerEvents: 'none',
+                zIndex: 1000,
+                transformOrigin: 'top center',
+                transform: 'none',
+                background: 'transparent',
+              }}
+              aria-hidden="true"
+            >
+              {Array.isArray(stripeMaskDebugRectsPct) && stripeMaskDebugRectsPct.length === 14
+                ? stripeMaskDebugRectsPct.map((r, idx) => (
+                  <div
+                    key={`stripe-tile-debug-abs-p1-${idx}`}
+                    style={{
+                      position: 'absolute',
+                      left: `${r.left}%`,
+                      top: `${r.top}%`,
+                      width: `${r.width}%`,
+                      height: `${r.height}%`,
+                      boxSizing: 'border-box',
+                      border: '2px solid rgba(0, 200, 255, 0.82)',
+                      background: idx % 2 === 0 ? 'rgba(0, 200, 255, 0.18)' : 'rgba(0, 200, 255, 0.1)',
+                      overflow: 'visible',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: -16,
+                        transform: 'translateX(-50%)',
+                        zIndex: 2,
+                        padding: '2px 6px',
+                        borderRadius: 6,
+                        fontSize: 12,
+                        fontWeight: 900,
+                        lineHeight: 1,
+                        color: 'rgba(2,6,23,0.95)',
+                        background: 'rgba(255, 255, 0, 0.94)',
+                        boxShadow: '0 6px 18px rgba(0,0,0,0.22)',
+                        border: '1px solid rgba(0,0,0,0.25)',
+                        userSelect: 'none',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {idx + 1}
+                    </div>
+                  </div>
+                ))
+                : Array.from({ length: 14 }).map((_, idx) => (
+                  <div
+                    key={`stripe-tile-debug-abs-fallback-p1-${idx}`}
+                    style={{
+                      height: '100%',
+                      flex: '1 1 0%',
+                      boxSizing: 'border-box',
+                      border: '2px solid rgba(0, 200, 255, 0.75)',
+                      background: idx % 2 === 0 ? 'rgba(0, 200, 255, 0.22)' : 'rgba(0, 200, 255, 0.11)',
+                    }}
+                  />
+                ))}
+            </div>
+          ) : null}
+
+          <div
+            className="relative"
+            style={{
+              height: '100%',
+              width: '100%',
+              // La franja s'hi centra: amb l'amplada fixa i l'alcada per
+              // l'aspecte, si no, quedava enganxada i semblava tallada.
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              zIndex: 1,
+              // LA MASCARA, DEL FULL BO (27/09/2026): vegeu
+              // `MegaStripePanel`. El full `v5` te les siluetes en unes
+              // altres coordenades i tallava les manigues.
+              WebkitMaskImage: senseMascaraSamarreta
+                ? 'none'
+                : (emptyShirtMaskUrl
+                  ? `url("${emptyShirtMaskUrl}")`
+                  : 'none'),
+              maskImage: senseMascaraSamarreta
+                ? 'none'
+                : (emptyShirtMaskUrl
+                  ? `url("${emptyShirtMaskUrl}")`
+                  : 'none'),
+              WebkitMaskRepeat: 'no-repeat',
+              maskRepeat: 'no-repeat',
+              WebkitMaskSize: '103% 100%',
+              maskSize: '103% 100%',
+              WebkitMaskPosition: '50% 0',
+              maskPosition: '50% 0',
+            }}
+          >
+            {isPortraitTablet ? (
+              <svg
+                viewBox={`0 0 ${VECTOR_FRANJA_VIEWBOX_OBERT.width} ${VECTOR_FRANJA_VIEWBOX_OBERT.height}`}
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                style={{
+                  // Exactament el mateix que la imatge de la franja (mateixa
+                  // mida i mateix aspecte): alcada del contenidor i amplada
+                  // per l'aspecte del viewBox.
+                  // Com la imatge de la franja: alcada del contenidor i
+                  // amplada per l'aspecte del viewBox.
+                  position: 'relative',
+                  height: '100%',
+                  width: 'auto',
+                  maxWidth: 'none',
+                  display: 'block',
+                  pointerEvents: 'none',
+                  zIndex: 4,
+                }}
+              >
+                {/* La imatge de la franja, DINS del perimetre vectorial: el
+                    clipPath son les 14 siluetes, aixi la imatge nomes es veu
+                    a dins de les samarretes. */}
+                <defs>
+                  <clipPath id={`hgFranjaImatge-${idRetall}`} clipPathUnits="userSpaceOnUse">
+                    {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
+                      <path key={`hg-clip-${k}`} d={d} />
+                    ))}
+                  </clipPath>
+                </defs>
+                {stripeImageSrc ? (
+                  <image
+                    href={stripeImageSrc}
+                    x={0}
+                    y={0}
+                    width={VECTOR_FRANJA_VIEWBOX.width}
+                    height={VECTOR_FRANJA_CONTINGUT}
+                    preserveAspectRatio="none"
+                    clipPath={`url(#hgFranjaImatge-${idRetall})`}
+                  />
+                ) : null}
+                {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
+                  <path
+                    key={`hg-samarreta-${k}`}
+                    id={`hgSamarreta-${k}`}
+                    d={d}
+                    fill="none"
+                    // El contorn de la stripe vectorial, amagat.
+                    stroke="none"
+                  />
+                ))}
+              </svg>
+            ) : null}
+
+            {megaStripeSpriteEnabledLocal && !isPortraitTablet ? (
+              <img
+                src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp'}
+                alt=""
+                className="block"
+                // Les mides del fitxer per atribut: vegeu MegaStripePanel
+                // (la filera de la franja no pot fer zero d'amplada mentre
+                // la imatge arriba, perque l'escala de la franja se'n val).
+                width={2866}
+                height={307}
+                style={{
+                  height: '100%',
+                  width: 'auto',
+                  // SENSE EL LÍMIT DEL PREFLIGHT (02/10/2026). El full de la
+                  // franja fa 9,33:1 i a 1024-1366 el contenidor es mes
+                  // estret que la imatge a aquesta alcada: amb el
+                  // `max-width: 100%` de sempre, la imatge s'encongia
+                  // d'amplada (7,5:1) i les catorze samarretes es
+                  // trepitjaven. Amb `none` la filera s'eixampla fins a
+                  // l'amplada que li toca i despres s'escala sencera, com
+                  // a la pagina 2.
+                  ...(esComposicioEstretaP1 ? { maxWidth: 'none' } : null),
+                }}
+                loading="eager"
+                decoding="async"
+              />
+            ) : null}
+
+            {shirtColor && shirtColor !== '#FFFFFF' && !isPortraitTablet ? (
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundColor: shirtColor,
+                  mixBlendMode: 'multiply',
+                  opacity: 0.9,
+                  pointerEvents: 'none',
+                  zIndex: 5,
+                  // A la vista vertical la franja te dues fileres i la
+                  // mascara de contorn del panell es d'una: el tint es
+                  // retalla amb la MATEIXA imatge de la stripe (el seu
+                  // canal alfa es el contorn de les samarretes), aixi no
+                  // tenyeix el rectangle de fons.
+                  ...((isPortraitTablet && stripeImageSrc)
+                    ? {
+                      WebkitMaskImage: `url("${encodeURI(stripeImageSrc)}")`,
+                      maskImage: `url("${encodeURI(stripeImageSrc)}")`,
+                      WebkitMaskSize: '100% 100%',
+                      maskSize: '100% 100%',
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                    }
+                    : null),
+                }}
+              />
+            ) : null}
+
+            {megaStripeRefEnabledLocal && megaStripeRefSrcLocal && !isPortraitTablet ? (
+              <img
+                src={megaStripeRefSrcLocal}
+                alt=""
+                className="block absolute inset-0"
+                style={{
+                  pointerEvents: 'none',
+                  zIndex: 6,
+                  height: '100%',
+                  width: 'auto',
+                  transformOrigin: 'top center',
+                  transform: 'translate(var(--megaStripeRefDx, 0px), var(--megaStripeRefDy, 0px)) scale(var(--megaStripeRefScale, 1))',
+                }}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : null}
+
+            {megaStripeRef2EnabledLocal && megaStripeRef2SrcLocal && !isPortraitTablet ? (
+              <img
+                src={megaStripeRef2SrcLocal}
+                alt=""
+                className="block absolute inset-0"
+                style={{
+                  pointerEvents: 'none',
+                  zIndex: 7,
+                  height: '100%',
+                  width: 'auto',
+                  transformOrigin: 'top center',
+                  transform: 'translate(var(--megaStripeRef2Dx, 0px), var(--megaStripeRef2Dy, 0px)) scale(var(--megaStripeRef2Scale, 1))',
+                }}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : null}
+
+            {stripeEmptyMaskSrc ? (
+              <img
+                src={stripeEmptyMaskSrc}
+                alt=""
+                aria-hidden="true"
+                className="block absolute"
+                style={{
+                  top: 0,
+                  left: 0,
+                  height: '100%',
+                  width: 'auto',
+                  pointerEvents: 'none',
+                  zIndex: 9,
+                  opacity: 'var(--hgStripeEmptyMaskOpacity, 1)',
+                }}
+                loading="eager"
+                decoding="async"
+              />
+            ) : null}
+
+            {Array.isArray(emptyTileIndices) && emptyTileIndices.length > 0 ? (
+              <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 10 }}>
+                {emptyTileIndices.map((idx) => {
+                  const r = Array.isArray(rectsMascara) && rectsMascara.length === 14
+                    ? rectsMascara[idx]
+                    : null;
+                  const leftPct = r ? Number(r.left) || 0 : (idx / 14) * 100;
+                  const widthPct = r ? Number(r.width) || 0 : (1 / 14) * 100;
+                  const topPct = r ? Number(r.top) || 0 : 0;
+                  const heightPct = r ? Number(r.height) || 100 : 100;
+                  return (
+                    <div
+                      key={`disabled-tile-p1-${idx}`}
+                      onPointerDown={(ev) => { ev.stopPropagation(); }}
+                      onClick={(ev) => { ev.stopPropagation(); }}
+                      style={{
+                        position: 'absolute',
+                        top: `${topPct}%`,
+                        height: `${heightPct}%`,
+                        left: `${leftPct}%`,
+                        width: `${widthPct}%`,
+                        background: 'var(--hgStripeDisabledFill, transparent)',
+                        pointerEvents: 'auto',
+                        cursor: 'default',
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {/* Silueta de les 14 samarretes (coordenades 0-1) per retallar-hi
+                els dibuixos i que no trepitgin el blanc entre samarretes. */}
+            {isPortraitTablet ? (
+              <svg width="100%" height="100%" aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                <clipPath id={idRetall} clipPathUnits="objectBoundingBox">
+                  <path d={VECTOR_FRANJA_SAMARRETES_01.join(' ')} clipRule="evenodd" />
+                </clipPath>
+              </svg>
+            ) : null}
+
+            {/* Els dibuixos tambe a la vista vertical: la p2 ja els hi
+                pinta (mateixa condicio, sense `!isPortraitTablet`) i el
+                `clipPath` de la vertical d'aqui dalt hi es per aixo. Amb
+                la guarda, a la tauleta vertical les samarretes de la p1
+                es quedaven sense dibuix (28/09/2026). */}
+            {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective ? (
+              <div
+                className="absolute inset-0"
+                style={{
+                  pointerEvents: 'none',
+                  zIndex: 12,
+                  transformOrigin: 'top center',
+                  transform: 'none',
+                  background: 'transparent',
+                  // El dibuix no ha de trepitjar el blanc entre samarretes:
+                  // es retalla amb la silueta vectorial de les 14 samarretes.
+                  // El dibuix no ha de trepitjar el blanc entre samarretes: es
+                  // retalla amb la silueta vectorial de les 14 samarretes
+                  // (clipPath mes avall; amb la imatge com a mascara no
+                  // s'hi va aplicar el canal alfa i el dibuix quedava fluix).
+                  clipPath: `url(#${idRetall})`,
+                }}
+              >
+                {Array.isArray(rectsMascara) && rectsMascara.length === 14
+                  ? rectsMascara.map((r, idx) => {
+                    if (picksDibuixFranja[idx] === false) {
+                      return null;
+                    }
+                    const picked = picksDibuixFranja[idx];
+                    const imgUrl = picked ? encodeURI(picked) : '';
+                    const safeW = Number(r?.width) || 0;
+                    const safeH = Number(r?.height) || 0;
+                    const safeL = Number(r?.left) || 0;
+                    const safeT = Number(r?.top) || 0;
+
+                    return (
+                      <div
+                        key={`stripe-tile-drawing-p1-${idx}-${imgUrl || ''}`}
+                        style={{
+                          position: 'absolute',
+                          left: `${safeL}%`,
+                          top: `${safeT}%`,
+                          width: `${safeW}%`,
+                          height: `${safeH}%`,
+                          overflow: 'hidden',
+                          boxSizing: 'border-box',
+                          background: drawingOverlayDebug ? 'rgba(217,70,239,0.06)' : 'transparent',
+                          border: drawingOverlayDebug ? '1px solid rgba(217,70,239,0.35)' : '0px solid transparent',
+                          // El desplacament del gap va DINS de cada filera: a la vista vertical
+                          // (dues fileres de 7) la posicio dins la filera es idx % 7.
+                          transform: tileGapPxLocal ? `translateX(${(isPortraitTablet ? (idx % 7) : idx) * tileGapPxLocal}px)` : 'none',
+                        }}
+                      >
+                        {drawingOverlayDebug ? (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: 4,
+                              left: 6,
+                              fontSize: 12,
+                              fontWeight: 900,
+                              color: 'rgba(88,28,135,0.92)',
+                              textShadow: '0 1px 1px rgba(255,255,255,0.85)',
+                              userSelect: 'none',
+                              zIndex: 13,
+                            }}
+                          >
+                            {`D${idx + 1}`}
+                          </div>
+                        ) : null}
+
+                        <DibuixFranja
+                          picked={picked}
+                          idx={idx}
+                          desplacamentGap={gapsDibuixFranja[idx]}
+                          calibrationOverrides={calibrationOverrides}
+                          stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
+                          rectsMascara={rectsMascara}
+                          isPortraitTablet={isPortraitTablet}
+                          active={active}
+                          drawingOverlayDebug={drawingOverlayDebug}
+                        />
+                      </div>
+                    );
+                  })
+                  : Array.from({ length: 14 }).map((_, idx) => {
+                    if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
+                      return null;
+                    }
+                    const base = (() => {
+                      try {
+                        if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
+                          return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
+                        }
+                        return normalizeOverlaySrc(drawingOverlaySrcEffective);
+                      } catch {
+                        return normalizeOverlaySrc(drawingOverlaySrcEffective);
+                      }
+                    })();
+
+                    const hasPerTileSrcFallback = Array.isArray(stripeTileOverlaySrcs) && !!stripeTileOverlaySrcs[idx];
+                    const picked = resolDibuixDeCasella({
+                      base, idx, hasPerTileSrcFallback, active, resolvedOverlaySrc,
+                      humanInsideVariant, firstContactVariant, isPortraitTablet, shirtColor,
+                    });
+
+                    const imgUrl = picked ? encodeURI(picked) : '';
+                    return (
+                      <div
+                        key={`stripe-tile-drawing-fallback-p1-${idx}-${imgUrl || ''}`}
+                        style={{
+                          position: 'absolute',
+                          top: '0%',
+                          height: '100%',
+                          left: `${(idx / 14) * 100}%`,
+                          width: `${(1 / 14) * 100}%`,
+                          overflow: 'hidden',
+                          boxSizing: 'border-box',
+                          // El desplacament del gap va DINS de cada filera: a la vista vertical
+                          // (dues fileres de 7) la posicio dins la filera es idx % 7.
+                          transform: tileGapPxLocal ? `translateX(${(isPortraitTablet ? (idx % 7) : idx) * tileGapPxLocal}px)` : 'none',
+                        }}
+                      >
+                        <DibuixFranja
+                          picked={picked}
+                          idx={idx}
+                          desplacamentGap={gapsDibuixFranja[idx]}
+                          calibrationOverrides={calibrationOverrides}
+                          stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
+                          rectsMascara={rectsMascara}
+                          isPortraitTablet={isPortraitTablet}
+                          active={active}
+                          drawingOverlayDebug={drawingOverlayDebug}
+                        />
+                      </div>
+                    );
+                  })}
+              </div>
+            ) : null}
+
+          </div>
+
+          <ClicAreaOverlayP1
+            src="/placeholders/cercador/full-clic-area-5.svg"
+            highlightAll={!!clicAreaHighlight}
+            highlightIndices={clicAreaHighlightIndices}
+            tshirtColor={shirtColor}
+            disabledIndices={emptyTileIndices}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  );
+
   return (
     <div
       ref={pageRootRef}
       className="w-full shrink-0"
       style={{ transform: (!isPortraitTablet && pageLift > 0) ? `translateY(-${pageLift}px)` : undefined }}
     >
-      {!hideGrid || reserveGridSpace ? (
-        <div
-          // SENSE `z-10` (28/09/2026). La filera (la graella i el bloc de la dreta) anava
-          // a zIndex 10 i per aixo la caixa del bloc tapava la maniga de la franja:
-          // tota la filera pintava per damunt. En Marc: «Es veu la caixa per sobre».
-          // Sense capa propia, la franja (que ve DESPRES al DOM) hi pinta per damunt,
-          // com a la p2.
-          className="relative grid grid-cols-1 gap-10"
-          style={{
-            // LA GRAELLA DE DUES FILERES I EL BLOC DE LA DRETA (26/09/2026,
-            // B2). A l'escriptori i a la tauleta apaisada la composicio es:
-            //
-            //   [ graella ................. ] 10 [ selector ]
-            //                                     [ fletxes  ]
-            //   [ franja de samarretes (amplada del carril) ]
-            //
-            // La graella arrenca a la vora esquerra del carril (x381) i el bloc
-            // de la dreta acaba a la dreta (x1524). La feina la fan
-            // `GraellaDuesFileresPagina1` (la MATEIXA graella de la pagina 2,
-            // amb la peça de 45 unitats) i `BlocDretaPagina1` (selector
-            // quadrat + fletxes quadrades).
-            //
-            // A la vista VERTICAL (tauleta vertical) es queda la malla de nou
-            // columnes de sempre: alla la graella viu a la taula.
-            transform: isPortraitTablet ? 'scale(var(--hgGridFitScale, 0.94))' : undefined,
-            transformOrigin: 'top center',
-            visibility: reserveGridSpace ? 'hidden' : undefined,
-            pointerEvents: reserveGridSpace ? 'none' : undefined,
-          }}
-          aria-hidden={reserveGridSpace ? true : undefined}
-        >
-          {isPortraitTablet ? (resolvedMega[active] || []).map((col, idx) => (
-            <MegaColumn
-              key={`${active}-${idx}`}
-              title={col.title}
-              isFirstContact={active === 'first_contact' || active === 'austen' || active === 'cube' || active === 'miscellania'}
-              isHumanInside={active === 'the_human_inside'}
-              collectionId={active}
-              disableMulti={active === 'austen' && austenSelectedDisableMulti}
-              stripeVariantVisibility={stripeVariantVisibility}
-              megaTileSelectorParams={megaTileSelectorParams}
-              onStartSelectorDrag={onStartSelectorDrag}
-              megaTileSize={megaTileSize}
-              compactLandscape={compactLandscape}
-              hideLabels
-              hideSelectorBackground
-              humanInsideVariant={humanInsideVariant}
-              items={active === 'austen' ? reorderAustenQuotes(col.items) : col.items}
-              row={true}
-              firstContactVariant={firstContactVariant}
-              onFirstContactWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
-              onFirstContactBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
-              onFirstContactMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
-              onHumanWhite={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('white'); }}
-              onHumanBlack={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('black'); }}
-              onHumanMulti={() => { setStripeOverlayOverrideActive(false); setHumanInsideVariant('color'); }}
-              onHumanPrev={() => setThinStartIndex((v) => v - 1)}
-              onHumanNext={() => setThinStartIndex((v) => v + 1)}
-              onSelectItem={(it) => {
-                setStripeOverlayOverrideActive(false);
-                if (active === 'first_contact') setFirstContactSelectedItem(it);
-                else if (active === 'the_human_inside') setHumanInsideSelectedItem(it);
-                else setSelectedItemByCollection((prev) => ({ ...prev, [active]: it }));
-                if (typeof onShirtClick === 'function') onShirtClick(active, it);
-              }}
-            />
-          )) : (
-            <div
-              data-filera-p1="1"
-              style={{
-                position: 'relative',
-                display: 'flex',
-                // LES DUES FILERES DE LA GRAELLA, CENTRADES AL SELECTOR
-                // (02/10/2026). En Marc: «Centra les dues files al selector». A
-                // 1024 la filera fa l'alcada del bloc (el quadrat del selector) i
-                // la graella, que es una mica mes alta (les dues fileres i el seu
-                // buit), hi queda centrada; a la resta es queda com estava.
-                // LA GRAELLA, AL TOP DEL CONJUNT FLETXES+SELECTOR (05/10/2026).
-                // En Marc: «Alinea la graella al top del conjunt fletxes+selector»:
-                // a la fila unica la graella no es centra dins la filera (quedava
-                // 27 px mes avall que el bloc), sino que arrenca a la mateixa vora.
-                alignItems: esFilaUnicaP1 ? 'flex-start' : (esComposicioEstretaP1 ? 'center' : 'flex-start'),
-                width: '100%',
-                ...(esComposicioEstretaP1 ? { height: `${blocDretaPx}px` } : null),
-                // LA FILERA, PER DAMUNT DE LA FRANJA (05/10/2026). En Marc: «A
-                // totes les vistes els clics de la fila de la graella estan
-                // capturats per alguna cosa». La caixa de la franja de
-                // samarretes es mes alta que les seves samarretes (porta els
-                // coixins) i arriba a la filera: com que va DESPRES al DOM,
-                // guanyava el clic. La filera mana i la franja queda per sota
-                // (els seus gestos, a la part de sota, no es toquen).
-                ...(esComposicioEstretaP1 ? { zIndex: 5 } : null),
-                marginTop: `${topFileraPx}px`,
-              }}
-            >
-              {/* LES FLETXES, A L'ESQUERRA DE LA GRAELLA (05/10/2026). En Marc:
-                  «A les versions no tactils: desktop i portatils, afegeix-los
-                  unes fletxes al cantó esquerre de la graella de dibuixos. A la
-                  p1». Es la MATEIXA peça que hi havia al bloc de la dreta (les
-                  dues fletxes apilades, ‹ a dalt i › a baix) i mou la graella
-                  amb el MATEIX pas publicat (`stepperP1`), com alla. */}
-              {esEscriptoriP1 && !esFilaUnicaP1 ? (
-                <div style={{
-                  position: 'relative',
-                  flex: '0 0 auto',
-                  // L'ALCADA, DECLARADA (05/10/2026). En Marc: «en els espais que
-                  // has deixat per posar-hi les fletxes no hi ha fletxes»: la
-                  // peça va amb `omple` (`h-full w-full`), i sense alcada al
-                  // pare la caixa feia 97x0 i els dos botons tambe (mesurat).
-                  width: `${blocDretaPx}px`,
-                  height: `${blocDretaPx}px`,
-                  marginRight: `${gapDretaPx}px`,
-                }}>
-                  <FletxesQuadratPagina1
-                    omple
-                    onPrev={() => stepperP1?.(1)}
-                    onNext={() => stepperP1?.(-1)}
-                  />
-                </div>
-              ) : null}
-              {/* EL VIEWPORT DE LA GRAELLA, DE LA VORA ESQUERRA DEL CARRIL DE LA
-                  PAGINA FINS AL SELECTOR (02/10/2026). En Marc: «Obre el viewport
-                  de la graella fins a la part esquerra del segon carril i fins al
-                  selector». A 1024 la graella no viu al carril del megaslide
-                  (605): el seu retall arrenca a la vora esquerra del carril de la
-                  pagina i s'acaba on arrenca el selector, i el porta alla el
-                  MATEIX desplacament que el bloc (`dx`). A la resta de mides, com
-                  sempre. */}
-              <div style={{
-                flex: esComposicioEstretaP1 ? '0 0 auto' : '1 1 0%',
-                minWidth: 0,
-                marginRight: esComposicioEstretaP1 ? 0 : `${gapDretaPx}px`,
-                ...(esComposicioEstretaP1 ? {
-                  // L'amplada de la CAIXA de la graella: el retall (el viewport)
-                  // mes el coixi de 10 px que porta a l'esquerra. El viewport va de
-                  // la vora esquerra del carril de la pagina fins a 10 px ABANS del
-                  // selector (en Marc: «Fes-li un marge al cantó del selector, 10
-                  // px»). El coixi de l'esquerra es compensa amb el desplacament.
-                  // El bloc de fletxes de l'esquerra tambe hi es: la graella
-                  // li deixa el seu costat mes el seu gap (05/10/2026).
-                  // L'amplada de la graella: el carril menys els dos quadrats
-                  // i els seus gaps (05/10/2026). Es el MATEIX numero que se li
-                  // passa a la stripe com a objectiu.
-                  width: `${ampleGraellaP1}px`,
-                  // El retall arrenca 10 px endins de la caixa de la graella (el
-                  // coixi de l'esquerra), o sigui que el desplacament va 10 px mes
-                  // enlla d'on va el bloc perque el RETALL caigui a la vora del
-                  // carril.
-                  // LA GRAELLA, A LA VORA ESQUERRA DEL CARRIL (05/10/2026). En
-                  // Marc: «Alinea la graella a l'esquerra del carril, ara no hi
-                  // es». El desplacament `dx` es el que porta les peces del
-                  // panell a la vora del carril; a la fila unica no hi ha el
-                  // coixi de 10 px, o sigui que el desplacament es `dx` sencer
-                  // (abans era `dx - 10` per compensar aquell coixi).
-                  ...(alcadaBlocEstretaP1 ? { transform: `translateX(${alcadaBlocEstretaP1.dx - (esFilaUnicaP1 ? 0 : 10)}px)` } : null),
-                } : null),
-              }}>
-                <GraellaDuesFileresPagina1
-                  items={itemsGraella}
-                  onStepper={setStepperP1}
-                  activeCollection={active}
-                  activeSubcollection={austenSubcollection}
-                  escala={esComposicioEstretaP1 ? escalaCarril * 0.75 : escalaCarril}
-                  unaFila={esFilaUnicaP1}
-                  alcadaCarruselPx={esFilaUnicaP1 ? costatFilaUnicaPx : alcadaFileraPx}
-                  centraFilesEnBloc={esComposicioEstretaP1}
-                  midaSelector={MIDA_BLOC_DRETA_PAGINA1_PX}
-                  onSelectGroup={(collection, subcollection, firstStripeItem) => {
-                    // EL CLIC TRIa EL DIBUIX I EL MOSTRA (28/09/2026). En Marc:
-                    // «El clic obre la pdp, pero no mostra el dibuix a la franja
-                    // ni a la graella»: el clic ha de deixar triat aquell dibuix
-                    // (amb la seva colleccio activa, perque la graella i la franja
-                    // l'ensenyin) i NO ha d'obrir la fitxa del producte. La PDP
-                    // s'obre des de les samarretes de la franja, com a la p2.
-                    if (collection !== active) setActive?.(collection);
-                    // LA SUBCALLECCIO, DESADA AL CLIC (28/09/2026). En Marc: «Quan
-                    // cliques un dibuix d'Austen, activa totes les col·leccions
-                    // d'Austen»: la graella passava `subcollection` i algu no el
-                    // desava enlloc. Es el MATEIX cami que la pagina 2 (vegeu
-                    // `onSelectGroup` de `MegaslidePagina2`).
-                    if (collection === 'austen') setAustenSubcollection?.(subcollection || null);
-                    else setAustenSubcollection?.(null);
-                    setStripeOverlayOverrideActive(false);
-                    if (firstStripeItem) {
-                      if (collection === 'first_contact') setFirstContactSelectedItem(firstStripeItem);
-                      else if (collection === 'the_human_inside') setHumanInsideSelectedItem(firstStripeItem);
-                      else setSelectedItemByCollection((prev) => ({ ...prev, [collection]: firstStripeItem }));
-                    }
-                  }}
-                />
-              </div>
-              {/* EL BLOC DE LA DRETA, COM EL DE LA PAGINA 2 (28/09/2026).
-
-                  En Marc: «Fes el bloc de la mateixa mida del bloc de la p2 i amb
-                  el selector (tambe de la mateixa mida que el p2) i les fletxes
-                  centrades al quadrat que et quedarà per haver redimensionat el
-                  selector» i «i les fletxes sota del selector, no al costat».
-
-                  El bloc fa `blocDretaPx` d'ample (59,5 px a 1920, la meitat del
-                  contenidor del selector de la p2): a dalt hi va el quadrat de
-                  les fletxes (59,5 x 59,5) i a sota el selector (59,5 x 119, la
-                  forma `rectangle` de la p2), tots dos a la DRETA. La caixa i
-                  l'ombra les duu el bloc sencer (vegeu
-                  `ESTIL_CAIXA_BLOC_ALCADA_AUTO`). */}
-              <div
-                ref={blocDretaRef}
-                data-bloc-dreta-p1="1"
-                style={{
-                  flex: '0 0 auto',
-                  // L'iPad Pro 13 apaïssat té el seu carril (1000) i el bloc hi fa
-                  // el carril sencer; a la resta, el segon carril de sempre.
-                  width: esComposicioEstretaP1
-                    ? (carrilMegaslide() != null ? `${ampleCarrilPaginaP1}px` : `min(${CARRIL_MEGASLIDE_939_PX}px, calc(100vw - 80px))`)
-                    : `${blocDretaPx}px`,
-                  minWidth: 0,
-                  // A 1024 EL BLOC SURT DEL FLUX (02/10/2026). El bloc fa tot el
-                  // carril de la pagina (939,2) i, com a fill flexible, deixava la
-                  // GRAELLA INTERCALADA amb amplada ZERO (el pare fa 605): en Marc:
-                  // «On és la graella intercalada? No l'aveig». Amb el bloc
-                  // absolut, la graella es queda tota la filera (605) i el bloc hi
-                  // passa per damunt, a la vora dreta del carril de la pagina (el
-                  // desplacament `dx` el porta alla, com abans).
-                  ...(esComposicioEstretaP1 ? { position: 'absolute', left: 0, top: 0 } : { position: 'relative' }),
-                  // EL BLOC ES TRANSPARENT I FA EL CARRIL SENCER (05/10/2026): a
-                  // la composicio estreta es una capa absoluta sobre tota la
-                  // filera i, amb `pointerEvents` automatic, capturava els clics
-                  // de la graella i de les fletxes. Qui els ha de rebre es el
-                  // selector, que va dins i ja porta `auto`.
-                  ...(esComposicioEstretaP1 ? { pointerEvents: 'none' } : null),
-                  // A 1024, el bloc es desplac, a la dreta del carril de la pagina.
-                  ...((esComposicioEstretaP1 && alcadaBlocEstretaP1) ? { transform: `translateX(${alcadaBlocEstretaP1.dx}px)` } : null),
-                  // EL BLOC, SENSE CAPA PROPRIA, PER SOTA DE LA FRANJA (28/09/2026).
-                  //
-                  // En Marc: «La franja continua per sota del bloc» i «Encara no.
-                  // Queda per sobre». El bloc i la franja son dins del MATEIX
-                  // contenidor, i el contingut de la franja es DESPRES del bloc al
-                  // DOM: sense capa propia (`zIndex: auto`) la franja hi pinta per
-                  // damunt i la samarreta tapa la caixa. Amb `zIndex: 3` (el de la
-                  // columna de la p2) el bloc guanyava i tapava la maniga: la
-                  // columna de la p2 pot anar a 3 perque alla la franja te una capa
-                  // propia (4) dins del seu propi apilat.
-                  // EL BLOC SON DUES BOTONERES QUADRADES APILADES (28/09/2026).
-                  // En Marc: «El bloc es un grup de tres botons + un grup de 2
-                  // botons, tots en vertical [...] son dues botoneres quadrades
-                  // apilades l'una sobre l'altra». Cada quadrat fa el costat del bloc
-                  // (128,9 a 1920) i el `marginBottom` negatiu compensa el que
-                  // creix, perque la filera no s'allargui i la franja no es mogui.
-                  // EL SELECTOR I LES FLETXES, QUADRATS (02/10/2026). En Marc:
-                  // «Fes que el selector i les fletxes comparteixin quadrat». A
-                  // 1920 el bloc ja fa els dos quadrats (256,6 = 2 x 128,3); a
-                  // 1024-1366 l'alcada sortia del bottom de la franja (223,6) i
-                  // cada botonera quedava 128,7 x 111,8, mes baixa que ampla.
-                  // Amb l'ajust el bloc fa els DOS quadrats sencers i el
-                  // `marginBottom` negatiu compensa el que creix, perque la
-                  // filera no s'allargui i la franja no es mogui.
-                  ...((((alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)) != null) ? {
-                    height: `${(alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)}px`,
-                    marginBottom: `${-(((alcadaBlocEstretaP1?.alcada ?? alcadaBlocP1)) - columnaDretaPx * 3)}px`,
-                  } : null),
-                  // LES FLETXES A DALT I EL SELECTOR A SOTA, A LA DRETA (28/09/2026).
-                  // El bloc es ample com la columna de la p2 (130 de disseny) perque
-                  // la maniga de l'ultima samarreta hi arribi; el selector i les
-                  // fletxes van a la dreta i el buit de l'esquerra es on cau l'ombra.
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                {/* LA CAIXA (LA VORA I L'OMBRA DE LA MANIGA), PER SOTA DE LA
-                    FRANJA. Te una capa propia a zIndex 0: es la que ha de quedar
-                    sota la samarreta perque l'ombra no hi caigui a sobre. */}
-                <div
-                  aria-hidden="true"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    zIndex: 0,
-                    pointerEvents: 'none',
-                    ...estilCaixaBlocAlcadaAuto(esComposicioEstretaP1),
-                    // A 1024 la caixa gran no pinta: cada peca porta la seva.
-                    ...(esComposicioEstretaP1 ? { backgroundColor: 'transparent', boxShadow: 'none' } : null),
-                    // EL FONS DEL QUADRAT DEL SELECTOR I LES FLETXES (02/10/2026).
-                    // En Marc: «Posa-li el fons al quadrat amb el selector i les
-                    // fletxes». A la composicio estreta la caixa va sense fons
-                    // (nomes radi i retall), i el quadrat nou —el selector i les
-                    // fletxes en dues columnes— quedava invisible sobre el paper:
-                    // se li posa el mateix fons que a la resta de caixes. Sense
-                    // vora ni ombra, que allo no ho ha demanat.
-                    //
-                    // A 1024, AIXÒ NO ES PINTA (02/10/2026). En Marc: «Pero ara hi
-                    // ha les fletxes i els enllacos del selector dins de la
-                    // mateixa franja i jo els vull separats». A 1024 el bloc fa
-                    // TOT el carril (939,2) i te les dues peces a les vorades: el
-                    // fons d'aquesta capa les unia amb una franja comuna de 939 px.
-                    // Alla el fons el porten les DUES PECES, cadascuna a la seva
-                    // caixa (vegeu els quadrats de sota): la capa del bloc nome's
-                    // queda el radi i el retall.
-                    ...((esComposicioEstretaP1 && !esComposicioEstretaP1) ? { backgroundColor: 'hsl(var(--grey-paper-soft))' } : null),
-                  }}
-                >
-                {/* LA PASTILLA BLANCA DEL SELECTOR, PER SOTA DE L'OMBRA (28/09/2026).
-                    En Marc: «A la p2, la pastilla blanca passa per sota de
-                    l'ombra, no nome's de la samarreta. A la p1 has aconseguit
-                    posar la pastilla per sota de la samarreta, pero no per sota
-                    de l'ombra» i «Et puc suggerir que imitis el que has fet a la
-                    p2?».
-
-                    A la p2 la caixa blanca de la colleccio activa es `static` i
-                    el seu fons es pinta ABANS que l'ombra (que es `absolute` amb
-                    `z-index: 0`): l'ombra hi cau a sobre. Aqui es fa el mateix
-                    dins d'aquesta capa: la pastilla es posicionada i SENSE
-                    `z-index`, i va ABANS de l'ombra al DOM, o sigui que l'ombra
-                    guanya i li passa per damunt.
-
-                    L'embolcall reserva el REQUADRE DEL SELECTOR: la meitat de
-                    baix del bloc, que es exactament on cau el selector quadrat
-                    (les dues botoneres son `flex: 1 1 50%`). Amb els MATEIXOS
-                    numeros de dins del selector, la pastilla cau al mateix lloc
-                    de sempre (mesurat a 1920: x1400,3..1519 · y259..291,8).
-
-                    Els BOTONS no es toquen: son a la capa de dalt (`zIndex: 6`),
-                    que es la que impedeix que la franja se'ls mengi els clics.
-                    Purament decorativa (`pointerEvents: none`). */}
-                {!esComposicioEstretaP1 ? capaPastillaBlancaP1 : null}
-                {!esComposicioEstretaP1 && ombraManigaP1 && mascaraManigaP1 ? (
-                  <div
-                    data-maniga-ombra-p1="1"
-                    style={{
-                      position: 'absolute',
-                      left: `${ombraManigaP1.left}px`,
-                      top: `${ombraManigaP1.top}px`,
-                      width: `${ombraManigaP1.width}px`,
-                      height: `${ombraManigaP1.height}px`,
-                      pointerEvents: 'none',
-                      zIndex: 0,
-                      // L'OMBRA DE LA MANIGA, REFORÇADA (28/09/2026). En Marc: «A
-                      // la maniga dreta de la p1, dona-li una miqueta mes de
-                      // forca». Els numeros son declarats
-                      // (`OMBRA_MANIGA_*`, geometriaMegaslide.js) i els MATEIXOS
-                      // que la columna de la p2.
-                      filter: `blur(${OMBRA_MANIGA_BLUR_PX}px)`,
-                      transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
-                    }}
-                  >
-                    {capaDifosaOmbraManigaP1}
-                  </div>
-                ) : null}
-                </div>
-                {/* ELS BOTONS, EN UNA CAPA PROPIA PER DAMUNT DE LA FRANJA.
-                    DUES BOTONERES QUADRADES APILADES: el quadrat de les fletxes a
-                    DALT i els tres botons del selector a SOTA (28/09/2026, ho va
-                    demanar en Marc: «Intercanvia les posicions del selector i les
-                    fletxes»). Es van intercanviar les DUES PECES de debo, no
-                    nome's el que s'hi pinta: el quadrat de les fletxes passa de
-                    la meitat de baix a la de dalt. Els dos quadrats fan el
-                    MATEIX (128,7 x 128,3 a 1920), o sigui que l'alcada del bloc,
-                    la de la filera i la de la franja no es mouen.
-                    PER QUE UNA CAPA A PART (28/09/2026). En Marc: «Alguna cosa
-                    captura els clics del selector». La franja va a zIndex 4 i la
-                    SEVA capa (amb el coixi de -40 px) arriba fins a x1524, o sigui
-                    que cobreix tot el bloc; els seus fills (el vel a z10 i el
-                    dibuix a z12) apilen DINS seu i guanyen a qualsevol zIndex que
-                    es posi al bloc. Amb les fletxes a baix no es notava (queien
-                    per sota del top de la franja, 226,6), pero amb el selector a
-                    la meitat de baix la franja se li menjava els clics.
-                    Amb la caixa i els botons en DUES capes, cada cosa va on toca:
-                    la caixa (vora + ombra) per sota de la samarreta, com sempre, i
-                    els botons per damunt (zIndex 6, un punt mes que el 4 de la
-                    franja). */}
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  zIndex: 6,
-                  height: '100%',
-                  width: '100%',
-                  // LA CAPA NO ES MENJA ELS CLICS DEL QUE TE A SOTA (05/10/2026).
-                  // En Marc: «A totes les vistes els clics de la fila de la
-                  // graella estan capturats per alguna cosa. Les fletxes, la
-                  // graella i el selector. Nome s a la p1». Aquesta capa fa
-                  // `inset: 0` sobre el BLOC, i a la composicio estreta el bloc
-                  // es el CARRIL SENCER (1200 px): amb `pointerEvents` automatic
-                  // cobria la graella de dibuixos (que es fora del bloc) i tambe
-                  // l'espai de les fletxes. Nome s els botons del selector han de
-                  // rebre clics, i ells ja porten `pointerEvents: 'auto'`.
-                  pointerEvents: 'none',
-                  display: 'flex',
-                  // EN DUES COLUMNES NOME'S A LA COMPOSICIO ESTRETA (02/10/2026).
-                  // En Marc: «Fes les fletxes en mig quadrat i el selector a
-                  // l'altre mig quadrat», «En dues columnes» i, en veure que allo
-                  // tambe passava a 1920/1440, «A les vistes 1920 i 1440 el
-                  // selector i les fletxes han d'estar una sota l'altra ocupant tot
-                  // el seu quadrat»: a 1024-1366 van en dues columnes i a la resta
-                  // apilats, com sempre.
-                  // A 1024, DOS QUADRATS APILATS (02/10/2026). En Marc: «Divideix el
-                  // quadrat de les fletxes/selector. Fes una mitosi i converteix-lo
-                  // en dos quadrats de la mateixa mida»: el bloc fa dos costats
-                  // d'alcada i cada botonera un quadrat sencer. A la resta de la
-                  // composicio estreta es queden en dues columnes.
-                  // EL QUADRAT CONJUNT (02/10/2026). En Marc: «Reverteix fins al
-                  // quadrat conjunt»: un sol quadrat amb les fletxes i el selector
-                  // a dins (dues columnes a la composicio estreta, apilats a la
-                  // resta), com estava abans de la mitosi.
-                  // DUES PECES DIFERENTS (02/10/2026). En Marc: «Pots separar les
-                  // fletxes del selector en dues peces diferents?»: a 1024 son DOS
-                  // quadrats de 96,5 independents, el de les fletxes a la vora
-                  // esquerra del carril de la pagina i el del selector a la dreta,
-                  // i cadascun porta la seva caixa (fons, radi i ombra). A la
-                  // resta, el quadrat conjunt de sempre.
-                  flexDirection: esFilaUnicaP1 ? 'column' : ((esComposicioEstretaP1 || esTauleta) ? 'row' : 'column'),
-                  justifyContent: esFilaUnicaP1 ? 'flex-start' : 'flex-end',
-                  alignItems: esFilaUnicaP1 ? 'flex-end' : ((esComposicioEstretaP1 || esTauleta) ? 'stretch' : 'flex-end'),
-                }}>
-                {/* A LA TAUETA NO HI HA FLETXES (02/10/2026). En Marc: «A les
-                    tablets no hi van fletxes», que es la mateixa regla que ja
-                    va fer treure les de 1024 («Me n'acabo d'adonar que un
-                    dispositiu tàctil no necessita fletxes... Esborra les
-                    fletxes»). El comentari ja deia que aquesta es la composicio
-                    de la tauleta, pero la condicio nome s mirava el 1024
-                    (1000-1050): a la resta de la banda (1280, 1366 i 1376) el
-                    quadrat de les fletxes s'hi muntava igualment. Ara no es
-                    munta a TOTA la composicio estreta i el selector queda sol,
-                    ocupant el quadrat sencer, a la vora dreta del carril. */}
-                {(esFilaUnicaP1 || !(esComposicioEstretaP1 || esTauleta)) ? (
-                <div style={{
-                  position: 'relative',
-                  flex: esFilaUnicaP1 ? '1 1 50%' : (esComposicioEstretaP1 ? '0 0 auto' : '1 1 50%'),
-                  minHeight: 0,
-                  width: (esFilaUnicaP1 || esComposicioEstretaP1) ? `${blocDretaPx}px` : '100%',
-                  height: esFilaUnicaP1 ? undefined : (esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined),
-                  // LA CAIXA DE CADA PECA: fons, radi i ombra propis.
-                  ...(esComposicioEstretaP1
-                    ? {
-                      backgroundColor: 'hsl(var(--grey-paper-soft))',
-                      borderRadius: '5.3px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                      overflow: 'hidden',
-                    }
-                    : null),
-                }}>
-                <FletxesQuadratPagina1
-                  omple
-                  // LA DIRECCIO DE LES FLETXES, INVERTIDA (28/09/2026). En Marc: «El
-                  // moviment de la graella amb les fletxes ha de ser al reves». El
-                  // carrusel es pinta amb `translateX(-desplacEf)`, o sigui que
-                  // SUMAR a `desplacGest` mou les peces cap a l'ESQUERRA: amb la
-                  // fletxa de la DRETA («Següent») la graella ha d'AVANÇAR (cap a
-                  // l'esquerra) i amb la de l'ESQUERRA («Anterior») ha de RECULAR.
-                  // Es el MATEIX criteri que la botonera de la p2 (vegeu
-                  // CercadorTextRow), on la fletxa de dalt avança i la de baix
-                  // recula; alla tambe es va haver d'invertir.
-                  onPrev={() => stepperP1?.(1)}
-                  onNext={() => stepperP1?.(-1)}
-                />
-                </div>
-                ) : null}
-                {/* EL QUADRAT DE SOTA: els tres botons del selector. Sense
-                    fletxes (tota la composicio estreta) es queda amb el quadrat
-                    sencer: es l'unic fill de la filera. */}
-                <div style={{
-                  position: 'relative',
-                  flex: esFilaUnicaP1 ? '1 1 50%' : (esComposicioEstretaP1 ? '0 0 auto' : ((esComposicioEstretaP1 || esTauleta) ? '1 1 100%' : '1 1 50%')),
-                  minHeight: 0,
-                  width: (esFilaUnicaP1 || esComposicioEstretaP1) ? `${blocDretaPx}px` : '100%',
-                  height: esFilaUnicaP1 ? undefined : (esComposicioEstretaP1 ? `${blocDretaPx}px` : undefined),
-                  // El bloc es transparent i deixa passar els clics; el quadrat
-                  // del selector els ha de rebre (05/10/2026).
-                  ...(esComposicioEstretaP1 ? { pointerEvents: 'auto' } : null),
-                  // LA CAIXA DE CADA PECA: fons, radi i ombra propis.
-                  ...(esComposicioEstretaP1
-                    ? {
-                      backgroundColor: 'hsl(var(--grey-paper-soft))',
-                      borderRadius: '5.3px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                      overflow: 'hidden',
-                    }
-                    : null),
-                }}>
-                {esComposicioEstretaP1 ? capaPastillaBlancaP1 : null}
-                {/* L'OMBRA DE LA MANIGA, AMB LA PEÇA DEL SELECTOR (02/10/2026).
-                    En Marc: «Pero ara hi ha les fletxes i els enllacos del
-                    selector dins de la mateixa franja i jo els vull separats» i
-                    «que l'ombra de la maniga vagi amb la peça del selector, que
-                    es on toca». A 1024 l'ombra NO es munta a la capa de la caixa
-                    del bloc (una capa de 939 px que hi pintava una franja
-                    comuna): es munta AQUI, dins de la peça del selector, i es la
-                    mateixa peça qui la retalla (`overflow: hidden`). Com que la
-                    mesura (`ombraManigaP1`) es fa contra el bloc, se li
-                    descompta el que la peça te a la seva esquerra (el bloc menys
-                    la peça: la peça va a la vora dreta). */}
-                {esComposicioEstretaP1 && ombraManigaP1 && mascaraManigaP1 ? (
-                  <div
-                    data-maniga-ombra-p1="1"
-                    style={{
-                      position: 'absolute',
-                      left: `${ombraManigaP1.left - (ampleCarrilPaginaP1 - blocDretaPx)}px`,
-                      top: `${ombraManigaP1.top}px`,
-                      width: `${ombraManigaP1.width}px`,
-                      height: `${ombraManigaP1.height}px`,
-                      pointerEvents: 'none',
-                      zIndex: 0,
-                      // Els MATEIXOS numeros declarats que la columna de la p2
-                      // (`OMBRA_MANIGA_*`, geometriaMegaslide.js).
-                      filter: `blur(${OMBRA_MANIGA_BLUR_PX}px)`,
-                      transform: `translate(${OMBRA_MANIGA_OFFSET.x}px, ${OMBRA_MANIGA_OFFSET.y}px)`,
-                    }}
-                  >
-                    {capaDifosaOmbraManigaP1}
-                  </div>
-                ) : null}
-                <SelectorQuadratPagina1
-                  dinsBloc
-                  omple
-                  format="square"
-                  // LA PASTILLA LA PINTA LA CAPA DE LA CAIXA (28/09/2026), perque
-                  // ha de quedar per sota de l'ombra de la maniga. Aqui nome's
-                  // queden els tres botons i el seu text, que han de seguir per
-                  // damunt de la franja.
-                  mostraPastilla={false}
-                  showWhite={stripeVariantVisibility?.white !== false}
-                  showBlack={stripeVariantVisibility?.black !== false}
-                  showMulti={stripeVariantVisibility?.color !== false}
-                  selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
-                  onWhite={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('white'); }}
-                  onBlack={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('black'); }}
-                  onMulti={() => { setStripeOverlayOverrideActive(false); setFirstContactVariant('color'); }}
-                />
-                </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : null}
-
-      {showStripe ? (
-        <div
-          // LA FRANJA PER DAMUNT DEL BLOC DE LA DRETA (28/09/2026). En Marc:
-          // «L'ombra de la maniga ha d'estar sota la maniga, no a sobre». El bloc
-          // porta dins l'ombra (la silueta de l'ultima casa, difosa) i, si el
-          // bloc va per damunt de la franja, l'ombra cau SOBRE la samarreta. Amb
-          // la franja a zIndex 4 (el MATEIX que a la p2), la samarreta tapa l'ombra i
-          // nome's se'n veu la part que cau dins del bloc, com a la pagina 2 (alla la franja es a
-          // zIndex 4 i la columna a 3).
-          className="relative"
-          style={{
-            // LA FRANJA, PER DAMUNT DEL BLOC (zIndex 4, com a la p2).
-            zIndex: 4,
-            // A la franja estreta (768-1366) la pàgina ja té els seus propis
-            // ajustos de 10 px i l'ajust general no s'hi ha d'aplicar.
-            //
-            // A LA VISTA VERTICAL TAMPOCO (28/09/2026). `ajustFranjaPx` es un
-            // calibratge d'ESCRIPTORI: son els 73,4 px que la franja de la p1
-            // puja per caure a la mateixa alcada que la de la p2 a 1920. A la
-            // vertical la franja viu dins d'un embolcall escalat (2,177) i allo
-            // es converteix en 73,4 x 2,177 = 159,8 px: la franja se n'anava
-            // 160 px enlaire i trepitjava la filera de la graella de dibuixos.
-            // Es el que feia que la p1 vertical no quadres amb la referencia
-            // bona del 23/09, on aquest ajust encara no existia.
-            marginTop: compactLandscape
-              ? '16px'
-              : (isPortraitTablet ? `${stripeRowPadPx}px` : `calc(${stripeRowPadPx}px - ${ajustFranjaPx}px)`),
-            paddingBottom: compactLandscape ? '8px' : `${stripeRowPadPx}px`,
-            paddingLeft: `${stripeRowPadXPx?.left || 0}px`,
-            paddingRight: `${stripeRowPadXPx?.right || 0}px`,
-            // La franja estreta (768-1366) no ha de pujar: el belt s'ha
-            // encongit, la graella de colors ha quedat 17 px més curta i
-            // aquests -15 px la partien en dues meitats (els cercles a dalt i
-            // el COLOR/NEGRE dins de les samarretes). Ha de coincidir amb el
-            // mateix ajust de MegaStripePanel (pàgina 2).
-            transform: (compactLandscape || esEstenyFins1366) ? 'none' : 'translateY(-15px)',
-          }}
-        >
-          <div
-            className="w-full bg-transparent"
-            // EL CENTRE ES EL DEL CARRIL, NO EL DEL CONTINGUT.
-            //
-            // El panell porta un coixi lateral (`stripeRowPadXPx`) i el
-            // centratge es feia sobre el CONTINGUT (el carril menys els
-            // coixins): si els dos coixins no son iguals —o si un navegador els
-            // aplica diferent— el centre se'n va. Aqui el coixi es descompta
-            // NEGATIU a l'embolcall, de manera que l'embolcall fa exactament el
-            // carril i el 50% de la filera es el centre del carril, a tothom.
-            style={{ width: 'auto', marginLeft: `-${stripeRowPadXPx?.left || 0}px`, marginRight: `-${stripeRowPadXPx?.right || 0}px` }}
-          >
-
-            <div
-              id="stripe-guide-stripe-row-p1"
-              ref={(el) => {
-                filaFranjaRef.current = el;
-                refGestosFranja(el);
-              }}
-              className="relative inline-block"
-              style={{
-                height: carrilPx(stripePreviewHPx),
-                width: 'auto',
-                // CENTRADA SOBRE EL CARRIL, A MA, NO PEL `justify-content`.
-                //
-                // La filera es mes ampla que el carril (les manigues hi surten)
-                // i amb `w-full flex justify-center` el centratge depenia del
-                // navegador: quan l'element desborda el contenidor, Chromium el
-                // centra pero FIREFOX L'ALINEA A L'INICI. Amb la franja
-                // desbordant, allo la desplaçava a la dreta (mesurat a la
-                // captura de l'amo del 24/09 a les 23:47: els cossos començaven
-                // a 459,5 en comptes de 381). Amb `left: 50%` i
-                // `translateX(-50%)` el centre es el del contenidor de
-                // maquetacio (el carril menys els coixins, que son iguals), a
-                // tots els navegadors.
-                // El centre, a mig cami entre la vora esquerra del carril i la
-                // dreta de les fletxes: aixi la cintura de la primera samarreta
-                // cau a la vora esquerra del carril i la de l'ultima a la guia
-                // de les fletxes. Sense fletxes (tauletes) el centre es el del
-                // carril, que es com estava.
-                // ENCAIXADA A L'AMPLADA DEL CARRIL (02/10/2026). En Marc: «Ara
-                // encaixa la stripe p1 a l'amplada del carril». El contenidor
-                // d'aquesta filera ja fa exactament el carril, o sigui que a la
-                // composicio estreta n'hi ha prou de no centrar-la i donar-li
-                // l'aspecte del full: la franja va de vora a vora del carril i
-                // l'alcada en surt sola (811 x 86,9 a 1366 en lloc de 713,9 x
-                // 76,5). A la resta de mides, com sempre.
-                left: centreCarrilFranja === null ? '50%' : `${centreCarrilFranja}px`,
-                transform: 'translateX(-50%)',
-                // La filera NO s'ha d'encongir per encabir-se al contenidor: la
-                // franja te una mida de disseny i es escala amb `transform`
-                // (com la de la pagina 2, que ja no s'encongia). Sense aixo, a
-                // 1280-1440 la franja de la pagina 1 quedava mes estreta que la
-                // de la pagina 2 (820 contra 1017 px) i les dues pagines no
-                // quadraven.
-                flexShrink: 0,
-              }}
-            >
-              {stripeOverlayDebug && stripeOverlayLoadState !== 'ok' ? (
-                <div
-                  className="absolute left-2 top-2"
-                  style={{
-                    zIndex: 100,
-                    pointerEvents: 'none',
-                    fontSize: 11,
-                    lineHeight: 1.2,
-                    padding: '6px 8px',
-                    borderRadius: 8,
-                    background: 'rgba(255, 80, 80, 0.92)',
-                    color: 'hsl(var(--grey-paper))',
-                    maxWidth: 420,
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  {stripeOverlayLoadState === 'no-src'
-                    ? 'overlay: no src'
-                    : (stripeOverlayLoadState === 'loading'
-                        ? 'overlay: loading...'
-                        : `overlay: failed (${resolvedOverlaySrc || 'empty'})`)}
-                </div>
-              ) : null}
-
-              <div
-                className="relative"
-                data-stripe-visual-content="1"
-                style={{
-                  ...((esComposicioEstretaP1 && alcadaBlocEstretaP1) ? { marginTop: `${alcadaBlocEstretaP1.dy}px` } : null),
-                  height: '100%',
-                  width: '100%',
-                  display: 'block',
-                  transformOrigin: 'top center',
-                  // A l'apaisada pugem la stripe 10px (les samarretes). El
-                  // desplaçament va amb la resta de la seva posicio, que ve de
-                  // les variables de calibracio.
-                  // La franja NO s'ajusta a l'alcada de la finestra: fa el carril
-                  // SEMPRE (vegeu MegaMenuPanel). Ha de coincidir amb
-                  // MegaStripePanel (pagina 2).
-                  // El desplaçament (i la resta de la posició) ve de les
-                  // variables de calibracio i NO s'escala: el `translate` va
-                  // abans de l'`scale`, o sigui en px del pare. El que s'escala
-                  // es la mida de la filera (`stripePreviewHPx`), i l'escala que
-                  // la porta al carril la calcula `useEscalaFranjaCarril` (les
-                  // manigues hi queden a fora, a la mida del dibuix).
-                  // EL LLOC DE LA FRANJA DE LA P2 (02/10/2026): a 1024-1366 la
-                  // franja de la p1 ha de caure on cau la de la p2 dins de la
-                  // seva pagina. El desplacament va ABANS del `translate` i de
-                  // l'`scale` de sempre, o sigui en px del pare.
-                  transform: `translate(var(--megaStripeDx, 0px), calc(var(--megaStripeDy, 0px) + ${(typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth <= 1366 && window.innerWidth >= window.innerHeight) ? -10 : 0}px + ${desplacamentFranjaEscriptori({ ample: typeof window !== 'undefined' ? window.innerWidth : 0, alt: typeof window !== 'undefined' ? window.innerHeight : 0, esTauleta: isPortraitTablet || isLandscapeTablet })}px)) scale(calc(var(--megaStripeScale, 1.2125) * ${factorCarrilFranja}))`,
-                  isolation: 'isolate',
-                }}
-              >
-                {stripeOverlayDebug ? (
-                  <div
-                    className="absolute inset-0 flex"
-                    style={{
-                      pointerEvents: 'none',
-                      zIndex: 1000,
-                      transformOrigin: 'top center',
-                      transform: 'none',
-                      background: 'transparent',
-                    }}
-                    aria-hidden="true"
-                  >
-                    {Array.isArray(stripeMaskDebugRectsPct) && stripeMaskDebugRectsPct.length === 14
-                      ? stripeMaskDebugRectsPct.map((r, idx) => (
-                        <div
-                          key={`stripe-tile-debug-abs-p1-${idx}`}
-                          style={{
-                            position: 'absolute',
-                            left: `${r.left}%`,
-                            top: `${r.top}%`,
-                            width: `${r.width}%`,
-                            height: `${r.height}%`,
-                            boxSizing: 'border-box',
-                            border: '2px solid rgba(0, 200, 255, 0.82)',
-                            background: idx % 2 === 0 ? 'rgba(0, 200, 255, 0.18)' : 'rgba(0, 200, 255, 0.1)',
-                            overflow: 'visible',
-                          }}
-                        >
-                          <div
-                            style={{
-                              position: 'absolute',
-                              left: '50%',
-                              top: -16,
-                              transform: 'translateX(-50%)',
-                              zIndex: 2,
-                              padding: '2px 6px',
-                              borderRadius: 6,
-                              fontSize: 12,
-                              fontWeight: 900,
-                              lineHeight: 1,
-                              color: 'rgba(2,6,23,0.95)',
-                              background: 'rgba(255, 255, 0, 0.94)',
-                              boxShadow: '0 6px 18px rgba(0,0,0,0.22)',
-                              border: '1px solid rgba(0,0,0,0.25)',
-                              userSelect: 'none',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {idx + 1}
-                          </div>
-                        </div>
-                      ))
-                      : Array.from({ length: 14 }).map((_, idx) => (
-                        <div
-                          key={`stripe-tile-debug-abs-fallback-p1-${idx}`}
-                          style={{
-                            height: '100%',
-                            flex: '1 1 0%',
-                            boxSizing: 'border-box',
-                            border: '2px solid rgba(0, 200, 255, 0.75)',
-                            background: idx % 2 === 0 ? 'rgba(0, 200, 255, 0.22)' : 'rgba(0, 200, 255, 0.11)',
-                          }}
-                        />
-                      ))}
-                  </div>
-                ) : null}
-
-                <div
-                  className="relative"
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                    // La franja s'hi centra: amb l'amplada fixa i l'alcada per
-                    // l'aspecte, si no, quedava enganxada i semblava tallada.
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    zIndex: 1,
-                    // LA MASCARA, DEL FULL BO (27/09/2026): vegeu
-                    // `MegaStripePanel`. El full `v5` te les siluetes en unes
-                    // altres coordenades i tallava les manigues.
-                    WebkitMaskImage: senseMascaraSamarreta
-                      ? 'none'
-                      : (emptyShirtMaskUrl
-                        ? `url("${emptyShirtMaskUrl}")`
-                        : 'none'),
-                    maskImage: senseMascaraSamarreta
-                      ? 'none'
-                      : (emptyShirtMaskUrl
-                        ? `url("${emptyShirtMaskUrl}")`
-                        : 'none'),
-                    WebkitMaskRepeat: 'no-repeat',
-                    maskRepeat: 'no-repeat',
-                    WebkitMaskSize: '103% 100%',
-                    maskSize: '103% 100%',
-                    WebkitMaskPosition: '50% 0',
-                    maskPosition: '50% 0',
-                  }}
-                >
-                  {isPortraitTablet ? (
-                    <svg
-                      viewBox={`0 0 ${VECTOR_FRANJA_VIEWBOX_OBERT.width} ${VECTOR_FRANJA_VIEWBOX_OBERT.height}`}
-                      preserveAspectRatio="none"
-                      aria-hidden="true"
-                      style={{
-                        // Exactament el mateix que la imatge de la franja (mateixa
-                        // mida i mateix aspecte): alcada del contenidor i amplada
-                        // per l'aspecte del viewBox.
-                        // Com la imatge de la franja: alcada del contenidor i
-                        // amplada per l'aspecte del viewBox.
-                        position: 'relative',
-                        height: '100%',
-                        width: 'auto',
-                        maxWidth: 'none',
-                        display: 'block',
-                        pointerEvents: 'none',
-                        zIndex: 4,
-                      }}
-                    >
-                      {/* La imatge de la franja, DINS del perimetre vectorial: el
-                          clipPath son les 14 siluetes, aixi la imatge nomes es veu
-                          a dins de les samarretes. */}
-                      <defs>
-                        <clipPath id={`hgFranjaImatge-${idRetall}`} clipPathUnits="userSpaceOnUse">
-                          {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
-                            <path key={`hg-clip-${k}`} d={d} />
-                          ))}
-                        </clipPath>
-                      </defs>
-                      {stripeImageSrc ? (
-                        <image
-                          href={stripeImageSrc}
-                          x={0}
-                          y={0}
-                          width={VECTOR_FRANJA_VIEWBOX.width}
-                          height={VECTOR_FRANJA_CONTINGUT}
-                          preserveAspectRatio="none"
-                          clipPath={`url(#hgFranjaImatge-${idRetall})`}
-                        />
-                      ) : null}
-                      {VECTOR_FRANJA_SAMARRETES.map((d, k) => (
-                        <path
-                          key={`hg-samarreta-${k}`}
-                          id={`hgSamarreta-${k}`}
-                          d={d}
-                          fill="none"
-                          // El contorn de la stripe vectorial, amagat.
-                          stroke="none"
-                        />
-                      ))}
-                    </svg>
-                  ) : null}
-
-                  {megaStripeSpriteEnabledLocal && !isPortraitTablet ? (
-                    <img
-                      src={stripeImageSrc || '/placeholders/t-shirt_buttons/v5/full-color-stripe-5.webp'}
-                      alt=""
-                      className="block"
-                      // Les mides del fitxer per atribut: vegeu MegaStripePanel
-                      // (la filera de la franja no pot fer zero d'amplada mentre
-                      // la imatge arriba, perque l'escala de la franja se'n val).
-                      width={2866}
-                      height={307}
-                      style={{
-                        height: '100%',
-                        width: 'auto',
-                        // SENSE EL LÍMIT DEL PREFLIGHT (02/10/2026). El full de la
-                        // franja fa 9,33:1 i a 1024-1366 el contenidor es mes
-                        // estret que la imatge a aquesta alcada: amb el
-                        // `max-width: 100%` de sempre, la imatge s'encongia
-                        // d'amplada (7,5:1) i les catorze samarretes es
-                        // trepitjaven. Amb `none` la filera s'eixampla fins a
-                        // l'amplada que li toca i despres s'escala sencera, com
-                        // a la pagina 2.
-                        ...(esComposicioEstretaP1 ? { maxWidth: 'none' } : null),
-                      }}
-                      loading="eager"
-                      decoding="async"
-                    />
-                  ) : null}
-
-                  {shirtColor && shirtColor !== '#FFFFFF' && !isPortraitTablet ? (
-                    <div
-                      aria-hidden="true"
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        backgroundColor: shirtColor,
-                        mixBlendMode: 'multiply',
-                        opacity: 0.9,
-                        pointerEvents: 'none',
-                        zIndex: 5,
-                        // A la vista vertical la franja te dues fileres i la
-                        // mascara de contorn del panell es d'una: el tint es
-                        // retalla amb la MATEIXA imatge de la stripe (el seu
-                        // canal alfa es el contorn de les samarretes), aixi no
-                        // tenyeix el rectangle de fons.
-                        ...((isPortraitTablet && stripeImageSrc)
-                          ? {
-                            WebkitMaskImage: `url("${encodeURI(stripeImageSrc)}")`,
-                            maskImage: `url("${encodeURI(stripeImageSrc)}")`,
-                            WebkitMaskSize: '100% 100%',
-                            maskSize: '100% 100%',
-                            WebkitMaskRepeat: 'no-repeat',
-                            maskRepeat: 'no-repeat',
-                          }
-                          : null),
-                      }}
-                    />
-                  ) : null}
-
-                  {megaStripeRefEnabledLocal && megaStripeRefSrcLocal && !isPortraitTablet ? (
-                    <img
-                      src={megaStripeRefSrcLocal}
-                      alt=""
-                      className="block absolute inset-0"
-                      style={{
-                        pointerEvents: 'none',
-                        zIndex: 6,
-                        height: '100%',
-                        width: 'auto',
-                        transformOrigin: 'top center',
-                        transform: 'translate(var(--megaStripeRefDx, 0px), var(--megaStripeRefDy, 0px)) scale(var(--megaStripeRefScale, 1))',
-                      }}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : null}
-
-                  {megaStripeRef2EnabledLocal && megaStripeRef2SrcLocal && !isPortraitTablet ? (
-                    <img
-                      src={megaStripeRef2SrcLocal}
-                      alt=""
-                      className="block absolute inset-0"
-                      style={{
-                        pointerEvents: 'none',
-                        zIndex: 7,
-                        height: '100%',
-                        width: 'auto',
-                        transformOrigin: 'top center',
-                        transform: 'translate(var(--megaStripeRef2Dx, 0px), var(--megaStripeRef2Dy, 0px)) scale(var(--megaStripeRef2Scale, 1))',
-                      }}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : null}
-
-                  {stripeEmptyMaskSrc ? (
-                    <img
-                      src={stripeEmptyMaskSrc}
-                      alt=""
-                      aria-hidden="true"
-                      className="block absolute"
-                      style={{
-                        top: 0,
-                        left: 0,
-                        height: '100%',
-                        width: 'auto',
-                        pointerEvents: 'none',
-                        zIndex: 9,
-                        opacity: 'var(--hgStripeEmptyMaskOpacity, 1)',
-                      }}
-                      loading="eager"
-                      decoding="async"
-                    />
-                  ) : null}
-
-                  {Array.isArray(emptyTileIndices) && emptyTileIndices.length > 0 ? (
-                    <div className="absolute inset-0" aria-hidden="true" style={{ pointerEvents: 'none', zIndex: 10 }}>
-                      {emptyTileIndices.map((idx) => {
-                        const r = Array.isArray(rectsMascara) && rectsMascara.length === 14
-                          ? rectsMascara[idx]
-                          : null;
-                        const leftPct = r ? Number(r.left) || 0 : (idx / 14) * 100;
-                        const widthPct = r ? Number(r.width) || 0 : (1 / 14) * 100;
-                        const topPct = r ? Number(r.top) || 0 : 0;
-                        const heightPct = r ? Number(r.height) || 100 : 100;
-                        return (
-                          <div
-                            key={`disabled-tile-p1-${idx}`}
-                            onPointerDown={(ev) => { ev.stopPropagation(); }}
-                            onClick={(ev) => { ev.stopPropagation(); }}
-                            style={{
-                              position: 'absolute',
-                              top: `${topPct}%`,
-                              height: `${heightPct}%`,
-                              left: `${leftPct}%`,
-                              width: `${widthPct}%`,
-                              background: 'var(--hgStripeDisabledFill, transparent)',
-                              pointerEvents: 'auto',
-                              cursor: 'default',
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  ) : null}
-
-                  {/* Silueta de les 14 samarretes (coordenades 0-1) per retallar-hi
-                      els dibuixos i que no trepitgin el blanc entre samarretes. */}
-                  {isPortraitTablet ? (
-                    <svg width="100%" height="100%" aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                      <clipPath id={idRetall} clipPathUnits="objectBoundingBox">
-                        <path d={VECTOR_FRANJA_SAMARRETES_01.join(' ')} clipRule="evenodd" />
-                      </clipPath>
-                    </svg>
-                  ) : null}
-
-                  {/* Els dibuixos tambe a la vista vertical: la p2 ja els hi
-                      pinta (mateixa condicio, sense `!isPortraitTablet`) i el
-                      `clipPath` de la vertical d'aqui dalt hi es per aixo. Amb
-                      la guarda, a la tauleta vertical les samarretes de la p1
-                      es quedaven sense dibuix (28/09/2026). */}
-                  {megaShirtDrawingEnabledLocal && drawingOverlaySrcEffective ? (
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        pointerEvents: 'none',
-                        zIndex: 12,
-                        transformOrigin: 'top center',
-                        transform: 'none',
-                        background: 'transparent',
-                        // El dibuix no ha de trepitjar el blanc entre samarretes:
-                        // es retalla amb la silueta vectorial de les 14 samarretes.
-                        // El dibuix no ha de trepitjar el blanc entre samarretes: es
-                        // retalla amb la silueta vectorial de les 14 samarretes
-                        // (clipPath mes avall; amb la imatge com a mascara no
-                        // s'hi va aplicar el canal alfa i el dibuix quedava fluix).
-                        clipPath: `url(#${idRetall})`,
-                      }}
-                    >
-                      {Array.isArray(rectsMascara) && rectsMascara.length === 14
-                        ? rectsMascara.map((r, idx) => {
-                          if (picksDibuixFranja[idx] === false) {
-                            return null;
-                          }
-                          const picked = picksDibuixFranja[idx];
-                          const imgUrl = picked ? encodeURI(picked) : '';
-                          const safeW = Number(r?.width) || 0;
-                          const safeH = Number(r?.height) || 0;
-                          const safeL = Number(r?.left) || 0;
-                          const safeT = Number(r?.top) || 0;
-
-                          return (
-                            <div
-                              key={`stripe-tile-drawing-p1-${idx}-${imgUrl || ''}`}
-                              style={{
-                                position: 'absolute',
-                                left: `${safeL}%`,
-                                top: `${safeT}%`,
-                                width: `${safeW}%`,
-                                height: `${safeH}%`,
-                                overflow: 'hidden',
-                                boxSizing: 'border-box',
-                                background: drawingOverlayDebug ? 'rgba(217,70,239,0.06)' : 'transparent',
-                                border: drawingOverlayDebug ? '1px solid rgba(217,70,239,0.35)' : '0px solid transparent',
-                                // El desplacament del gap va DINS de cada filera: a la vista vertical
-                                // (dues fileres de 7) la posicio dins la filera es idx % 7.
-                                transform: tileGapPxLocal ? `translateX(${(isPortraitTablet ? (idx % 7) : idx) * tileGapPxLocal}px)` : 'none',
-                              }}
-                            >
-                              {drawingOverlayDebug ? (
-                                <div
-                                  style={{
-                                    position: 'absolute',
-                                    top: 4,
-                                    left: 6,
-                                    fontSize: 12,
-                                    fontWeight: 900,
-                                    color: 'rgba(88,28,135,0.92)',
-                                    textShadow: '0 1px 1px rgba(255,255,255,0.85)',
-                                    userSelect: 'none',
-                                    zIndex: 13,
-                                  }}
-                                >
-                                  {`D${idx + 1}`}
-                                </div>
-                              ) : null}
-
-                              <DibuixFranja
-                                picked={picked}
-                                idx={idx}
-                                desplacamentGap={gapsDibuixFranja[idx]}
-                                calibrationOverrides={calibrationOverrides}
-                                stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
-                                rectsMascara={rectsMascara}
-                                isPortraitTablet={isPortraitTablet}
-                                active={active}
-                                drawingOverlayDebug={drawingOverlayDebug}
-                              />
-                            </div>
-                          );
-                        })
-                        : Array.from({ length: 14 }).map((_, idx) => {
-                          if (Array.isArray(stripeTileOverlaySrcs) && !stripeTileOverlaySrcs[idx]) {
-                            return null;
-                          }
-                          const base = (() => {
-                            try {
-                              if (Array.isArray(stripeTileOverlaySrcs) && stripeTileOverlaySrcs[idx]) {
-                                return normalizeOverlaySrc(stripeTileOverlaySrcs[idx]);
-                              }
-                              return normalizeOverlaySrc(drawingOverlaySrcEffective);
-                            } catch {
-                              return normalizeOverlaySrc(drawingOverlaySrcEffective);
-                            }
-                          })();
-
-                          const hasPerTileSrcFallback = Array.isArray(stripeTileOverlaySrcs) && !!stripeTileOverlaySrcs[idx];
-                          const picked = resolDibuixDeCasella({
-                            base, idx, hasPerTileSrcFallback, active, resolvedOverlaySrc,
-                            humanInsideVariant, firstContactVariant, isPortraitTablet, shirtColor,
-                          });
-
-                          const imgUrl = picked ? encodeURI(picked) : '';
-                          return (
-                            <div
-                              key={`stripe-tile-drawing-fallback-p1-${idx}-${imgUrl || ''}`}
-                              style={{
-                                position: 'absolute',
-                                top: '0%',
-                                height: '100%',
-                                left: `${(idx / 14) * 100}%`,
-                                width: `${(1 / 14) * 100}%`,
-                                overflow: 'hidden',
-                                boxSizing: 'border-box',
-                                // El desplacament del gap va DINS de cada filera: a la vista vertical
-                                // (dues fileres de 7) la posicio dins la filera es idx % 7.
-                                transform: tileGapPxLocal ? `translateX(${(isPortraitTablet ? (idx % 7) : idx) * tileGapPxLocal}px)` : 'none',
-                              }}
-                            >
-                              <DibuixFranja
-                                picked={picked}
-                                idx={idx}
-                                desplacamentGap={gapsDibuixFranja[idx]}
-                                calibrationOverrides={calibrationOverrides}
-                                stripeMaskTileRectsRawPct={stripeMaskTileRectsRawPct}
-                                rectsMascara={rectsMascara}
-                                isPortraitTablet={isPortraitTablet}
-                                active={active}
-                                drawingOverlayDebug={drawingOverlayDebug}
-                              />
-                            </div>
-                          );
-                        })}
-                    </div>
-                  ) : null}
-
-                </div>
-
-                <ClicAreaOverlayP1
-                  src="/placeholders/cercador/full-clic-area-5.svg"
-                  highlightAll={!!clicAreaHighlight}
-                  highlightIndices={clicAreaHighlightIndices}
-                  tshirtColor={shirtColor}
-                  disabledIndices={emptyTileIndices}
-                />
-              </div>
-            </div>
+      {esFilaUnicaP1 ? (
+        // LA FILA UNICA: el bloc surt de la filera i es fa germa del conjunt
+        // [filera + stripe], dins d'un flex amb stretch perque agafi l'alcada
+        // exacta del conjunt (la graella d'una fila + la stripe) sense cap mesura.
+        <div style={{ display: 'flex', alignItems: 'stretch', marginTop: `${topFileraPx}px` }}>
+          <div style={{ flex: '1 1 0%', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            {!hideGrid || reserveGridSpace ? gridNode : null}
+            {showStripe ? stripeNode : null}
           </div>
+          {blocDretaNode}
         </div>
-      ) : null}
+      ) : (
+        <>
+          {!hideGrid || reserveGridSpace ? gridNode : null}
+          {showStripe ? stripeNode : null}
+        </>
+      )}
     </div>
   );
 }
