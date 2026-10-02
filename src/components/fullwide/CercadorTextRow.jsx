@@ -10,7 +10,7 @@ import {
 } from './midesGraella.js';
 // L'amplada del retall (l'últim input mesurat de la graella) viu amb la resta
 // de geometria declarada del megaslide.
-import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA_COLUMNA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
+import { ampladaRetallGraella, ampladaColumnaGraella, desnivellsLiniesGraella, desnivellColorsGraella, margeBaixFletxesGraella, centratgeSelectorY, desplacTopSelector, topFranjaPagina2, GRAELLA_DRETA_FLETXES_CARRIL_PX, GRAELLA_COLUMNA_DRETA_CARRIL_PX, GRAELLA_GAP_COLUMNES_PX, COLUMNA_TOP_AJUST_PX, COLUMNA_BAIX_AJUST_PX, OMBRA_MANIGA_ALFA_COLUMNA, OMBRA_MANIGA_BLUR_PX, OMBRA_MANIGA_OFFSET, AIRE_FRANJA_COLLECCIONS_PX, pagina1BlocDretaPx, composicioMegaslide, esComposicioEstretaMegaslide } from '../megaslide/geometriaMegaslide.js';
 import { carrilPct, carrilLane, carrilPx, readRootCssNumber, getLayoutViewportWidth, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
 import { deviceLayoutFromViewport } from '../../utils/layoutModel.js';
 import { GRAELLA_DIBUIXOS_ESCALA_VERTICAL } from '../../config/stripeCalibrationsVertical.js';
@@ -576,13 +576,19 @@ export function CercadorDibuixosGraella({
     // perque tambe refresquen el valor quan canvia la finestra (les variables
     // del carril no provoquen cap re-render).
     const calcula = () => {
-      const d = margeBaixFletxesGraella({
-        dibuix: dibuixPx / 1.5,
-        gapV,
-        carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
-        midaSelector,
-        escala: readRootCssNumber('--hg-escala-mega', 1),
-      });
+      // A LA FILA UNICA EL BLOC DE FLETXES ES EL QUADRAT DEL SELECTOR (05/10/2026):
+      // el seu baix cau on cau el del selector (el carrusel fa una fila i el
+      // selector hi arrenca al mateix top), o sigui que el marge es l'alcada del
+      // selector menys la del carrusel. A la resta, la formula declarada de sempre.
+      const d = filaUnica
+        ? midaSelector * readRootCssNumber('--hg-escala-mega', 1) - alcadaCarrusel
+        : margeBaixFletxesGraella({
+          dibuix: dibuixPx / 1.5,
+          gapV,
+          carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
+          midaSelector,
+          escala: readRootCssNumber('--hg-escala-mega', 1),
+        });
       setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - d) < 0.01 ? previ : d));
     };
     const frame = requestAnimationFrame(calcula);
@@ -595,7 +601,7 @@ export function CercadorDibuixosGraella({
       window.clearTimeout(t2);
       window.removeEventListener('resize', calcula);
     };
-  }, [ambFletxes, refCarrusel, dibuixPx, gapV, midaSelector]);
+  }, [ambFletxes, refCarrusel, dibuixPx, gapV, midaSelector, filaUnica, alcadaCarrusel]);
 
   // LES DUES LINIES DE DIBUIXOS, CADA UNA CENTRADA AMB LA SEVA CEL·LA.
   //
@@ -1018,7 +1024,7 @@ export function CercadorDibuixosGraella({
             // (24/09/2026, ho va demanar l'amo). Dues meitats (una fletxa a
             // dalt i l'altra a baix) i el bloc de la mida del selector, amb el
             // bottom quadrat amb el seu.
-            width: carrilPx(midaSelector / 2),
+            width: carrilPx(filaUnica ? midaSelector : midaSelector / 2),
             height: carrilPx(midaSelector),
             zIndex: 5,
             // SENSE FONS (28/09/2026): en Marc va demanar la caixa el mateix
@@ -1913,6 +1919,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     && typeof window !== 'undefined'
     && deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isDesktop
     && window.innerWidth >= 1200 && window.innerWidth <= 1366;
+  // LES FLETXES DE LA P2, DE LA MIDA DEL SELECTOR (05/10/2026). En Marc: «Ajusta
+  // les fletxes a l'espai que tenen»: als portatils de 1200-1366 el selector es
+  // el quadrat de la p1 (`pagina1BlocDretaPx(1) * 0,75`, 96,5) i les fletxes hi
+  // fan el QUADRAT, com el bloc de la p1; a la resta es queden amb el rectangle
+  // de sempre (mitja amplada, alcada del selector).
+  const midaFletxes = esFilaUnicaP2 ? pagina1BlocDretaPx(1) * 0.75 : midaSelector;
   const [mesures, setMesures] = useState({
     midesGraella: null,
     margesEnllacos: { dalt: 0, baix: 0 },
@@ -2266,7 +2278,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // fletxes son al desktop i a la tauleta apaisada, no a la vertical) i el
     // fan servir els dos.
     const reservaDreta = carruselAmbFletxes({ isPortraitTablet, isLandscapeTablet })
-      ? `calc(${carrilPx(midaSelector / 2)} + ${carrilPx(10)})`
+      ? `calc(${carrilPx(esFilaUnicaP2 ? midaFletxes : midaSelector / 2)} + ${carrilPx(10)})`
       : 0;
     // LA COMPOSICIO ESTRETA FA TOT EL CARRIL (02/10/2026).
     //
@@ -2419,7 +2431,7 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
           numColumns={numColumns}
           // UNA SOLA FILA ALS PORTATILS DE 1200 A 1366 (05/10/2026), com la p1.
           filaUnica={esFilaUnicaP2}
-          midaSelector={midaSelector}
+          midaSelector={midaFletxes}
           reservaDreta={reservaDreta}
           carrusel
           // LES DUES FILES DE LA GRAELLA, EN BLOC AMB LA TIRA DE COLORS

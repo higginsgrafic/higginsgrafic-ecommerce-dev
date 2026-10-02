@@ -16,7 +16,7 @@ import {
 } from './geometriaMegaslide.js';
 import { COIX_ENLLAC_COLLECCIONS_PX } from '../fullwide/estilsBlocs.js';
 import { carrilPx, readRootCssNumber, MEGASLIDE_REFERENCIA_PX, MIDA_TAULETA_APAISADA_MIN, MIDA_TAULETA_APAISADA_MAX } from '../../utils/layoutMetrics.js';
-import { carrilMegaslide, paramsMegaslide, CARRIL_MEGASLIDE_939_PX } from '../../utils/layoutModel.js';
+import { carrilMegaslide, paramsMegaslide, CARRIL_MEGASLIDE_939_PX, deviceLayoutFromViewport } from '../../utils/layoutModel.js';
 import { SelectorQuadratPagina1, PastillaBlancaPagina1 } from '../fullwide/BlocDretaPagina1.jsx';
 import { CapaTaulaVertical, TaulaVerticalP2 } from './TaulaVertical.jsx';
 import {
@@ -173,6 +173,15 @@ export default function MegaslidePagina2({
   // 1024, amb la columna a la dreta. El nom es queda perque mitja composicio
   // el fa servir, pero ara vol dir `isLandscapeTablet`.
   const esCarrilPagina1024 = typeof window !== 'undefined' && isLandscapeTablet;
+  // ELS PORTATILS DE 1200 A 1366 (05/10/2026). En Marc: «Aquestes modificacions
+  // només han d'afectar la franja de 1200-1366»: el selector quadrat i la graella
+  // d'una fila de la p2 son nome s per a aquests tres formats. La classe la diu el
+  // model (`isDesktop`), no la bandera `isLandscapeTablet` (que als escriptoris
+  // arriba CERTA per la regla vella de `MegaMenuPanel`).
+  const esPortatilP2 = esComposicioEstreta
+    && typeof window !== 'undefined'
+    && deviceLayoutFromViewport(window.innerWidth, window.innerHeight).isDesktop
+    && window.innerWidth >= 1200 && window.innerWidth <= 1366;
   // LA FRANJA DE COLLECCIONS NOME'S QUEDA A 1280-1366 (02/10/2026): a 1024 els
   // enllacos son la columna de la dreta (vegeu `CercadorTextRow`), o sigui que
   // tot el que a la composicio estreta es feia «al voltant de la franja» (el seu
@@ -1375,13 +1384,14 @@ export default function MegaslidePagina2({
             {/* AQUEST EMBOLCALL TAMBE ES PLE (129,4 x 129,4) i taparia el
                 carrusel: no rep clics. Els rep la pastilla, que es qui es veu. */}
             <div style={{ width: '100%', height: '100%', pointerEvents: 'none', transform: `translateY(${topVisualAlignmentY + selectorCentratgeY}px)` }}>
-              {/* LA MATEIXA PECA QUE EL SELECTOR DE LA P1 (02/10/2026): el
-                  quadrat amb el fons, el radi i l'ombra, la pastilla blanca a
-                  la casella triada i els tres enllacos de text. EL SELECTOR DE
-                  LA P2 ES SEMPRE EL QUADRAT DE LA P1 (05/10/2026): abans el
-                  rectangle era nome's per a la resta de vistes, i en Marc l'ha
-                  fet quadrat a totes. */}
-              <div style={{
+              {(esCarrilPagina1024 || esPortatilP2) ? (
+                /* LA MATEIXA PECA QUE EL SELECTOR DE LA P1 (02/10/2026): el
+                   quadrat amb el fons, el radi i l'ombra, la pastilla blanca a
+                   la casella triada i els tres enllacos de text. EL SELECTOR DE
+                   LA P2 ES EL QUADRAT DE LA P1 ALS PORTATILS DE 1200-1366
+                   (05/10/2026): a la resta de vistes es queda el rectangle de
+                   sempre. */
+                <div style={{
                   position: 'relative',
                   width: '100%',
                   height: '100%',
@@ -1408,6 +1418,26 @@ export default function MegaslidePagina2({
                     onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
                   />
                 </div>
+              ) : (
+              <FirstContactDibuix00Buttons
+                // EL SELECTOR DE LA PAGINA 2 ES RECTANGLE (26/09/2026): fora de
+                // 1024 i dels portatils de 1200-1366 es queda el de sempre, la
+                // meitat d'amplada i el doble d'alçada.
+                format="rectangle"
+                // LA CAIXA, CLAVADA AMB LA PASTILLA DE LA FRANJA (02/10/2026):
+                // l'amplada surt de la primera casa de la franja (vegeu
+                // `ampleCaixaBcnPx`) i l'alçada es queda la de disseny.
+                ampladaPx={ampleCaixaBcnPx != null ? `${ampleCaixaBcnPx}px` : null}
+                alcadaPx={carrilPx(bnSliderSize)}
+                onWhite={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('white') : setFirstContactVariant('white'); }}
+                onBlack={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('black') : setFirstContactVariant('black'); }}
+                onMulti={() => { setStripeOverlayOverrideActive(false); active === 'the_human_inside' ? setHumanInsideVariant('color') : setFirstContactVariant('color'); }}
+                showWhite={stripeVariantVisibility?.white !== false}
+                showBlack={stripeVariantVisibility?.black !== false}
+                showMulti={stripeVariantVisibility?.color !== false}
+                selectedVariant={active === 'the_human_inside' ? humanInsideVariant : firstContactVariant}
+              />
+              )}
             </div>
           </div>
         ) : null}
