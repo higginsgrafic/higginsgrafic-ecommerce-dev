@@ -959,7 +959,11 @@ function MegaStripePanelP1({
                 // 1024 la filera fa l'alcada del bloc (el quadrat del selector) i
                 // la graella, que es una mica mes alta (les dues fileres i el seu
                 // buit), hi queda centrada; a la resta es queda com estava.
-                alignItems: esComposicioEstretaP1 ? 'center' : 'flex-start',
+                // LA GRAELLA, AL TOP DEL CONJUNT FLETXES+SELECTOR (05/10/2026).
+                // En Marc: «Alinea la graella al top del conjunt fletxes+selector»:
+                // a la fila unica la graella no es centra dins la filera (quedava
+                // 27 px mes avall que el bloc), sino que arrenca a la mateixa vora.
+                alignItems: esFilaUnicaP1 ? 'flex-start' : (esComposicioEstretaP1 ? 'center' : 'flex-start'),
                 width: '100%',
                 ...(esComposicioEstretaP1 ? { height: `${blocDretaPx}px` } : null),
                 // LA FILERA, PER DAMUNT DE LA FRANJA (05/10/2026). En Marc: «A
