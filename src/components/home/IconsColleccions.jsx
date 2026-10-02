@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ICONES_COLLECCIONS, ICONA_ALCADA_U, ICONA_ALCADA_FC_U } from '@/config/iniciNou';
+import { ICONES_COLLECCIONS, ICONA_ALCADA_U, ICONA_ALCADA_FC_U, ICONA_AMPLADA_FC_U } from '@/config/iniciNou';
 
 /**
  * LA FRANJA D'ICONES DE COLLECCIO.
@@ -21,10 +21,17 @@ function IconsColleccions() {
     <div
       data-icones-colleccions="1"
       style={{
-        // L'ALCADA DE LA FRANJA ES LA D'AUSTEN, no la de la icona mes alta.
-        // Austen es la referencia de volum del grup, i First Contact (98,9) es
-        // mes gran que la resta (70,4). Es `height` i no `minHeight` perque la
-        // icona mes alta, si no, tornaria a manar sobre l'alcada.
+        // L'ALCADA DE LA FRANJA ES LA D'AUSTEN, no la de la icona mes alta
+        // (04/10/2026, amb les icones un 50 % mes grans). Austen es la
+        // referencia de volum del grup; First Contact es mes gran que la resta.
+        // Es `height` i no `minHeight` perque la icona mes alta, si no, tornaria
+        // a manar sobre l'alcada.
+        //
+        // DUES COSES QUE ES COMPLEIXEN I QUE NO S'HAN DE PERDRE, comprovades a
+        // 1024, 1180, 1280, 1366, 1376, 1512 i 1920: el CENTRE D'AUSTEN cau
+        // exactament al centre de la banda (desviacio 0 px a totes), i el CAP DE
+        // FIRST CONTACT cau exactament al cap de la franja (0 px a totes), o
+        // sigui que el seu desbordament se'n va cap avall i no desplaça el grup.
         height: u(ICONA_ALCADA_U),
         // EL CENTRE QUE MANA ES EL DE LA FRANJA. Amb el cap alineat, Austen
         // (70,4) omple la franja exactament, i el fenix (98,9) hi comença a dalt
@@ -35,10 +42,10 @@ function IconsColleccions() {
         // sota, i el resultat era que la franja pujava 14,3 unitats i a ull es
         // veia el grup massa amunt. El coixi, fora.
         display: 'flex',
-        // L'ALINEACIO. La franja te l'alcada d'Austen (70,4) i les icones
-        // s'alineen pel CAP: aixi Austen, Cube, The Human Inside i Miscellania
-        // (que fan just 70,4) omplen la franja, i First Contact (98,9) hi
-        // comença a dalt i sobresurt per baix.
+        // L'ALINEACIO. La franja te l'alcada d'Austen i les icones s'alineen pel
+        // CAP: aixi Austen, Cube, The Human Inside i Miscellania (que fan
+        // exactament aquesta alcada) omplen la franja, i First Contact (margada
+        // mes ample que alt) hi comença a dalt i sobresurt per baix.
         alignItems: 'flex-start',
         justifyContent: 'center',
         flexWrap: 'wrap',
@@ -63,7 +70,7 @@ function IconsColleccions() {
               src={c.icon}
               alt={c.name}
               style={{
-                width: esFirstContact ? u(67.36) : 'auto',
+                width: esFirstContact ? u(ICONA_AMPLADA_FC_U) : 'auto',
                 height: esFirstContact ? 'auto' : u(ICONA_ALCADA_U),
                 maxHeight: u(ICONA_ALCADA_FC_U),
                 objectFit: 'contain',

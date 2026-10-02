@@ -288,10 +288,23 @@ export const ICONES_COLLECCIONS = [
   { id: 'miscellania', name: 'Miscel·lània', href: '/miscellania', icon: '/custom_logos/collections/collection-miscellania-logo.svg' },
 ];
 
-/** L'alcada de referencia de les icones, en unitats de disseny. */
-export const ICONA_ALCADA_U = 70.4;
+/**
+ * LES ICONES DE COLLECCIO, UN 50 % MES GRANS (04/10/2026).
+ *
+ * En Marc: «Augmenta les icones un 50%». Les de referencia de la pagina vella
+ * eren 70,4 unitats d'alcada (i First Contact 99, que es mes ample que alt);
+ * aquestes son les mateixes x 1,5.
+ *
+ * L'alcada de la fila es la d'Austen (`ICONA_ALCADA_U`), i el buit entre icones
+ * tambe es un cos, o sigui que tot puja alhora i la fila queda igual de
+ * proporcionada. Com que la banda de les icones es la mida del megaslide, la
+ * hero no es mou: les icones creixen dins del seu espai.
+ */
+export const ICONA_ALCADA_U = 105.6;
 /** First Contact es mes ample que alt i es dibuixa mes gran. */
-export const ICONA_ALCADA_FC_U = 99;
+export const ICONA_ALCADA_FC_U = 148.5;
+/** L'amplada de First Contact (67,36 unitats x 1,5). */
+export const ICONA_AMPLADA_FC_U = 101.04;
 
 /**
  * LA MIDA DEL DIBUIX DINS DE LA HERO, per a cada dibuix.
