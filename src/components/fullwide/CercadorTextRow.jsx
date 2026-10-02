@@ -450,6 +450,9 @@ export function CercadorDibuixosGraella({
    *  el BLOC que formen queda centrat a la finestra (i la finestra, al
    *  selector). En Marc: «Centra la graella, en bloc, en y, amb el selector». */
   centraFilesEnBloc = false,
+  /** UNA SOLA FILA (05/10/2026): totes les peces a la fila de dalt, a un pas
+   *  sencer i amb el periode del carrusel d'una fila. Vegeu `MegaStripePanelP1`. */
+  filaUnica = false,
   isPortraitTablet = false,
   isLandscapeTablet = false,
   fontBoost = 0,
@@ -489,7 +492,7 @@ export function CercadorDibuixosGraella({
   // vegades i el desplaçament es modular sobre el periode (una volta). Quan
   // s'arriba al final, el que es veu es la segona copia, que es exactament el
   // mateix; el residu torna a començar i no es nota el salt.
-  const periode = carrusel ? (items.length * pas) / 2 : 0;
+  const periode = carrusel ? (items.length * pas) / (filaUnica ? 1 : 2) : 0;
   const ampleTira = carrusel ? periode * 2 + pas : 0;
   // LA FINESTRA CONTÉ LES DUES FILES SENCERES (25/09/2026).
   //
@@ -502,7 +505,7 @@ export function CercadorDibuixosGraella({
     ? (Number.isFinite(alcadaCarruselPx) && alcadaCarruselPx > 0 ? alcadaCarruselPx : alcadaFila * 2)
     : 0;
   // Una peça per clic de fletxa (mig pas: les peces van mig pas una de l'altra).
-  const unPas = pas / 2;
+  const unPas = filaUnica ? pas : pas / 2;
 
   // EL CARRUSEL ES MOU ARROSSEGANT, I AL DESKTOP TAMBE AMB FLETXES.
   //
@@ -636,7 +639,7 @@ export function CercadorDibuixosGraella({
   // I s'hi afegeix la TOLERANCIA (0,5 px): el desnivell pot deixar la fila mig
   // pixel mes amunt del seu punt fix, i amb la vora a ras (`0,00 px`) un
   // arrodoniment de pixel de pantalla encara podria pelar-ne un.
-  const sobreixDalt = carrusel ? Math.max(0, desnivellsLinies.primera) + 0.5 : 0;
+  const sobreixDalt = carrusel ? (filaUnica ? 0 : Math.max(0, desnivellsLinies.primera) + 0.5) : 0;
   useLayoutEffect(() => {
     if (!carrusel) return undefined;
     // EL DESNIVELL DE LES DUES FILES, DECLARAT (26/09/2026). Abans es mesuraven
@@ -849,8 +852,10 @@ export function CercadorDibuixosGraella({
             // separacio entre les dues fileres s'ha d'aplicar aqui. Amb `gapV` la
             // filera 1 no es mou i la 2 baixa.
             position: 'absolute',
-            left: `${(i * pas) / 2}px`,
-            top: `${(i % 2)
+            left: filaUnica ? `${i * pas}px` : `${(i * pas) / 2}px`,
+            top: `${filaUnica
+              ? (alcadaCarrusel - alcadaFila) / 2
+              : (i % 2)
               // NOME'S LA GRAELLA DE LA P1 SEPARA LES FILES AMB `gapV` (28/09/2026).
               // La seva graella va `senseFletxes` (les fletxes son al bloc de la
               // dreta); a la p2 el `gapV` es el pas vertical de la seva propia
