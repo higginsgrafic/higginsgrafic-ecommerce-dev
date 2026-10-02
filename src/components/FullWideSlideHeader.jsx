@@ -465,6 +465,93 @@ function FullWideSlideHeader({
     activeRef.current = active;
   }, [active]);
 
+  // L'ESCALFAMENT DEL PANELL (04/10/2026). En Marc: «Si has d'acabar fent el
+  // mateix ja tant se val que acabis el que ja esta comencat», sobre l'experiment
+  // de la branca `feat/mega-escalfament`.
+  //
+  // EL PROBLEMA MESURAT. La composicio del megaslide no neix quadrada: l'alcada
+  // del panell surt d'una mesura del contingut de la pagina 1 que va canviant
+  // mentre les imatges arriben (374 -> 435 -> 309 a 1376x954), la franja de la
+  // pagina 2 viatja 61,6 px (el bucle `ajustFranjaP2Y` de la banda de tauleta
+  // apaissada), hi ha els repassos de 180/340/400 ms i les fonts. Amb el
+  // megaslide obert, tot aixo es veu; amb el megaslide TANCAT, nome's es veu que
+  // les peces es mouen si el panell s'obre abans no hagi convergit.
+  //
+  // LA SOLUCIO. El panell es munta DORMINT (fora del flux, invisible, sense
+  // clics i sense animacio: vegeu `MegaMenuPanel`) i nome's entra en flux quan
+  // l'escalfament ha acabat. Com que esta muntat amb la MATEIXA geometria que
+  // obert, tots els calibratges i les mesures convergeixen d'amagat.
+  //
+  // DOS ESTATS, PERQUE DORMIR TE DOS TEMPS:
+  //   `panellDormint`  el panell ja es al DOM, amagat. Amb el megaslide tancat
+  //                    s'espera 1,2 s per no competir amb el primer pintat; si
+  //                    la URL ja porta una colleccio, es munta de seguida.
+  //   `escalfamentFet` ja ha convergit i es pot obrir sense ensenyar res.
+  //
+  // ESCALFAR NO ES NOME'S ESPERAR. Un retard fix no serveix: la mesura depen de
+  // quant triguen les imatges i les fonts, i el mateix retard que a una carrega
+  // li sobra a una altra li falta (mesurat: amb 1,4 s, una carrega obria amb el
+  // panell a 435 px i una altra amb 309, que es el bo). Qui ho sap de debo es el
+  // panell, que publica `mesuraEstable` quan la seva alcada fa 220 ms que no
+  // canvia; a partir d'aqui nome's cal esperar que la FRANJA tambe es quedi
+  // quieta (el bucle `ajustFranjaP2Y` hi arriba unes passades mes tard). Amb el
+  // topall de seguretat, el megaslide s'obre igualment.
+  const [panellDormint, setPanellDormint] = useState(false);
+  useEffect(() => {
+    if (contained) return undefined;
+    if (panellDormint) return undefined;
+    const t = window.setTimeout(() => setPanellDormint(true), active ? 0 : 1200);
+    return () => window.clearTimeout(t);
+  }, [contained, panellDormint, active]);
+
+  const [mesuraPanellEstable, setMesuraPanellEstable] = useState(false);
+  const handleMesuraEstable = useCallback(() => setMesuraPanellEstable(true), []);
+
+  const CALMA_FRANJA_MS = 700;
+  const MINIM_DORMIR_MS = 900;
+  const TOPALL_ESCALFAMENT_MS = 3500;
+  const [escalfamentFet, setEscalfamentFet] = useState(false);
+  useEffect(() => {
+    if (!panellDormint || escalfamentFet || contained) return undefined;
+    const inici = performance.now();
+    let ultimCanvi = inici;
+    let anterior = null;
+    let raf = 0;
+    // TOT EL QUE ES MOU, A LA CLAU. L'alcada del panell i les dues franges: si
+    // nome's se'n vigilés una, una mesura dolenta que es queda quieta 220 ms
+    // (el llindar del panell) passaria per bona i el megaslide s'obriria amb la
+    // reserva vella (mesurat: s'obria amb 374 px i tot seguit queia a 309).
+    const clau = () => {
+      const s = document.querySelector('[data-mega-panel-surface="1"]');
+      if (!s) return null;
+      const r = s.getBoundingClientRect();
+      const f1 = document.querySelector('[data-mega-page-viewport="1"] [data-stripe-visual-content="1"]');
+      const f2 = document.querySelector('[data-stripe-visual-content="2"]');
+      const b1 = f1 ? f1.getBoundingClientRect() : null;
+      const b2 = f2 ? f2.getBoundingClientRect() : null;
+      const m = (n) => (n == null ? '-' : Math.round(n * 2) / 2);
+      return `${m(r.height)}|${m(b1 && b1.top)}|${m(b1 && b1.height)}|${m(b2 && b2.top)}`;
+    };
+    const mira = () => {
+      const ara = clau();
+      if (ara != null && ara !== anterior) {
+        anterior = ara;
+        ultimCanvi = performance.now();
+      }
+      const passat = performance.now() - inici;
+      if (passat > TOPALL_ESCALFAMENT_MS
+        || (passat > MINIM_DORMIR_MS
+          && mesuraPanellEstable
+          && performance.now() - ultimCanvi > CALMA_FRANJA_MS)) {
+        setEscalfamentFet(true);
+        return;
+      }
+      raf = requestAnimationFrame(mira);
+    };
+    raf = requestAnimationFrame(mira);
+    return () => cancelAnimationFrame(raf);
+  }, [panellDormint, escalfamentFet, contained, mesuraPanellEstable]);
+
   useEffect(() => {
     if (active !== 'austen') setAustenSubcollection(null);
   }, [active]);
@@ -2405,6 +2492,10 @@ function FullWideSlideHeader({
   const ensureMegaOpen = () => {
     setManualOverrideClosed(false);
     setOberturaMega((v) => v + 1);
+    // L'OBERTURA DEMANADA (04/10/2026). Tots els camins que obren el megaslide
+    // des de tancat passen per aqui (la lupa, les icones de colleccio, la roda):
+    // cap d'ells no ha d'esperar que el panell acabi d'escalfar-se.
+    setEscalfamentFet(true);
     // LA COLLECCIO DE LA URL MANA (25/09/2026). Abans aixo era
     // `setActive((prev) => prev || 'first_contact')`, i quan el megaslide es
     // tancava en navegar a una PDP, en tornar `active` era `null` i allo posava
@@ -3170,7 +3261,14 @@ function FullWideSlideHeader({
 
   // El panell nome's es munta quan hi ha colleccio i la seva composicio ja te
   // les imatges a la memoria (o quan el topall de 400 ms ha passat).
-  const potMuntarElPanell = Boolean(active) && oberturaAPunt;
+  const panellObert = Boolean(active) && oberturaAPunt && (contained || escalfamentFet);
+  // MUNTAT NO ES OBERT (04/10/2026). Amb l'escalfament (vegeu `panellDormint` a
+  // dalt) el panell tambe existeix quan el megaslide esta TANCAT, pero dormint.
+  // Tot allo que decideix si el megaslide es veu (el fons de la capcalera, la
+  // reserva d'espai, el cadenat) ha de penjar de `panellObert`, no d'aixo: si no,
+  // el megaslide tancat pintaria l'espai reservat i la capcalera es tornaria
+  // transparent amb el panell amagat al darrere.
+  const potMuntarElPanell = panellObert || panellDormint;
 
   // QUAN EL PANELL COMENCA A APAREIXER. L'animacio del panell porta l'estona
   // invisible com a retràs (`MEGA_PANEL_DELAY_MS`), i per tant l'aparicio
@@ -3178,13 +3276,13 @@ function FullWideSlideHeader({
   // panell i s'esborra en desmuntar-se: mentre el panell no es vegi, ni
   // l'espai reservat es pinta de blanc ni el cadenat es munta.
   useEffect(() => {
-    if (!potMuntarElPanell) {
+    if (!panellObert) {
       setPanellComenca(false);
       return undefined;
     }
     const id = window.setTimeout(() => setPanellComenca(true), MEGA_PANEL_DELAY_MS);
     return () => window.clearTimeout(id);
-  }, [potMuntarElPanell]);
+  }, [panellObert]);
 
   useEffect(() => {
     if (!active) return;
@@ -3364,7 +3462,7 @@ function FullWideSlideHeader({
   return (
     <header
       ref={headerRef}
-      className={`${contained ? 'relative' : 'fixed'} z-[10000] ${(isLandscapeTablet && active) || (potMuntarElPanell && !panellComenca) ? 'bg-transparent' : 'bg-background'}`}
+      className={`${contained ? 'relative' : 'fixed'} z-[10000] ${(isLandscapeTablet && active) || (panellObert && !panellComenca) ? 'bg-transparent' : 'bg-background'}`}
       onMouseLeave={(e) => {
         if (isManualLockEnabled()) return;
         if (megaAccordionLocked) return;
@@ -3975,7 +4073,9 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
       {potMuntarElPanell ? (
       <MegaMenuPanel
-        active={active}
+        active={active || (panellDormint ? 'first_contact' : null)}
+        dormint={!panellObert}
+        onMesuraEstable={handleMesuraEstable}
         megaPage={megaPage}
         megaFullScreen={megaFullScreen}
         megaMenuRef={refPanellMega}

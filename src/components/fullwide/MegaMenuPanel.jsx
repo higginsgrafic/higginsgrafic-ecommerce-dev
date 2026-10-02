@@ -160,6 +160,14 @@ export default function MegaMenuPanel({
   setAcordioExpandedPage4,
   isPortraitTablet = false,
   isLandscapeTablet = false,
+  // DORMINT: el panell esta muntat i escalfat pero amagat (el megaslide esta
+  // tancat). Amb la MATEIXA geometria que obert, perque tots els calibratges i
+  // resolucions convergeixin ABANS de la primera obertura (04/10/2026).
+  dormint = false,
+  // AVIS DE COMPOSICIO ESTABLE (04/10/2026). El panell dormint ha de poder dir
+  // a la capcalera quan la seva alcada ja es la bona: es qui decideix si el
+  // megaslide s'obre d'amagat o de cop. Vegeu `FullWideSlideHeader`.
+  onMesuraEstable = null,
 }) {
   if (!active) return null;
 
@@ -342,6 +350,15 @@ export default function MegaMenuPanel({
     desarAlcada(`${alcadaGuard(p1ContentBottomPx)}px`);
   }, [mesuraEstable, p1ContentBottomPx, isPortraitTablet, paymentFillsScreen, margeExtraDesktop, paddingVerticalPanellPx, alcadaGuard]);
 
+  // L'AVIS, CAP A FORA. `mesuraEstable` vol dir que l'alcada del contingut de la
+  // pagina 1 fa 220 ms que no canvia: es el moment en que el panell deixa de
+  // fer el rebot. La capcalera l'aprofita per obrir el megaslide nome's quan la
+  // composicio ja es la bona (04/10/2026).
+  useEffect(() => {
+    if (!mesuraEstable) return;
+    if (typeof onMesuraEstable === 'function') onMesuraEstable();
+  }, [mesuraEstable, onMesuraEstable]);
+
   // La graella de dibuixos de la taula ensenya 7 dibuixos alhora (com la
   // columna de l'horitzontal) i les fletxes passen de pagina.
   const [paginaGraella, _setPaginaGraella] = useState(0);
@@ -416,9 +433,21 @@ export default function MegaMenuPanel({
       <div
         data-mega-panel-surface="1"
         className="relative z-[10000] block border-b border-border"
+        aria-hidden={dormint || undefined}
         style={{
           overflow: 'visible',
           backgroundColor: 'hsl(var(--grey-paper))',
+          // DORMINT: fora del flux (no empeny el contingut de sota), invisible i
+          // sense clics. La MATEIXA mida i posicio que obert, perque els
+          // percentatges dels calibratges no canviin.
+          ...(dormint ? {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            visibility: 'hidden',
+            pointerEvents: 'none',
+          } : {}),
           // El megaslide apareixia de cop i es veia com s'anava muntant el
           // contingut. Amb aquesta animacio es desplega suaument (baixa i es
           // fon alhora), i l'ull ja no percep que les imatges arriben.
@@ -441,7 +470,7 @@ export default function MegaMenuPanel({
           // sensacio era que el megaslide «primer feia un espai buit i despres
           // apareixia». Qui ho hagi de saber (la capcalera, que es qui pinta
           // aquell espai, i el cadenat) ho llegeix d'aqui, i no ho endevina.
-          animation: `mega-panel-desplega 340ms cubic-bezier(0.22, 1, 0.36, 1) ${MEGA_PANEL_DELAY_MS}ms backwards`,
+          animation: dormint ? 'none' : `mega-panel-desplega 340ms cubic-bezier(0.22, 1, 0.36, 1) ${MEGA_PANEL_DELAY_MS}ms backwards`,
           ...(megaFullScreen ? {
             minHeight: '100vh',
           } : {})

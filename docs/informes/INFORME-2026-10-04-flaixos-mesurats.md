@@ -46,3 +46,11 @@ traça neta; la primera aprofita feina ja feta i verificada a mitges.
 Abans de mesurar res m'he trobat que **la pàgina no carregava** (22 imports reanomenats amb guió
 baix que el mòdul no exporta, de la neteja del codi mort). Arreglat a `d078a9f6`; la bateria
 (600/600 proves, eslint net, build OK) i la pàgina tornen a estar bé.
+
+## 6. Resolt el 04/10/2026 (vespre)
+
+L'experiment s'ha portat a `main` i s'ha mesurat: vegeu
+**`INFORME-2026-10-04-escalfament-del-panell.md`**. El panell es munta dormint i la
+convergència passa amagada; les alçades que es veuen durant l'obertura són **una sola**
+(309 px a 1376×954) i el rebot 374 → 435 → 309 ja no es veu. L'únic moviment que queda és
+el de la pròpia animació (26 px, monòtons).
