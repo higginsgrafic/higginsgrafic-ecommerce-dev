@@ -1017,7 +1017,9 @@ function MegaStripePanelP1({
                   // coixi de l'esquerra), o sigui que el desplacament va 10 px mes
                   // enlla d'on va el bloc perque el RETALL caigui a la vora del
                   // carril.
-                  ...((alcadaBlocEstretaP1) ? { transform: `translateX(${alcadaBlocEstretaP1.dx - 10}px)` } : null),
+                  // AMB UNA SOLA FILA NO HI HA DESPLACAMENT (05/10/2026): la
+                  // graella arrenca a la vora esquerra del carril.
+                  ...(!esFilaUnicaP1 && alcadaBlocEstretaP1 ? { transform: `translateX(${alcadaBlocEstretaP1.dx - 10}px)` } : null),
                 } : null),
               }}>
                 <GraellaDuesFileresPagina1

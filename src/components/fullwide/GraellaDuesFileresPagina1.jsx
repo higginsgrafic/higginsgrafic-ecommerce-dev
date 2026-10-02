@@ -135,7 +135,10 @@ export default function GraellaDuesFileresPagina1({
         // i el seu centre (147,0) es queden clavats a la casella COLOR. Traient
         // tambe el coixi, tot el dibuix marxaria 10 px mes i el centre cauria
         // 1 px fora de la casella.
-        paddingLeft: '10px',
+        // AMB UNA SOLA FILA, LA GRAELLA ARRENCA A LA VORA DEL CARRIL
+        // (05/10/2026). En Marc: «Allarga la graella fins a l'esquerra del
+        // carril»: el coixi de 10 px era el de la composicio de dues files.
+        paddingLeft: unaFila ? 0 : '10px',
         // LA PRIMERA FILERA, AL TOP DEL SELECTOR (28/09/2026). En Marc: «mou-les
         // juntes cap amunt. Alinea la primera fila amb el top del selector». Les
         // peces del carrusel van absolutes i la primera filera cau
