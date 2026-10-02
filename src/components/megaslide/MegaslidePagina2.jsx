@@ -510,7 +510,13 @@ export default function MegaslidePagina2({
             aireDaltP2,
             panelAlt - rBcn.height - alcadaFranja - rFranja.height - 2 * AIRE_FRANJA_COLLECCIONS_PX,
           ));
-          objectiuTop = panelTop + aire - topBcn;
+          objectiuTop = panelTop + aire - topBcn
+            // EL BLOC, AL TOP DE LA COLUMNA DE COLLECCIONS (05/10/2026). En Marc:
+            // «Alinea el selector i la graella de dibuixos al top de la columna de
+            // colleccions»: als portatils de 1200-1366 la columna de la p2 baixa
+            // 18 px per fer la mateixa alcada que el bloc de la p1, i el selector
+            // i la graella (que hi arrenquen al mateix top) la segueixen.
+            + (esPortatilP2 ? 18 : 0);
         }
       }
       //    (Amb el selector, el centratge del selector tambe mou el seu top i
@@ -603,7 +609,7 @@ export default function MegaslidePagina2({
     // (02/10/2026) midaSelectorP2 hi entra: es derivat de bnSliderSize i
     // esCarrilPagina1024 (que ja hi son) i d'una constant de modul
     // (pagina1BlocDretaPx(1)), aixi que no afegeix cap re-execucio nova.
-  }, [active, midaSelectorP2, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, esComposicioEstreta, esComposicioFranja, esCarrilPagina1024, ampleCarrilPaginaP2, topGraellaColors, mesuraGraellaP2]);
+  }, [active, midaSelectorP2, bnSliderSize, isPortraitTablet, isLandscapeTablet, page1PageLift, esBandaEstreta, esComposicioEstreta, esComposicioFranja, esCarrilPagina1024, esPortatilP2, ampleCarrilPaginaP2, topGraellaColors, mesuraGraellaP2]);
 
   // (El centratge del selector amb la graella de colors s'ha fusionat amb
   // l'efecte de dalt. Era un segon bucle que reescrivia el valor que el primer

@@ -2128,15 +2128,9 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
         // A 1024 la columna arrenca al top del selector (i del bloc). Els 2 px
         // son el marge propi de la peça, que va en NEGATIU (mesurat: amb `dalt`
         // 0 el seu sostre cau a 66 i amb 2 a 64; el del selector es a 68).
-        const dalt = (esColumna1024
+        const dalt = esColumna1024
           ? -2
-          : desplacTopEf - scyEf - COLUMNA_TOP_AJUST_PX)
-          // LA COLUMNA, DE LA MATEIXA ALCADA QUE EL BLOC FLETXES+SELECTOR DE LA P1
-          // (05/10/2026). En Marc: «Fes la columna de col·leccions de la mateixa
-          // alcada que la columna fletxes+selector de la p1». Als portatils de
-          // 1200-1366 el bloc de la p1 fa 170 px (91..261) i la columna de la p2
-          // en feia 188 (73..261): el seu sostre baixa 18 px per quadrar-hi.
-          - (esFilaUnicaP2 ? 18 : 0);
+          : desplacTopEf - scyEf - COLUMNA_TOP_AJUST_PX;
         // EL SOSTRE DE LA FRANJA TAMBE ES DECLARAT (26/09/2026): el seu top ja
         // no es llegeix del DOM (`topFranjaPagina2`: el coixi del panell mes la
         // reserva de la graella vella mes els desplaçaments de disseny). De la
