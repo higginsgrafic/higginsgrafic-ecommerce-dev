@@ -2881,8 +2881,28 @@ function FullWideSlideHeader({
     const mesura = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const ample = nav.clientWidth;
-        const natural = nav.scrollWidth;
+        // L'ESPAI DISPONIBLE ES EL QUE QUEDA ENTRE EL LOGO I LES ICONES (04/10/2026).
+        // Abans es llegia `nav.clientWidth`, i amb el nav estirat sobre la fila
+        // (`absolute`, perque quedi centrat de debò) allo era tota la fila: el
+        // bucle creia que sempre hi cabia i el darrer enllac se'n anava a sobre
+        // de la lupa. Amb el forat mesurat entre els germans, val per a les dues
+        // disposicions (el nav al flux a les tauletes i estirat a l'escriptori).
+        const fila = nav.parentElement;
+        const fr = fila.getBoundingClientRect();
+        const mig = fr.left + fr.width / 2;
+        const germans = [...fila.children]
+          .filter((e) => e !== nav)
+          .map((e) => e.getBoundingClientRect())
+          .filter((r) => r.width > 2);
+        const esq = Math.max(fr.left, ...germans.filter((r) => r.left < mig).map((r) => r.right));
+        const dreta = Math.min(fr.right, ...germans.filter((r) => r.left >= mig).map((r) => r.left));
+        const ample = Math.max(0, dreta - esq);
+        // EL CONTINGUT, MESURAT DELS SEUS FILLS. Amb el nav estirat, el seu
+        // `scrollWidth` es la fila sencera (la caixa), no el que hi ha a dins.
+        const fills = [...nav.children].map((e) => e.getBoundingClientRect());
+        const natural = fills.length
+          ? Math.max(...fills.map((r) => r.right)) - Math.min(...fills.map((r) => r.left))
+          : nav.scrollWidth;
         const primer = nav.firstElementChild;
         if (!ample || !natural || !primer) return;
         // LA MIDA DE LA DESKTOP ES EL PRIMER OBJECTIU (02/10/2026). En Marc: «Mira
@@ -3517,7 +3537,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
       >
         <div
           data-capcalera-fila="1"
-          className="flex h-[72px] items-center gap-3"
+          className="relative flex h-[72px] items-center gap-3"
           style={{
             // LA FILA FA EL LOGO (32 px) MÉS 20 px D'AIRE A DALT I A BAIX = 72
             // (04/10/2026: «Dona-li 10 px d'aire al header, per sobre i per
@@ -3562,9 +3582,15 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             // la fila ha d'anar centrada com alla; el `--hg-mega-x` es la x del
             // carril del MEGASLIDE (605 px a 1024) i deixava el header 160 px a
             // la dreta.
-            marginLeft: esCarrilHeaderAmpliat
-              ? 'calc((100vw - min(939.2px, 100vw - 80px)) / 2 - var(--rulerInset, 0px))'
-              : 'calc(var(--hg-mega-x, 0px) - var(--rulerInset, 0px))',
+            // CENTRAT AL MATEIX MARGE QUE LA PAGINA (04/10/2026). Abans la fila
+            // es col·locava amb la x del carril del MEGASLIDE, que es calcula
+            // sobre la finestra, mentre el contingut de la pagina (`hg-marc__contingut`)
+            // es centra dins del marc del lloc, que reserva la barra de
+            // desplaçament: a 1512 aixo deixava el header 7,5 px a la dreta de les
+            // icones i de la hero. Amb els marges automatics, tots dos es centren
+            // dins del mateix marc i coincideixen.
+            marginLeft: 'auto',
+            marginRight: 'auto',
             // SENSE COIXÍ: EL LOGO A LA VORA ESQUERRA DEL CARRIL I LES ICONES A
             // LA DRETA (24/09/2026, ho va demanar l'amo).
             //
@@ -3644,12 +3670,30 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
           </Link>
 
           <nav ref={navRef} className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap ${esTauleta ? 'overflow-hidden' : ''} ${esDobleHeader ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: navGapPx != null ? `${navGapPx}px` : (isLandscapeTablet ? '1rem' : '0.25rem'), minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : {
-              // El -5% és un ajust òptic del nav (el desplaça cap a l'esquerra).
-              // Dins el carril, a la banda estreta (768-1366) el nav no té marge
-              // per a aquest desplaçament: el seu contingut ja hi va just i el
-              // -5% el posava sota el logo (la «F» de FIRST CONTACT quedava
-              // tallada a 1280).
-              transform: esBandaEstreta ? 'none' : 'translateX(-5%)',
+              // SENSE DESPLAÇAMENT: EL NAV VA CENTRAT (04/10/2026). En Marc:
+              // «Centra tot el contingut. Hi ha coses descentrades». Hi havia un
+              // `translateX(-5%)` d'ajust optic que el movia 33 px a l'esquerra a
+              // 1512 (i que a la banda estreta ja es desactivava); mesurat, el
+              // centre del nav queia a 719,4 quan el mig de la finestra es 756.
+              transform: 'none',
+              // EL NAV, CENTRAT SOBRE LA FILA (04/10/2026). La seva caixa va
+              // entre el logo i les icones de la dreta, i com que el logo no fa
+              // la mateixa amplada que elles, el seu centre queia 3 px a
+              // l'esquerra a 1512 i 24 a 1180. Amb el nav estirat sobre la fila
+              // (`absolute`) i centrat, cau on toca a totes les vistes; el logo
+              // hi va a sobre (`z-10`) i les icones de la dreta es queden a la
+              // seva vora amb el `ml-auto`.
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              // I ES DEIXA ENCONGIR (04/10/2026): sense `minWidth: 0` la fila no
+              // el pot estrènyer i el nav desborda el carril (a 1280, 34 px, i
+              // empenyia les icones fora de la franja); a mes, el bucle que
+              // adapta el gap no s'activava mai perque el nav sempre «hi cabia»
+              // dins de la seva propia caixa.
+              minWidth: 0,
               ...(navGapPx != null ? { gap: `${navGapPx}px`, columnGap: `${navGapPx}px` } : { columnGap: carrilPx(16) }),
             }}>
             {resolvedNav.map((item) => {

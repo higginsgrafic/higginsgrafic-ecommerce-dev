@@ -34,6 +34,8 @@
  * `esp`   quin token de l'escala d'espaiat porta a sobre. `null` la primera
  * `alcada` NOMÉS per a l'esquelet buit: quin `--esp-*` fa de caixa provisional
  */
+import { deviceLayoutFromViewport } from '@/utils/layoutModel';
+
 export const SECCIONS_INICI = [
   { id: 'hero', label: 'Hero', esp: null, alcada: null },
   { id: 'colleccio-1', label: 'Galeria 1 · First Contact', esp: '--esp-4', alcada: '--esp-4' },
@@ -105,12 +107,25 @@ export const HERO_ALCADA_VERTICAL = 430;
  * nome's hi coincideix.
  */
 export function espaiMegaslideCss(ample, alt) {
-  // VERTICAL: qualsevol finestra mes alta que ampla. El tall era `ample < 1024`,
-  // i la tauleta vertical de 1032 (iPad Pro 13) no hi entrava: la banda li
-  // quedava a 244 px quan el panell en fa 615, i el megaslide se li tirava a
-  // sobre. Mesurat: la recta vertical dona 580 i el panell en fa 615.
-  if (alt > ample) return 'calc(0.585 * var(--inici-nou-carril, 0px))';
-  if (ample <= 1376) return 'calc(0.2529 * var(--inici-nou-carril, 0px) + 5.3px)';
+  // LA CLASSE MANA, COM AL MEGASLIDE (04/10/2026). En Marc: «La hero de la 1280
+  // l'has de tornar a calcular»: el 1280 va passar a escriptori (vegeu
+  // `layoutMetrics`), el megaslide hi fa la composicio d'escriptori (223 px de
+  // panell, no 244) i la banda li aplicava la recta de tauleta.
+  //
+  // L'ESCRIPTORI ESTRET te recta propia: entre 1201 i 1366 el panell no segueix
+  // la recta dels grans (a 764 de carril en fa 223 i la recta dels grans en
+  // diria 247). Es la que passa pels punts mesurats (764 -> 223, 776 -> 226 i
+  // 816 -> 234), o sigui `0,2115 x carril + 61,4`.
+  const layout = deviceLayoutFromViewport(ample, alt);
+  if (layout.isPortraitTablet || layout.isMobile) {
+    return 'calc(0.585 * var(--inici-nou-carril, 0px))';
+  }
+  if (layout.isLandscapeTablet) {
+    return 'calc(0.2529 * var(--inici-nou-carril, 0px) + 5.3px)';
+  }
+  if (ample <= 1366) {
+    return 'calc(0.2115 * var(--inici-nou-carril, 0px) + 61.4px)';
+  }
   return 'calc(0.1775 * var(--inici-nou-carril, 0px) + 111.3px)';
 }
 
