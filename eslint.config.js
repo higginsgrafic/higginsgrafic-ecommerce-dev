@@ -34,10 +34,10 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      // (02/10/2026) Apagat: el patro hook+provider al mateix fitxer i els
+      // exports d'utilitats (Meta dels correus, shadcn button, helpers) son
+      // intencionats. La regla nome s afecta el hot-reload en dev, no la produccio.
+      'react-refresh/only-export-components': 'off',
     },
   },
   {
@@ -82,7 +82,7 @@ export default tseslint.config(
       'react-hooks/refs': 'warn',
       'react-hooks/preserve-manual-memoization': 'warn',
       'react-hooks/error-boundaries': 'warn',
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'react-refresh/only-export-components': 'off',
       'react/prop-types': 'off',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
