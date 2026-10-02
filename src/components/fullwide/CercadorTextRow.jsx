@@ -407,6 +407,11 @@ function carruselAmbFletxes({ isPortraitTablet = false, isLandscapeTablet = fals
   return esEscriptori || (!isPortraitTablet && !isLandscapeTablet);
 }
 
+// El `mt-2` (0,5rem = 8px) que `FirstContactDibuix09Buttons` porta a la seva
+// variant horitzontal: desplaça les fletxes visibles 8 px per sota del bloc que
+// les penja, i el centratge les ha de descomptar.
+const MARGIN_FLETXES_HORITZONTALS_PX = 8;
+
 export function CercadorDibuixosGraella({
   // EL REF DE LA CAIXA QUE ES MOU (EL RETALL DEL CARRUSEL). Qui el posa el pot
   // passar per mesurar-la de fora (la filera de la pagina 2 ho fa); si no
@@ -576,24 +581,28 @@ export function CercadorDibuixosGraella({
     // perque tambe refresquen el valor quan canvia la finestra (les variables
     // del carril no provoquen cap re-render).
     const calcula = () => {
-      // A LA FILA UNICA LES FLETXES SON HORITZONTALS I ES CENTREN AMB EL BLOC
-      // GRAELLA + TIRA DE COLORS (05/10/2026). En Marc: «Posa les fletxes
-      // horitzontals centrades a la graella+tira de colors. Considera'ls com si
-      // fossin un sol bloc per a centrar les fletxes»: el centre del bloc es el
-      // punt mig entre el top del carrusel (la graella) i el bottom de la tira de
-      // colors de sota. A la resta, la formula declarada de sempre.
+      // A LA FILA UNICA LES FLETXES SON HORITZONTALS I ES CENTREN AMB ELS
+      // DIBUIXOS (05/10/2026). En Marc: «Centra la fletxa dreta a la samarreta
+      // 14 i la fletxa esquerra a la samarreta 13» i, com a alternativa, «mira de
+      // centrar les fletxes als dibuixos»: les fletxes es centren amb la GRAELLA
+      // DE DIBUIXOS (la fila de samarretes), no amb el bloc graella+tira de
+      // colors. El centre dels dibuixos es el del retall, i el marge es la
+      // mitja diferencia entre l'alcada de les fletxes i la del carrusel.
       if (filaUnica) {
         const carruselEl = refCarrusel.current;
-        const filera = carruselEl?.closest('[data-p2-cercador-row]');
-        const colorsEl = filera?.querySelector('[data-p2-color-grid]');
         const escala = readRootCssNumber('--hg-escala-mega', 1);
         const hFletxes = (midaSelector / 2) * escala;
         let d = hFletxes / 2;
-        if (carruselEl && colorsEl) {
+        if (carruselEl) {
           const topCarrusel = carruselEl.getBoundingClientRect().top;
-          const bottomColors = colorsEl.getBoundingClientRect().bottom;
-          const centreBloc = (topCarrusel + bottomColors) / 2;
-          d = centreBloc + hFletxes / 2 - carruselEl.getBoundingClientRect().bottom;
+          const bottomCarrusel = carruselEl.getBoundingClientRect().bottom;
+          const centreDibuixos = (topCarrusel + bottomCarrusel) / 2;
+          d = centreDibuixos + hFletxes / 2 - bottomCarrusel;
+          // El `mt-2` de la botonera horitzontal (8 px, vegeu
+          // `FirstContactDibuix09Buttons`) baixa les fletxes visibles 8 px per
+          // sota del seu embolcall: es descompta perque els chevrons quedin
+          // centrats amb els dibuixos, no amb el bloc que els penja.
+          d -= MARGIN_FLETXES_HORITZONTALS_PX;
         }
         setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - d) < 0.01 ? previ : d));
         return;
@@ -2290,8 +2299,12 @@ function CercadorTextRow({ activeCollection, activeSubcollection, selectedStripe
     // tots dos acabin on comencen les fletxes. Es calcula UNA vegada aqui (les
     // fletxes son al desktop i a la tauleta apaisada, no a la vertical) i el
     // fan servir els dos.
+    // A LA FILA UNICA EL BLOC DE FLETXES FA MITJA MIDA DEL SELECTOR (05/10/2026):
+    // la reserva dreta es la MEITAT del selector (no el selector sencer), mes el
+    // gap de 10 px. Abans es reservava `midaFletxes` sencer i la graella es
+    // quedava 62 px enrere de les fletxes, que flotaven en l'aire.
     const reservaDreta = carruselAmbFletxes({ isPortraitTablet, isLandscapeTablet })
-      ? `calc(${carrilPx(esFilaUnicaP2 ? midaFletxes : midaSelector / 2)} + ${carrilPx(10)})`
+      ? `calc(${carrilPx(esFilaUnicaP2 ? midaFletxes / 2 : midaSelector / 2)} + ${carrilPx(10)})`
       : 0;
     // LA COMPOSICIO ESTRETA FA TOT EL CARRIL (02/10/2026).
     //

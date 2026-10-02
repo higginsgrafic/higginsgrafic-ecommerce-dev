@@ -424,13 +424,19 @@ export function FirstContactDibuix09Buttons({
             (25 %), i el de baix a 89,25 (75 %). Mesurat abans: 145,1 i 184,8
             contra els centres de les meitats (135,2 i 194,7), o sigui 9,9 px
             desviats cap al mig. Amb 1/4 i 3/4 la desviacio es 0. */}
+        {/* ELS CHEVRONS, AL CENTRE DE LA SEVA MEITAT, TAMBE EN HORITZONTAL
+            (05/10/2026). Amb `vertical` les meitats son la de dalt i la de baix
+            (1/4 i 3/4 de l'alcada); sense, la de l'esquerra i la de la dreta
+            (1/4 i 3/4 de l'amplada). Abans, en horitzontal, tots dos queien a
+            `left-1/2` i es trepitjaven al centre: la botonera ensenyava una sola
+            fletxa. */}
         <ChevronLeft
-          className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-1/4' : 'top-1/2'}`}
+          className={`pointer-events-none absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'left-1/2 top-1/4' : 'left-1/4 top-1/2'}`}
           strokeWidth={1.75}
           aria-hidden="true"
         />
         <ChevronRight
-          className={`pointer-events-none absolute left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'top-3/4' : 'top-1/2'}`}
+          className={`pointer-events-none absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-foreground/80 ${vertical ? 'left-1/2 top-3/4' : 'left-3/4 top-1/2'}`}
           strokeWidth={1.75}
           aria-hidden="true"
         />
