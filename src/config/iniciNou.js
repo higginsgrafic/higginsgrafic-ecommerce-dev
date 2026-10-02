@@ -106,12 +106,21 @@ export const HERO_ALCADA_VERTICAL = 430;
 export const ESPAI_ICONES_PX = 280;
 
 /**
- * L'AIRE DE LA HERO, EN PX (04/10/2026): el mateix a dalt i a baix, a tot
- * arreu. Abans hi havia un aire diferent per a cada banda de formats (25 px als
- * portatils, 50 a l'escriptori, els desens del megaslide a la resta); amb la
- * base simple n'hi ha un de sol.
+ * LA MIDA DE LA HERO, COM A FRACCIO DE L'ESPAI (04/10/2026).
+ *
+ * En Marc: «Encaixa la hero a zero a dalt i a baix i l'anem reduint fins que
+ * sigui la mida bona. Aixi partim de la mateixa proporcio a cada vista».
+ *
+ * L'ESPai es el tros de sota la banda de les icones (que es on acaba el
+ * megaslide quan s'obre) fins al fons del viewport. Amb el factor a 1 la hero hi
+ * va ENCAIXADA: toca la banda per dalt i el fons per baix, i no hi ha aire. A
+ * partir d'aqui es redueix fins que quedi be, i com que el factor es el mateix a
+ * totes les vistes, la hero ocupa SEMPRE la mateixa fraccio de pantalla.
+ *
+ * El que sobra es reparteix a parts iguals entre dalt i baix (la hero va
+ * centrada), o sigui que l'aire es `(1 - factor) / 2` de l'espai a cada banda.
  */
-export const AIRE_HERO_PX = 40;
+export const FACTOR_HERO_ESPAI = 1;
 
 /**
  * L'AIRE DE LA HERO, com a fraccio de l'AMPLE DEL CARRIL (el total, els dos
