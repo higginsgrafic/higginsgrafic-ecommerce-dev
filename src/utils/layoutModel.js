@@ -5,6 +5,7 @@ import {
   MIDA_TAULETA_APAISADA_MIN,
   MIDA_TAULETA_APAISADA_MAX,
   ALCADA_TAULETA_APAISADA_MAX,
+  esTauletaApaisada,
 } from './layoutMetrics';
 
 /**
@@ -76,11 +77,17 @@ const ALCADA_CAPCALERA_TAULETA_VERTICAL = 134;
  *   1. mobil             =  ample < 600  ||  (ample < 768 && alcada < ample)
  *   2. tauleta vertical  =  alcada > ample  &&  ample <= 1032
  *   3. tauleta apaissada =  alcada < ample  &&  ample <= 1376  &&  alcada <= 1100
+ *                           &&  (ample <= 1200  ||  alcada >= 900)
  *   4. escriptori        =  la resta
  *
  * L'alcada de 1100 nomes actua a la banda 1025-1376: es el que separa una
  * tauleta apaissada d'un monitor. I una finestra exactament quadrada (que no
  * es dona) cau a escriptori.
+ *
+ * I A LA BANDA DE 1201 A 1376, L'ALÇADA DE 900 (04/10/2026). En Marc: «L'de 1280
+ * no ha de ser el de la tablet sino el del desktop»: alla hi conviuen els iPads
+ * grans (1366x946 i 1376x954) amb els portatils (1280x666, 1280x720, 1366x634),
+ * i el que els separa es l'alcada. Per sota de 1200 no canvia res.
  *
  * ELS DOS LÍMITS SON ELS DE LA TAULETA MES GRAN DE LA LLISTA (02/10/2026). En
  * Marc: «Em pregunto si no es podrien veure els formats tablet que tenim
@@ -95,13 +102,10 @@ export function deviceLayoutFromViewport(vw, vh) {
   const isMobile = ample > 0
     && (ample < MIDA_MOVIL || (ample < MIDA_TAULETA_APAISADA_MIN && alt < ample));
   const isPortraitTablet = !isMobile && ample > 0 && ample <= MIDA_TAULETA_VERTICAL_MAX && alt > ample;
-  const isLandscapeTablet =
-    !isMobile &&
-    !isPortraitTablet &&
-    ample <= MIDA_TAULETA_APAISADA_MAX &&
-    alt > 0 &&
-    alt < ample &&
-    alt <= ALCADA_TAULETA_APAISADA_MAX;
+  // LA MATEIXA REGLA QUE `layoutMetrics` (esTauletaApaisada), i no una copia: si
+  // les dues divergeixen, la mateixa finestra te dues classes i es veu com un
+  // salt (ho diu el comentari de `layoutMetrics.js`).
+  const isLandscapeTablet = !isMobile && !isPortraitTablet && esTauletaApaisada({ ample, alt });
   const isDesktop = !isMobile && !isPortraitTablet && !isLandscapeTablet;
 
   return {

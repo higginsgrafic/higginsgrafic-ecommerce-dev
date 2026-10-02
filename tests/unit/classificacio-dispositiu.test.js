@@ -74,8 +74,13 @@ const FORMATS = [
   ['iPad Air 13 apaïsada', 1366, 946, 'tauleta apaissada'],
   ['iPad Pro 13 apaïsada', 1376, 954, 'tauleta apaissada'],
   // Portàtils i escriptori
-  ['Portàtil 1280', 1280, 666, 'tauleta apaissada'],
-  ['Portàtil 1366', 1366, 634, 'tauleta apaissada'],
+  //
+  // EL 1280 I EL 1366 DE PORTATIL SON ESCRIPTORI (04/10/2026). En Marc: «M'he
+  // equivocat en un megaslide... El de 1280 no ha de ser el de la tablet sino el
+  // del desktop». A la banda de 1201 a 1376 hi conviuen els iPads grans (1366x946
+  // i 1376x954) amb els portatils, i el que els separa es l'alcada (900).
+  ['Portàtil 1280', 1280, 666, 'escriptori'],
+  ['Portàtil 1366', 1366, 634, 'escriptori'],
   ['Portàtil 1440', 1440, 766, 'escriptori'],
   ['Portàtil 1512', 1512, 848, 'escriptori'],
   ['Portàtil 1536', 1536, 890, 'escriptori'],
@@ -120,10 +125,20 @@ describe('la classificació de dispositiu', () => {
     // vertical es 1032 des del 02/10 (PLA §1.2).
     expect(classeDe(1032, 1300)).toBe('tauleta vertical');
     expect(classeDe(1033, 1300)).toBe('escriptori');
-    // (04/10/2026) El maxim de tauleta apaissada es 1376 des del 02/10, no 1366.
-    expect(classeDe(1366, 800)).toBe('tauleta apaissada');
-    expect(classeDe(1376, 800)).toBe('tauleta apaissada');
-    expect(classeDe(1377, 800)).toBe('escriptori');
+    // (04/10/2026) El maxim de tauleta apaissada es 1376 des del 02/10, no 1366,
+    // I A LA BANDA DE 1201 A 1376 CAL L'ALÇADA D'UN IPAD (900): «L'de 1280 no ha
+    // de ser el de la tablet sino el del desktop». Amb les alcades de debò:
+    expect(classeDe(1366, 946)).toBe('tauleta apaissada');
+    expect(classeDe(1376, 954)).toBe('tauleta apaissada');
+    expect(classeDe(1377, 954)).toBe('escriptori');
+    // I els portatils d'aquella banda, escriptori, tambe amb la seva alcada.
+    expect(classeDe(1280, 666)).toBe('escriptori');
+    expect(classeDe(1280, 586)).toBe('escriptori');
+    expect(classeDe(1280, 720)).toBe('escriptori');
+    expect(classeDe(1366, 634)).toBe('escriptori');
+    // Els models, per sota de 1200, no es toquen.
+    expect(classeDe(1180, 742)).toBe('tauleta apaissada');
+    expect(classeDe(1200, 742)).toBe('tauleta apaissada');
     // L'alcada de 1100 separa tauleta apaissada de monitor.
     expect(classeDe(1200, 1100)).toBe('tauleta apaissada');
     expect(classeDe(1200, 1101)).toBe('escriptori');

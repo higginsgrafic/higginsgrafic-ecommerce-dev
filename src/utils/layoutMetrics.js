@@ -215,6 +215,22 @@ export const MIDA_TAULETA_VERTICAL_MAX = 1032;
 export const MIDA_TAULETA_APAISADA_MIN = 768;
 export const MIDA_TAULETA_APAISADA_MAX = 1376;
 export const ALCADA_TAULETA_APAISADA_MAX = 1100;
+/**
+ * ON S'ACABA LA TAULETA APAISSADA PETITA I COMENÇA LA BANDA DE LES GRANS
+ * (04/10/2026), i l'alçada que hi ha de tenir una tauleta.
+ *
+ * En Marc: «M'he equivocat en un megaslide... El de 1280 no ha de ser el de la
+ * tablet sino el del desktop». La banda de 1201 a 1376 te D UES coses que la
+ * regla d'amplada sola no pot separar: els iPads grans (1366x946 i 1376x954,
+ * que son tauleta) i els portatils (1280x666, 1280x720 i 1366x634, que no). El
+ * que els separa es l'ALÇADA: cap iPad gran baixa de 946 i cap portatil arriba
+ * a 800.
+ *
+ * Per sota de 1200 no canvia res: alla hi ha els models del megaslide (1024x768,
+ * 1180x742, 1200x742...), que continuen sent tauleta amb la regla de sempre.
+ */
+export const MIDA_TAULETA_APAISADA_GRAN_MIN = 1200;
+export const ALCADA_TAULETA_APAISADA_GRAN_MIN = 900;
 
 /**
  * Tauleta apaïsada i tauleta vertical: NOMES amb mides, mai amb el touch.
@@ -228,10 +244,15 @@ export const ALCADA_TAULETA_APAISADA_MAX = 1100;
 export function esTauletaApaisada({ ample, alt } = {}) {
   const w = ample ?? (typeof window !== 'undefined' ? window.innerWidth : 0);
   const h = alt ?? (typeof window !== 'undefined' ? window.innerHeight : 0);
+  // A LA BANDA DE LES GRANS, A MES, L'ALÇADA: si no, el 1280x666 d'un portatil
+  // passaria per tauleta.
+  const aLaBandaDeLesGrans = w > MIDA_TAULETA_APAISADA_GRAN_MIN
+    && h < ALCADA_TAULETA_APAISADA_GRAN_MIN;
   return w >= MIDA_TAULETA_APAISADA_MIN
     && w <= MIDA_TAULETA_APAISADA_MAX
     && h < w && h > 0
-    && h <= ALCADA_TAULETA_APAISADA_MAX;
+    && h <= ALCADA_TAULETA_APAISADA_MAX
+    && !aLaBandaDeLesGrans;
 }
 
 /** Tauleta vertical: la regla de `useDeviceLayout`, tambe sense touch. */
