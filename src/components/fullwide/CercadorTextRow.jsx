@@ -407,11 +407,6 @@ function carruselAmbFletxes({ isPortraitTablet = false, isLandscapeTablet = fals
   return esEscriptori || (!isPortraitTablet && !isLandscapeTablet);
 }
 
-// El `mt-2` (0,5rem = 8px) que `FirstContactDibuix09Buttons` porta a la seva
-// variant horitzontal: desplaça les fletxes visibles 8 px per sota del bloc que
-// les penja, i el centratge les ha de descomptar.
-const MARGIN_FLETXES_HORITZONTALS_PX = 8;
-
 export function CercadorDibuixosGraella({
   // EL REF DE LA CAIXA QUE ES MOU (EL RETALL DEL CARRUSEL). Qui el posa el pot
   // passar per mesurar-la de fora (la filera de la pagina 2 ho fa); si no
@@ -581,39 +576,21 @@ export function CercadorDibuixosGraella({
     // perque tambe refresquen el valor quan canvia la finestra (les variables
     // del carril no provoquen cap re-render).
     const calcula = () => {
-      // A LA FILA UNICA LES FLETXES SON HORITZONTALS I ES CENTREN AMB ELS
-      // DIBUIXOS (05/10/2026). En Marc: «Centra la fletxa dreta a la samarreta
-      // 14 i la fletxa esquerra a la samarreta 13» i, com a alternativa, «mira de
-      // centrar les fletxes als dibuixos»: les fletxes es centren amb la GRAELLA
-      // DE DIBUIXOS (la fila de samarretes), no amb el bloc graella+tira de
-      // colors. El centre dels dibuixos es el del retall, i el marge es la
-      // mitja diferencia entre l'alcada de les fletxes i la del carrusel.
-      if (filaUnica) {
-        const carruselEl = refCarrusel.current;
-        const escala = readRootCssNumber('--hg-escala-mega', 1);
-        const hFletxes = (midaSelector / 2) * escala;
-        let d = hFletxes / 2;
-        if (carruselEl) {
-          const topCarrusel = carruselEl.getBoundingClientRect().top;
-          const bottomCarrusel = carruselEl.getBoundingClientRect().bottom;
-          const centreDibuixos = (topCarrusel + bottomCarrusel) / 2;
-          d = centreDibuixos + hFletxes / 2 - bottomCarrusel;
-          // El `mt-2` de la botonera horitzontal (8 px, vegeu
-          // `FirstContactDibuix09Buttons`) baixa les fletxes visibles 8 px per
-          // sota del seu embolcall: es descompta perque els chevrons quedin
-          // centrats amb els dibuixos, no amb el bloc que els penja.
-          d -= MARGIN_FLETXES_HORITZONTALS_PX;
-        }
-        setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - d) < 0.01 ? previ : d));
-        return;
-      }
-      const d = margeBaixFletxesGraella({
-        dibuix: dibuixPx / 1.5,
-        gapV,
-        carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
-        midaSelector,
-        escala: readRootCssNumber('--hg-escala-mega', 1),
-      });
+      // A LA FILA UNICA LES FLETXES TORNEN A ANAR APILADES I OCUPEN NOMES
+      // L'ALCADA DEL SELECTOR (05/10/2026). En Marc: «Apila les fletxes» i «Per
+      // la columna de les fletxes nomes tens l'espai vertical que ocupa el
+      // selector»: als portatils de 1200-1366 les fletxes fan DUES files (l'alcada
+      // del selector, que es 2 x la del carrusel, escalada) i el seu baix cau on
+      // cau el del selector. A la resta, la formula declarada de sempre.
+      const d = filaUnica
+        ? 2 * alcadaCarrusel * readRootCssNumber('--hg-escala-mega', 1) - alcadaCarrusel
+        : margeBaixFletxesGraella({
+          dibuix: dibuixPx / 1.5,
+          gapV,
+          carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
+          midaSelector,
+          escala: readRootCssNumber('--hg-escala-mega', 1),
+        });
       setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - d) < 0.01 ? previ : d));
     };
     const frame = requestAnimationFrame(calcula);
@@ -1050,10 +1027,14 @@ export function CercadorDibuixosGraella({
             // dalt i l'altra a baix) i el bloc de la mida del selector, amb el
             // bottom quadrat amb el seu.
             width: carrilPx(midaSelector / 2),
-            // A LA FILA UNICA LES FLETXES SON HORITZONTALS (05/10/2026) i fan un
-            // quadrat de mitja mida del selector; a la resta, el rectangle de
-            // sempre (dues fletxes apilades de l'alcada del selector).
-            height: carrilPx(filaUnica ? midaSelector / 2 : midaSelector),
+            // LES FLETXES, APILADES A TOT ARREU (05/10/2026): el rectangle de
+            // sempre, mitja amplada i l'alcada del selector, amb una fletxa a
+            // dalt i l'altra a baix. A la fila unica l'alcada es la del selector
+            // (dues files, 2 x la del carrusel, escalada), no la del selector
+            // quadrat de sempre.
+            height: filaUnica
+              ? `calc(${2 * alcadaCarrusel}px * var(--hg-escala-mega, 1))`
+              : carrilPx(midaSelector),
             zIndex: 5,
             // SENSE FONS (28/09/2026): en Marc va demanar la caixa el mateix
             // dia («un bloc com el de la columna del selector de la p1, a la p2,
@@ -1062,7 +1043,10 @@ export function CercadorDibuixosGraella({
             // fletxes de la pagina 1.
           }}>
             <FirstContactDibuix09Buttons
-              vertical={!filaUnica}
+              vertical
+              // A LA FILA UNICA LES FLETXES FAN L'ALCADA DEL SELECTOR (dues files,
+              // 2 x la del carrusel, escalada), no el rectangle de sempre.
+              alcadaPx={filaUnica ? `calc(${2 * alcadaCarrusel}px * var(--hg-escala-mega, 1))` : null}
               // LA DIRECCIO DE LES FLETXES DE LA GRAELLA, INVERTIDA (28/09/2026).
               //
               // En Marc: «Inverteix la direcció del moviment de les fletxes a la

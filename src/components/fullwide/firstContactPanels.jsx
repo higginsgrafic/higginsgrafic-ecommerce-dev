@@ -359,6 +359,10 @@ export function FirstContactDibuix09Buttons({
   // Els chevrons segueixen apuntant a esquerra i dreta: el carrusel es mou en
   // horitzontal, el que canvia es on son els botons.
   vertical = false,
+  // L'ALCADA DECLARADA, SI HI ES (05/10/2026): quan arriba, mana sobre
+  // l'`aspect-[1/2]` de la variant vertical. La fa servir la p2 als portatils,
+  // on el selector fa DUES files i no el rectangle de sempre.
+  alcadaPx = null,
   onPrevPointerDown,
   onPrevPointerUp,
   onNextPointerDown,
@@ -384,7 +388,10 @@ export function FirstContactDibuix09Buttons({
     // del bloc, que es el mateix que dir a 21,6 px del centre. Per aixo el
     // dibuix de la fletxa viu a l'embolcall (el bloc) i no dins del boto: dins
     // del boto, el 1/3 i el 2/3 serien els de la meitat, i quedaven a 86 px.
-    <div className={`relative w-full ${vertical ? 'aspect-[1/2]' : 'mt-2 aspect-square'}`}>
+    <div
+      className={`relative w-full ${vertical ? 'aspect-[1/2]' : 'mt-2 aspect-square'}`}
+      style={alcadaPx != null ? { height: alcadaPx } : undefined}
+    >
       {/* SENSE FONS (26/09/2026, ho va demanar l'amo): el bloc portava un
           `bg-muted` (rgb(249,250,251) a 1920) que ara desapareix. L'ancora
           `#stripe-guide-right-anchor` es queda (els guions la fan servir) pero
