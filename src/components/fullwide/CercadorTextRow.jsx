@@ -576,19 +576,35 @@ export function CercadorDibuixosGraella({
     // perque tambe refresquen el valor quan canvia la finestra (les variables
     // del carril no provoquen cap re-render).
     const calcula = () => {
-      // A LA FILA UNICA EL BLOC DE FLETXES ES EL QUADRAT DEL SELECTOR (05/10/2026):
-      // el seu baix cau on cau el del selector (el carrusel fa una fila i el
-      // selector hi arrenca al mateix top), o sigui que el marge es l'alcada del
-      // selector menys la del carrusel. A la resta, la formula declarada de sempre.
-      const d = filaUnica
-        ? midaSelector * readRootCssNumber('--hg-escala-mega', 1) - alcadaCarrusel
-        : margeBaixFletxesGraella({
-          dibuix: dibuixPx / 1.5,
-          gapV,
-          carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
-          midaSelector,
-          escala: readRootCssNumber('--hg-escala-mega', 1),
-        });
+      // A LA FILA UNICA LES FLETXES SON HORITZONTALS I ES CENTREN AMB EL BLOC
+      // GRAELLA + TIRA DE COLORS (05/10/2026). En Marc: «Posa les fletxes
+      // horitzontals centrades a la graella+tira de colors. Considera'ls com si
+      // fossin un sol bloc per a centrar les fletxes»: el centre del bloc es el
+      // punt mig entre el top del carrusel (la graella) i el bottom de la tira de
+      // colors de sota. A la resta, la formula declarada de sempre.
+      if (filaUnica) {
+        const carruselEl = refCarrusel.current;
+        const filera = carruselEl?.closest('[data-p2-cercador-row]');
+        const colorsEl = filera?.querySelector('[data-p2-color-grid]');
+        const escala = readRootCssNumber('--hg-escala-mega', 1);
+        const hFletxes = (midaSelector / 2) * escala;
+        let d = hFletxes / 2;
+        if (carruselEl && colorsEl) {
+          const topCarrusel = carruselEl.getBoundingClientRect().top;
+          const bottomColors = colorsEl.getBoundingClientRect().bottom;
+          const centreBloc = (topCarrusel + bottomColors) / 2;
+          d = centreBloc + hFletxes / 2 - carruselEl.getBoundingClientRect().bottom;
+        }
+        setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - d) < 0.01 ? previ : d));
+        return;
+      }
+      const d = margeBaixFletxesGraella({
+        dibuix: dibuixPx / 1.5,
+        gapV,
+        carril: readRootCssNumber('--hg-mega-w', MEGASLIDE_REFERENCIA_PX),
+        midaSelector,
+        escala: readRootCssNumber('--hg-escala-mega', 1),
+      });
       setMargeBaixFletxes((previ) => (previ !== null && Math.abs(previ - d) < 0.01 ? previ : d));
     };
     const frame = requestAnimationFrame(calcula);
@@ -1024,8 +1040,11 @@ export function CercadorDibuixosGraella({
             // (24/09/2026, ho va demanar l'amo). Dues meitats (una fletxa a
             // dalt i l'altra a baix) i el bloc de la mida del selector, amb el
             // bottom quadrat amb el seu.
-            width: carrilPx(filaUnica ? midaSelector : midaSelector / 2),
-            height: carrilPx(midaSelector),
+            width: carrilPx(midaSelector / 2),
+            // A LA FILA UNICA LES FLETXES SON HORITZONTALS (05/10/2026) i fan un
+            // quadrat de mitja mida del selector; a la resta, el rectangle de
+            // sempre (dues fletxes apilades de l'alcada del selector).
+            height: carrilPx(filaUnica ? midaSelector / 2 : midaSelector),
             zIndex: 5,
             // SENSE FONS (28/09/2026): en Marc va demanar la caixa el mateix
             // dia («un bloc com el de la columna del selector de la p1, a la p2,
@@ -1034,7 +1053,7 @@ export function CercadorDibuixosGraella({
             // fletxes de la pagina 1.
           }}>
             <FirstContactDibuix09Buttons
-              vertical
+              vertical={!filaUnica}
               // LA DIRECCIO DE LES FLETXES DE LA GRAELLA, INVERTIDA (28/09/2026).
               //
               // En Marc: «Inverteix la direcció del moviment de les fletxes a la
