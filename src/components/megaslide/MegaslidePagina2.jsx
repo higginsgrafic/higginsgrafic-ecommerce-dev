@@ -6,8 +6,8 @@ import {
   centratgeSelectorY,
   desplacTopSelector,
   visualOffsetYFranjaPagina2,
-  _desplacamentCentratgeFranja,
-  _casaIniciGrupActiu,
+
+
   buscaGrupActiuFranja,
   desplacamentGrupActiuFranja,
   AIRE_FRANJA_COLLECCIONS_PX,

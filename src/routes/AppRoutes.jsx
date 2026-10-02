@@ -37,7 +37,6 @@ import {
   FullWideSlidePage,
   MegaslideIconsTestPage,
   ConstructorColleccioPage,
-  _PdpRoute,
   PdpPage,
   ConstructorPdpPreview,
   HtmlBasePage,

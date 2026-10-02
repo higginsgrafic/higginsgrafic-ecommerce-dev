@@ -32,7 +32,6 @@ import {
   TDP_SEPARACIO_FONS_PX,
   TDP_FONS_BLEED_PX,
   TDP_POSTER_SEPARACIO_PX,
-  _TDP_POSTER_PADDING_TOP_PX,
   TDP_PEUSEPARACIO_PX,
 } from '@/config/collectionVertical';
 import { readOverlayState, writeOverlayState } from '@/utils/collectionOverlayState';

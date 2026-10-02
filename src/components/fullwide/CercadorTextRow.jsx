@@ -3,7 +3,7 @@ import { CERCADOR_COLLECTIONS, CERCADOR_COLORS, etiquetaColleccio } from './Cerc
 // La geometria de la graella viu a midesGraella.js perquè també la fa servir
 // el mòdul de mesura única. Aquí només es consumeix.
 import {
-  GRAELLA_COLUMNES, _GRAELLA_ESQUERRA_LANDSCAPE,
+  GRAELLA_COLUMNES,
   midaDibuix, gapHorizontal, gapVertical, colorGap,
   midesGraellaCompacta,
   MARGE_ESQUERRA_DIBUIXOS_ESCRIPTORI_PX,

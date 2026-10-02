@@ -5,9 +5,7 @@ import {
   ChevronDown,
   Trash2,
   Plus,
-  _Eye,
   EyeOff,
-  _GripVertical,
   X,
   Check,
   Edit3

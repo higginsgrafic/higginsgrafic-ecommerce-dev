@@ -10,10 +10,7 @@ import { caminsSiluetes, precarregaSiluetesSamarreta, textSiluetesSamarreta } fr
 import useEscalaFranjaCarril from '../../hooks/useEscalaFranjaCarril.js';
 import useArrossegamentPas from '../../hooks/useArrossegamentPas.js';
 import {
-  _DIBUIXOS_FRANJA_DX,
-  _DIBUIXOS_FRANJA_DY,
-  _DIBUIXOS_FRANJA_AMPLADA_NATURAL,
-  _escalaDibuixFranja,
+
   alcadaReservaGraellaPanellCss,
   esBandaEstretaFranja,
   AJUST_BAIX_BLOC_FRANJA_PX,
@@ -25,15 +22,9 @@ import {
   areesClicEstreta,
   VECTOR_FRANJA_SAMARRETES,
   VECTOR_FRANJA_SAMARRETES_01,
-  _VECTOR_FRANJA_CAIXES,
   VECTOR_FRANJA_VIEWBOX,
   VECTOR_FRANJA_VIEWBOX_OBERT,
   VECTOR_FRANJA_CONTINGUT,
-  _VECTOR_FRANJA_SAMARRETA,
-  _VECTOR_FRANJA_SAMARRETA_01,
-  _VECTOR_FRANJA_IMPRESSIO_01,
-  _VECTOR_FRANJA_MIDA_SENCERA,
-  _VECTOR_FRANJA_MIDA_IMPRESSIO,
   VEL_SAMARETA_CAIXA,
   VEL_SILUETA_CAIXES,
 } from '../../config/vectorFranja.js';

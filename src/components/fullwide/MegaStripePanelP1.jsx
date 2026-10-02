@@ -32,10 +32,7 @@ import {
   pagina1AlcadaFileraPx,
   pagina1BlocDretaPx,
   pagina1ColumnaDretaPx,
-  _DIBUIXOS_FRANJA_DX,
-  _DIBUIXOS_FRANJA_DY,
-  _DIBUIXOS_FRANJA_AMPLADA_NATURAL,
-  _escalaDibuixFranja,
+
   esBandaEstretaFranja,
   pageLiftPagina1,
   OMBRA_MANIGA_ALFA,
