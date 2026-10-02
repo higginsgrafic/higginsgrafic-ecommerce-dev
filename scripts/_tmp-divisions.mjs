@@ -169,3 +169,39 @@ for (const N of [16, 20, 24, 32]) {
     console.log(`  ${f.nom.padEnd(28)} ${String(k).padStart(2)}/${String(N).padStart(2)}  ${String(r1(linia - f.P)).padStart(6)}   ${String(r1(topA)).padStart(7)}/${String(r1(alcadaA)).padStart(7)}   ${String(r1(topB)).padStart(7)}/${String(r1(alcadaB)).padStart(7)}   ${String(m).padStart(2)}`);
   }
 }
+
+// --- RESUM 4: quantes divisions QUEDEN del megaslide fins a baix -------------
+console.log('\nQUANTES DIVISIONS QUEDEN DEL MEGASLIDE FINS AL BOTTOM DEL VIEWPORT');
+for (const tol of [2, 4]) {
+  console.log(`\n  tolerancia ${tol} px:`);
+  console.log('  vista                        N    divisio   queden   mida divisio   error');
+  for (const f of horitzontals) {
+    const e = encaix(f, tol);
+    if (!e) { console.log(`  ${f.nom.padEnd(28)} —`); continue; }
+    console.log(`  ${f.nom.padEnd(28)} ${String(e.N).padStart(2)}   ${String(e.k).padStart(2)}/${String(e.N).padStart(2)}   ${String(e.r).padStart(6)}   ${String(r1(f.S / e.N)).padStart(12)}   ${String(r1(e.error)).padStart(6)}`);
+  }
+}
+
+// --- RESUM 5: que quedin SEMPRE les mateixes divisions ---------------------
+//
+// Si el que queda son sempre les mateixes divisions, els 8/10 de la regla son
+// divisions senceres i l'aire tambe (amb 10: hero 8, aire 1 a cada banda).
+console.log('\nSI EL QUE QUEDA SON SEMPRE LES MATEIXES DIVISIONS (k triat per encaixar-hi el final del megaslide)');
+for (const r of [10, 20, 30, 40]) {
+  console.log(`\n  queden ${r} divisions (hero = ${Math.round(0.8 * r)}, aire = ${(r - Math.round(0.8 * r)) / 2} a cada banda):`);
+  console.log('  vista                     k/N      linia   error   mida divisio   hero top/alcada');
+  for (const f of horitzontals) {
+    let millor = null;
+    for (let k = 1; k <= 60; k += 1) {
+      const N = k + r;
+      const linia = (k / N) * f.S;
+      const err = Math.abs(linia - f.P);
+      if (millor == null || err < millor.err) millor = { k, N, linia, err, error: linia - f.P };
+    }
+    const m = Math.round(0.8 * r);
+    const air = (r - m) / 2;
+    const top = f.capcalera + (millor.k + air) * (f.S / millor.N);
+    const alcada = m * (f.S / millor.N);
+    console.log(`  ${f.nom.padEnd(26)} ${String(millor.k).padStart(2)}/${String(millor.N).padStart(2)}  ${String(r1(millor.linia)).padStart(7)}  ${String(r1(millor.error)).padStart(6)}   ${String(r1(f.S / millor.N)).padStart(12)}   ${String(r1(top)).padStart(7)}/${String(r1(alcada)).padStart(7)}   (avui ${f.heroTop}/${f.heroAlcada})`);
+  }
+}

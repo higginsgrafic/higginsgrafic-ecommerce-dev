@@ -358,7 +358,18 @@ function MarcInici({ seccions }) {
       // seva vora de veritat. Les 11 files nomes coincideixen amb el separador
       // quan la seva alcada escala amb la finestra; a 1024 i 1366 el panell
       // acaba una mica mes avall, i el bloc l'ha de cobrir.
-      const blocMega = taula ? taula.blocMega : Math.max(megaFiles * fila, liniaTaula - capcalera);
+      // I EL MEGASLIDE NO POT TAPAR LA HERO (04/10/2026). La taula surt de
+      // l'ESTIMACIO de la seva alcada: mentre la vora de debò no arribi a la
+      // hero, la taula mana i el desajust se'l menja l'aire de dalt (dues
+      // divisions). Pero si el megaslide acaba prou mes avall per tapar-la (una
+      // pagina mes alta, l'acordio desplegat, el formulari estirat), el bloc
+      // creix fins a la seva vora i la hero baixa amb ell. Sense aixo la hero
+      // desapareix sota el panell.
+      cala.style.width = 'var(--inici-hero-aire, 0px)';
+      const aireHeroi = parseFloat(getComputedStyle(cala).width) || 0;
+      const blocMega = taula
+        ? Math.max(taula.blocMega, linia - capcalera - aireHeroi)
+        : Math.max(megaFiles * fila, linia - capcalera);
       // LA PAGINA DE SOTA es la resta. El CADENAT, pero, penja 56 px dins seu i
       // per tant no es pot fer servir per centrar-hi la hero: el seu bloc es el
       // que queda DESPRES del cadenat.
