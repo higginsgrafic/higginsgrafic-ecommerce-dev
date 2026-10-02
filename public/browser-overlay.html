@@ -1347,6 +1347,13 @@ const posaPagina = (n) => {
         'HG_MEGA_PAGE',
         JSON.stringify({ value: n, expiresAt: Date.now() + 10 * 60 * 1000 })
       );
+      // EL CADENAT, TANCAT (05/10/2026). En Marc: «Fes que quan clico el boto
+      // P1/P2 del visor iframe, s'activi el cadenat de totes les vistes»: en
+      // posar la pagina, el megaslide es bloqueja a totes les finestres.
+      m.iframe.contentWindow.sessionStorage.setItem(
+        'HG_MEGA_LOCKED',
+        JSON.stringify({ value: true, expiresAt: Date.now() + 10 * 60 * 1000 })
+      );
     } catch { /* ignore */ }
     m.el.classList.remove('carregat');
     m.carregat = false;

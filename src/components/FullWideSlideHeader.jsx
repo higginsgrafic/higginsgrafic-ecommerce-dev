@@ -410,7 +410,11 @@ function FullWideSlideHeader({
   }, []);
 
   const [showRegisterOverlay, setShowRegisterOverlay] = useState(false);
-  const [megaLocked, setMegaLocked] = useState(false);
+  // EL CADENAT (BLOQUEIG DEL MEGASLIDE), PERSISTIT (05/10/2026). En Marc: «Fes
+  // que quan clico el boto P1/P2 del visor iframe, s'activi el cadenat de totes
+  // les vistes»: el visor escriu `HG_MEGA_LOCKED` a cada finestra (com fa amb
+  // `HG_MEGA_PAGE`) i, en recarregar, el cadenat surt ja tancat a totes.
+  const [megaLocked, setMegaLocked] = usePersistentState('HG_MEGA_LOCKED', false);
   const [lockBtnTop, setLockBtnTop] = useState(null);
   // EL PANELL JA APAREIX (01/10/2026).
   //
