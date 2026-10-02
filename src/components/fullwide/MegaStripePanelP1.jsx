@@ -927,7 +927,12 @@ function MegaStripePanelP1({
                 <div style={{
                   position: 'relative',
                   flex: '0 0 auto',
+                  // L'ALCADA, DECLARADA (05/10/2026). En Marc: «en els espais que
+                  // has deixat per posar-hi les fletxes no hi ha fletxes»: la
+                  // peça va amb `omple` (`h-full w-full`), i sense alcada al
+                  // pare la caixa feia 97x0 i els dos botons tambe (mesurat).
                   width: `${blocDretaPx}px`,
+                  height: `${blocDretaPx}px`,
                   marginRight: `${gapDretaPx}px`,
                 }}>
                   <FletxesQuadratPagina1
