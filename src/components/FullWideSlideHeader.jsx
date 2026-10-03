@@ -3705,7 +3705,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
             />
           </Link>
 
-          <nav ref={navRef} className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap ${esTauleta ? 'overflow-hidden' : ''} ${esDobleHeader ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: navGapPx != null ? `${navGapPx}px` : (isLandscapeTablet ? '1rem' : '0.25rem'), minWidth: 0, justifyContent: 'flex-start', marginLeft: isPortraitTablet ? '-60px' : undefined } : {
+          <nav ref={navRef} className={`hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-4 flex-nowrap ${esTauleta ? 'overflow-hidden' : ''} ${esDobleHeader ? 'md:hidden' : ''}`} style={(isPortraitTablet || isLandscapeTablet) ? { gap: navGapPx != null ? `${navGapPx}px` : (isLandscapeTablet ? '1rem' : '0.25rem'), minWidth: 0, justifyContent: 'center', marginLeft: isPortraitTablet ? '-60px' : undefined } : {
               // SENSE DESPLAÇAMENT: EL NAV VA CENTRAT (04/10/2026). En Marc:
               // «Centra tot el contingut. Hi ha coses descentrades». Hi havia un
               // `translateX(-5%)` d'ajust optic que el movia 33 px a l'esquerra a
