@@ -5,7 +5,7 @@ import { CERCADOR_COLORS } from '@/data/collections';
 import useIsMobile from '@/hooks/useIsMobile';
 import { deviceLayoutFromViewport, esIPadPro13Estricte } from '@/utils/layoutModel';
 import { HERO_DIBUIX_MIDA, HERO_DIBUIX_MIDA_DEFECTE } from '@/config/iniciNou';
-import { MIDA_TAULETA_APAISADA_MAX, MIDA_TAULETA_VERTICAL_MAX } from '@/utils/layoutMetrics';
+import { MIDA_TAULETA_APAISADA_MAX } from '@/utils/layoutMetrics';
 
 /**
  * EL MARGE INVISIBLE DE LA IMATGE DE LA SAMARRETA (04/10/2026).
@@ -113,10 +113,6 @@ function HeroInici() {
   // amb `auto 100 %` de l'alcada de la franja, i si l'alcada no canvia, la
   // samarreta tampoc.
   const esHeroSeccioAmpla = esApaissada && ampleFinestra > 1200 && ampleFinestra <= MIDA_TAULETA_APAISADA_MAX;
-  // A LA VISTA 1024, EL TRACKING DELS NOMS A LA MEITAT (02/10/2026). En Marc: «A
-  // la vista 1024 redueix el traking de les colleccions de la hero a la meitat»:
-  // allo on els noms hi van justos, el `letterSpacing` passa de 0,18em a 0,09em.
-  const esHeroTrackingMig = ampleFinestra > 0 && ampleFinestra <= MIDA_TAULETA_VERTICAL_MAX;
   // LA MIDA DE LA HERO (04/10/2026). En Marc: «Ara, redueix la hero un 25 % a
   // totes excepte a l'iPad Pro 13 que l'augmentaràs un 50 %».
   //
@@ -335,8 +331,9 @@ function HeroInici() {
                     fontFamily: 'Oswald, sans-serif',
                     fontSize: isMobile ? '13px' : '18px',
                     fontWeight: 600,
-                    // A 1024, la meitat (vegeu `esHeroTrackingMig`).
-                    letterSpacing: esHeroTrackingMig ? '0.09em' : '0.18em',
+                    // EL TRACKING, A ZERO (05/10/2026). En Marc: «Redueix el
+                    // letter-spacing dels títols de col·lecció de la hero [a] 0».
+                    letterSpacing: 0,
                     textTransform: 'uppercase',
                     margin: 0,
                     opacity: 0.95,
