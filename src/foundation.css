@@ -61,11 +61,12 @@
      primer pintat, abans que la capçalera el publiqui. */
   --contingut-max: var(--carril, min(70.3125vw, 1350px));
 
-  /* EL CARRIL DE LA PAGINA NOVA: EL TRAM DEL LOGO A LA ICONA D'USUARI.
-     La capçalera el publica com a `--hg-band-w` (1270 a 1920, 953 a 1440, 933 a
-     1280 i 1024, i 688 a 768), i la pagina nova el llegeix en comptes de
-     derivar-lo. El valor de reserva nomes s'usa abans que la capçalera el
-     publiqui, i a 1920 dona 1.264,5, que es el tram mesurat.
+  /* EL CARRIL DE LA PAGINA NOVA: EL DEL MEGASLIDE.
+     El tram del logo a la icona d'usuari (`--hg-band-w`) es 5 px mes ample que
+     el carril del megaslide (`--hg-mega-w`); en Marc ho va corregir: «Han de
+     coincidir amb el carril del megaslide». Ara la pagina nova hi resta aquests
+     5 px, i la hero i les galeries queden clavades al carril de la p1/p2. El
+     valor de reserva nomes s'usa abans que la capçalera el publiqui.
 
      PER QUE ES UNA VARIABLE A PART I NO `--contingut-max`. `--contingut-max` es
      GLOBAL i la fan servir totes les pagines: canviar-la mou el carril de tot el
@@ -73,7 +74,7 @@
      sencera (alcada de 6932 a 6778, fitxes de 321x505 a 301x485). Posant-ho en
      una variable propia, la pagina nova mana el seu carril i no toca el dels
      altres. */
-  --inici-nou-carril: var(--hg-band-w, min(65.86vw, 1264.5px));
+  --inici-nou-carril: calc(var(--hg-band-w, min(65.86vw, 1264.5px)) - 5px);
 
   /* LA UNITAT, SOBRE EL CARRIL. `--u` es la unitat de disseny, i val el carril
      dividit per 1350: a 1920, 1 px.
@@ -87,6 +88,15 @@
      677x285 a 1024 i el titol es quedava igual. Amb la unitat lligada al
      carril, creix tot alhora. */
   --u: calc(var(--contingut-max) / 1350);
+}
+
+/* A LA VERTICAL EL TRAM DEL LOGO A LA ICONA D'USUARI NO ES EL DEL MEGASLIDE
+   (el panell vertical fa 992 px, mes ample que la finestra), o sigui que alla
+   la pagina nova es queda amb el seu carril sense la correccio de 5 px. */
+@media (orientation: portrait) {
+  :root {
+    --inici-nou-carril: var(--hg-band-w, min(65.86vw, 1264.5px));
+  }
 }
 
 /* OJO: ha de ser `:root`, no `html`. `:root` te mes especificitat que `html`
