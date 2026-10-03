@@ -35,6 +35,12 @@ import useUrlActiveCollection from '@/hooks/useUrlActiveCollection';
 import useMegaStripeDebugVars from '@/hooks/useMegaStripeDebugVars';
 import useMegaTileSelectorDrag from '@/hooks/useMegaTileSelectorDrag';
 import { MARGE_DALT_BLOC_FRANJA_PX } from './megaslide/geometriaMegaslide.js';
+// LA PAGINA D'INICI NOVA (05/10/2026). En Marc: «He clicat el logo del header
+// per anar a la pàgina d'inici [...] S'han fet totes les hero, petites»: el logo
+// anava a `/` (la pagina vella, amb la hero escalada al 70,5 %) i ara va a la
+// pagina nova, que es on es treballa. Haura de tornar a `/` el dia que la nova
+// substitueixi la vella.
+import { RUTA_INICI_NOU } from '@/config/iniciNou.js';
 
 
 // Plantilla independent de l'acordió del CISTELL — taula pròpia sobre la pauta
@@ -3651,7 +3657,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
         >
           <div className="relative flex items-center gap-2 lg:gap-2">
             {/* Logo a l'esquerra (desktop + tablet vertical) */}
-            <Link id="stripe-guide-header-logo-anchor" to="/" aria-label="Higgins GRÀFIC - Pàgina d'inici" onClick={() => { if (active) closeMegaExplicitly(); }} className="relative z-10 pointer-events-auto hidden min-[600px]:flex items-center gap-2 font-black tracking-tight text-foreground">
+            <Link id="stripe-guide-header-logo-anchor" to={RUTA_INICI_NOU} aria-label="Higgins GRÀFIC - Pàgina d'inici" onClick={() => { if (active) closeMegaExplicitly(); }} className="relative z-10 pointer-events-auto hidden min-[600px]:flex items-center gap-2 font-black tracking-tight text-foreground">
               <span
                 id="stripe-guide-header-logo-mark-anchor"
                 ref={logoMarkRef}
@@ -3677,7 +3683,7 @@ top: 'var(--globalHeaderTopOffset, 0px)', left: 'var(--rulerInset, 0px)', right:
 
           {/* Mòbil: logo centrat en X respecte al viewport */}
           <Link
-            to="/"
+            to={RUTA_INICI_NOU}
             aria-label="Higgins GRÀFIC - Pàgina d'inici"
             onClick={() => { if (active) closeMegaExplicitly(); }}
             className="min-[600px]:hidden absolute z-10 pointer-events-auto flex items-center gap-2 font-black tracking-tight text-foreground"
