@@ -327,8 +327,9 @@ function HeroInici() {
                   }}
                 />
               ) : null}
-              {/* EL NOM de la colleccio, a l'esquerra. */}
-              <div style={{ position: 'relative', zIndex: 2, paddingLeft: '24px', color: 'hsl(var(--grey-ink-2))' }}>
+              {/* EL NOM de la colleccio, a l'esquerra. SENSE PADDING (05/10/2026):
+                  el text ha d'arribar a la vora del carril, com la caixa. */}
+              <div style={{ position: 'relative', zIndex: 2, color: 'hsl(var(--grey-ink-2))' }}>
                 <p
                   style={{
                     fontFamily: 'Oswald, sans-serif',
